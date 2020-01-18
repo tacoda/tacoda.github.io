@@ -1,0 +1,93 @@
+body {
+  font-family: "Fira Sans", sans-serif;
+}
+
+p {
+  font-size: 1rem;
+}
+
+.code {
+  font-size: 1rem;
+}
+
+.avatar {
+  border-radius: 0.5rem;
+}
+
+.tag {
+  font-weight: bold;
+}
+
+.tag:not(body).is-python,
+.tag:not(body).is-react {
+  background-color: #3298dc;
+  color: #fff;
+}
+
+.tag:not(body).is-ruby,
+.tag:not(body).is-rails,
+.tag:not(body).is-laravel {
+  background-color: #f14668;
+  color: #fff;
+}
+
+.tag:not(body).is-phoenix {
+  background-color: #df5e36;
+  color: #fff;
+}
+
+.tag:not(body).is-rust {
+  background-color: #871a1a;
+  color: #fff;
+}
+
+.tag:not(body).is-aws,
+.tag:not(body).is-js {
+  background-color: #ffdd57;
+}
+
+.tag:not(body).is-heroku {
+  background-color: #a64eff;
+  color: #fff;
+}
+
+.tag:not(body).is-elixir {
+  background-color: #7300e7;
+  color: #fff;
+}
+
+.tag:not(body).is-php,
+.tag:not(body).is-wasm {
+  background-color: #5f56e8;
+  color: #fff;
+}
+
+.tag:not(body).is-vue {
+  background-color: #00d1b2;
+  color: #fff;
+}
+
+.cli {
+  margin: 1rem;
+  padding: 0.25rem;
+  color: #fff;
+  background-color: #262b36;
+  border-radius: 0.2rem;
+  font-size: 14px;
+}
+
+.command {
+  font-family: "Fira Mono", monospace;
+}
+
+.prompt {
+  padding: 0rem 0.5rem;
+}
+
+#gif {
+  padding: 1rem;
+}
+
+.card {
+  background-color: #fafafa;
+}
