@@ -30,7 +30,6 @@ url: "https://tacoda.dev" # the base hostname & protocol for your site, e.g. htt
 github_username:  tacoda
 
 # Build settings
-theme: minima
 plugins:
   - jekyll-feed
 
