@@ -4,12 +4,12 @@ layout: default
 
 # Contact Me
 
-<div class="flex">
-  <div class="flex-auto p-6">
-    <a href="mailto:tacoda@hey.com"><i class="fas fa-envelope"></i></a>
+<div class="flex flex-wrap">
+  <div class="p-6">
+    <a href="mailto:tacoda@hey.com"><i class="fas fa-envelope"></i>&nbsp; Email</a>
   </div>
-  <div class="flex-auto p-6">
-    <a href="https://github.com/tacoda"><i class="fab fa-github"></i></a>
+  <div class="p-6">
+    <a href="https://github.com/tacoda"><i class="fab fa-github"></i>&nbsp; GitHub</a>
   </div>
 </div>
 
