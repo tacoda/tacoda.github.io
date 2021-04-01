@@ -6,8 +6,6 @@ layout: default
 
 <a href="https://github.com/tacoda"><i class="fab fa-github">&nbsp; <i class="fas">{{ site.github_username }}</i></i></a>
 
-<a href="https://dsc.bio/tacoda"><i class="fab fa-discord">&nbsp; <i class="fas">{{ site.discord_username }}</i></i></a>
-
 I am a full-stack developer interested in artificial intelligence, information security, data privacy, web performance and scaling, and cloud computing.
 
 I have worked with several cloud products. Most notably, AWS, Azure, and Heroku.
