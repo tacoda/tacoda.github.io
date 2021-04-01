@@ -4,11 +4,16 @@ title:  "How and Why to Avoid Nil"
 date:   2020-04-01 12:00:00 -0400
 categories: ruby nil
 ---
-# Why do nils happen?
 
-# Solutions
+# How and Why to Avoid Nil
 
-## Invert the Object Relationship
+## Why do nils happen?
+
+## Solutions
+
+- Invert the Object Relationship
+
+### Invert the Object Relationship
 
 {% highlight ruby %}
 class Person
