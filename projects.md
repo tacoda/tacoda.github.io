@@ -4,6 +4,8 @@ title: Projects
 permalink: /projects/
 ---
 
+# Projects
+
 <ul>
   {% for project in site.pages %}
   {% if project.dir contains '_projects' %}
