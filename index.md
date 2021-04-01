@@ -2,9 +2,13 @@
 layout: default
 ---
 
+# Contact Me
+
 <a href="mailto:tacoda@hey.com"><i class="fas fa-envelope">&nbsp; tacoda@hey.com</i></a>
 
 <a href="https://github.com/tacoda"><i class="fab fa-github">&nbsp; <i class="fas">{{ site.github_username }}</i></i></a>
+
+# About Me
 
 I am a full-stack developer interested in artificial intelligence, information security, web performance and scaling, and cloud computing.
 
