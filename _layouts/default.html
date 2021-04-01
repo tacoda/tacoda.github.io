@@ -1,39 +1,46 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>{{ page.title }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/1.9.2/tailwind.min.css" integrity="sha512-l7qZAq1JcXdHei6h2z8h8sMe3NbMrmowhOl+QkP3UhifPpCW2MC4M0i26Y8wYpbz1xD9t61MLT9L1N773dzlOA==" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
-    <link rel="stylesheet" href="/css/main.css">
-  </head>
-  <body>
-    <header>
-      <div class="flex flex-row">
-        <img class="m-4 rounded-full" src="https://avatars0.githubusercontent.com/u/39019266?s=75&amp;v=4"/>
-        <a href="/">
-          <h1 class="text-6xl">{{ site.title }}</h1>
-        </a>
+
+<head>
+  <meta charset="utf-8">
+  <title>{{ page.title }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/1.9.2/tailwind.min.css"
+    integrity="sha512-l7qZAq1JcXdHei6h2z8h8sMe3NbMrmowhOl+QkP3UhifPpCW2MC4M0i26Y8wYpbz1xD9t61MLT9L1N773dzlOA=="
+    crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+    crossorigin="anonymous" />
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+  <header>
+    <div class="flex flex-row">
+      <img class="m-4 rounded-full" src="https://avatars0.githubusercontent.com/u/39019266?s=75&amp;v=4" />
+      <a href="/">
+        <h1 class="text-6xl">{{ site.title }}</h1>
+      </a>
+    </div>
+  </header>
+  <nav>
+    <div class="flex flex-row bg-gray-200">
+      <div class="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
+        <a href="/"><i class="fas fa-address-card">&nbsp; About</i></a>
       </div>
-    </header>
-    <nav>
-      <div class="flex flex-row bg-gray-200">
-        <div class="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-          <a href="/"><i class="fas fa-address-card">&nbsp; About</i></a>
-        </div>
-        <div class="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-          <a href="/projects/"><i class="fas fa-briefcase">&nbsp; Projects</i></a>
-        </div>
-        <div class="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
-          <a href="/blog/"><i class="fas fa-blog">&nbsp; Blog</i></a>
-        </div>
+      <div class="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
+        <a href="/projects/"><i class="fas fa-briefcase">&nbsp; Projects</i></a>
       </div>
-    </nav>
-    <section id="container">
-      {{ content }}
-    </section>
-    <footer>
-      &copy; Ian Johnson
-    </footer>
-  </body>
+      <div class="text-gray-700 text-center bg-gray-400 px-4 py-2 m-2">
+        <a href="/blog/"><i class="fas fa-blog">&nbsp; Blog</i></a>
+      </div>
+    </div>
+  </nav>
+  <section id="container">
+    {{ content }}
+  </section>
+  <footer class="site-footer">
+    &copy; Ian Johnson
+  </footer>
+</body>
+
 </html>
