@@ -35,6 +35,7 @@ disableSpecial1stPost = false
 disableScrollToTop = false
 comments = false
 hidemeta = false
+hideFooter = true
 hideSummary = false
 showtoc = false
 tocopen = false
@@ -47,14 +48,14 @@ tocopen = false
   safari_pinned_tab = "<link / abs url>"
 
   [params.label]
-  text = "Home"
+  text = "Ian Johnson"
   icon = "/apple-touch-icon.png"
   iconHeight = 35
 
   [params.profileMode]
   enabled = true
   title = "Ian Johnson"
-  subtitle = "Software Engineer | Full Stack Developer | Security Enthusiast | Open Source Contributor"
+  subtitle = "Software Engineer | Security Enthusiast | Open Source Contributor"
   imageUrl = "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b"
   imageWidth = 120
   imageHeight = 120
