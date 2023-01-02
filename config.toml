@@ -94,12 +94,12 @@ tocopen = false
   url = "https://www.linkedin.com/in/tacoda/"
 
   [[params.socialIcons]]
+  name = "mastodon"
+  url = "https://hachyderm.io/@tacoda"
+
+  [[params.socialIcons]]
   name = "email"
   url = "mailto:tacoda@hey.com"
-
-  # [[params.socialIcons]]
-  # name = "mastodon"
-  # url = "https://mastodon.com/"
 
   # [[params.socialIcons]]
   # name = "exercism"
