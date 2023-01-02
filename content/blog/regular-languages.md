@@ -1,6 +1,6 @@
 ---
 title: "Regular Languages"
-date: 2020-09-15T11:30:03+00:00
+date: 2023-01-02T11:30:03+00:00
 # weight: 1
 # aliases: ["/first"]
 tags: ["language", "regex", "regular expressions", "pcre", "pomsky"]
@@ -13,7 +13,7 @@ hidemeta: false
 comments: false
 description: "Regular Languages, PCRE, and Pomsky."
 # canonicalURL: "https://canonical.url/to/page"
-disableHLJS: true # to disable highlightjs
+# disableHLJS: true # to disable highlightjs
 disableShare: false
 disableHLJS: false
 hideSummary: false
@@ -25,13 +25,13 @@ ShowWordCount: true
 ShowRssButtonInSectionTermList: true
 UseHugoToc: true
 cover:
-    image: "<image path/url>" # image path/url
+    image: "https://media.licdn.com/dms/image/D4E16AQGw6Ow73j0HUA/profile-displaybackgroundimage-shrink_350_1400/0/1671636629469?e=1677715200&v=beta&t=2MKRKo682atDczyT6l15uNkubCEeFVdHy11zfOULI5w" # image path/url
     alt: "<alt text>" # alt text
     caption: "<text>" # display caption under cover
     relative: false # when using page bundles set this to true
     hidden: true # only hide on current single page
 editPost:
-    URL: "https://github.com/<path_to_repo>/content"
+    URL: "https://github.com/tacoda.github.io/content"
     Text: "Suggest Changes" # edit text
     appendFilePath: true # to append file path to Edit link
 ---

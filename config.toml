@@ -1,12 +1,12 @@
-baseURL = "https://examplesite.com/"
-title = "ExampleSite"
+baseURL = "https://www.tacoda.dev/"
+title = "Ian Johnson"
 paginate = 5
 theme = "PaperMod"
-enableRobotsTXT = true
+enableRobotsTXT = false
 buildDrafts = false
 buildFuture = false
 buildExpired = false
-googleAnalytics = "UA-123-45"
+# googleAnalytics = "UA-123-45"
 pygmentsUseClasses = true
 
 [minify]
@@ -15,11 +15,11 @@ minifyOutput = true
 
 [params]
 env = "production"
-title = "ExampleSite"
-description = "ExampleSite description"
+title = "Ian Johnson"
+description = "Ian Johnson: Software Engineer"
 keywords = [ "Blog", "Portfolio", "PaperMod" ]
-author = "Me"
-images = [ "<link or path of image for opengraph, twitter-cards>" ]
+author = "Ian Johnson"
+images = [ "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b" ]
 DateFormat = "January 2, 2006"
 defaultTheme = "auto"
 disableThemeToggle = false
@@ -69,29 +69,41 @@ tocopen = false
     url = "tags"
 
   [params.homeInfoParams]
-  Title = "Hi there 👋"
-  Content = "Welcome to my blog"
+  Title = "Hello, World! 👋"
+  Content = """\
+    I am a full stack web developer with a penchant \
+    for Ruby on Rails and React. Application security \
+    is something I am very focused on. Using Rust to \
+    explore building native programs has been a recent \
+    project of mine. I am always interested in learning \
+    more about security and cloud computing. I also enjoy \
+    contributing to open source projects.\
+    """
 
   [[params.socialIcons]]
-  name = "twitter"
-  url = "https://twitter.com/"
+  name = "linkedin"
+  url = "https://linkedin.com/"
 
   [[params.socialIcons]]
-  name = "stackoverflow"
-  url = "https://stackoverflow.com"
+  name = "mastodon"
+  url = "https://mastodon.com/"
 
   [[params.socialIcons]]
   name = "github"
   url = "https://github.com/"
 
-[params.analytics.google]
-SiteVerificationTag = "XYZabc"
+  [[params.socialIcons]]
+  name = "exercism"
+  url = "https://exercism.com/"
 
-[params.analytics.bing]
-SiteVerificationTag = "XYZabc"
+# [params.analytics.google]
+# SiteVerificationTag = "XYZabc"
 
-[params.analytics.yandex]
-SiteVerificationTag = "XYZabc"
+# [params.analytics.bing]
+# SiteVerificationTag = "XYZabc"
+
+# [params.analytics.yandex]
+# SiteVerificationTag = "XYZabc"
 
   [params.cover]
   hidden = true
