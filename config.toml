@@ -98,6 +98,10 @@ tocopen = false
   url = "https://hachyderm.io/@tacoda"
 
   [[params.socialIcons]]
+  name = "discord"
+  url = "https://discordapp.com/users/690011890415698169"
+
+  [[params.socialIcons]]
   name = "email"
   url = "mailto:tacoda@hey.com"
 
