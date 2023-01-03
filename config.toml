@@ -102,6 +102,10 @@ tocopen = false
   url = "https://discordapp.com/users/690011890415698169"
 
   [[params.socialIcons]]
+  name = "matrix"
+  url = "https://matrix.to/#/@tacoda:matrix.org"
+
+  [[params.socialIcons]]
   name = "email"
   url = "mailto:tacoda@hey.com"
 
