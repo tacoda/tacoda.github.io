@@ -123,3 +123,4 @@ number (operator number)*
 |---|---|---|---|---|---|
 | The word `hello` | `'hello'` | `'hello'` | `'hello'` | hello | bye |
 | Word character followed by a space and new line | `\w\s\n` | `\w\s\n` | `[word] [space] [n]` | 'a ⏎' | 'a⏎' |
+
