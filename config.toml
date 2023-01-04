@@ -102,8 +102,8 @@ tocopen = false
   url = "https://www.hackerrank.com/tacoda"
 
   [[params.socialIcons]]
-  name = "resume"
-  url = "/resume.pdf"
+  name = "cv"
+  url = "/cv.pdf"
 
   [[params.socialIcons]]
   name = "linkedin"
