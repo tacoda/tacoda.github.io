@@ -89,17 +89,17 @@ tocopen = false
   name = "github"
   url = "https://github.com/tacoda"
 
-  [[params.socialIcons]]
-  name = "gitlab"
-  url = "https://gitlab.com/tacodadev"
+  # [[params.socialIcons]]
+  # name = "gitlab"
+  # url = "https://gitlab.com/tacodadev"
 
-  [[params.socialIcons]]
-  name = "stackoverflow"
-  url = "https://stackoverflow.com/users/9816094/tacoda"
+  # [[params.socialIcons]]
+  # name = "stackoverflow"
+  # url = "https://stackoverflow.com/users/9816094/tacoda"
 
-  [[params.socialIcons]]
-  name = "hackerrank"
-  url = "https://www.hackerrank.com/tacoda"
+  # [[params.socialIcons]]
+  # name = "hackerrank"
+  # url = "https://www.hackerrank.com/tacoda"
 
   [[params.socialIcons]]
   name = "cv"
@@ -113,13 +113,13 @@ tocopen = false
   name = "mastodon"
   url = "https://hachyderm.io/@tacoda"
 
-  [[params.socialIcons]]
-  name = "discord"
-  url = "https://discordapp.com/users/690011890415698169"
+  # [[params.socialIcons]]
+  # name = "discord"
+  # url = "https://discordapp.com/users/690011890415698169"
 
-  [[params.socialIcons]]
-  name = "matrix"
-  url = "https://matrix.to/#/@tacoda:matrix.org"
+  # [[params.socialIcons]]
+  # name = "matrix"
+  # url = "https://matrix.to/#/@tacoda:matrix.org"
 
   [[params.socialIcons]]
   name = "email"
