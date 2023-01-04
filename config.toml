@@ -102,12 +102,12 @@ tocopen = false
   # url = "https://www.hackerrank.com/tacoda"
 
   [[params.socialIcons]]
-  name = "cv"
-  url = "/cv.pdf"
-
-  [[params.socialIcons]]
   name = "linkedin"
   url = "https://www.linkedin.com/in/tacoda/"
+
+  [[params.socialIcons]]
+  name = "cv"
+  url = "/cv.pdf"
 
   [[params.socialIcons]]
   name = "mastodon"
