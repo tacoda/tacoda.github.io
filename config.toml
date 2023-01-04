@@ -90,12 +90,20 @@ tocopen = false
   url = "https://github.com/tacoda"
 
   [[params.socialIcons]]
-  name = "linkedin"
-  url = "https://www.linkedin.com/in/tacoda/"
+  name = "gitlab"
+  url = "https://gitlab.com/tacodadev"
 
   [[params.socialIcons]]
   name = "stackoverflow"
   url = "https://stackoverflow.com/users/9816094/tacoda"
+
+  [[params.socialIcons]]
+  name = "hackerrank"
+  url = "https://www.hackerrank.com/tacoda"
+
+  [[params.socialIcons]]
+  name = "linkedin"
+  url = "https://www.linkedin.com/in/tacoda/"
 
   [[params.socialIcons]]
   name = "mastodon"
