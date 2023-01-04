@@ -94,6 +94,10 @@ tocopen = false
   url = "https://www.linkedin.com/in/tacoda/"
 
   [[params.socialIcons]]
+  name = "stackoverflow"
+  url = "https://stackoverflow.com/users/9816094/tacoda"
+
+  [[params.socialIcons]]
   name = "mastodon"
   url = "https://hachyderm.io/@tacoda"
 
