@@ -109,9 +109,9 @@ tocopen = false
   name = "cv"
   url = "/cv.pdf"
 
-  [[params.socialIcons]]
-  name = "mastodon"
-  url = "https://hachyderm.io/@tacoda"
+  # [[params.socialIcons]]
+  # name = "mastodon"
+  # url = "https://hachyderm.io/@tacoda"
 
   # [[params.socialIcons]]
   # name = "discord"
