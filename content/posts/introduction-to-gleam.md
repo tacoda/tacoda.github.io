@@ -48,9 +48,9 @@ The BEAM is the virtual machine that runs Elixir and Erlang. It is not a program
 
 ## What is this "OTP" thing?
 
-> **OTP:** Open Telecom Protocol
+> **OTP:** Open Telecom Platform
 
-The Open Telecom Protocol (OTP), is a collection of middleware, libraries, and tools that are commonly used on the BEAM which leverage the strengths of the platform. One example of functionality found in OTP is a Supervisor. A Supervisor is a common pattern on the BEAM which uses one process to manage other processes. The OTP Supervisor is the analog of the object-oriented Observer pattern.
+The Open Telecom Platform (OTP), is a collection of middleware, libraries, and tools that are commonly used on the BEAM which leverage the strengths of the platform. One example of functionality found in OTP is a Supervisor. A Supervisor is a common pattern on the BEAM which uses one process to manage other processes. The OTP Supervisor is the analog of the object-oriented Observer pattern.
 
 ## In essence, it is a concurrent runtime that provides fault-tolerance and distribution out of the box.
 
@@ -74,7 +74,7 @@ BEAM bytecode is the same as Elixir bytecode; it's what we use to write programs
 
 ## Gleam has some really cool features and I am excited to learn more about it
 
-Gleam programs can be compiled to BEAM bytecode and then run on any BEAM compatible runtime, including the Erlang VM, Node.js or any JavaScript environment (such as web browsers). I am personally very hopeful that WebAssemby will be added as a compilation target soon.
+Gleam programs can be compiled to BEAM bytecode and then run on any BEAM compatible runtime, including the Erlang VM, Node.js or any JavaScript environment (such as web browsers). I am personally very hopeful that WebAssembly will be added as a compilation target soon.
 
 Here is a quick TL;DR of the features that I am most excited about:
 
