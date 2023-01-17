@@ -71,9 +71,26 @@ cd bam
 gleam test
 ```
 
+## Hello World!
+
+**`src/bam.gleam`:**
+
+```gleam
+import gleam/io
+
+pub fn main() {
+  io.println("Hello from bam!")
+}
+```
+
+```sh
+gleam run
+# Hello from bam!
+```
+
 ## What is BAM?
 
-Bank Account Manager (BAM) is a simple project that can get us up-and-running with Gleam. This is a toy project that can start with a very small amount of functionality and still have the room to increase complexity by adding arbitrary features. It is complex enough that we will need to work with **all** aspects of writing programs. Thus, in this series we will:
+[Bank Account Manager (BAM)](https://github.com/tacoda/bam) is a simple project that can get us up-and-running with Gleam. This is a toy project that can start with a very small amount of functionality and still have the room to increase complexity by adding arbitrary features. It is complex enough that we will need to work with **all** aspects of writing programs. Thus, in this series we will:
 
 - Write documentation
 - Write tests
@@ -101,7 +118,16 @@ pub fn hello_world_test() {
 }
 ```
 
-Any good test should describe 
+```sh
+gleam test
+# .
+# Finished in 0.XXX seconds
+# 1 tests, 0 failures
+```
+
+Any good test should describe the cases well enough to get an understanding of the behavior of the code under test. Good documentation should serve as executable documentation. In the hello world test, we see an assertion that `1 |> should.equal(1)`. This is pretty straight-forward.
+
+> **Side Note:** I _really_ like this pipe syntax. It's one of my favorite things about Elixir and I'm glad to see it show up here.
 
 ## Type-Driven Development
 
@@ -113,8 +139,36 @@ Here is my initial `Account` type:
 
 ```gleam
 pub type Account {
-  Checking(balance: Float)
-  Savings(balance: Float)
-  Business(balance: Float)
+  Account(balance: Float)
 }
 ```
+
+Now that we have the `Account` type, we can drive out a simple getter function.
+
+```gleam
+pub fn get_balance(account: Account) -> Float {
+  account.balance
+}
+```
+
+This function really appeals to my inner mathematician. It is _well-defined_, unambiguous, explicit in all the right places, and omissive in all the right places. From this code, I can gather a lot of information:
+
+- `get_balance` is a public function
+- It accepts one argument of type `Account`
+- It returns a `Float`
+
+Here is what I appreciate about these things: I don't have to test them! I can trust they will always be true because they are part of the definition of the code. I don't have to worry about edge cases with types (only with content). And, better yet, if I write code that fails to fulfill these requirements, then it simply fails to compile.
+
+## Wire Up `main`
+
+```gleam
+pub fn main() {
+  let account = Account(1.0)
+
+  account
+  |> get_balance
+  |> io.println
+}
+```
+
+This is enough to get us going. Here, we create an Account using a constructor and then print out the balance.
