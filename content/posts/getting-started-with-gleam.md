@@ -176,7 +176,6 @@ pub fn main() {
 
   account
   |> get_balance
-  |> io.println
 }
 ```
 
@@ -184,7 +183,6 @@ This is enough to get us going. Here, we create an Account using a constructor a
 
 ```sh
 gleam run
-# 1.0
 ```
 
 ## Takeaways

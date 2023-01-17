@@ -67,7 +67,7 @@ Check out the website at [https://gleam.run](https://gleam.run/). The source cod
 
 ## It aims to bring better type safety and more readable code to your Elixir and Erlang projects.
 
-You can use Gleam for both frontend and backend web applications (or anything else, really). The compiler generates standard BEAM bytecode. The compiler also has the ability to target JavaScript to allow it to be run in-browser or on the V8 platform.
+You can use Gleam for both frontend and backend web applications (or anything else, really). Gleam runs on the Erlang virtual machine. The compiler generates Erlang which is then sent to the Erlang compiler. The compiler also has the ability to target JavaScript to allow it to be run in-browser or on the V8 platform.
 
 ## Gleam programs can be compiled to BEAM bytecode and then run on any BEAM compatible runtime.
 
