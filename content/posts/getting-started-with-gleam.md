@@ -41,9 +41,13 @@ UseHugoToc: true
 
 There is a full [Getting Started Guide](https://gleam.run/getting-started/) available from Gleam.
 
+## Try It Out
+
+If you just want to try out Gleam without installing anything, you can use the [online playground](https://johndoneth.github.io/gleam-playground/). In this series, we will be building an application, so I'm going to install Gleam locally.
+
 ## Installing Gleam
 
-I'm working on a Mac, and I know this is very popular among developers. Installation on other operating systems is covered in the Getting Started Guide from Gleam.
+I'm working on a Mac, so I will be using Brew. Installation on other operating systems is covered in the Getting Started Guide from Gleam. Gleam is available though many package managers, including asdf and nix.
 
 ```sh
 brew update
@@ -56,7 +60,7 @@ Brew took care of updating Erlang for me, because I already had it installed pre
 
 ```sh
 erl -version
-# Erlang (SMP,ASYNC_THREADS) (BEAM) emulator version 13.1.3
+# Erlang (SMP,ASYNC_THREADS) (BEAM) emulator version XX.XX.XX
 ```
 
 ## A Note About PATH
@@ -125,7 +129,7 @@ gleam test
 # 1 tests, 0 failures
 ```
 
-Any good test should describe the cases well enough to get an understanding of the behavior of the code under test. Good documentation should serve as executable documentation. In the hello world test, we see an assertion that `1 |> should.equal(1)`. This is pretty straight-forward.
+Any good test should describe the cases well enough to get an understanding of the behavior of the code under test. Good tests should serve as executable documentation. In the hello world test, we see an assertion that `1 |> should.equal(1)`. This is pretty straight-forward.
 
 > **Side Note:** I _really_ like this pipe syntax. It's one of my favorite things about Elixir and I'm glad to see it show up here.
 
@@ -185,7 +189,7 @@ gleam run
 
 ## Takeaways
 
-- Good documentation should serve as executable documentation
+- Good tests should serve as executable documentation
 - Designing by contract results in unambiguous code, which increases confidence
 
 ---
