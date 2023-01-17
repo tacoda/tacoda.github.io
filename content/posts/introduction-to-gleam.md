@@ -1,7 +1,8 @@
 ---
 title: "Introduction to Gleam"
 date: 2023-01-16T11:30:03+00:00
-# weight: 1
+publishdate: 2023-01-16T11:30:03+00:00
+weight: 1
 # aliases: ["/first"]
 tags: ["gleam", "beam", "programming"]
 author: "Ian Johnson"

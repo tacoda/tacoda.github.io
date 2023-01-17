@@ -1,0 +1,120 @@
+---
+title: "Getting Started with Gleam"
+date: 2023-01-16T21:30:03+00:00
+publishdate: 2023-01-16T21:30:03+00:00
+weight: 2
+# aliases: ["/first"]
+tags: ["gleam", "beam", "programming"]
+author: "Ian Johnson"
+# author: ["Me", "You"] # multiple authors
+showToc: false
+TocOpen: false
+draft: false
+hidemeta: false
+comments: false
+# description: ""
+# canonicalURL: "https://canonical.url/to/page"
+# disableHLJS: true # to disable highlightjs
+disableShare: false
+disableHLJS: false
+hideSummary: true
+searchHidden: true
+ShowReadingTime: true
+ShowBreadCrumbs: true
+ShowPostNavLinks: true
+ShowWordCount: true
+ShowRssButtonInSectionTermList: true
+UseHugoToc: true
+# cover:
+#     image: "https://media.licdn.com/dms/image/D4E16AQGw6Ow73j0HUA/profile-displaybackgroundimage-shrink_350_1400/0/1671636629469?e=1677715200&v=beta&t=2MKRKo682atDczyT6l15uNkubCEeFVdHy11zfOULI5w" # image path/url
+#     alt: "<alt text>" # alt text
+#     caption: "<text>" # display caption under cover
+#     relative: false # when using page bundles set this to true
+#     hidden: true # only hide on current single page
+# editPost:
+#     URL: "https://github.com/tacoda.github.io/content"
+#     Text: "Suggest Changes" # edit text
+#     appendFilePath: true # to append file path to Edit link
+---
+
+## Getting Started
+
+There is a full [Getting Started Guide](https://gleam.run/getting-started/) available from Gleam.
+
+## Installing Gleam
+
+I'm working on a Mac, and I know this is very popular among developers. Installation on other operating systems is covered in the Getting Started Guide from Gleam.
+
+```sh
+brew update
+brew install gleam
+```
+
+## Verifying Installation
+
+Brew took care of updating Erlang for me, because I already had it installed previously as a dependency for Elixir. Brew should take care of installing and dependencies automatically, but if you run into a problem running the following command, then installing Erlang using Brew with resolve this.
+
+```sh
+erl -version
+# Erlang (SMP,ASYNC_THREADS) (BEAM) emulator version 13.1.3
+```
+
+## A Note About PATH
+
+The `PATH` environment variable is where Unix-like systems, such as Mac, search to find binaries when attempting to run commands. Because I already have the location of my Brew packages in my Path, I did not have to deal with this problem. If you do happen to run into this issue, then you will want to fix it by adding the path to the Erlang binary to your Path, which is covered in the Getting Started Guide from Gleam.
+
+## Creating a New Project
+
+```sh
+gleam new bam
+cd bam
+gleam test
+```
+
+## What is BAM?
+
+Bank Account Manager (BAM) is a simple project that can get us up-and-running with Gleam. This is a toy project that can start with a very small amount of functionality and still have the room to increase complexity by adding arbitrary features. It is complex enough that we will need to work with **all** aspects of writing programs. Thus, in this series we will:
+
+- Write documentation
+- Write tests
+- Build packages
+- Refactor
+- Consider tradeoffs
+- Discuss best-practices
+
+## Look at the Tests!
+
+**`test/bam_test.gleam`:**
+
+```gleam
+import gleeunit
+import gleeunit/should
+
+pub fn main() {
+  gleeunit.main()
+}
+
+// gleeunit test functions end in `_test`
+pub fn hello_world_test() {
+  1
+  |> should.equal(1)
+}
+```
+
+Any good test should describe 
+
+## Type-Driven Development
+
+Gleam's type system makes me nostalgic of an idea that I learned while learning Scheme, while reading [How to Design Programs](https://htdp.org/2003-09-26/Book/). This idea is [Design by Contract](https://htdp.org/2003-09-26/Book/curriculum-Z-H-5.html#node_sec_2.5). The reason that I like this idea so much is that it makes our code _well-defined_, which means that it is unambiguous!
+
+> If you are interested in How to Design Programs, you should use the [Second Edition](https://htdp.org/2022-8-7/Book/index.html).
+
+Here is my initial `Account` type:
+
+```gleam
+pub type Account {
+  Checking(balance: Float)
+  Savings(balance: Float)
+  Business(balance: Float)
+}
+```
