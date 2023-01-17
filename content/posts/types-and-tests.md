@@ -347,7 +347,7 @@ gleam test
 We've seen this before:
 
 ```gleam
-import bam.{Account, deposit}
+import bam.{Account, deposit, get_balance}
 ```
 
 ```sh
