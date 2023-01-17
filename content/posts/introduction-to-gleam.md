@@ -100,6 +100,8 @@ For more information about Gleam, visit the following links:
 - [Gleam stdlib Docs](https://hexdocs.pm/gleam_stdlib/)
 - [Awesome Gleam](https://hexdocs.pm/gleam_stdlib/)
 
+---
+
 **Next up:** We will build a simple application using Gleam.
 
 _Sneak peak:_ [BAM](https://github.com/tacoda/bam)

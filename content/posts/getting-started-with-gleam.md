@@ -151,11 +151,16 @@ pub fn get_balance(account: Account) -> Float {
 }
 ```
 
-This function really appeals to my inner mathematician. It is _well-defined_, unambiguous, explicit in all the right places, and omissive in all the right places. From this code, I can gather a lot of information:
+This function really appeals to my inner mathematician. It is _well-defined_, unambiguous, explicit in all the right places, and omissive in all the right places. From this code, we can gather a lot of information:
 
 - `get_balance` is a public function
 - It accepts one argument of type `Account`
 - It returns a `Float`
+
+```mermaid
+flowchart LR
+  Account --> get_balance[/get_balance/] --> Float
+```
 
 Here is what I appreciate about these things: I don't have to test them! I can trust they will always be true because they are part of the definition of the code. I don't have to worry about edge cases with types (only with content). And, better yet, if I write code that fails to fulfill these requirements, then it simply fails to compile.
 
@@ -172,3 +177,17 @@ pub fn main() {
 ```
 
 This is enough to get us going. Here, we create an Account using a constructor and then print out the balance.
+
+```sh
+gleam run
+# 1.0
+```
+
+## Takeaways
+
+- Good documentation should serve as executable documentation
+- Designing by contract results in unambiguous code, which increases confidence
+
+---
+
+**Next up:** We will start to build out basic functionality for banking accounts.
