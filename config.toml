@@ -126,12 +126,20 @@ tocopen = false
   # url = "https://matrix.to/#/@tacoda:matrix.org"
 
   [[params.socialIcons]]
+  name = "exercism"
+  url = "https://exercism.org/profiles/tacoda"
+
+  [[params.socialIcons]]
+  name = "dev"
+  url = "https://dev.to/tacoda"
+
+  [[params.socialIcons]]
+  name = "rss"
+  url = "/posts/index.xml"
+
+  [[params.socialIcons]]
   name = "email"
   url = "mailto:tacoda@hey.com"
-
-  # [[params.socialIcons]]
-  # name = "exercism"
-  # url = "https://exercism.com/"
 
 # [params.analytics.google]
 # SiteVerificationTag = "XYZabc"
