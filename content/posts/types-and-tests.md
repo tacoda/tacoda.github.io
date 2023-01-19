@@ -211,6 +211,14 @@ pub fn hello_world_test() {
 }
 ```
 
+### Glee Who?
+
+[Gleeunit](https://hexdocs.pm/gleeunit/gleeunit.html) is a testing framework for Gleam. It uses Erlang's EUnit test framework. From hexdocs, we learn:
+
+> Any Erlang or Gleam function in the `test` directory with a name editing in `_test` is considered a test function and will be run.
+
+Gleeunit runs any module in the `test` directory that ends with `_test.gleam`.
+
 ## Adding The First Test
 
 First, we will remove the `hello_world_test`. The initial test we will start with is adding a valid, positive value to the account balance.
@@ -261,6 +269,8 @@ Our test is not testing _anything_ at the moment, so let's make it assert things
 Now we will convert this statement into some Gleam code:
 
 ```gleam
+import gleeunit
+import gleeunit/should
 import bam.{Account}
 
 pub fn main() {
@@ -285,6 +295,8 @@ gleam test
 We know this story, except that this is the new function that has not yet been defined. Let's blindly apply the fix we had before to see what results.
 
 ```gleam
+import gleeunit
+import gleeunit/should
 import bam.{Account, deposit}
 
 pub fn main() {
@@ -377,26 +389,34 @@ What's going on here? Well, the `account` is in scope from a `let` statement. It
 
 ### Data-Driven Perspective
 
+Data Type Flow for `deposit`:
+
 ```mermaid
 flowchart LR
   Account & Float --> deposit[/deposit/] --> Output[Account]
 ```
+
+Data Type Flow for `get_balance`:
 
 ```mermaid
 flowchart LR
   Account --> get_balance[/get_balance/] --> Float
 ```
 
+Data Type Flow for `should.equal`:
+
 ```mermaid
 flowchart LR
-  Expected[Float] & Actual[Float] --> should_equal[/should.equal/] --> Bool
+  Expected[Float] & Actual[Float] --> should_equal[/should.equal/] --> Nil
 ```
+
+> **Note:** Here we are using specific types to assert equality. How does `should.equal` compare different types successfully? Because it uses _Generic Types_. We will explore this more. In this case, we are using the float _"version"_ of `should.equal`.
 
 ### Process-Driven Perspective
 
 ```mermaid
 flowchart LR
-  account -- Account --> deposit -- Account --> get_balance -- Float --> should.equal -- Bool --> True
+  account -- Account --> deposit -- Account --> get_balance -- Float --> should.equal  --> Nil
 ```
 
 ## Takeaways
