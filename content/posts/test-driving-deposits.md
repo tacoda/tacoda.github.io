@@ -4,7 +4,7 @@ date: 2023-01-19T11:30:03+00:00
 publishdate: 2023-01-19T11:30:03+00:00
 weight: 4
 # aliases: ["/first"]
-tags: ["gleam", "beam", "programming"]
+tags: ["gleam", "beam", "programming", "testing"]
 author: "Ian Johnson"
 # author: ["Me", "You"] # multiple authors
 showToc: false
@@ -227,7 +227,7 @@ gleam test
 
 Gleam, like many other functional languages, uses pattern matching for a variety of cases. We can use it control flow, destructure data, and much more. The code above smells to me because of the value that `case` is evaluating: `amount >= 0.0`. This is an expression that returns a boolean and we are pattern matching on the boolean just as one would expect from `if` (or `cond`).
 
-However this is code seems to miss the point of the pattern matching, and thus misuse the `case`. The data that matters is the `amount`. The boolean expression we have chosen is only assessing a case of the `amount`. It is, in effect, a redundant `case`. What if we were to look at only the value of `amount`?
+However this code seems to miss the point of the pattern matching, and thus misuse the `case`. The data that matters is the `amount`. The boolean expression we have chosen is only assessing a case of the `amount`. It is, in effect, a redundant `case`. What if we were to look at only the value of `amount`?
 
 ```gleam
 pub fn deposit(account: Account, amount: Float) -> Account {
@@ -418,7 +418,9 @@ gleam test
 # 2 tests, 0 failures
 ```
 
-I am unsure why the test function signature do not seem to be verified, but I'm going to clean that up anyway because I would rather be explicit about types in a type-driven language.
+I am unsure why the test function signature does not seem to be verified, but I'm going to clean that up anyway because I would rather be explicit about types in a type-driven language.
+
+> **TIL:** Annotations are entirely optional in Gleam (other than in some cases when using record accessors) so you get no more type safety in adding them. They are good to have though!
 
 ```gleam
 fn create_account() -> Account {
