@@ -68,9 +68,7 @@ otto serve
 
 **View the site**
 
-```sh
-open http://127.0.0.1:8778/
-```
+View the generated site at `http://localhost:8778/`:
 
 ![Otto Welcome Page](/otto-welcome.jpg)
 
