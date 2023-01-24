@@ -145,6 +145,14 @@ tocopen = false
   name = "email"
   url = "mailto:tacoda@hey.com"
 
+  [[params.socialIcons]]
+  name = "buymeacoffee"
+  url = "https://www.buymeacoffee.com/tacoda"
+
+  [[params.socialIcons]]
+  name = "kofi"
+  url = "https://ko-fi.com/tacoda"
+
 # [params.analytics.google]
 # SiteVerificationTag = "XYZabc"
 
