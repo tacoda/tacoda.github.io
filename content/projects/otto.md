@@ -72,6 +72,8 @@ otto serve
 open http://127.0.0.1:8778/
 ```
 
+![Otto Welcome Page](/otto-welcome.jpg)
+
 ## Links
 
 - [GitHub](https://github.com/tacoda/ottogen)
