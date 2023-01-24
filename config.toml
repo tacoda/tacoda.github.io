@@ -121,17 +121,17 @@ tocopen = false
   # name = "mastodon"
   # url = "https://hachyderm.io/@tacoda"
 
-  # [[params.socialIcons]]
-  # name = "discord"
-  # url = "https://discordapp.com/users/690011890415698169"
+  [[params.socialIcons]]
+  name = "discord"
+  url = "https://discordapp.com/users/690011890415698169"
 
   # [[params.socialIcons]]
   # name = "matrix"
   # url = "https://matrix.to/#/@tacoda:matrix.org"
 
-  [[params.socialIcons]]
-  name = "exercism"
-  url = "https://exercism.org/profiles/tacoda"
+  # [[params.socialIcons]]
+  # name = "exercism"
+  # url = "https://exercism.org/profiles/tacoda"
 
   [[params.socialIcons]]
   name = "dev"
