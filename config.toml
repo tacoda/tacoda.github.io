@@ -1,4 +1,4 @@
-baseURL = "https://tacoda.github.io/"
+baseURL = "https://www.tacoda.dev/"
 title = "Ian Johnson"
 paginate = 5
 theme = "PaperMod"
@@ -101,10 +101,6 @@ tocopen = false
   # name = "stackoverflow"
   # url = "https://stackoverflow.com/users/9816094/tacoda"
 
-  # [[params.socialIcons]]
-  # name = "hackerrank"
-  # url = "https://www.hackerrank.com/tacoda"
-
   [[params.socialIcons]]
   name = "twitter"
   url = "https://twitter.com/tacodadev"
@@ -116,6 +112,10 @@ tocopen = false
   [[params.socialIcons]]
   name = "cv"
   url = "/cv.pdf"
+
+  [[params.socialIcons]]
+  name = "hackerrank"
+  url = "https://www.hackerrank.com/tacoda"
 
   # [[params.socialIcons]]
   # name = "mastodon"
