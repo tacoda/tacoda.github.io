@@ -129,9 +129,9 @@ tocopen = false
   # name = "matrix"
   # url = "https://matrix.to/#/@tacoda:matrix.org"
 
-  # [[params.socialIcons]]
-  # name = "exercism"
-  # url = "https://exercism.org/profiles/tacoda"
+  [[params.socialIcons]]
+  name = "exercism"
+  url = "https://exercism.org/profiles/tacoda"
 
   [[params.socialIcons]]
   name = "dev"
