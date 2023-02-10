@@ -28,12 +28,11 @@
     <div class="post-content">
       {{ .Content }}
     </div>
+    <hr />
     <div class="post-footer">
-        <p>
-            <a href="https://ko-fi.com/tacoda" target="_blank" rel="noreferrer noopener me">
-                {{ partial "icon.html" (dict "ctx" $ "name" "coffee") }}
-            </a>
-        </p>
+        <a href="https://ko-fi.com/tacoda" target="_blank" rel="noreferrer noopener me">
+            {{ partial "icon.html" (dict "ctx" $ "name" "coffee") }}
+        </a>
     </div>
   </article>
   {{ end }}
