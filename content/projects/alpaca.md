@@ -45,5 +45,5 @@ UseHugoToc: true
 
 ---
 
-<iframe src="https://tacoda-alpaca.onrender.com" title="Alpaca Image Generator"></iframe>
+<iframe src="https://tacoda-alpaca.onrender.com" width="100%" height="300" title="Alpaca Image Generator"></iframe>
 
