@@ -1,7 +1,7 @@
 baseURL = "https://www.tacoda.dev/"
 title = "Ian Johnson"
 paginate = 5
-theme = "PaperMod"
+theme = "m10c"
 enableRobotsTXT = false
 buildDrafts = false
 buildFuture = false
@@ -16,9 +16,11 @@ minifyOutput = true
 [params]
 env = "production"
 title = "Ian Johnson"
-description = "Ian Johnson: Software Engineer"
+description = "Software Engineer"
 keywords = [ "Blog", "Portfolio", "PaperMod" ]
 author = "Ian Johnson"
+avatar = "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b"
+menu_item_separator = "|"
 images = [ "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b" ]
 DateFormat = "January 2, 2006"
 defaultTheme = "auto"
@@ -40,6 +42,13 @@ hideSummary = false
 showtoc = false
 tocopen = false
 
+  # [params.style]
+  # darkestColor = "#d35050"
+  # darkColor = "#212121"
+  # lightColor = "#f5e3e0"
+  # lightestColor = "#f5f5f5"
+  # primaryColor = "#ffffff"
+
   [params.assets]
   favicon = "<link / abs url>"
   favicon16x16 = "<link / abs url>"
@@ -52,14 +61,14 @@ tocopen = false
   icon = "/apple-touch-icon.png"
   iconHeight = 35
 
-  [params.profileMode]
-  enabled = true
-  title = "Ian Johnson"
-  subtitle = "Software Engineer | Security Enthusiast | Open Source Contributor"
-  imageUrl = "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b"
-  imageWidth = 120
-  imageHeight = 120
-  imageTitle = "my image"
+  # [params.profileMode]
+  # enabled = true
+  # title = "Ian Johnson"
+  # subtitle = "Software Engineer | Security Enthusiast | Open Source Contributor"
+  # imageUrl = "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b"
+  # imageWidth = 120
+  # imageHeight = 120
+  # imageTitle = "my image"
 
     [[params.profileMode.buttons]]
     name = "About"
@@ -89,9 +98,29 @@ tocopen = false
 # contributing to open source projects.\
 # """
 
-  [[params.socialIcons]]
+  [[params.social]]
+  icon = "github"
   name = "github"
   url = "https://github.com/tacoda"
+
+  [[params.social]]
+  icon = "linkedin"
+  name = "linkedin"
+  url = "https://www.linkedin.com/in/tacoda/"
+
+  [[params.social]]
+  icon = "mail"
+  name = "email"
+  url = "mailto:tacoda@hey.com"
+
+  [[params.social]]
+  icon = "coffee"
+  name = "kofi"
+  url = "https://ko-fi.com/tacoda"
+
+  # [[params.socialIcons]]
+  # name = "github"
+  # url = "https://github.com/tacoda"
 
   # [[params.socialIcons]]
   # name = "gitlab"
@@ -101,21 +130,21 @@ tocopen = false
   # name = "stackoverflow"
   # url = "https://stackoverflow.com/users/9816094/tacoda"
 
-  [[params.socialIcons]]
-  name = "twitter"
-  url = "https://twitter.com/tacodadev"
+  # [[params.socialIcons]]
+  # name = "twitter"
+  # url = "https://twitter.com/tacodadev"
 
-  [[params.socialIcons]]
-  name = "linkedin"
-  url = "https://www.linkedin.com/in/tacoda/"
+  # [[params.socialIcons]]
+  # name = "linkedin"
+  # url = "https://www.linkedin.com/in/tacoda/"
 
-  [[params.socialIcons]]
-  name = "cv"
-  url = "/cv.pdf"
+  # [[params.socialIcons]]
+  # name = "cv"
+  # url = "/cv.pdf"
 
-  [[params.socialIcons]]
-  name = "hackerrank"
-  url = "https://www.hackerrank.com/tacoda"
+  # [[params.socialIcons]]
+  # name = "hackerrank"
+  # url = "https://www.hackerrank.com/tacoda"
 
   # [[params.socialIcons]]
   # name = "mastodon"
@@ -129,29 +158,29 @@ tocopen = false
   # name = "matrix"
   # url = "https://matrix.to/#/@tacoda:matrix.org"
 
-  [[params.socialIcons]]
-  name = "exercism"
-  url = "https://exercism.org/profiles/tacoda"
+  # [[params.socialIcons]]
+  # name = "exercism"
+  # url = "https://exercism.org/profiles/tacoda"
 
-  [[params.socialIcons]]
-  name = "dev"
-  url = "https://dev.to/tacoda"
+  # [[params.socialIcons]]
+  # name = "dev"
+  # url = "https://dev.to/tacoda"
 
-  [[params.socialIcons]]
-  name = "rss"
-  url = "/posts/index.xml"
+  # [[params.socialIcons]]
+  # name = "rss"
+  # url = "/posts/index.xml"
 
-  [[params.socialIcons]]
-  name = "email"
-  url = "mailto:tacoda@hey.com"
+  # [[params.socialIcons]]
+  # name = "email"
+  # url = "mailto:tacoda@hey.com"
 
-  [[params.socialIcons]]
-  name = "buymeacoffee"
-  url = "https://www.buymeacoffee.com/tacoda"
+  # [[params.socialIcons]]
+  # name = "buymeacoffee"
+  # url = "https://www.buymeacoffee.com/tacoda"
 
-  [[params.socialIcons]]
-  name = "kofi"
-  url = "https://ko-fi.com/tacoda"
+  # [[params.socialIcons]]
+  # name = "kofi"
+  # url = "https://ko-fi.com/tacoda"
 
 # [params.analytics.google]
 # SiteVerificationTag = "XYZabc"
@@ -199,17 +228,17 @@ name = "posts"
 url = "/posts/"
 weight = 20
 
-[[menu.main]]
-identifier = "projects"
-name = "projects"
-url = "/projects/"
-weight = 30
+# [[menu.main]]
+# identifier = "projects"
+# name = "projects"
+# url = "/projects/"
+# weight = 30
 
-[[menu.main]]
-identifier = "tags"
-name = "tags"
-url = "/tags/"
-weight = 40
+# [[menu.main]]
+# identifier = "tags"
+# name = "tags"
+# url = "/tags/"
+# weight = 40
 
 # [[menu.main]]
 # identifier = "Ian Johnson"

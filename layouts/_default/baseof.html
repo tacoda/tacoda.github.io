@@ -1,29 +1,58 @@
-<!DOCTYPE html>
-<html lang="{{ site.Language }}" dir="{{ .Language.LanguageDirection | default " auto" }}">
-
-<head>
-    {{- partial "head.html" . }}
+<!doctype html>
+<html lang="{{ .Site.LanguageCode | default "en-us" }}">
+  <head>
+    <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} // {{ .Site.Title }}{{ end }}</title>
+    <link rel="shortcut icon" href="{{ .Site.Params.favicon | default "/favicon.ico" }}" />
+    <meta charset="utf-8" />
+    {{ hugo.Generator }}
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="{{ .Site.Params.author | default "John Doe" }}" />
+    <meta name="description" content="{{ if .IsHome }}{{ .Site.Params.description }}{{ else }}{{ .Description }}{{ end }}" />
+    {{ $style := resources.Get "css/main.scss" | resources.ExecuteAsTemplate "css/main.scss" . | resources.ToCSS | resources.Minify | resources.Fingerprint -}}
+    <link rel="stylesheet" href="{{ $style.RelPermalink }}" />
     <style>
-        :root {
-            --main-width: 900px;
-        }
+     .app-header-avatar {
+       width:6rem;
+       height:6rem;
+       border-radius:100%;
+       border:.3rem solid #57cc8a;
+     }
     </style>
-</head>
 
-<body class="
-{{- if (or (ne .Kind `page` ) (eq .Layout `archives`) (eq .Layout `search`)) -}}
-{{- print " list" -}} {{- end -}} {{- if eq site.Params.defaultTheme `dark` -}} {{- print " dark" }} {{- end -}} " id="
-    top">
-    {{- partialCached "header.html" . .Page -}}
-    <main class="main">
-        {{- block "main" . }}{{ end }}
+    {{ template "_internal/google_analytics.html" . }}
+    {{ template "_internal/twitter_cards.html" . }}
+    {{ template "_internal/opengraph.html" . }}
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="{{ .Site.BaseURL }}"><img class="app-header-avatar" src="{{ .Site.Params.avatar | default "avatar.jpg" | relURL }}" alt="{{ .Site.Params.author | default "John Doe" }}" /></a>
+      <span class="app-header-title">{{ .Site.Title }}</span>
+      {{- with .Site.Menus.main }}
+      <nav class="app-header-menu">
+        {{- range $key, $item := . }}
+          {{- if ne $key 0 }}
+            {{ $.Site.Params.menu_item_separator | default " - " | safeHTML }}
+          {{ end }}
+          <a class="app-header-menu-item" href="{{ $item.URL }}">{{ $item.Name }}</a>
+        {{- end }}
+      </nav>
+      {{- end }}
+      <p>{{ .Site.Params.description | default "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vehicula turpis sit amet elit pretium." }}</p>
+      {{- with .Site.Params.social }}
+      <div class="app-header-social">
+        {{ range . }}
+          <a href="{{ .url }}" target="_blank" rel="noreferrer noopener me">
+            {{ partial "icon.html" (dict "ctx" $ "name" .icon "title" .name) }}
+          </a>
+        {{ end }}
+      </div>
+      {{- end }}
+    </header>
+    <main class="app-container">
+      {{ block "main" . }}
+        {{ .Content }}
+      {{ end }}
     </main>
-    {{ partialCached "footer.html" . .Layout .Kind (.Param "hideFooter") (.Param "ShowCodeCopyButtons") -}}
-</body>
-
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script>
-    mermaid.initialize({ startOnLoad: true });
-</script>
-
+  </body>
 </html>
