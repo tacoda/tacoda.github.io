@@ -113,11 +113,6 @@ tocopen = false
   name = "email"
   url = "mailto:tacoda@hey.com"
 
-  [[params.social]]
-  icon = "coffee"
-  name = "kofi"
-  url = "https://ko-fi.com/tacoda"
-
   # [[params.socialIcons]]
   # name = "github"
   # url = "https://github.com/tacoda"
