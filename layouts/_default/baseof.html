@@ -15,7 +15,13 @@
        width:6rem;
        height:6rem;
        border-radius:100%;
-       border:.3rem solid #57cc8a;
+       border:.3rem solid {{ .Site.Params.style.primaryColor | safeHTML }};
+     }
+     .posts-list-item-title {
+       font-size: 1.4rem;
+     }
+     .posts-list-item-title:hover {
+       font-style: italic;
      }
     </style>
 
