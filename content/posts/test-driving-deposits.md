@@ -2,7 +2,7 @@
 title: "Test-Driving Deposits"
 date: 2023-01-19T11:30:03+00:00
 publishdate: 2023-01-19T11:30:03+00:00
-weight: 4
+# weight: 4
 # aliases: ["/first"]
 tags: ["gleam", "beam", "programming", "testing"]
 author: "Ian Johnson"

@@ -2,7 +2,7 @@
 title: "Why I Still Use Make"
 date: 2023-01-20T11:30:03+00:00
 publishdate: 2023-01-20T11:30:03+00:00
-weight: 5
+# weight: 5
 tags: ["make", "tooling", "programming"]
 author: "Ian Johnson"
 showToc: false

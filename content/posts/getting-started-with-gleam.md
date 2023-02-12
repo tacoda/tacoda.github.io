@@ -2,7 +2,7 @@
 title: "Getting Started with Gleam"
 date: 2023-01-16T21:30:03+00:00
 publishdate: 2023-01-16T21:30:03+00:00
-weight: 2
+# weight: 2
 # aliases: ["/first"]
 tags: ["gleam", "beam", "programming"]
 author: "Ian Johnson"

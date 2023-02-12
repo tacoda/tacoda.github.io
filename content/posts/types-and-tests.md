@@ -2,7 +2,7 @@
 title: "Types and Tests"
 date: 2023-01-17T11:30:03+00:00
 publishdate: 2023-01-17T11:30:03+00:00
-weight: 3
+# weight: 3
 # aliases: ["/first"]
 tags: ["gleam", "beam", "programming"]
 author: "Ian Johnson"
