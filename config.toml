@@ -17,7 +17,7 @@ minifyOutput = true
 env = "production"
 title = "Ian Johnson"
 description = "Software Engineer"
-keywords = [ "Blog", "Portfolio", "PaperMod" ]
+keywords = [ "Blog", "Portfolio" ]
 author = "Ian Johnson"
 avatar = "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b"
 menu_item_separator = "|"
@@ -61,15 +61,6 @@ tocopen = false
   icon = "/apple-touch-icon.png"
   iconHeight = 35
 
-  # [params.profileMode]
-  # enabled = true
-  # title = "Ian Johnson"
-  # subtitle = "Software Engineer | Security Enthusiast | Open Source Contributor"
-  # imageUrl = "http://gravatar.com/avatar/0a09dcb201b488dece3b9e47e3f2443b"
-  # imageWidth = 120
-  # imageHeight = 120
-  # imageTitle = "my image"
-
     [[params.profileMode.buttons]]
     name = "About"
     url = "about"
@@ -85,18 +76,6 @@ tocopen = false
     [[params.profileMode.buttons]]
     name = "Tags"
     url = "tags"
-
-#   [params.homeInfoParams]
-#   Title = "Ian Johnson"
-#   Content = """Software Engineer | Full Stack Developer | Security Enthusiast | Open Source Contributor\n\n
-# I am a full stack web developer with a penchant \
-# for Ruby on Rails and React. Application security \
-# is something I am very focused on. Using Rust to \
-# explore building native programs has been a recent \
-# project of mine. I am always interested in learning \
-# more about security and cloud computing. I also enjoy \
-# contributing to open source projects.\
-# """
 
   [[params.social]]
   icon = "github"
@@ -122,70 +101,6 @@ tocopen = false
   icon = "mail"
   name = "email"
   url = "mailto:tacoda@hey.com"
-
-  # [[params.socialIcons]]
-  # name = "github"
-  # url = "https://github.com/tacoda"
-
-  # [[params.socialIcons]]
-  # name = "gitlab"
-  # url = "https://gitlab.com/tacodadev"
-
-  # [[params.socialIcons]]
-  # name = "stackoverflow"
-  # url = "https://stackoverflow.com/users/9816094/tacoda"
-
-  # [[params.socialIcons]]
-  # name = "twitter"
-  # url = "https://twitter.com/tacodadev"
-
-  # [[params.socialIcons]]
-  # name = "linkedin"
-  # url = "https://www.linkedin.com/in/tacoda/"
-
-  # [[params.socialIcons]]
-  # name = "cv"
-  # url = "/cv.pdf"
-
-  # [[params.socialIcons]]
-  # name = "hackerrank"
-  # url = "https://www.hackerrank.com/tacoda"
-
-  # [[params.socialIcons]]
-  # name = "mastodon"
-  # url = "https://hachyderm.io/@tacoda"
-
-  # [[params.socialIcons]]
-  # name = "discord"
-  # url = "https://discordapp.com/users/690011890415698169"
-
-  # [[params.socialIcons]]
-  # name = "matrix"
-  # url = "https://matrix.to/#/@tacoda:matrix.org"
-
-  # [[params.socialIcons]]
-  # name = "exercism"
-  # url = "https://exercism.org/profiles/tacoda"
-
-  # [[params.socialIcons]]
-  # name = "dev"
-  # url = "https://dev.to/tacoda"
-
-  # [[params.socialIcons]]
-  # name = "rss"
-  # url = "/posts/index.xml"
-
-  # [[params.socialIcons]]
-  # name = "email"
-  # url = "mailto:tacoda@hey.com"
-
-  # [[params.socialIcons]]
-  # name = "buymeacoffee"
-  # url = "https://www.buymeacoffee.com/tacoda"
-
-  # [[params.socialIcons]]
-  # name = "kofi"
-  # url = "https://ko-fi.com/tacoda"
 
 # [params.analytics.google]
 # SiteVerificationTag = "XYZabc"
@@ -215,11 +130,6 @@ tocopen = false
   minMatchCharLength = 0
   keys = [ "title", "permalink", "summary", "content" ]
 
-# [[menu.main]]
-# identifier = "categories"
-# name = "categories"
-# url = "/categories/"
-# weight = 10
 
 [[menu.main]]
 identifier = "about"
@@ -232,18 +142,6 @@ identifier = "posts"
 name = "posts"
 url = "/posts/"
 weight = 20
-
-# [[menu.main]]
-# identifier = "projects"
-# name = "projects"
-# url = "/projects/"
-# weight = 30
-
-# [[menu.main]]
-# identifier = "tags"
-# name = "tags"
-# url = "/tags/"
-# weight = 40
 
 # [[menu.main]]
 # identifier = "Ian Johnson"
