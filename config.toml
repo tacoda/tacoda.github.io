@@ -43,8 +43,8 @@ showtoc = false
 tocopen = false
 
   [params.style]
-    primaryColor = "#57cc8a"
-    darkColor = "#3f4c54"
+  primaryColor = "#57cc8a"
+  darkColor = "#3f4c54"
   # primaryColor = "#d3908e"
   # primaryColor = "#8caee0"
   # primaryColor = "#9993dc"
@@ -63,22 +63,6 @@ tocopen = false
   text = "Ian Johnson"
   icon = "/apple-touch-icon.png"
   iconHeight = 35
-
-    [[params.profileMode.buttons]]
-    name = "About"
-    url = "about"
-
-    [[params.profileMode.buttons]]
-    name = "Posts"
-    url = "posts"
-
-    [[params.profileMode.buttons]]
-    name = "Projects"
-    url = "projects"
-
-    [[params.profileMode.buttons]]
-    name = "Tags"
-    url = "tags"
 
   [[params.social]]
   icon = "github"
@@ -145,12 +129,6 @@ identifier = "posts"
 name = "posts"
 url = "/posts/"
 weight = 20
-
-# [[menu.main]]
-# identifier = "Ian Johnson"
-# name = "tacoda.dev"
-# url = "https://www.tacoda.dev/"
-# weight = 30
 
 [markup.highlight]
 noClasses = false
