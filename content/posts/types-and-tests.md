@@ -423,7 +423,3 @@ flowchart LR
 
 - Strong types are not an impediment to test-driven development
 - Leverage Gleam's types to constrain the test space
-
----
-
-**Next up:** We will add more tests and create a better way of creating accounts.

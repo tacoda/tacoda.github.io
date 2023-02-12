@@ -189,7 +189,3 @@ gleam run
 
 - Good tests should serve as executable documentation
 - Designing by contract results in unambiguous code, which increases confidence
-
----
-
-**Next up:** We will start to build out basic functionality for banking accounts.

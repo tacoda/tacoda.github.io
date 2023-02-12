@@ -607,7 +607,3 @@ Back to green tests! Lot's more to do here, but I think it's time for a well-des
 
 - Rely on pattern matching
 - _Where_ abstractions are defined matters as much as _which_ abstractions are defined
-
----
-
-**Next up:** We will explore more options creating accounts and test our edge-case.
