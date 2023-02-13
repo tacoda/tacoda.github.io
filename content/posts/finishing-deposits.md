@@ -694,6 +694,8 @@ Green tests! We have officially swapped the type of balance from `Float` to `Amo
 
 **Bonus Points:** We can remove our `to_float` function, since nothing is using it.
 
+**NOTE:** We also do not need the `Currency` type yet, so we will leave it out for now. It will return soon to help make the account manager smarter.
+
 ## Ending State
 
 **`src/bam.gleam`:**
@@ -709,11 +711,6 @@ pub type Account {
 
 pub type Amount {
   Amount(amount: Int)
-}
-
-pub type Currency {
-  USD
-  GBP
 }
 
 pub fn create_account() -> Account {
@@ -789,4 +786,5 @@ pub fn negative_deposits_should_not_accumulate_test() {
 
 - Use types to explore the interface
 - Use tests to verify the behavior
+- Types and tests are the ebb and flow of writing effective test-driven gleam code
 
