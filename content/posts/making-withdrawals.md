@@ -592,9 +592,9 @@ Next, we'll separate our test code.
 There are two main things we have to abide by in order to get our tests running:
 
 1. Test files must have `_test` as a suffix for the filename (before the `.gleam` extension).
-2. Test functions must end it `_test` in order to be run.
+2. Test functions must end in `_test` in order to be run.
 
-It seems fairly likely that we will be doing more with accounts and that should warrant it's own set of tests. With this thought in mind, I will create a folder for all account-related tests.
+It seems fairly likely that we will be doing more with accounts and that should warrant its own set of tests. With this thought in mind, we will create a folder for all account-related tests.
 
 ```sh
 mkdir test/accounts
