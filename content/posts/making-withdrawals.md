@@ -657,7 +657,7 @@ pub fn negative_deposits_should_not_accumulate_test() {
 import gleeunit/should
 import bamlib/account.{Amount, create_account, deposit, get_balance, withdraw}
 
-pub fn withdrawal_deccreases_account_balance_test() {
+pub fn withdrawal_decreases_account_balance_test() {
   create_account()
   |> deposit(Amount(100))
   |> withdraw(Amount(50))
