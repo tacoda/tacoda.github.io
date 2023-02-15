@@ -130,6 +130,12 @@ name = "posts"
 url = "/posts/"
 weight = 20
 
+[[menu.main]]
+identifier = "resources"
+name = "resources"
+url = "/resources/"
+weight = 30
+
 [markup.highlight]
 noClasses = false
 
