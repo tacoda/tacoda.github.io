@@ -53,11 +53,7 @@ tocopen = false
   # lightestColor = "#f5f5f5"
 
   [params.assets]
-  favicon = "<link / abs url>"
-  favicon16x16 = "<link / abs url>"
-  favicon32x32 = "<link / abs url>"
-  apple_touch_icon = "<link / abs url>"
-  safari_pinned_tab = "<link / abs url>"
+  favicon = "favicon.ico"
 
   [params.label]
   text = "Ian Johnson"
