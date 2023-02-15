@@ -127,10 +127,16 @@ url = "/posts/"
 weight = 20
 
 [[menu.main]]
+identifier = "projects"
+name = "projects"
+url = "/projects/"
+weight = 30
+
+[[menu.main]]
 identifier = "resources"
 name = "resources"
 url = "/resources/"
-weight = 30
+weight = 40
 
 [markup.highlight]
 noClasses = false
