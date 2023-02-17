@@ -1,5 +1,5 @@
 ---
-title: "Lessons from The Oxford University Style Guide"
+title: "Notes from The Oxford University Style Guide"
 date: 2023-02-16T16:30:03+00:00
 publishdate: 2023-02-16T16:30:03+00:00
 # weight: 5

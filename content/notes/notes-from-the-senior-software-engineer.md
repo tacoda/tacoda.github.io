@@ -1,5 +1,5 @@
 ---
-title: "Lessons from The Senior Software Engineer"
+title: "Notes from The Senior Software Engineer"
 date: 2023-02-16T17:30:03+00:00
 publishdate: 2023-02-16T17:30:03+00:00
 # weight: 5

@@ -1,5 +1,5 @@
 ---
-title: "Lessons from The Effective Engineer"
+title: "Notes from The Effective Engineer"
 date: 2023-02-16T13:30:03+00:00
 publishdate: 2023-02-16T13:30:03+00:00
 # weight: 5
