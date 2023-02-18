@@ -121,35 +121,31 @@ url = "/about/"
 weight = 10
 
 [[menu.main]]
-identifier = "notes"
-name = "notes"
-url = "/notes/"
-weight = 20
-
-[[menu.main]]
 identifier = "posts"
 name = "posts"
 url = "/posts/"
-weight = 30
+weight = 20
 
 [[menu.main]]
 identifier = "projects"
 name = "projects"
 url = "/projects/"
-weight = 40
+weight = 30
 
 [[menu.main]]
 identifier = "resources"
 name = "resources"
 url = "/resources/"
-weight = 50
+weight = 40
 
 [[menu.main]]
 identifier = "tags"
 name = "tags"
 url = "/tags/"
-weight = 60
+weight = 50
 
 [markup.highlight]
 noClasses = false
 
+[outputs]
+home = ["HTML", "RSS", "JSON"]
