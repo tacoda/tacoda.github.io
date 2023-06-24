@@ -93,13 +93,14 @@ sudo dnf install bzip2 ncurses libffi readline
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
 . "$HOME/.asdf/asdf.sh"
 . "$HOME/.asdf/completions/asdf.bash"
-asdf
+which asdf
+asdf --version
 ```
 
 ## Install Python
 
 ```
-asdf pluin add python
+asdf plugin add python
 asdf list-all python
 asdf install python 3.11.0
 asdf global python 3.11.0
@@ -109,4 +110,5 @@ asdf global python 3.11.0
 
 ```
 which python
+python --version
 ```
