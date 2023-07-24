@@ -66,11 +66,6 @@ tocopen = false
   url = "https://github.com/tacoda"
 
   [[params.social]]
-  icon = "twitter"
-  name = "twitter"
-  url = "https://twitter.com/tacodadev"
-
-  [[params.social]]
   icon = "linkedin"
   name = "linkedin"
   url = "https://www.linkedin.com/in/tacoda/"
