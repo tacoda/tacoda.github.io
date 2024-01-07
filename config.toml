@@ -1,4 +1,4 @@
-baseURL = "https://www.tacoda.dev/"
+baseURL = "https://tacoda.github.io/"
 title = "Ian Johnson"
 paginate = 5
 theme = "m10c"
