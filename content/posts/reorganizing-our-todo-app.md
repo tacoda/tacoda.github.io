@@ -321,7 +321,7 @@ python todo.py
 # $ ./todo report		 # Statistics
 ```
 
-So far, this is looking great! Next up, we are going to change how we are going to wrap our task in a class.
+So far, this is looking great! Next up, we are going to wrap our task in a class.
 
 ## Key Takeaways
 
