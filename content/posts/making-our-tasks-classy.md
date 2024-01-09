@@ -312,7 +312,7 @@ python todo.py
 # $ ./todo report		 # Statistics
 ```
 
-All we have done here is wrap up everything in a `Task` class that is really acting like a module in this case. Next up, we are going to add tests and start refactoring.
+All we have done here is wrap up everything in a `Task` class that is really acting like a module in this case. Next up, we are going to add tests so we can make changes with more confidence.
 
 ## Key Takeaways
 
