@@ -89,7 +89,7 @@ def test_adding_task(task, capsys):
     assert "Buy Bread" in captured.out
 ```
 
-Awesome! So fixtures can call other fixtures. For example, our `task` fixture uses our `task_file` fixture. Also, our tasks can ignore `task_file` and just pay attention to the `task` fixture. Let's run out tests:
+Awesome! So fixtures can call other fixtures. For example, our `task` fixture uses our `task_file` fixture. Also, our tasks can ignore `task_file` and just pay attention to the `task` fixture. Let's run our tests:
 
 ```sh
 poetry run pytest
