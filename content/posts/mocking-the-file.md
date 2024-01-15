@@ -258,6 +258,31 @@ And we are **Green**! Now, we should refactor, but we'll hold off for now. We ha
 
 Let's move the last relevant test to `test_task_list.py`.
 
+### `tests/test_task_list.py`
+
+```python
+def test_adding_task_to_list(todo_file, capsys):
+    with todo_file:
+        with open('todo.txt', 'a') as todo:
+            with open('done.txt', 'a') as done:
+                task_list = TaskList(todo, done)
+                task_list.add("Buy Bread")
+    captured = capsys.readouterr()
+    assert "Buy Bread" in captured.out
+
+
+def test_listing_tasks(todo_file, capsys):
+    with todo_file:
+        with open('todo.txt', 'a') as todo:
+            with open('done.txt', 'a') as done:
+                task_list = TaskList(todo, done)
+                task_list.ls()
+    captured = capsys.readouterr()
+    assert "[1] Buy Milk" in captured.out
+```
+
+We have only moved these tests. They are essentially the same. They are just using `TaskList` instead of `Task`. We will refactor to clean these up soon. At least now they are in the proper place.
+
 ### `todo/task_list.py`
 
 ```python
