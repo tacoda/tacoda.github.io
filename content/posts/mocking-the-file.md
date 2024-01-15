@@ -326,7 +326,7 @@ poetry run pytest tests/test_task_list.py
 # tests/test_task_list.py .. 
 ```
 
-Awesome! We now have green tests, but they are cosmetic. So, next up we will connect those tests to real code, deal with more mocking and test organization
+Awesome! We now have green tests, but they are cosmetic. So, next up we will connect those tests to real code and deal with more mocking and test organization.
 
 ## Key Takeaways
 
