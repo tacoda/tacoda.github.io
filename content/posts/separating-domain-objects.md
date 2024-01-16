@@ -31,33 +31,32 @@ from todo.task import Task
 
 
 if __name__ == '__main__':
-    # try:
-        args = sys.argv
-        if(args[1] == 'add'):
-            if(len(args[2:]) == 0):
-                sys.stdout.buffer.write(
-                    "Error: Missing todo string. Nothing added!".encode('utf8'))
-            else:
-                with open('todo.txt', 'a') as f:
-                        task = Task(f)
-                        task.add(''.join(args[2:]))
+    args = sys.argv
+    if(args[1] == 'add'):
+        if(len(args[2:]) == 0):
+            sys.stdout.buffer.write(
+                "Error: Missing todo string. Nothing added!".encode('utf8'))
+        else:
+            with open('todo.txt', 'a') as f:
+                    task = Task(f)
+                    task.add(''.join(args[2:]))
 
-        elif(args[1] == 'done' and len(args[2:]) == 0):
-            if(len(args[2:]) == 0):
-                sys.stdout.buffer.write(
-                    "Error: Missing NUMBER for marking todo as done.".encode('utf8'))
-            else:
-                Task.done(args[2:])
+    elif(args[1] == 'done' and len(args[2:]) == 0):
+        if(len(args[2:]) == 0):
+            sys.stdout.buffer.write(
+                "Error: Missing NUMBER for marking todo as done.".encode('utf8'))
+        else:
+            Task.done(args[2:])
 
-        elif(args[1] == 'del' and len(args[2:]) == 0):
-            if(len(args[2:]) == 0):
-                sys.stdout.buffer.write(
-                    "Error: Missing NUMBER for deleting todo.".encode('utf8'))
-            else:
-                Task.deL(args[2])
+    elif(args[1] == 'del' and len(args[2:]) == 0):
+        if(len(args[2:]) == 0):
+            sys.stdout.buffer.write(
+                "Error: Missing NUMBER for deleting todo.".encode('utf8'))
+        else:
+            Task.deL(args[2])
 
-        elif(args[1] == 'ls'):
-            Task.ls()
+    elif(args[1] == 'ls'):
+        Task.ls()
 ```
 
 ### `todo/task.py`
