@@ -331,7 +331,7 @@ And they pass!
 
 > As a side note, did you notice how many things we had to change from copy-pasting code? This is one of the main reasons why doing that can be problematic. Even worse, if your codebase happens to be untested then it's likely you'll find it in production as a bug.
 
-Now we can deleted the `Task.add` method entirely. Running the tests again verifies that this does not break our implmentation.
+Now we can delete the `Task.add` method entirely. Running the tests again verifies that this does not break our implmentation.
 
 Next up is `Task.ls`. Here's the method that we will move:
 
