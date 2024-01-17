@@ -245,7 +245,7 @@ def test_marking_task_done(task, capsys):
 Since we have marked the test to be skipped, pytest will happily skip it and report it in our test as `s`. So now let's get a little more information from out tests. Run them with a `-v` flag.
 
 ```sh
-poetry run pytest
+poetry run pytest -v
 # tests/test_task.py::test_marking_task_done SKIPPED (unconditional skip)
 # tests/test_task_list.py::test_adding_task_to_list PASSED
 # tests/test_task_list.py::test_listing_tasks PASSED
@@ -293,7 +293,7 @@ poetry run pytest -v
 # tests/test_task_list.py::test_listing_tasks_displays_output PASSED 
 ```
 
-Now our tests are much more descriptive. What's the benefit. Now I can just read my tests and I know what they are tests. These descriptions are better, but they are still not quite english-like. We are going to extend that soon.
+Now our tests are much more descriptive. What's the benefit? Now I can just read my tests and I know what they are testing. These descriptions are better, but they are still not quite english-like. We are going to extend that soon.
 
 This also allows us to easily add our other cases.
 
@@ -328,7 +328,7 @@ def test_adding_a_task_increases_list_size(task_list):
 def test_adding_a_task_appends_that_task(task_list):
     task_list.add("Buy Bread")
     task = task_list.all()
-    assert "Buy Bread" == task.description
+    assert "Buy Bread" in task.description
 
 
 def test_listing_tasks_displays_output(task_list, capsys):
