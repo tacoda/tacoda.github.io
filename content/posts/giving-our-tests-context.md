@@ -1,7 +1,7 @@
 ---
 title: "Giving Our Tests Context"
-date: 2024-01-17T11:30:03+00:00
-publishdate: 2024-01-17T11:30:03+00:00
+date: 2024-01-18T11:30:03+00:00
+publishdate: 2024-01-18T11:30:03+00:00
 tags: ["python", "programming"]
 author: "Ian Johnson"
 showToc: false
