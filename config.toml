@@ -128,16 +128,10 @@ url = "/projects/"
 weight = 30
 
 [[menu.main]]
-identifier = "resources"
-name = "resources"
-url = "/resources/"
-weight = 40
-
-[[menu.main]]
 identifier = "tags"
 name = "tags"
 url = "/tags/"
-weight = 50
+weight = 40
 
 [markup.highlight]
 noClasses = false
