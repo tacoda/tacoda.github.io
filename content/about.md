@@ -2,7 +2,9 @@
 
 I am a fullstack web developer versed in PHP, Python, Ruby, JavaScript, TypeScript, and Go. Application security is something I am very focused on. Recent projects I have embarked on include exploring artificial intelligence, native programs, and progressive web apps. I am always interested in learning more about security and cloud computing. I also enjoy contributing to open source projects.
 
-This blog covers subject matter related to code. My _other_ blog is about travel. Check it out at https://world.hey.com/tacoda!
+[Technical Substack](https://diffengine.substack.com/)
+
+[Travel Subtack](https://roamingroots.substack.com/)
 
 ## How I can help your organization
 
