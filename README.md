@@ -1,3 +1,3 @@
-# tacodadev
+# tacoda.github.io
 
-Static website for https://tacoda.dev
+My GitHub pages website.
