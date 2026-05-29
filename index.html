@@ -14,7 +14,7 @@
     </script>
   </head>
   <body>
-    <div class="bg-white">
+    <div class="bg-white pb-24">
       <main class="isolate">
         <!-- Hero section -->
         <div
@@ -38,14 +38,14 @@
                   scalable web applications and cloud-based solutions. I love
                   solving complex problems, expanding my skills, and embracing
                   the remote work lifestyle. I also help teams integrate AI into
-                  their engineering process holistically — focusing on the
+                  their engineering process holistically, focusing on the
                   highest-leverage wins rather than scattered experiments. My
                   core expertise lies in web applications: particularly Ruby,
                   Python, PHP, JavaScript, and Go. I take pride in creating
                   software that is simple, durable, and impactful.
                 </p>
                 <p class="mt-4 text-lg leading-8 text-gray-600">
-                  I bring ideas to life by working across the entire web stack —
+                  I bring ideas to life by working across the entire web stack
                   from backend APIs to frontend interfaces, and everything in
                   between. I’m comfortable with testing frameworks, databases,
                   memory caches, job queues, web servers, Linux systems, cloud
@@ -73,7 +73,7 @@
         </div>
 
         <!-- Consulting section -->
-        <div class="mx-auto mt-10 max-w-7xl px-6 sm:mt-16 lg:px-8">
+        <div class="mx-auto mt-4 max-w-7xl px-6 sm:mt-6 lg:px-8">
           <h2
             class="text-pretty text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
           >
@@ -130,7 +130,7 @@
         </div>
 
         <!-- Stats -->
-        <div class="mx-auto mt-4 max-w-7xl px-6 sm:mt-6 lg:px-8">
+        <div class="mx-auto mt-16 max-w-7xl px-6 sm:mt-24 lg:px-8">
           <h2
             class="text-pretty text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
           >
@@ -596,13 +596,18 @@
       </main>
 
       <!-- Footer -->
-      <footer class="mt-24 sm:mt-30" aria-labelledby="footer-heading">
+      <footer
+        class="fixed inset-x-0 bottom-0 z-10 border-t border-gray-900/10 bg-white"
+        aria-labelledby="footer-heading"
+      >
         <h2 id="footer-heading" class="sr-only">Footer</h2>
-        <div class="mx-auto max-w-7xl px-6 pb-8 lg:px-8">
-          <div
-            class="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 md:flex md:items-center md:justify-between lg:mt-24"
-          >
-            <div class="flex space-x-6 md:order-2">
+        <div
+          class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8"
+        >
+          <p class="text-xs leading-5 text-gray-500">
+            &copy; 2026 Ian Johnson
+          </p>
+          <div class="flex space-x-6">
               <a
                 href="mailto:ian@tacoda.dev"
                 class="text-gray-400 hover:text-gray-500"
@@ -674,11 +679,7 @@
                 </svg>
               </a>
             </div>
-            <p class="mt-8 text-xs leading-5 text-gray-500 md:order-1 md:mt-0">
-              &copy; 2026 Ian Johnson
-            </p>
           </div>
-        </div>
       </footer>
     </div>
   </body>
