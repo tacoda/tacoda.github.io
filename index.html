@@ -336,6 +336,13 @@
             data-route="/projects"
             >Projects</a
           >
+          <a
+            href="#/resources"
+            class="nav-link"
+            data-link
+            data-route="/resources"
+            >Resources</a
+          >
           <a href="https://blog.tacoda.dev" class="nav-link">Blog</a>
         </nav>
 
@@ -391,6 +398,12 @@
           class="block px-6 py-3 text-sm text-slate-200 hover:bg-white/5"
           data-link
           >Projects</a
+        >
+        <a
+          href="#/resources"
+          class="block px-6 py-3 text-sm text-slate-200 hover:bg-white/5"
+          data-link
+          >Resources</a
         >
         <a
           href="https://blog.tacoda.dev"
@@ -773,6 +786,66 @@
       </section>
     </template>
 
+    <template id="route-resources">
+      <section class="route">
+        <div class="mx-auto max-w-6xl px-6 pt-16 pb-24 lg:px-8 lg:pt-24">
+          <p class="text-xs font-semibold uppercase tracking-widest text-violet-300 animate-fade-in">
+            Resources
+          </p>
+          <h1 class="mt-3 text-5xl font-extrabold tracking-tight text-white sm:text-6xl animate-fade-in-up">
+            Worked examples, <span class="gradient-text">in full.</span>
+          </h1>
+          <p class="mt-6 max-w-2xl text-lg text-slate-300 animate-fade-in-up" style="animation-delay:80ms">
+            Long-form breakdowns of real systems, drawn from working code, with
+            the domain specifics stripped out. Structure, thresholds, and
+            control flow unchanged.
+          </p>
+
+          <div class="mt-14 grid gap-6 sm:grid-cols-2">
+            <a href="/guardrails/" class="glass glass-hover reveal group relative overflow-hidden rounded-2xl p-6">
+              <div class="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 opacity-20 blur-2xl transition-opacity duration-500 group-hover:opacity-40"></div>
+              <div class="relative">
+                <div class="flex items-center justify-between">
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-slate-300">
+                    Guardrails
+                  </span>
+                  <span class="text-slate-500 transition group-hover:translate-x-0.5 group-hover:text-white">↗</span>
+                </div>
+                <h3 class="mt-6 text-2xl font-bold tracking-tight text-white">
+                  <span class="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Five Guardrails</span>
+                </h3>
+                <p class="mt-3 text-sm leading-6 text-slate-400">
+                  Five worked examples of agent guardrails, ascending from a
+                  single deny-list entry to a self-measuring delivery loop that
+                  writes rules back into its own charter.
+                </p>
+              </div>
+            </a>
+
+            <a href="/factory/" class="glass glass-hover reveal group relative overflow-hidden rounded-2xl p-6" style="transition-delay:60ms">
+              <div class="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-cyan-400 to-sky-500 opacity-20 blur-2xl transition-opacity duration-500 group-hover:opacity-40"></div>
+              <div class="relative">
+                <div class="flex items-center justify-between">
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-slate-300">
+                    Factory
+                  </span>
+                  <span class="text-slate-500 transition group-hover:translate-x-0.5 group-hover:text-white">↗</span>
+                </div>
+                <h3 class="mt-6 text-2xl font-bold tracking-tight text-white">
+                  <span class="bg-gradient-to-r from-cyan-400 to-sky-500 bg-clip-text text-transparent">The Factory</span>
+                </h3>
+                <p class="mt-3 text-sm leading-6 text-slate-400">
+                  Anatomy of a lights-on factory: gates before an action,
+                  provenance during it, one model dependency, and a durable
+                  queue holding the whole thing together.
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+    </template>
+
     <template id="route-404">
       <section class="route">
         <div class="mx-auto max-w-3xl px-6 py-40 text-center lg:px-8">
@@ -917,6 +990,7 @@
         '/': 'route-home',
         '/about': 'route-about',
         '/projects': 'route-projects',
+        '/resources': 'route-resources',
       };
 
       function currentRoute() {

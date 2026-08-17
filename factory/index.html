@@ -1,0 +1,1896 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Factory — Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Anatomy of a lights-on factory: one model dependency, a pure derive function, and a durable queue. A harness by definition, a factory by operation, a queue by design. From Harness Engineering by Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/factory/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Factory — Harness Engineering">
+<meta property="og:description" content="Anatomy of a lights-on factory: one model dependency, a pure derive function, and a durable queue.">
+<meta property="og:url" content="https://www.tacoda.dev/factory/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Factory — Harness Engineering">
+<meta name="twitter:description" content="Anatomy of a lights-on factory: one model dependency, a pure derive function, and a durable queue.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- aside ---------- */
+.aside {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--gold-soft);
+  background: var(--surface);
+  padding: 1.1rem 1.2rem;
+  border-radius: 2px;
+  display: grid;
+  gap: 1rem;
+}
+.aside > .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.aside > .label::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+.aside p { font-size: 0.95rem; max-width: 62ch; }
+.aside .tablewrap { background: var(--surface); }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>A lights-on factory</span>
+      <span class="sep">/</span>
+      <span>Anatomy of a running system</span>
+    </div>
+    <h1>A harness by definition, a factory by operation, <em>a queue by design</em></h1>
+    <p class="standfirst">
+      A <em>lights-on factory</em>: it takes a tracker card and returns a merged pull request, and
+      the lights are on in two distinct senses — governance gates raise a decision to a human
+      <em>before</em> an action is taken, and observability and provenance record what happened
+      <em>during</em> it. Autonomy is a separate dial. It is about 5,300 lines of Python:
+      three runtime dependencies, one model dependency, sixteen job handlers, seven seams, 193 tests.
+      Nothing in it knows what the code it delivers is <em>for</em> — no product vocabulary, no
+      business rules, no domain types. That absence is a design property, not an omission: the
+      factory is the machinery, and everything domain-specific lives in the target repo's charter,
+      where it can be authored and changed without touching the engine. The five rungs below ascend
+      the way the system was actually built: one dependency, one pure function, one durable queue,
+      one writer per card, one lit loop.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">— author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      harness surface · ~5,300 lines of Python · 3 runtime deps (fastapi · uvicorn · pyyaml) · 1 model dep
+      · 16 job handlers · 7 seams · 193 tests · state is files<br>
+      substitutions · <code>make</code> = your task runner · <code>PROJ-000</code> = your issue key
+      · tracker and code host = whatever you already run
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Deterministic</dt>
+          <dd>A pure function or a gate decides. No inference, no spend, unit-testable.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Model turn</dt>
+          <dd>The expensive, non-deterministic move. Spent only where inference is required.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Durable</dt>
+          <dd>A persisted artifact — a file the queue can resume from and an auditor can read.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="The five rungs">
+    <ol>
+      <li><a href="#rung-1"><span class="n">1</span> One dependency</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> Derive, don't remember</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> The queue is the design</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> One writer per card</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> The lit factory &amp; the dial</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Complexity 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">One dependency</span>
+      </div>
+      <div>
+        <h2>The smallest model dependency that does the job</h2>
+        <p class="thesis">
+          This harness reaches for exactly one library to run an agent: the Claude Agent SDK. Not
+          because frameworks are bad — because the SDK <em>is</em> Claude Code, and Claude Code is
+          already the harness this shop prefers. Point it at a directory and the target repo's
+          charter, hooks, skills and MCP servers load natively. Everything a framework would add on
+          top is either already there or not needed yet.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>dep</b> claude-agent-sdk&gt;=0.1</span>
+          <span class="chip kind-rule"><b>seam</b> providers/base.py · ModelProvider</span>
+          <span class="chip kind-agent"><b>impl</b> providers/claude_sdk.py</span>
+          <span class="chip kind-agent"><b>impl</b> providers/stub.py</span>
+          <span class="chip kind-config"><b>config</b> PDS_MODEL · PDS_MODEL_API_KEY</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The whole dependency list is short enough to print. Three packages run the daemon and its
+        board; one optional extra runs the model. There is no workflow engine, no graph library, no
+        agent framework, and no vector store.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>pyproject.toml — the entire dependency surface</span><span class="tag pass">one model dep</span></figcaption>
+<pre><code>dependencies = [
+  "fastapi&gt;=0.115",   <span class="c-dim"># the board's API</span>
+  "uvicorn&gt;=0.30",    <span class="c-dim"># serves it</span>
+  "pyyaml&gt;=6.0",      <span class="c-dim"># charter frontmatter</span>
+]
+
+[project.optional-dependencies]
+<span class="c-dim"># the model seam: claude-agent-sdk runs Claude Code (drives the `claude` CLI,
+# which the image installs). `anthropic` is only for the eval llm_judge — a
+# single Messages-API completion, no agent.</span>
+agent = [<span class="c-pass">"claude-agent-sdk&gt;=0.1"</span>, "anthropic&gt;=0.40"]</code></pre>
+      </figure>
+
+      <p>
+        The reason one dependency is enough is that the SDK is not a thin HTTP client — it runs
+        Claude Code in-process. Pointed at <code>cwd=&lt;the task's worktree&gt;</code>, it loads
+        that repo's <code>CLAUDE.md</code>, its glob-scoped <code>.claude/rules</code>, its skills,
+        its <code>.mcp.json</code> servers and its <code>settings.json</code> hooks — natively, with
+        no reproduction on the harness side. A framework-based harness has to rebuild all of that:
+        context assembly, tool definitions, permission modes, hook dispatch. Here the harness
+        injects only the one layer Claude cannot know about — cross-repo governance policy — and
+        gets the rest for free.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>providers/base.py — the seam, in full</span><span class="tag warn">~30 lines</span></figcaption>
+<pre><code>@dataclass
+class ModelResult:
+    text: str                      <span class="c-dim"># final assistant text</span>
+    cost_usd: float = 0.0
+    tokens: int = 0
+    ok: bool = True
+    error: str | None = None
+    data: dict | None = None       <span class="c-dim"># parsed structured output</span>
+
+
+class ModelProvider(ABC):
+    @abstractmethod
+    def run(self, prompt: str, *, cwd: Path | None = None, extra_dirs: list[Path] | None = None,
+            timeout: float = 3600, schema: dict | None = None, phase: str = "",
+            on_event=None) -&gt; ModelResult:
+        <span class="c-dim">"""Run one agent turn. The harness NEVER shells out to a model
+        directly; it goes through here."""</span></code></pre>
+      </figure>
+
+      <h3 class="sub">Subscription auth, and why it decides the architecture</h3>
+      <p>
+        One provider covers both auth modes, and the default is the interesting one. If an API key
+        is configured it is passed through to the SDK; if it is not, the SDK falls back to the
+        <code>claude</code> CLI's own ambient authentication — the subscription already being paid
+        for. No token to mint, rotate, scope or leak, and no per-token invoice for a factory whose
+        normal state is four long agent turns running at once.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>providers/claude_sdk.py — the option kwargs</span><span class="tag pass">key optional, by design</span></figcaption>
+<pre><code>self.api_key = api_key or None       <span class="c-dim"># "" → None: no key means ambient CLI auth</span>
+
+kwargs = {
+    "cwd": str(root),
+    "permission_mode": "bypassPermissions",   <span class="c-dim"># headless: no interactive approval</span>
+    "disallowed_tools": self._disallowed(phase),
+}
+if self.model:
+    kwargs["model"] = self.model
+<span class="c-pass">if self.api_key:                     # ONLY when explicitly configured
+    kwargs["env"] = {"ANTHROPIC_API_KEY": self.api_key}</span>
+
+<span class="c-dim"># Two behaviors are set explicitly because SDK defaults differ from `claude -p`:
+# the Claude Code system prompt (SDK apps default to none) and permission bypass.
+# `setting_sources` is left at the SDK default — all sources, i.e. CLI parity.</span>
+return ClaudeAgentOptions(system_prompt={"type": "preset", "preset": "claude_code"}, **kwargs)</code></pre>
+      </figure>
+
+      <p>
+        Cost is still measured. The SDK's terminal <code>ResultMessage</code> carries
+        <code>total_cost_usd</code> and a token count, so every job records what the turn would have
+        cost whether or not anything was metered — which is what makes the per-card price in rung 5
+        possible without an invoice.
+      </p>
+
+      <aside class="aside">
+        <span class="label">Aside — the pattern is not Claude-specific</span>
+        <p>
+          "Drive a stock coding-agent harness from code, on the subscription you already pay for" is
+          not a single-vendor trick. Two other vendors ship the same shape: an official SDK that
+          spawns and drives their own CLI, reusing the login that CLI already stored. Two more get
+          part of the way. The differences are worth knowing before you pick, because they are
+          differences in <em>credential</em>, not in capability.
+        </p>
+
+        <div class="tablewrap">
+          <table>
+            <caption>Stock harnesses that can be embedded, and what they authenticate with</caption>
+            <thead>
+              <tr><th>Harness</th><th>Embeddable SDK</th><th>Subscription auth, headless</th><th>The catch</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Claude Code</td>
+                <td><code>claude-agent-sdk</code></td>
+                <td>yes — ambient CLI auth</td>
+                <td>none; key is opt-in</td>
+              </tr>
+              <tr>
+                <td>Codex</td>
+                <td><code>@openai/codex-sdk</code> · <code>openai-codex</code></td>
+                <td>yes — reuses the saved CLI login</td>
+                <td>docs prefer a key for CI; the plan path is gated on private runners, no public repos, one serialized consumer of the credential file</td>
+              </tr>
+              <tr>
+                <td>Copilot</td>
+                <td><code>@github/copilot-sdk</code> (+ Python, Go, …)</td>
+                <td>yes — the credential <em>is</em> a GitHub token</td>
+                <td>none of note; there is no metered key to fall back to</td>
+              </tr>
+              <tr>
+                <td>Cursor</td>
+                <td><code>@cursor/sdk</code></td>
+                <td>via a <em>user</em> key that bills that user's plan</td>
+                <td>subscription-backed automation wearing an API-key shape</td>
+              </tr>
+              <tr class="flag">
+                <td>Gemini CLI</td>
+                <td>none documented</td>
+                <td>cached account credential survives <code>--prompt</code></td>
+                <td>no embedding surface — you shell out and parse JSON</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>
+          Two caveats matter more than the comparison. Vendor terms differ and they move, so read the
+          current ones for whichever you pick instead of inheriting an assumption from a blog post.
+          And the frameworks do none of this: LangChain, LangGraph, deepagents and Pydantic AI all
+          authenticate with a provider API key, and every subscription-shaped adapter for them is
+          community glue. Subscription auth is a property of the vendor's own CLI-driving SDK — which
+          is a second, independent reason the seam here wraps one of those.
+        </p>
+
+        <h3 class="sub">The suggestion: make the harness a port, not a choice</h3>
+        <p>
+          If several stock harnesses can be embedded, then "which coding agent runs the turn" is
+          exactly the kind of decision that belongs behind a port. The factory already has the port —
+          <code>ModelProvider</code>, thirty lines, written before there was a second implementation
+          to justify it. An adapter per harness is the natural next move, and each adapter's job is
+          narrow: run one turn in a working directory, stream progress lines, come back with text,
+          tokens, cost and optional structured data.
+        </p>
+
+        <figure class="code">
+          <figcaption><span>a sketch, not shipped code — one port, an adapter per stock harness</span><span class="tag warn">the shape it wants</span></figcaption>
+<pre><code>ADAPTERS = {                          <span class="c-dim"># each implements ModelProvider.run()</span>
+    "claude":  ClaudeSDKProvider,     <span class="c-dim"># claude-agent-sdk    · ambient CLI auth</span>
+    "codex":   CodexProvider,         <span class="c-dim"># @openai/codex-sdk   · saved CLI login</span>
+    "copilot": CopilotProvider,       <span class="c-dim"># @github/copilot-sdk · GitHub token</span>
+    <span class="c-pass">"stub":    StubProvider,          # tests: the whole factory, no model at all</span>
+}
+provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=posture)</code></pre>
+        </figure>
+
+        <p>
+          What each adapter absorbs is the part that is genuinely vendor-shaped: the stream event
+          types, how structured output is coaxed out and validated, how tool policy is expressed, and
+          which auth mode is in play. What none of them touch is the queue, the reconciler, the pure
+          derive function, the worktree isolation or the oversight dial — none of which have any
+          opinion about which agent did the work. That is the payoff of putting the seam in early:
+          the factory becomes harness-agnostic without a rewrite, and adding a vendor is one class
+          plus its mock, not a migration.
+        </p>
+
+        <p>
+          It is also the honest way to hedge a fast-moving decision. Vendors change their auth
+          posture, their pricing and their SDK surface on their own schedule; a port converts each of
+          those from an incident into an adapter edit. And a second adapter buys something
+          immediately, before any vendor changes anything — the same interface, implemented as a stub,
+          is what lets this system's whole delivery loop run in 193 tests with no model, no network
+          and no spend.
+        </p>
+      </aside>
+
+      <h3 class="sub">When to reach past the SDK</h3>
+      <p>
+        This is a threshold, not a preference. The SDK is the right tool while the flow you need is
+        the flow a stock harness already runs. The moment you need something a stock harness cannot
+        give you — a genuinely custom control flow, or the ability to swap the model underneath —
+        that is when a framework earns its place, and Pydantic AI, LangChain, LangGraph and
+        deepagents are the right answers to that question.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Stock flow</span>
+          <span class="what">Run an agent inside a repo, under that repo's own charter, and get structured output back. The SDK does this natively — <code>schema=</code> plus a JSON-extraction helper is the entire structured-output layer here.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Orchestration</span>
+          <span class="what">Retries, leases, dead letters, checkpoints, backpressure. A durable queue, ~200 lines of it (rung&nbsp;3) — not a workflow engine. The queue is the orchestration.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Custom flow</span>
+          <span class="what">A control flow no stock harness will run for you: a graph with joins and conditional fan-in, per-node memory policies, a human-approval node mid-graph, cross-process resumption of a partial graph. <strong>Reach for the framework.</strong></span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Model choice</span>
+          <span class="what">Swapping models or providers per step — a cheap model to classify, an expensive one to implement, a third to judge. A provider-agnostic framework is the honest way to do that; a single-vendor SDK is not.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not yet</span>
+          <span class="what">Neither threshold has been hit here, so neither dependency exists here. If one arrives, the change is one class behind <code>ModelProvider</code> — which is the whole reason the seam was written before it was needed.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Start with a framework and you pay twice. Once in reproduction: the framework's runtime
+          re-implements charter loading, tool policy, hook dispatch and permission modes that Claude
+          Code already does, and your versions drift from the ones your engineers use interactively.
+          And once at the meter: framework paths authenticate with a provider API key, so an
+          unattended factory bills per token from the first run, before you know whether the flow is
+          even right.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          Take the highest rung of the ladder that holds. If your preferred harness is Claude Code,
+          its SDK <em>is</em> your agent framework — reaching past it buys custom flow and model
+          portability, and until you need those two things it buys only surface area. The discipline
+          that makes this safe is not the choice, it is the <strong>seam</strong>: thirty lines of
+          abstract class means the decision stays reversible, and a stub implementation of the same
+          interface is what lets the whole factory run in tests with no model at all.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Complexity 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Pure function</span>
+      </div>
+      <div>
+        <h2>Derive, don't remember</h2>
+        <p class="thesis">
+          The daemon holds no opinion about where a card is. Every tick it reads current external
+          state, hands a snapshot to a pure function, and gets back at most one action to enqueue.
+          The controller model, not the event model: if the daemon dies mid-run, external state is
+          untouched and the next tick resumes from it.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>pure</b> harness/derive.py · derive_action</span>
+          <span class="chip kind-rule"><b>pure</b> derive.py · route_feedback</span>
+          <span class="chip kind-make"><b>loop</b> harness/reconciler.py · tick</span>
+          <span class="chip kind-gate"><b>guardrail</b> per-issue at-most-one-active</span>
+          <span class="chip kind-gate"><b>guardrail</b> poison guard</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <code>derive.py</code> has no imports that touch the network, the disk or the clock. It maps
+        one issue snapshot to one decision, and the pipeline it encodes is a table anyone can read:
+        Backlog → Needs&nbsp;Details → To&nbsp;Do → In&nbsp;Progress → In&nbsp;Review →
+        In&nbsp;Staging → Done, over four phases (Discover → Define → Dispatch → Verify).
+      </p>
+
+      <figure class="code">
+        <figcaption><span>harness/derive.py — the state machine, no I/O</span><span class="tag warn">deterministic</span></figcaption>
+<pre><code>@dataclass(frozen=True)
+class Decision:
+    action: str | None       <span class="c-dim"># job fn to enqueue, or None (waiting / terminal)</span>
+    reason: str
+
+def derive_action(issue: Issue) -&gt; Decision:
+    s = issue.status
+    if s == BACKLOG:
+        <span class="c-dim"># nothing rendered yet, or new feedback since the last render</span>
+        return Decision("draft", "in Backlog → draft the contract") if _needs_refine(issue) else NOTHING
+    if s == NEEDS_DETAILS:
+        if issue.has_marker(M_APPROVE):
+            return Decision("approve", "contract approved → move to To Do")
+        return Decision("draft", "draft the contract") if _needs_refine(issue) else NOTHING
+    if s == TO_DO:      return Decision("dispatch", "approved and ready → dispatch executor chain")
+    if s == IN_PROGRESS: return Decision("execute", "in progress → run/continue executor chain")
+    <span class="c-dim"># In Review (verdict), In Staging / Done (terminal), Backlog (awaiting triage)</span>
+    return NOTHING</code></pre>
+      </figure>
+
+      <p>
+        Note what <em>isn't</em> here. No model call decides where a card goes next. Routing feedback
+        is the same story — whether a comment means "revise the open PR" or "file a follow-up card"
+        is decided by the card's status, in one line, for free:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>derive.py — routing without inference</span><span class="tag warn">one line, testable</span></figcaption>
+<pre><code>def route_feedback(status: str) -&gt; str:
+    <span class="c-dim">"""In-flight work is revised on the same PR; shipped or not-yet-started work
+    is triaged as a follow-up card, never touching a frozen PR."""</span>
+    return "revise" if status in (IN_PROGRESS, IN_REVIEW) else "triage"</code></pre>
+      </figure>
+
+      <p>
+        The reconciler is the impure half, and it is deliberately dull: read the tracker, call
+        <code>derive_action</code>, enqueue, write a snapshot for the board. All the subtlety is in
+        <em>not</em> enqueueing — three guards, each answering a different failure.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>harness/reconciler.py — the three guards on enqueue</span><span class="tag block">refuses duplicates</span></figcaption>
+<pre><code>def _has_active(self, key, action):     <span class="c-dim"># already queued or leased → skip</span>
+    return any(j.status in (QUEUED, LEASED) and j.fn == action
+               and j.payload.get("issue_key") == key for j in self.store.all())
+
+def _is_poisoned(self, key, action):
+    <span class="c-dim"># A dead-lettered OR operator-cancelled (key, action) blocks re-enqueue —
+    # otherwise a failing action re-derives EVERY TICK, forever. The operator
+    # retries (resume) or drops (cancel) it from the job page.</span>
+    return any(j.status in (DEAD, CANCELLED) and j.fn == action
+               and j.payload.get("issue_key") == key for j in self.store.all())
+
+<span class="c-dim"># a drop or a from-scratch restart in flight pre-empts other work for the card</span>
+_PREEMPT = ("close", "restart")
+
+def _retire_poison(self, key, action):
+    <span class="c-dim"># Newer operator feedback SUPERSEDES a failed prior attempt, so it stops
+    # counting as poison and a fresh job runs. Every feedback yields a NEW job —
+    # we never revive an old one.</span>
+    ...</code></pre>
+      </figure>
+
+      <h3 class="sub">What the controller model buys</h3>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Crash safety</span>
+          <span class="what">The daemon can be killed at any instant. Nothing is lost because nothing was held: state lives in the tracker, the code host, git and the queue's files. The next tick reads the world as it is and continues.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Testability</span>
+          <span class="what">The interesting logic is a pure function over a dataclass, so the entire pipeline — every transition, every route — is covered by fast tests with no daemon, no network and no model.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Cost</span>
+          <span class="what">Routing decisions cost nothing. Inference is spent on drafting a contract, implementing a change and reviewing a diff — the three places judgment is actually required.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Idle discipline</span>
+          <span class="what">A card mid-approval derives <code>NOTHING</code> rather than re-rendering. <code>_needs_refine</code> re-drafts only when new feedback arrives after the last render, so a waiting card is not silently re-spent every tick.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Free observability</span>
+          <span class="what">The same pass writes <code>pipeline.json</code> — cards grouped by stage, each with its next action — which is the board's entire data source. The projection is a by-product of deciding.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Go event-driven with state in the process and two failure modes arrive together. A missed
+          or duplicated webhook wedges a card in a state nobody can name, and a deploy mid-run loses
+          the only copy of "where were we". Then, because in-process state is unreliable, the natural
+          fix is to ask the model where the card is — which is expensive, non-deterministic, and
+          untestable, three properties you do not want in a routing decision.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          Deterministic decisions stay in the harness; a model turn is spent only where inference is
+          required. The test for a rule is whether you can write it as a pure function over external
+          state — if you can, it does not belong in a prompt. <strong>Derive, don't
+          remember</strong> is the same discipline at the system level that "read the file, don't
+          recall it" is at the agent level.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Complexity 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Durable queue</span>
+      </div>
+      <div>
+        <h2>The queue is the design, not the plumbing</h2>
+        <p class="thesis">
+          Every property this factory needs turns out to be a queue property. Resume after a crash?
+          A lease. Survive a transient failure? Bounded retries with backoff. Stop a wedged card from
+          burning money forever? A dead-letter. Know what a card cost? A field on the job. Limit how
+          many agents run at once? The size of the pool. Get all of it in about 200 lines of Python
+          over files on disk — no broker, no database, no daemon but your own.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>seam</b> queue/store.py · Queue</span>
+          <span class="chip kind-make"><b>impl</b> queue/file_store.py · FileStore</span>
+          <span class="chip kind-config"><b>model</b> queue/job.py · Job · JobState</span>
+          <span class="chip kind-make"><b>pool</b> queue/worker.py · WorkerPool</span>
+          <span class="chip kind-gate"><b>ctx</b> worker.py · Context.save / bill</span>
+          <span class="chip kind-cmd"><b>registry</b> queue/registry.py</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The unit of work is a job, and the job record is the whole contract between the loop and the
+        world. Everything the factory later wants to know — what ran, how many times, what it cost,
+        what it had gotten through before it died — is a field here.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>queue/job.py — the unit of work</span><span class="tag pass">one file per job on disk</span></figcaption>
+<pre><code>@dataclass
+class Job:
+    id: int
+    fn: str                                  <span class="c-dim"># handler name in the registry</span>
+    payload: dict = field(default_factory=dict)
+    status: JobState = JobState.QUEUED
+    attempts: int = 0
+    max_attempts: int = 3
+    idempotency_key: str | None = None
+    lease_until: float = 0.0                 <span class="c-dim"># visibility timeout while leased</span>
+    run_after: float = 0.0                   <span class="c-dim"># backoff / delayed scheduling</span>
+    parent_id: int | None = None             <span class="c-dim"># chained job trees</span>
+    error: str | None = None
+    result: Any = None
+    checkpoint: dict = field(default_factory=dict)   <span class="c-dim"># durable mid-job state</span>
+    cost_usd: float = 0.0
+    tokens: int = 0
+    created_at: float = field(default_factory=now)
+    updated_at: float = field(default_factory=now)</code></pre>
+      </figure>
+
+      <div class="tablewrap">
+        <table>
+          <caption>The state machine of a job — who moves it, and what it means</caption>
+          <thead>
+            <tr><th>State</th><th>Set by</th><th>Meaning</th><th>Leasable</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>queued</td><td>enqueue · fail</td><td>ready, or waiting out a backoff (<code>run_after</code>)</td><td>yes</td></tr>
+            <tr><td>leased</td><td>lease</td><td>a worker holds it until <code>lease_until</code></td><td>on expiry</td></tr>
+            <tr><td>done</td><td>complete</td><td>succeeded; result, cost and tokens recorded</td><td>no — final</td></tr>
+            <tr><td>dead</td><td>lease (attempts exhausted)</td><td>dead-letter: off the main queue, kept on disk</td><td>via resume</td></tr>
+            <tr><td>paused</td><td>operator control file</td><td>held by a human; not leasable until resumed</td><td>via resume</td></tr>
+            <tr><td>cancelled</td><td>operator control file</td><td>terminated by a human</td><td>no — final</td></tr>
+            <tr class="flag"><td>superseded</td><td>newer feedback</td><td>retired, kept for history, no longer counts as poison</td><td>no — final</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        <code>superseded</code> is the state worth stealing. Without it, a dead-lettered job is
+        permanent poison: the reconciler refuses to re-enqueue that <code>(card, action)</code> pair,
+        so a card that failed once can never be retried, and the operator's button does nothing. With
+        it, newer human feedback retires the corpse and a fresh job runs — history intact, no zombie
+        revived.
+      </p>
+
+      <h3 class="sub">Durability: write-through, not write-later</h3>
+      <p>
+        The store keeps an in-memory cache for speed and a file per job for truth. Every mutation
+        updates the cache and immediately flushes JSON to disk; startup rehydrates the cache from the
+        files. There is no migration, no schema and nothing to back up beyond a directory — and the
+        contents are readable with <code>cat</code> at three in the morning, which is a feature.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>queue/file_store.py — durability in six lines</span><span class="tag pass">state is files</span></figcaption>
+<pre><code><span class="c-dim">"""Write-through queue store: in-memory cache for speed AND a file per job for
+durability. Every mutation updates the cache then flushes to disk. On startup we
+rehydrate the cache from the files, so a crash resumes where it left off.
+
+Concurrency: a single re-entrant lock serializes writes. Correct and simple at
+this scale. ponytail: global lock, shard by job-id if throughput ever matters."""</span>
+
+def _rehydrate(self):
+    for f in sorted(self.jobs_dir.glob("*.json")):
+        job = Job.from_dict(json.loads(f.read_text()))
+        self._cache[job.id] = job
+        if job.idempotency_key:
+            self._idem[job.idempotency_key] = job.id
+        self._seq = max(self._seq, job.id)
+
+def _flush(self, job):
+    job.updated_at = self._now()
+    (self.jobs_dir / f"{job.id}.json").write_text(json.dumps(job.to_dict(), indent=2))</code></pre>
+      </figure>
+
+      <h3 class="sub">Leasing: crash recovery without a heartbeat</h3>
+      <p>
+        <code>lease()</code> is where four mechanisms meet in twenty lines. It hands out one ready
+        job, reclaims leases that expired because a worker died, increments the attempt counter, and
+        dead-letters anything that has burned its budget. Nothing else in the system needs to know
+        that a worker crashed.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>file_store.py — lease, retry and dead-letter in one place</span><span class="tag block">exhausted → dead</span></figcaption>
+<pre><code>def lease(self, lease_seconds):
+    with self._lock:
+        self.apply_controls()                <span class="c-dim"># operator pause/cancel first</span>
+        t = self._now()
+        while True:
+            candidate = self._next_ready(t)
+            if candidate is None:
+                return None
+            candidate.attempts += 1
+            if candidate.attempts &gt; candidate.max_attempts:
+                <span class="c-block">candidate.status = JobState.DEAD    # dead-letter, off the queue</span>
+                self._flush(candidate)
+                self.trace(candidate.id, "error", "dead_letter", {"fn": candidate.fn})
+                continue                     <span class="c-dim"># … and look at the next candidate</span>
+            candidate.status = JobState.LEASED
+            candidate.lease_until = t + lease_seconds
+            self._flush(candidate)
+            return candidate</code></pre>
+      </figure>
+
+      <p>
+        A one-hour visibility timeout is right for agent work and wrong for a restart, so startup has
+        its own recovery: at that moment no worker holds a lease, therefore every leased job is
+        orphaned and can be requeued immediately instead of waiting the timeout out.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>file_store.py — orphan recovery at boot</span><span class="tag pass">no waiting out an hour</span></figcaption>
+<pre><code>def recover_orphaned(self) -&gt; int:
+    <span class="c-dim">"""Requeue jobs left LEASED by a previous process (crash/restart). At startup
+    no workers hold leases, so a leased job is orphaned."""</span>
+    for job in self._cache.values():
+        if job.status == JobState.LEASED:
+            job.status = JobState.QUEUED
+            job.run_after = self._now()
+            self._flush(job)
+            self.trace(job.id, "warn", "recovered_orphan", {"fn": job.fn})</code></pre>
+      </figure>
+
+      <h3 class="sub">Checkpoints: the difference between retry and restart</h3>
+      <p>
+        A retried agent job is not a pure function — its first attempt may already have brought up a
+        container stack, created a branch or opened a pull request. The checkpoint is what keeps a
+        retry from redoing the expensive, side-effecting parts. Handlers get a
+        <code>Context</code> whose <code>save()</code> writes durable mid-job state and whose
+        <code>bill()</code> accrues spend, and the pattern in practice is a single guard:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the checkpoint pattern — do the costly thing once</span><span class="tag pass">retry-safe</span></figcaption>
+<pre><code><span class="c-dim"># orchestrator._dispatch — bring the stack up ONCE, not per retry</span>
+if self.setup_cmd and <span class="c-pass">not ctx.checkpoint.get("stack_up")</span>:
+    ok, tail = _run_cmd(self.setup_cmd, path, env=_compose_env(key))
+    <span class="c-pass">ctx.save(stack_up=True)</span>              <span class="c-dim"># flushed to the job file immediately</span>
+    ctx.trace("stack_setup", {"cmd": self.setup_cmd, "ok": ok, "tail": tail})
+
+<span class="c-dim"># worker.Context — the only sanctioned way to persist mid-job state</span>
+def save(self, **state):
+    self.job.checkpoint.update(state)
+    self.store.checkpoint(self.job.id, self.job.checkpoint)
+
+def bill(self, cost_usd, tokens=0):          <span class="c-dim"># worker bills this on complete AND on fail</span>
+    self.cost_usd += cost_usd
+    self.tokens += tokens</code></pre>
+      </figure>
+
+      <p>
+        Billing on failure is the small decision that makes cost data trustworthy. A failed attempt
+        spent real money; if only successful jobs recorded their spend, the factory's own numbers
+        would flatter it. So <code>fail()</code> takes <code>cost_usd</code> too, and the job's total
+        is the sum of everything it ever burned.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>worker.py — every failure routes through the queue</span><span class="tag block">handlers never crash the loop</span></figcaption>
+<pre><code>def backoff_for(attempt, base, cap):
+    return min(cap, base * (2 ** max(0, attempt - 1)))   <span class="c-dim"># exponential, capped</span>
+
+try:
+    result = handler(ctx, job.payload)
+    self.store.complete(job.id, result, cost_usd=ctx.cost_usd, tokens=ctx.tokens)
+except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every failure through the queue</span>
+    self.store.fail(job.id, f"{type(exc).__name__}: {exc}",
+                    backoff=backoff_for(job.attempts, self.backoff_base, self.backoff_cap),
+                    <span class="c-pass">cost_usd=ctx.cost_usd, tokens=ctx.tokens)</span>   <span class="c-dim"># bill the failed attempt</span></code></pre>
+      </figure>
+
+      <h3 class="sub">What each mechanism actually buys</h3>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Idempotent enqueue</span>
+          <span class="what">A repeated <code>idempotency_key</code> returns the original job id and traces a <code>dedupe</code>. Duplicate ticks, retried webhooks and an operator double-click are all harmless by construction.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Lease + timeout</span>
+          <span class="what">At-least-once delivery with crash recovery and no heartbeat protocol. A dead worker's job becomes leasable again on expiry; a restart shortcuts that with orphan recovery.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Backoff</span>
+          <span class="what">Capped exponential (60s base, 30min cap). A rate limit or a flaky remote costs waiting, not a tight retry loop against someone else's service.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Dead-letter</span>
+          <span class="what">Three attempts and the job leaves the queue instead of retrying forever. Combined with the reconciler's poison guard, a wedged card stops spending — visibly, in a state a human can see and act on.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Checkpoint</span>
+          <span class="what">Resume rather than restart: the branch, the worktree path and the "stack is already up" flag survive a crash, so attempt two continues instead of re-paying.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Append-only trace</span>
+          <span class="what">Every enqueue, lease, checkpoint, failure and completion appends one JSON line to <code>traces.jsonl</code>. That file is the audit log — the dashboard's database is a projection of it, rebuildable at any time.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Run the same loop with in-process state and a <code>for</code> loop over cards, and the
+          failure is not that it breaks — it is that it breaks <em>invisibly and expensively</em>. A
+          retry re-runs a handler whose first attempt already opened a pull request. A restart loses
+          the fact that a container stack is up, and the next attempt collides with it. A card that
+          fails deterministically retries forever, and you find out from the bill. None of these need
+          a distributed system to appear; they appear on one laptop, on the first bad afternoon.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          Choose the durable unit first and the rest of the system hangs off it. Because the job
+          record carries cost, attempts, checkpoint and result, the factory gets pricing,
+          observability, operator control and crash recovery without a second mechanism for any of
+          them. <strong>Agentic orchestration is a queue problem wearing a new hat</strong> — and the
+          boring, decades-old answers (idempotency keys, visibility timeouts, dead-letters, capped
+          backoff) are the ones that hold when the worker is a non-deterministic agent that runs for
+          twenty minutes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Complexity 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Concurrency</span>
+      </div>
+      <div>
+        <h2>One writer per card, parallel everywhere else</h2>
+        <p class="thesis">
+          Four agents run at once here, and none of them can collide, because the serialization point
+          is in the leasing function rather than in anyone's prompt. Per-card single-writer in the
+          queue, a git worktree per card, a container namespace per card, and a bounded pool that
+          <em>is</em> the backpressure. The operator's controls arrive as files, because the board and
+          the daemon are different processes.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>gate</b> file_store._next_ready</span>
+          <span class="chip kind-rule"><b>policy</b> policies/single-writer.md</span>
+          <span class="chip kind-make"><b>seam</b> harness/workspace.py · GitWorkspace</span>
+          <span class="chip kind-config"><b>config</b> PDS_WORKERS=4</span>
+          <span class="chip kind-hook"><b>control</b> queue/control.py · ControlStore</span>
+          <span class="chip kind-hook"><b>switch</b> state/STOP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The single-writer guarantee is eight lines inside the function that picks the next job. A job
+        carrying an <code>issue_key</code> is skipped while another job for that same key holds a
+        live lease. Two agents therefore never write one worktree — not because they were told not
+        to, but because the second one is never handed the work.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>file_store._next_ready — the single-writer guarantee</span><span class="tag block">skips a busy card</span></figcaption>
+<pre><code>def _next_ready(self, t):
+    <span class="c-dim"># Per-issue serialization: at most one job per issue_key runs at a time, so two
+    # jobs never write the same worktree concurrently. Jobs without an issue_key
+    # are not serialized.</span>
+    <span class="c-block">active_keys = {
+        self._issue_key(j) for j in self._cache.values()
+        if j.status == JobState.LEASED and j.lease_until &gt; t and self._issue_key(j)
+    }</span>
+    ready = []
+    for j in self._cache.values():
+        if j.status == JobState.QUEUED and j.run_after &lt;= t:
+            if self._issue_key(j) and self._issue_key(j) in active_keys:
+                continue                          <span class="c-dim"># another job for this card is in flight</span>
+            ready.append(j)
+        elif j.status == JobState.LEASED and j.lease_until &lt; t:
+            ready.append(j)                       <span class="c-dim"># expired lease → reclaimable</span>
+    return min(ready, key=lambda j: j.id) if ready else None   <span class="c-dim"># FIFO by id</span></code></pre>
+      </figure>
+
+      <p>
+        Serializing per card is only half of it; the other half is making sure two <em>different</em>
+        cards cannot collide either. Each card gets its own git worktree off the source repo — shared
+        <code>.git</code>, so it is fast and there is no full clone per card — and its own container
+        project namespace, so <code>make up</code> and <code>make down</code> refer to the same stack
+        and to nobody else's.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>isolation, twice: the tree and the stack</span><span class="tag pass">no shared mutable ground</span></figcaption>
+<pre><code><span class="c-dim"># harness/workspace.py — a worktree per card, idempotent (resume returns the existing one)</span>
+def prepare(self, issue_key, branch, base="main") -&gt; Path:
+    dest = self._dir(issue_key)
+    if dest.exists():
+        return dest                                   <span class="c-dim"># resume: worktree already there</span>
+    _git(["worktree", "prune"], cwd=self.source)      <span class="c-dim"># clear stale registrations</span>
+    if self._branch_exists(branch):
+        _git(["worktree", "add", "--force", str(dest), branch], cwd=self.source)
+    else:
+        _git(["worktree", "add", "--force", "-b", branch, str(dest), base], cwd=self.source)
+    return dest
+
+<span class="c-dim"># orchestrator._compose_env — a container namespace per card</span>
+def _compose_env(issue_key: str) -&gt; dict:
+    <span class="c-dim"># So N concurrent jobs don't collide on container/network/volume names — and so
+    # `make down` tears down the same stack `make up` brought up.
+    # ponytail: names are isolated; if the stack binds FIXED HOST PORTS, the
+    # consumer repo's compose must make those per-project too.</span>
+    slug = re.sub(r"[^a-z0-9]+", "-", issue_key.lower()).strip("-")
+    return {"COMPOSE_PROJECT_NAME": f"pds-{slug}"}</code></pre>
+      </figure>
+
+      <p>
+        Backpressure needs no separate mechanism: the pool is bounded, so the number of agents in
+        flight is the number of workers, and the default (four) is set by the ceiling the target repo
+        can actually run. Stopping needs no protocol either — a file on disk, checked by every worker
+        between jobs, external to the loop's own logic so it works even when the loop is confused.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>worker.py — bounded pool, file kill switch</span><span class="tag warn">stop is a file</span></figcaption>
+<pre><code><span class="c-dim">"""Bounded pool = backpressure (N agents in flight, no more). A kill switch (a
+file on disk) stops the loop cleanly mid-run, external to the loop's own logic."""</span>
+
+def killed(self) -&gt; bool:
+    return self._stop.is_set() or (self.kill_switch is not None and self.kill_switch.exists())
+
+def _loop(self, worker_id):
+    while not self.killed():
+        if not self.run_one():
+            time.sleep(self.idle_sleep)      <span class="c-dim"># nothing ready — don't spin hot</span>
+
+<span class="c-dim"># halt the whole factory, from anywhere, with no signal handling:  touch state/STOP</span></code></pre>
+      </figure>
+
+      <h3 class="sub">Cross-process control: the board writes files, the daemon owns state</h3>
+      <p>
+        The dashboard and the daemon are separate processes with separate caches of the same job
+        files. If the dashboard mutated a job directly it would race the daemon's write-through
+        flush. So the board never writes job state — it drops a control file, and the daemon applies
+        it on the next lease, owning every status transition. Same mechanism as the kill switch, for
+        the same reason.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>queue/control.py + apply_controls — one writer, again</span><span class="tag pass">file-based IPC</span></figcaption>
+<pre><code><span class="c-dim"># The dashboard and the daemon are separate processes with separate FileStore
+# caches, so the dashboard must NOT mutate job files directly. It drops a control
+# file here; the daemon's FileStore applies it (owning all status transitions).</span>
+
+if   action == PAUSE  and job.status == QUEUED: job.status = PAUSED
+elif action == RESUME and job.status == PAUSED: job.status = QUEUED
+elif action == RESUME and job.status == DEAD:
+    job.status, job.attempts = QUEUED, 0         <span class="c-dim"># retry with a fresh attempt budget</span>
+elif action == CANCEL and job.status in (QUEUED, PAUSED, DEAD):
+    job.status = CANCELLED                       <span class="c-dim"># … and the card's worktree gets reset</span>
+elif action == CANCEL and job.status == LEASED:
+    <span class="c-warn">self.trace(job_id, "warn", "cancel_pending_running", {})</span>
+    <span class="c-dim"># can't preempt a running subprocess; leave pending for a requeue</span></code></pre>
+      </figure>
+
+      <h3 class="sub">Five collisions, five answers</h3>
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Same card twice</span>
+          <span class="what">Two jobs for one card — a <code>resume</code> arriving while an <code>execute</code> is mid-flight. Prevented in <code>_next_ready</code>: the second is not leasable until the first's lease ends.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Two cards, one tree</span>
+          <span class="what">Prevented by a worktree per card. Isolated checkouts on their own branches, sharing one <code>.git</code>, cleaned up on merge or drop.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Two stacks, one name</span>
+          <span class="what">Prevented by a per-card compose project name. The known ceiling is stated in the code: fixed host ports still need the target repo's compose to be per-project.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Too many agents</span>
+          <span class="what">Prevented by the pool size — the only throttle, and it is one integer. Four is the target repo's port-slot cap, not a guess about model limits.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Cancel mid-run</span>
+          <span class="what">A leased job cannot be preempted, so the cancel is traced and left pending; when it lands, a <code>reset</code> job stops the stack and hard-resets the worktree to base, leaving the card cleanly restartable.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Two agents in one worktree produce interleaved edits that no review can untangle and no
+          test can localise — the diff is a merge of two intentions. Two container stacks under one
+          project name mean one card's <code>make down</code> silently kills another card's database.
+          And an unbounded pool discovers its own limit the expensive way: rate limits, a saturated
+          laptop, and a set of half-finished branches whose runs died together.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          Serialize where writes land; parallelize everything else. The important part is
+          <em>where</em> the serialization lives: in the queue, as a property of leasing, not as an
+          instruction in a prompt an agent may reason its way around. <strong>A concurrency rule an
+          agent has to remember is not a concurrency rule</strong> — and the corollary is that giving
+          each unit of work its own ground (its own tree, its own stack, its own namespace) removes
+          more coordination than any amount of locking adds.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 5 ============ -->
+  <section class="rung" id="rung-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Complexity 5 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Lit loop</span>
+      </div>
+      <div>
+        <h2>Lights on: gates before the action, provenance during it</h2>
+        <p class="thesis">
+          Lights-on is not "nobody is watching" — it is the opposite, and it has two halves.
+          <em>Before</em> an action: governance gates raise the decision to a human — an approval
+          touchpoint, an interrupt on ambiguity, a merge gate that refuses a red pull request.
+          <em>During</em> the action: observability and provenance — a trace line per event, a
+          persisted artifact per step, a cost per card, every decision mirrored where the work lives.
+          Autonomy is a separate dial, and it moves without disturbing either half.
+        </p>
+        <div class="chips">
+          <span class="chip kind-make"><b>audit</b> state/traces.jsonl</span>
+          <span class="chip kind-config"><b>readmodel</b> observability/ · sqlite (rebuildable)</span>
+          <span class="chip kind-hook"><b>interrupt</b> harness/interrupts.py</span>
+          <span class="chip kind-config"><b>dial</b> PDS_OVERSIGHT</span>
+          <span class="chip kind-gate"><b>gate</b> harness/gates.py · merge_ready</span>
+          <span class="chip kind-skill"><b>loop</b> harness/improve.py</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">One card, start to finish</h3>
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Draft</span>
+          <span class="what">
+            A model turn drafts the intent contract — outcome, acceptance, scope in and out, open
+            questions — against a JSON schema, so the next step gets fields rather than prose. The
+            rendered contract is written back to the card and the card moves to await approval.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Dispatch</span>
+          <span class="what">
+            No model. Prepare the worktree, checkpoint the branch and path, bring the stack up once,
+            assign the card, move it to In&nbsp;Progress. Every one of those is durable, so a crash
+            here costs seconds.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Execute</span>
+          <span class="what">
+            The agent runs inside the worktree with the contract inlined — the card is the source of
+            truth, so the executor is handed it rather than left to fetch it. Then commit, count
+            added lines, and verify.
+          </span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Verify</span>
+          <span class="what">
+            The harness dispatches the <em>target repo's own</em> Stop hooks — its authored
+            <code>make pre-commit</code> and test commands — and falls back to a configured test
+            command only if the repo has none. Commands belong to the charter; dispatch belongs to
+            the harness.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Review</span>
+          <span class="what">
+            Push, open the pull request, move to In&nbsp;Review, and chain an automated review job
+            that returns structured findings and a suggested verdict — recorded as an artifact and
+            mirrored as a comment.
+          </span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Merge</span>
+          <span class="what">
+            <code>merge_ready</code> is a hard precondition even on a human accept: a red or closed
+            pull request cannot be squashed. Merge, move to staging, then tear down — stop the stack,
+            remove the worktree.
+          </span>
+        </li>
+      </ol>
+
+      <p>
+        Two things make that sequence auditable rather than merely automatic. Every step ends with a
+        hard, persisted artifact — which is exactly what lets the queue resume it and an auditor
+        replay it. And the audit log is the queue's own append-only <code>traces.jsonl</code>: the
+        dashboard's sqlite database is a <em>projection</em> of that file, rebuildable at will, never
+        the source of truth. Files are the store; the tracker and the pull request are mirrors, kept
+        current so decisions are visible where the work lives.
+      </p>
+
+      <h3 class="sub">The two halves, mechanism by mechanism</h3>
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Before · gate</span>
+          <span class="what">
+            <strong>Approval touchpoints.</strong> Two moves in the whole pipeline can require a
+            recorded human approval before they happen — promoting a drafted contract, and merging a
+            reviewed pull request. Which of them need one is the dial's only job.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Before · gate</span>
+          <span class="what">
+            <strong>Interrupts.</strong> The executor that hits a real decision raises a question
+            instead of choosing. The card blocks — no further action is taken on it — until a human
+            answers on the board.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Before · gate</span>
+          <span class="what">
+            <strong>Deterministic preconditions.</strong> <code>merge_ready</code> refuses a red or
+            closed pull request even when a human has already said accept, and at lights-out
+            settings a blocking review finding holds the card instead of auto-accepting it.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">During · record</span>
+          <span class="what">
+            <strong>Traces.</strong> Every enqueue, lease, checkpoint, model turn, failure and
+            completion appends a line to <code>traces.jsonl</code> as it happens — including the
+            agent's own step-by-step output, streamed into the job's log while it runs.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">During · record</span>
+          <span class="what">
+            <strong>Artifacts and cost.</strong> Each phase persists its structured result, and each
+            job carries the dollars and tokens it burned — including on the attempts that failed.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">During · record</span>
+          <span class="what">
+            <strong>Provenance.</strong> Contracts, interrupt answers, verdicts and review findings
+            are mirrored onto the card and the pull request, so the decision trail sits where the
+            work lives rather than only in the harness's own files.
+          </span>
+        </li>
+      </ol>
+
+      <h3 class="sub">Ambiguity becomes a question, not a guess</h3>
+      <p>
+        An agent that hits a real decision point has two bad options — pick something, or stop — and
+        one good one. The execute schema carries a <code>needs_input</code> flag; when it comes back
+        set, the harness files an interrupt, the card blocks, and the question appears on the board
+        for a human. The answer is written back, the reconciler enqueues a <code>resume</code>
+        carrying the feedback, and the same answer is mirrored to the card and the pull request so
+        the decision is recorded where the work is.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>orchestrator._execute — the interrupt path</span><span class="tag block">blocks, does not guess</span></figcaption>
+<pre><code>data = res.data or {}
+<span class="c-dim"># structured signal: the model needs a human decision → raise an interrupt
+# (resolved on the board), mirrored to the tracker for visibility.</span>
+if data.get("needs_input"):
+    question = data.get("question") or "The executor needs a decision to proceed."
+    <span class="c-block">self.interrupts.raise_(key, question, job_id=ctx.job.id)</span>
+    self.contracts.comment(key, f"pds:interrupt {question}")
+    return "interrupted"          <span class="c-dim"># stays In Progress; the reconciler blocks the card</span>
+
+<span class="c-dim"># … and on the way back, in the reconciler:</span>
+if intr["status"] == RESOLVED:
+    self._retire_poison(full.key, "resume")   <span class="c-dim"># a prior failed resume must not wedge this one</span>
+    <span class="c-pass">self.store.enqueue("resume", {"issue_key": full.key, "feedback": intr["feedback"]})</span></code></pre>
+      </figure>
+
+      <h3 class="sub">The dial</h3>
+      <p>
+        Autonomy is a setting, not a rewrite. Every level runs the same handlers and writes the same
+        audit trail; they differ only in which transitions need a recorded human approval first.
+        There are exactly two human touchpoints to place on that scale — approving a drafted
+        contract, and merging a reviewed pull request — and at the middle setting the default gate is
+        just the merge.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>PDS_OVERSIGHT — the same factory, five amounts of human contact</caption>
+          <thead>
+            <tr><th>Level</th><th>Approval required</th><th>Who proposes</th><th>Audit trail</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>manual</td><td>every transition</td><td>a human drives</td><td>full</td></tr>
+            <tr><td>assisted <em>(default)</em></td><td>every transition</td><td>AI proposes, human accepts</td><td>full</td></tr>
+            <tr><td>supervised</td><td>gated steps only — merge by default</td><td>AI proposes</td><td>full</td></tr>
+            <tr><td>autonomous</td><td>none; humans notified out of band</td><td>AI</td><td>full</td></tr>
+            <tr class="flag"><td>dark</td><td>none — fully lights-out</td><td>AI</td><td>full</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Lights-out is not the same as ungated. At the two highest settings a card in review
+        auto-accepts <em>only</em> if the automated review's findings pass a deterministic gate; a
+        blocking finding holds the card and marks it on the board for a human, who can still accept
+        it in the app. The dial removes the human's obligation to touch every move — it does not
+        remove the gates.
+      </p>
+
+      <h3 class="sub">The loop that changes the rules — and the asymmetry</h3>
+      <p>
+        The factory can mine its own failures, propose a change, validate it, and adopt it. Which
+        raises the obvious question: adopt it <em>where</em>? The answer is the governor. A charter
+        change is authored text, cheap to review and trivial to revert, so a validated proposal is
+        applied. A harness change is code, so a proposal is only ever recorded — it becomes a
+        human-reviewed edit like any other.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>orchestrator._improve — apply the charter, only record the harness</span><span class="tag warn">asymmetric by design</span></figcaption>
+<pre><code><span class="c-dim">"""Self-improvement at two levels:
+  - level 'charter' (scoped to a job/card): mine that card's failures, propose a
+    charter guide, validate, and APPLY it (charter is authored, reversible, cheap).
+  - level 'harness' (whole system): mine across all jobs, propose changes, but
+    only RECORD them — a harness/code change is a human-reviewed edit."""</span>
+
+for p in proposals:
+    valid = loop.validate(p)                       <span class="c-dim"># validated against evals/</span>
+    <span class="c-pass">if valid and level == "charter":
+        loop.accept(p)                             # applied to the repo's .claude/rules</span>
+    out.append({"id": p.primitive_id, "accepted": p.accepted,
+                "rationale": p.rationale, "validation": p.validation, "level": level})</code></pre>
+      </figure>
+
+      <p>
+        The same split runs through the whole system, and it is the one line worth carrying away
+        from this page: <em>authored → charter; applied → harness.</em> Behaviour specifications —
+        rules, gates, skills, the commands that verify a change — live in the target repo, where the
+        people who own that code can author them. The machinery that runs specifications — the loop,
+        the queue, dispatch, isolation, the dial — lives in the harness, and knows nothing about what
+        it is delivering. That is why there is no domain vocabulary anywhere in these 5,300 lines,
+        and why the factory can be pointed at a different repo on a Tuesday without a rewrite.
+      </p>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Skip the dial and autonomy becomes all-or-nothing: a system nobody trusts enough to leave
+          running, or one running unattended before anyone has earned the right to. Skip the
+          asymmetry and it is worse — a harness that edits its own code from mined failures is a
+          system whose behaviour drifts without a diff anyone reviewed. And skip the persisted
+          artifact at each step and none of the rest is even measurable: a reported success whose
+          write is invisible in external state did not happen.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          A harness by definition, a factory by operation, a queue by design — and the three are not
+          separate claims. It is a <strong>harness</strong> because it applies a charter it does not
+          author, which is what keeps domain knowledge out of the engine. It is a
+          <strong>lights-on factory</strong> because a gate raises the decision to a human before an
+          action and provenance records what happened during it — so autonomy becomes a dial you can
+          turn rather than a leap you take. And it is a
+          <strong>queue</strong> because durability, retry, isolation, cost and audit are all
+          properties of a job record — which is what makes the other two claims survive contact with
+          a crash at 3am.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The factory</strong> — the anatomy of one lights-on factory, from its single model
+      dependency to its self-improving loop. <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Rungs ascend by composition: 1 dependency → 1 pure function → 1 durable queue → 1 writer per
+      card → 1 lit loop. Each rung's mechanisms depend on the ones below it.</div>
+    <div>Excerpts are drawn from a working harness, lightly trimmed for width; structure, thresholds
+      and control flow are unchanged. Deliberately absent: any business vocabulary — the engine does
+      not know what it delivers. Colour encodes signal:
+      <span style="color:var(--gold)">deterministic</span> ·
+      <span style="color:var(--brick)">model turn</span> ·
+      <span style="color:var(--forest)">durable</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
