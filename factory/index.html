@@ -668,7 +668,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       A <em>lights-on factory</em>: it takes a tracker card and returns a merged pull request, and
       the lights are on in two distinct senses — governance gates raise a decision to a human
       <em>before</em> an action is taken, and observability and provenance record what happened
-      <em>during</em> it. Autonomy is a separate dial. It is about 5,300 lines of Python:
+      <em>after</em> it. Autonomy is a separate dial. It is about 5,300 lines of Python:
       three runtime dependencies, one model dependency, sixteen job handlers, seven seams, 193 tests.
       Nothing in it knows what the code it delivers is <em>for</em> — no product vocabulary, no
       business rules, no domain types. That absence is a design property, not an omission: the
@@ -721,7 +721,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <li><a href="#rung-2"><span class="n">2</span> Derive, don't remember</a></li>
       <li><a href="#rung-3"><span class="n">3</span> The queue is the design</a></li>
       <li><a href="#rung-4"><span class="n">4</span> One writer per card</a></li>
-      <li><a href="#rung-5"><span class="n">5</span> The lit factory &amp; the dial</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> The lights-on factory &amp; the dial</a></li>
     </ol>
   </nav>
 
@@ -749,7 +749,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           <span class="chip kind-rule"><b>seam</b> providers/base.py · ModelProvider</span>
           <span class="chip kind-agent"><b>impl</b> providers/claude_sdk.py</span>
           <span class="chip kind-agent"><b>impl</b> providers/stub.py</span>
-          <span class="chip kind-config"><b>config</b> PDS_MODEL · PDS_MODEL_API_KEY</span>
+          <span class="chip kind-config"><b>config</b> FACTORY_MODEL · FACTORY_MODEL_API_KEY</span>
         </div>
       </div>
     </div>
@@ -1025,6 +1025,7 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
           <span class="chip kind-rule"><b>pure</b> harness/derive.py · derive_action</span>
           <span class="chip kind-rule"><b>pure</b> derive.py · route_feedback</span>
           <span class="chip kind-make"><b>loop</b> harness/reconciler.py · tick</span>
+          <span class="chip kind-rule"><b>seam</b> Tracker · CodeHost</span>
           <span class="chip kind-gate"><b>guardrail</b> per-issue at-most-one-active</span>
           <span class="chip kind-gate"><b>guardrail</b> poison guard</span>
         </div>
@@ -1103,6 +1104,44 @@ def _retire_poison(self, key, action):
     # we never revive an old one.</span>
     ...</code></pre>
       </figure>
+
+      <h3 class="sub">The tracker and the code host are ports too</h3>
+      <p>
+        The reconciler reads two systems it does not own — the ticketing system the cards live in and
+        the code host the branches and pull requests live on — and neither belongs in
+        <code>derive_action</code>. The same discipline that put <code>ModelProvider</code> in front
+        of the agent puts a port in front of each of these: the pure function sees an
+        <code>Issue</code> snapshot and returns a decision, and the vendor's REST shapes, field ids,
+        status names and rate limits stay on the far side of an adapter.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>a sketch, not shipped code — two more ports, one adapter per vendor</span><span class="tag warn">the shape it wants</span></figcaption>
+<pre><code>class Tracker(Protocol):              <span class="c-dim"># the ticketing system: cards in, decisions mirrored back</span>
+    def issues(self) -&gt; list[Issue]: ...
+    def transition(self, key: str, status: str) -&gt; None: ...
+    def comment(self, key: str, body: str) -&gt; None: ...
+
+class CodeHost(Protocol):             <span class="c-dim"># branches, pull requests, checks</span>
+    def open_pr(self, branch: str, title: str, body: str) -&gt; PR: ...
+    def checks_green(self, pr: PR) -&gt; bool: ...
+    def merge(self, pr: PR) -&gt; None: ...
+
+TRACKERS   = {"jira": JiraTracker, "linear": LinearTracker, "gh-issues": GhIssuesTracker}
+CODE_HOSTS = {"github": GitHubHost, "gitlab": GitLabHost}
+<span class="c-pass">FAKES      = {"tracker": InMemoryTracker, "host": InMemoryHost}   # the 193 tests run on these</span></code></pre>
+      </figure>
+
+      <p>
+        What each adapter absorbs is the vendor-shaped part: how a status is named and transitioned,
+        whether a merge is a squash or a rebase, which webhook or poll tells you a check went red,
+        and how the credential is scoped. What none of them touch is the pipeline. Swapping Jira for
+        Linear, or GitHub for GitLab, is a class and its fake — the state machine, the guards and
+        the queue do not know a substitution happened. It is also what makes
+        <em>tracker and code host = whatever you already run</em> a claim rather than a hope, and
+        what lets the whole delivery loop run in tests against in-memory doubles: a controller that
+        derives from external state is only as testable as the seam it reads that state through.
+      </p>
 
       <h3 class="sub">What the controller model buys</h3>
       <ol class="sequence">
@@ -1443,7 +1482,7 @@ except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every fai
           <span class="chip kind-gate"><b>gate</b> file_store._next_ready</span>
           <span class="chip kind-rule"><b>policy</b> policies/single-writer.md</span>
           <span class="chip kind-make"><b>seam</b> harness/workspace.py · GitWorkspace</span>
-          <span class="chip kind-config"><b>config</b> PDS_WORKERS=4</span>
+          <span class="chip kind-config"><b>config</b> FACTORY_WORKERS=4</span>
           <span class="chip kind-hook"><b>control</b> queue/control.py · ControlStore</span>
           <span class="chip kind-hook"><b>switch</b> state/STOP</span>
         </div>
@@ -1508,7 +1547,7 @@ def _compose_env(issue_key: str) -&gt; dict:
     # ponytail: names are isolated; if the stack binds FIXED HOST PORTS, the
     # consumer repo's compose must make those per-project too.</span>
     slug = re.sub(r"[^a-z0-9]+", "-", issue_key.lower()).strip("-")
-    return {"COMPOSE_PROJECT_NAME": f"pds-{slug}"}</code></pre>
+    return {"COMPOSE_PROJECT_NAME": f"factory-{slug}"}</code></pre>
       </figure>
 
       <p>
@@ -1620,12 +1659,12 @@ elif action == CANCEL and job.status == LEASED:
         <span class="meter-label">Lit loop</span>
       </div>
       <div>
-        <h2>Lights on: gates before the action, provenance during it</h2>
+        <h2>Lights on: gates before the action, the record after it</h2>
         <p class="thesis">
           Lights-on is not "nobody is watching" — it is the opposite, and it has two halves.
           <em>Before</em> an action: governance gates raise the decision to a human — an approval
           touchpoint, an interrupt on ambiguity, a merge gate that refuses a red pull request.
-          <em>During</em> the action: observability and provenance — a trace line per event, a
+          <em>After</em> it: observability and provenance — a trace line per completed step, a
           persisted artifact per step, a cost per card, every decision mirrored where the work lives.
           Autonomy is a separate dial, and it moves without disturbing either half.
         </p>
@@ -1633,7 +1672,7 @@ elif action == CANCEL and job.status == LEASED:
           <span class="chip kind-make"><b>audit</b> state/traces.jsonl</span>
           <span class="chip kind-config"><b>readmodel</b> observability/ · sqlite (rebuildable)</span>
           <span class="chip kind-hook"><b>interrupt</b> harness/interrupts.py</span>
-          <span class="chip kind-config"><b>dial</b> PDS_OVERSIGHT</span>
+          <span class="chip kind-config"><b>dial</b> FACTORY_OVERSIGHT</span>
           <span class="chip kind-gate"><b>gate</b> harness/gates.py · merge_ready</span>
           <span class="chip kind-skill"><b>loop</b> harness/improve.py</span>
         </div>
@@ -1730,22 +1769,23 @@ elif action == CANCEL and job.status == LEASED:
           </span>
         </li>
         <li data-signal="pass">
-          <span class="when">During · record</span>
+          <span class="when">After · record</span>
           <span class="what">
             <strong>Traces.</strong> Every enqueue, lease, checkpoint, model turn, failure and
-            completion appends a line to <code>traces.jsonl</code> as it happens — including the
-            agent's own step-by-step output, streamed into the job's log while it runs.
+            completion appends a line to <code>traces.jsonl</code> once the step has happened —
+            including the agent's own step-by-step output, flushed into the job's log as each turn
+            lands.
           </span>
         </li>
         <li data-signal="pass">
-          <span class="when">During · record</span>
+          <span class="when">After · record</span>
           <span class="what">
             <strong>Artifacts and cost.</strong> Each phase persists its structured result, and each
             job carries the dollars and tokens it burned — including on the attempts that failed.
           </span>
         </li>
         <li data-signal="pass">
-          <span class="when">During · record</span>
+          <span class="when">After · record</span>
           <span class="what">
             <strong>Provenance.</strong> Contracts, interrupt answers, verdicts and review findings
             are mirrored onto the card and the pull request, so the decision trail sits where the
@@ -1772,7 +1812,7 @@ elif action == CANCEL and job.status == LEASED:
 if data.get("needs_input"):
     question = data.get("question") or "The executor needs a decision to proceed."
     <span class="c-block">self.interrupts.raise_(key, question, job_id=ctx.job.id)</span>
-    self.contracts.comment(key, f"pds:interrupt {question}")
+    self.contracts.comment(key, f"factory:interrupt {question}")
     return "interrupted"          <span class="c-dim"># stays In Progress; the reconciler blocks the card</span>
 
 <span class="c-dim"># … and on the way back, in the reconciler:</span>
@@ -1792,7 +1832,7 @@ if intr["status"] == RESOLVED:
 
       <div class="tablewrap">
         <table>
-          <caption>PDS_OVERSIGHT — the same factory, five amounts of human contact</caption>
+          <caption>FACTORY_OVERSIGHT — the same factory, five amounts of human contact</caption>
           <thead>
             <tr><th>Level</th><th>Approval required</th><th>Who proposes</th><th>Audit trail</th></tr>
           </thead>
@@ -1868,7 +1908,7 @@ for p in proposals:
           separate claims. It is a <strong>harness</strong> because it applies a charter it does not
           author, which is what keeps domain knowledge out of the engine. It is a
           <strong>lights-on factory</strong> because a gate raises the decision to a human before an
-          action and provenance records what happened during it — so autonomy becomes a dial you can
+          action and provenance records what happened after it — so autonomy becomes a dial you can
           turn rather than a leap you take. And it is a
           <strong>queue</strong> because durability, retry, isolation, cost and audit are all
           properties of a job record — which is what makes the other two claims survive contact with
