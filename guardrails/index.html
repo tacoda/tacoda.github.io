@@ -1,0 +1,1434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five Guardrails — Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Five worked examples of agent guardrails, ascending from a single deny-list entry to a self-measuring delivery loop. From Harness Engineering by Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/guardrails/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Five Guardrails — Harness Engineering">
+<meta property="og:description" content="Five worked examples of agent guardrails, ascending from a single deny-list entry to a self-measuring delivery loop.">
+<meta property="og:url" content="https://www.tacoda.dev/guardrails/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Five Guardrails — Harness Engineering">
+<meta name="twitter:description" content="Five worked examples of agent guardrails, ascending from a single deny-list entry to a self-measuring delivery loop.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Guardrails in practice</span>
+      <span class="sep">/</span>
+      <span>Worked examples</span>
+    </div>
+    <h1>Five guardrails, from <em>one line of config</em> to a closed loop</h1>
+    <p class="standfirst">
+      Every example below is running code in a production charter — a Laravel API with a
+      TypeScript/React front end, Docker for local development, Jira and GitHub for state.
+      Nothing here depends on that stack. Swap Laravel for Rails or Django, <code>make</code> for
+      <code>just</code> or <code>npm run</code>, Jira for Linear: the patterns are about
+      <em>where a constraint is enforced</em>, not what enforces it. They ascend deliberately —
+      rung&nbsp;1 is a rule and a deny-list entry; rung&nbsp;5 is an orchestrator that measures
+      its own cost and writes new rules back into the charter it runs under. Each rung buys
+      something the one below it could not.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">— author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      charter surface · 40 rules · 28 skills · 8 agents · 6 commands · 9 feature docs · 16 gate scripts<br>
+      substitutions · <code>make</code> = your task runner · <code>PROJ-000</code> = your issue key
+      · <code>app/Services/Billing/</code> = your highest-risk module
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Block</dt>
+          <dd>Sensor exits&nbsp;2. Tool call refused, message returned to the agent as a prompt.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Warn</dt>
+          <dd>Soft limit crossed. Written to stderr, execution continues, human reads it.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Pass / sanctioned</dt>
+          <dd>The permitted path the guardrail leaves open — a make target, an escape marker.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="The five rungs">
+    <ol>
+      <li><a href="#rung-1"><span class="n">1</span> Deny list</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> Rule → hook</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> Four moments</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> Defence in depth</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> The loop &amp; the brake</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Complexity 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Config only</span>
+      </div>
+      <div>
+        <h2>A rule nobody can talk their way out of</h2>
+        <p class="thesis">
+          The cheapest guardrail there is: prose that states the intent, a deny list that makes
+          it non-negotiable, and a sanctioned path that makes compliance the easy option.
+          No scripts, no hooks — three artifacts pointing the same direction.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>rule</b> .claude/rules/toolchain.md</span>
+          <span class="chip kind-config"><b>config</b> .claude/settings.json</span>
+          <span class="chip kind-make"><b>guardrail</b> Makefile</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        This project runs entirely inside Docker. An agent that types <code>php artisan migrate</code>
+        executes it on the host, where there is no PHP extension set and no database — and then,
+        being helpful, invents a workaround. The failure is not that the command was wrong; it is
+        that the wrong command was <em>available</em>.
+      </p>
+
+      <h3 class="sub">The three artifacts</h3>
+
+      <figure class="code">
+        <figcaption><span>.claude/rules/toolchain.md — the guide, always-on (<code>paths: **</code>)</span><span class="tag warn">authored</span></figcaption>
+        <pre><code>**Always use `make` targets.** Never run `npm`, `npx`, `php`, `php artisan`,
+`composer`, `vite`, or similar tools directly — they execute on the host, not
+in the container, and bypass the project's environment.
+
+- No appropriate target exists → add one to the `Makefile` and document it in
+  `.claude/features/common-commands.md`.
+- An existing target is not flexible enough → add `ARGS=` support rather than
+  reaching for the raw tool.
+- Coreutils (`ls`, `grep`, `tail`, `git`, etc.) are fine to run directly.</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption><span>.claude/settings.json — the enforcement</span><span class="tag block">refuses at tool-call time</span></figcaption>
+<pre><code>"permissions": {
+  "allow": [
+    <span class="c-pass">"Bash(make *)"</span>, "Bash(git *)", "Bash(gh *)", "Bash(jira *)",
+    "Bash(docker compose exec *)", "Bash(grep *)", "Bash(find *)"
+  ],
+  "deny": [
+    <span class="c-block">"Bash(php *)"</span>,      <span class="c-block">"Bash(php artisan *)"</span>,
+    <span class="c-block">"Bash(npm *)"</span>,      <span class="c-block">"Bash(npx *)"</span>,
+    <span class="c-block">"Bash(composer *)"</span>, <span class="c-block">"Bash(./vendor/bin/*)"</span>
+  ]
+}</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption><span>Makefile — the sanctioned path, self-documenting</span><span class="tag pass">permitted</span></figcaption>
+<pre><code>test-parallel:  <span class="c-dim">## Run use-case-tier tests in parallel via paratest (no DB)</span>
+test-adapter:   <span class="c-dim">## Run adapter-tier tests against SQLite :memory: / stubbed HTTP</span>
+pint-fix:       <span class="c-dim">## Fix PHP code style (ARGS= for extra flags)</span>
+migrate:        <span class="c-dim">## Run database migrations (ARGS= for extra flags)</span></code></pre>
+      </figure>
+
+      <h3 class="sub">How it fires</h3>
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Session start</span>
+          <span class="what"><code>toolchain.md</code> auto-loads — its <code>paths:</code> glob is <code>**</code>, so it is in context every turn.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Tool call</span>
+          <span class="what">Agent tries <code>php artisan migrate</code>. The deny pattern matches; the call never runs.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Recovery</span>
+          <span class="what">The rule already named the alternative, so the retry is <code>make migrate</code> — not an invented workaround.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          The rule alone is advisory: a sufficiently stuck agent reasons its way past prose
+          ("just this once, to check the version"). The deny list alone is a wall with no door —
+          blocked, no stated alternative, and the agent starts guessing at paths.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          A guardrail has three parts, and skipping any one of them costs you. <strong>State the
+          intent</strong> so the agent can generalise to cases you did not enumerate.
+          <strong>Enforce it mechanically</strong> so the constraint does not depend on the
+          agent's mood. <strong>Leave a sanctioned path</strong> so compliance is cheaper than
+          evasion. Guardrails that only block produce creative circumvention.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Complexity 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Rule + hook</span>
+      </div>
+      <div>
+        <h2>Compiling a rule into a sensor</h2>
+        <p class="thesis">
+          A deny list matches command strings. It cannot see inside a file write. To enforce a
+          content rule you need a hook that reads the tool payload — and, crucially, one that
+          inspects only the <em>new</em> content, so the gate judges the change rather than the
+          codebase.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>rule</b> prohibited-patterns.md <code>locked: true</code></span>
+          <span class="chip kind-hook"><b>hook</b> PreToolUse · Edit|Write|MultiEdit</span>
+          <span class="chip kind-gate"><b>script</b> scripts/charter/check-banned-tokens.sh</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The rule's frontmatter carries the incident that motivated it. That <code>why:</code>
+        field is not documentation courtesy — it is what lets an agent reason about the edge case
+        the rule's letter does not cover.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>.claude/rules/prohibited-patterns.md — frontmatter</span><span class="tag warn">authored</span></figcaption>
+<pre><code>---
+description: Functions and patterns that must never appear in committed code —
+  debug output, raw queries, imperative array functions, lazy-loaded relationships
+paths:
+  - "app/**/*.php"
+  - "database/**/*.php"
+  - "tests/**/*.php"
+  - "routes/**/*.php"
+layer: project
+<span class="c-block">locked: true</span>
+why: A `dd()` shipped to production swallowed a KeyboardInterrupt and broke the
+  dashboard; `DB::raw()` with string interpolation is a SQL-injection class; an
+  N+1 in a hot path silently slows production until it pages someone.
+---</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption><span>scripts/charter/check-banned-tokens.sh — the sensor</span><span class="tag block">exit 2</span></figcaption>
+<pre><code><span class="c-dim"># Extract NEW content from tool input — the gate judges the change,
+# not the file it lands in.</span>
+case "$tool" in
+  Write)     content=$(jq -r '.tool_input.content')                       ;;
+  Edit)      content=$(jq -r '.tool_input.new_string')                    ;;
+  MultiEdit) content=$(jq -r '[.tool_input.edits[]?.new_string]|join("\n")') ;;
+esac
+
+declare -a banned=(
+  '\bdd\s*\('        '\bdump\s*\('       '\bddd\s*\('
+  'DB::raw\s*\('     'DB::statement\s*\(' '\bprint_r\s*\('
+  '\bvar_dump\s*\('  '\bray\s*\('
+)
+
+while IFS= read -r line; do
+  <span class="c-pass">case "$line" in *"charter:allow"*) continue ;; esac</span>
+  ...
+done &lt;&lt;&lt; "$content"
+
+if [ -n "$violation" ]; then
+  cat &gt;&amp;2 &lt;&lt;EOF
+<span class="c-block">charter: blocked $tool on $rel — banned token in new content.</span>
+$violation
+See .claude/rules/prohibited-patterns.md. Use the structured logger
+(\`Log::debug(...)\`) for debug output and Eloquent or parameter-bound
+queries instead of raw DB calls. To override one line, append the
+inline marker:  <span class="c-pass">// charter:allow ray</span>
+EOF
+  <span class="c-block">exit 2</span>
+fi</code></pre>
+      </figure>
+
+      <h3 class="sub">Four design decisions worth stealing</h3>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Fail open</span>
+          <span class="what">No file path, non-code extension, or an allowlisted directory (<code>scripts/</code>, <code>vendor/</code>, <code>database/migrations/</code>) → <code>exit 0</code>. A sensor that blocks on cases it does not understand is a sensor that gets turned off.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Exit 2 talks</span>
+          <span class="what">Exit&nbsp;2 returns stderr <em>to the agent</em>, not to a log read after the fact. The block message is therefore written as a prompt: what fired, why, and the specific alternative to use instead.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Two escape grains</span>
+          <span class="what">Per-line <code>// charter:allow</code> and whole-run <code>CHARTER_BYPASS=1</code>. One legitimate exception should not require disabling the gate globally — that is how gates die.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Names its rule</span>
+          <span class="what">The message cites <code>prohibited-patterns.md</code>. Sensor and guide stay coupled, so fixing one prompts fixing the other.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          The rule fires only when the file's path happens to match a loaded glob and the agent
+          happens to weight it. A <code>dd()</code> inserted while debugging survives to review —
+          and a one-line debug statement in a large diff is precisely what review skims past.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          This is the compilation step: a rule that can be expressed as a regex over new content
+          should be <em>both</em> prose and a hook. Prose so the agent generalises; a hook so
+          compliance does not depend on generalisation. The test for whether a rule is ready to
+          compile is falsifiability — "no <code>env()</code> outside <code>config/</code>" compiles;
+          "prefer clean code" never will.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Complexity 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">One rule, four sensors</span>
+      </div>
+      <div>
+        <h2>The same law enforced at four moments</h2>
+        <p class="thesis">
+          <code>commits.md</code> is one rule file with two iron laws: no AI attribution, and no
+          commit with failing checks. It is enforced at four different points in the session
+          lifecycle, because each failure is cheapest to catch at a different moment — and one of
+          those sensors exists purely to detect that the others are missing.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>rule</b> commits.md</span>
+          <span class="chip kind-hook"><b>hook</b> SessionStart</span>
+          <span class="chip kind-hook"><b>hook</b> PreToolUse · Bash</span>
+          <span class="chip kind-hook"><b>hook</b> Stop</span>
+          <span class="chip kind-gate"><b>git hook</b> scripts/hooks/pre-commit</span>
+          <span class="chip kind-make"><b>guardrail</b> make pre-commit</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">The timeline</h3>
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">T0 · Session start</span>
+          <span class="what">
+            <code>session-start.sh</code> prints branch, last commit, dirty count — then checks
+            that the git pre-commit hook is actually installed and executable.
+            <strong>A missing hook is not an inconvenience; it is the silent absence of
+            verification</strong>, so it warns loudly.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">T1 · Before Bash</span>
+          <span class="what">
+            <code>check-commit-msg.sh</code> intercepts <code>git commit -m</code> and tests the
+            subject against Conventional Commits with an optional <code>[PROJ-123]</code> prefix.
+            Blocks before the commit object exists — nothing to amend, nothing to force-push.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">T2 · Turn end</span>
+          <span class="what">
+            The <code>Stop</code> hook catches the agent declaring "done" with uncommitted code
+            changes and runs <code>make pre-commit</code> before the turn can close.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">T3 · Commit</span>
+          <span class="what">
+            The git hook runs <code>make pre-commit</code>, which calls <code>detect-scope.sh</code>
+            to size the run and <code>make charter-gates</code> to run the diff sensors.
+          </span>
+        </li>
+      </ol>
+
+      <figure class="code">
+        <figcaption><span>scripts/charter/session-start.sh — the sensor that checks the sensors</span><span class="tag warn">stderr, non-blocking</span></figcaption>
+<pre><code><span class="c-dim"># The git hook is the ONLY gate on the commit path (commits.md) — the agent no
+# longer runs `make pre-commit` explicitly. So a missing hook is not a small
+# inconvenience, it is silent absence of verification. Warn loudly.</span>
+hooks_path="$(git config core.hooksPath || true)"
+[ -z "$hooks_path" ] &amp;&amp; hooks_path="$(git rev-parse --git-common-dir)/hooks"
+if [ ! -x "${hooks_path}/pre-commit" ]; then
+  echo "<span class="c-warn">charter: ⚠ NO pre-commit hook at ${hooks_path}/pre-commit —
+        commits are UNVERIFIED. Run \`make install-hooks\`.</span>"
+fi</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption><span>scripts/charter/check-commit-msg.sh — fail-open parsing, strict matching</span><span class="tag block">exit 2</span></figcaption>
+<pre><code><span class="c-dim"># Only intercept actual `git commit -m ...` invocations. Other commands
+# (gh pr create, jira comment) may contain the literal string "git commit"
+# in a body/heredoc — those must pass.</span>
+if ! echo "$cmd" | grep -qE '(^|[;&amp;|[:space:]])git[[:space:]]+commit[[:space:]]'; then
+  exit 0
+fi
+
+<span class="c-dim"># Couldn't parse the message → fail open so unusual invocations pass.</span>
+[ -z "$msg" ] &amp;&amp; exit 0
+
+re='^(\[[A-Z]+-[0-9]+\] )?(feat|fix|refactor|test|docs|chore|perf|build|ci|style|revert)(\([a-z0-9._-]+\))?!?: .+$'
+
+if [[ ! $subject =~ $re ]]; then
+  <span class="c-block">charter: blocked git commit — subject does not match Conventional Commits.</span>
+    got: $subject
+  Expected:  type(scope): subject
+             [PROJ-123] type(scope): subject
+  <span class="c-block">exit 2</span>
+fi</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption><span>scripts/detect-scope.sh — the exception, reasoned rather than convenient</span><span class="tag pass">scopes the gate</span></figcaption>
+<pre><code>case "$f" in
+    *.md|*.txt|*.rst|LICENSE|LICENSE.*) ;;
+    <span class="c-dim"># Generated by `make charter-index` and read by no checker, so `all`
+    # would verify nothing a docs scope doesn't. Shell scripts deliberately
+    # do NOT belong here: `make charter-gates` executes scripts/charter/*.sh
+    # on every pre-commit, so a broken gate script silently stops gating.</span>
+    .claude/INDEX.json) ;;
+    *.php)                       has_php=true   ;;
+    *.ts|*.tsx|*.js|*.jsx|*.css) has_js=true    ;;
+    *)                           has_other=true ;;
+esac</code></pre>
+      </figure>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Collapse these to a single commit-time gate and you get the expensive failure mode: a
+          malformed subject line discovered after a six-minute full-suite run, or worse, a "done"
+          declared on a red tree because nothing checked at the moment the claim was made. The
+          <code>SessionStart</code> warning is the easiest of the four to skip building, because
+          it blocks nothing — and it is the one that catches a fresh clone where
+          <code>make install-hooks</code> never ran and <em>every other sensor on this list is
+          silently absent</em>.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          Enforcement moment is a design variable, not an implementation detail. Ask, for each
+          law: <em>when is this failure cheapest to fix?</em> Then place the sensor there — and
+          place one more sensor where you would discover that the first is gone. Note the
+          asymmetry in the parsing: <strong>strict about what it rejects, generous about what it
+          declines to judge</strong>. Unparseable input exits&nbsp;0. Gates that guess block real
+          work, and gates that block real work get bypassed.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Complexity 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Mechanical + judgment</span>
+      </div>
+      <div>
+        <h2>Pairing a dumb gate with an agent that reads intent</h2>
+        <p class="thesis">
+          Every codebase has one module where mistakes are not recoverable — the billing
+          calculator, the permissions resolver, the migration runner. Protecting it needs two
+          kinds of sensor that fail in opposite directions: a script that counts, and an agent
+          that understands. The charter deliberately pairs them.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>rule</b> billing-high-risk.md <code>locked: true</code></span>
+          <span class="chip kind-agent"><b>agent</b> billing-risk.md</span>
+          <span class="chip kind-agent"><b>agent</b> scope-guard.md</span>
+          <span class="chip kind-gate"><b>gate</b> check-regression-test.sh</span>
+          <span class="chip kind-gate"><b>gate</b> check-diff-size.sh</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The rule's <code>why:</code> and its "recent regression context" section do work no regex
+        can: they tell the agent <em>which kind of caution</em> applies here. Not "be careful" —
+        specifically, pin behaviour before touching it, and never bundle a behaviour change with
+        a refactor. Substitute your own module and your own incident; the shape holds.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>.claude/rules/billing-high-risk.md</span><span class="tag warn">authored · locked</span></figcaption>
+<pre><code>---
+description: The billing calculator is mission-critical and recently regressed
+  — changes require regression tests, explicit approval for behavior changes,
+  and characterization tests before any refactor
+paths:
+  - "app/Services/Billing/**"
+  - "tests/**/Billing/**"
+layer: project
+<span class="c-block">locked: true</span>
+why: Billing regressions ship wrong money to the wrong accounts; the module
+  already broke once in production this year and changes here have
+  non-recoverable blast radius.
+---
+## IRON LAWS
+
+**EVERY CHANGE PAIRED WITH A REGRESSION TEST.**
+No change under `app/Services/Billing/` lands without a test under
+`tests/UseCase/Services/Billing/` that fails *before* the change and passes
+after. Pure refactors need characterization tests that pin current behavior.
+
+**BEHAVIOR CHANGES REQUIRE EXPLICIT USER APPROVAL.**
+Any diff that intentionally changes a calculator's output for a given input is
+a behavior change — <span class="c-warn">even if the new output is "more correct"</span>.
+Do not bundle a behavior change with a refactor; separate commits, separate PRs.
+
+## Recent regression context
+The last production regression here turned on a subtle date/rounding
+combination the suite did not pin. Until the characterization cards land,
+<span class="c-warn">assume every calculator branch is undertested.</span></code></pre>
+      </figure>
+
+      <h3 class="sub">The pairing, in both directions</h3>
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Mechanical</span>
+          <span class="what">
+            <code>check-regression-test.sh</code> — app code changed, no test file added or
+            modified → <code>exit 2</code>. It cannot tell a good test from a bad one. It does not
+            need to; it catches the case where there is none.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Judgment</span>
+          <span class="what">
+            <code>billing-risk.md</code> — a read-only agent with <code>allowed_tools</code>
+            restricted to <code>Read</code>, <code>Grep</code>, <code>Glob</code> and three
+            <code>git</code> verbs. It reads the diff and asks whether the test actually pins the
+            behaviour, and whether the math precision quietly shifted.
+          </span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Mechanical</span>
+          <span class="what">
+            <code>check-diff-size.sh</code> — warns past 15 files, blocks past 40. Pure counting;
+            no idea what the card asked for.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Judgment</span>
+          <span class="what">
+            <code>scope-guard.md</code> — reads the Jira card and the diff together, and flags
+            drive-by edits that are individually reasonable and collectively out of scope.
+          </span>
+        </li>
+      </ol>
+
+      <figure class="code">
+        <figcaption><span>scripts/charter/check-diff-size.sh — a gate that names its own companion</span><span class="tag block">exit 2 past hard ceiling</span></figcaption>
+<pre><code><span class="c-dim"># Blast-radius gate. A "small fix" that quietly rewrote 40 files is a signal to
+# stop and look. Mechanical backstop to the intent-aware
+# .claude/agents/scope-guard.md.</span>
+
+warn="${CHARTER_DIFF_WARN:-15}"
+max="${CHARTER_DIFF_MAX:-40}"
+
+if [ "$count" -gt "$max" ]; then
+<span class="c-block">charter: blast-radius gate — diff touches $count files (hard ceiling $max).</span>
+A bounded change rarely rewrites this many files. Stop and look: is this
+scope creep? Split it into separate cards, or — if the size is intentional
+(a sweep, a rename) — re-run with <span class="c-pass">CHARTER_BYPASS=1</span>.
+<span class="c-pass">See .claude/agents/scope-guard.md for the intent-aware companion check.</span>
+fi
+
+if [ "$count" -gt "$warn" ]; then
+  echo "<span class="c-warn">charter: blast-radius warning — diff touches $count files
+        (soft limit $warn). Confirm it is all in scope for the card.</span>" &gt;&amp;2
+fi</code></pre>
+      </figure>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Gates alone: a change adds one trivial assertion, passes the regression gate, and ships
+          a rounding-mode shift. Agents alone: expensive, non-deterministic, and the first thing
+          dropped when a run is under time pressure. The regression that motivated this rule turned
+          on a date-and-rounding edge case — it would have passed a file-count check and a
+          test-presence check both.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          Sensors have a cost/precision curve, and high-risk code needs both ends of it. Scripts
+          are free, deterministic and dumb — run them always. Agents are expensive, probabilistic
+          and can read intent — run them where the blast radius justifies the cost. The
+          implementation detail that makes the pair work: <strong>each one names the other in its
+          output</strong>, so a human who sees the cheap signal knows the expensive check exists.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 5 ============ -->
+  <section class="rung" id="rung-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Complexity 5 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Closed loop</span>
+      </div>
+      <div>
+        <h2>The loop that writes its own rules — and the brake that stops it</h2>
+        <p class="thesis">
+          Everything above composes into one delivery run: an orchestrator derives the next phase
+          from external state, dispatches it to a subagent, verifies from the store rather than
+          the report, prices the run, and proposes a new charter rule. Then the interesting part
+          — the machinery that stops that flywheel from becoming a ratchet.
+        </p>
+        <div class="chips">
+          <span class="chip kind-skill"><b>skill</b> /drive</span>
+          <span class="chip kind-skill"><b>skill</b> /implement</span>
+          <span class="chip kind-rule"><b>rule</b> single-writer.md</span>
+          <span class="chip kind-agent"><b>agents</b> 4 review lenses, parallel</span>
+          <span class="chip kind-skill"><b>skill</b> /smoke</span>
+          <span class="chip kind-make"><b>guardrail</b> make drive-metrics</span>
+          <span class="chip kind-cmd"><b>command</b> /learn</span>
+          <span class="chip kind-cmd"><b>command</b> /prune</span>
+          <span class="chip kind-make"><b>guardrail</b> make charter-which</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">One card, start to finish</h3>
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Drive</span>
+          <span class="what">
+            <code>/drive</code> reads Jira, GitHub and git — never conversation memory — and
+            derives the next phase from a table. Its iron law is <em>DERIVE, DON'T REMEMBER</em>.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Dispatch</span>
+          <span class="what">
+            One subagent, foreground, one at a time. <code>single-writer.md</code> prohibits
+            concurrent writers outright — <strong>no gate unlocks it, no urgency justifies
+            it</strong>. The child gets identifiers (Jira key, PR number, worktree path), never a
+            briefing; if a phase can only be dispatched by explaining the situation to it, the
+            loop has drifted into holding state in conversation and must stop.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Fan out</span>
+          <span class="what">
+            Inside <code>/implement</code>, four review agents run <em>in parallel</em> — legal,
+            because they are read-only sensors returning structured findings against a shared
+            schema. Reconciliation is dedup-and-filter, not a forensic merge. Only the main loop
+            applies fixes.
+          </span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Smoke</span>
+          <span class="what">
+            Exercise the feature's happy path against a running stack and capture the evidence —
+            a screenshot per meaningful state, or a report. Then re-read Jira, GitHub and git.
+            <em>Never trust the subagent's self-report</em>: a reported success whose write is
+            invisible in external state did not happen, and a change nobody drove is a change
+            nobody proved. Both are failed passes.
+          </span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Price</span>
+          <span class="what">
+            <code>make drive-metrics KEY=PROJ-482</code> — merged LOC against token cost, priced
+            from a rate table. Reported without editorialising, and with its two limits stated:
+            list-price arithmetic, not an invoice; LOC flatters a card that wrote a lot.
+          </span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Learn</span>
+          <span class="what">
+            <code>/learn</code>, invoked with no argument, runs the retrospective itself from the
+            run's recorded artifacts, proposes one rule diff, and stops for human approval.
+          </span>
+        </li>
+      </ol>
+
+      <figure class="code">
+        <figcaption><span>/learn — the bar a lesson must clear</span><span class="tag warn">approval-gated</span></figcaption>
+<pre><code><span class="c-dim">Derive candidates from what the run *recorded*, never from recall:</span>
+1. A two-strike gate — the same failure twice.
+2. A repeated `auto-resolved:` judgment call across checkpoint lines.
+3. A review finding re-raised after a fix.
+4. A workflow gap.
+5. Cost — but <span class="c-warn">expensive is not the same as wasteful, and only waste is a lesson.</span>
+
+<span class="c-dim">Then apply the bar, and expect to fail it:</span>
+A candidate earns a charter change only if it <span class="c-block">recurred within the run,
+or names a rule that was already wrong</span>. A one-off call that went fine is
+not a lesson — promoting it is exactly how a charter accumulates the
+decorative rules `/prune` later has to retire.
+
+<span class="c-pass">"No lessons — nothing recurred" is a correct and common outcome.</span>
+Say it in one line and stop. Do not proceed to Step 1 to have something
+to show for the invocation.</code></pre>
+      </figure>
+
+      <h3 class="sub">The brake</h3>
+      <p>
+        A flywheel that only adds rules is a ratchet, and the cost is paid on every file the agent
+        touches. So the charter is instrumented against itself. <code>make charter-index</code>
+        builds a descriptor index; <code>make charter-which</code> replays glob matching for any
+        path and totals the bytes of charter the agent reads <em>before it reads the file</em>.
+        Run against one calculator file, on a charter of the size given at the top of this page:
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>$ make charter-which FILE=app/Services/Billing/InvoiceCalculator.php</caption>
+          <thead>
+            <tr><th>Kind</th><th>Id</th><th>Matching glob</th><th class="num">Bytes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>rule</td><td>services</td><td>app/Services/**</td><td class="num">12,944</td></tr>
+            <tr><td>rule</td><td>security</td><td>app/**/*.php</td><td class="num">9,669</td></tr>
+            <tr><td>rule</td><td>commits</td><td>**</td><td class="num">9,283</td></tr>
+            <tr><td>feature</td><td>billing-flow</td><td>app/Services/Billing/**</td><td class="num">6,416</td></tr>
+            <tr><td>rule</td><td>single-writer</td><td>**</td><td class="num">5,651</td></tr>
+            <tr><td>rule</td><td>feature-flags</td><td>app/**/*.php</td><td class="num">5,407</td></tr>
+            <tr><td>rule</td><td>prohibited-patterns</td><td>app/**/*.php</td><td class="num">4,668</td></tr>
+            <tr><td>rule</td><td>design-principles</td><td>app/**/*.php</td><td class="num">4,201</td></tr>
+            <tr><td>rule</td><td>no-facades</td><td>app/**/*.php</td><td class="num">3,743</td></tr>
+            <tr><td>rule</td><td>billing-high-risk</td><td>app/Services/Billing/**</td><td class="num">3,431</td></tr>
+            <tr><td>rule</td><td>verification-before-completion</td><td>**</td><td class="num">3,207</td></tr>
+            <tr><td>rule</td><td>git-workflow</td><td>**</td><td class="num">2,351</td></tr>
+            <tr><td>rule</td><td>env-config</td><td>app/**/*.php</td><td class="num">2,058</td></tr>
+            <tr><td>rule</td><td>toolchain</td><td>**</td><td class="num">1,428</td></tr>
+            <tr><td>rule</td><td>role-checks</td><td>app/**/*.php</td><td class="num">1,373</td></tr>
+            <tr class="total flag"><td colspan="3">TOTAL — over budget (60,000) across 15 charter files</td><td class="num">75,830</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Read the <em>shape</em> rather than the totals. Three rules load on <code>**</code> and
+        are paid on every file in the repo. Five more load on <code>app/**/*.php</code>, which is
+        most of the backend. Only two are actually specific to this module — and they are the two
+        smallest entries in the table. That distribution is the finding: the budget is consumed
+        almost entirely by rules that are not about the file being edited.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>The report, with the remedy attached</span><span class="tag block">--check exits 1</span></figcaption>
+<pre><code><span class="c-block">OVER load budget: 75830 / 60000 bytes across 15 charter files</span>
+  → merge into the rule that already owns this glob, or move reference
+    material to .claude/features/ with narrower paths:
+    (.claude/rules/charter-versioning.md)</code></pre>
+      </figure>
+
+      <p>
+        Two read-only scans complete the brake. <code>rule-drift.sh</code> checks every
+        <code>paths:</code> glob against the repo and flags globs matching zero files — a rule
+        describing code that no longer exists. <code>decorative-rule-check.sh</code> counts each
+        rule three ways (commits in 90 days, cross-references from skills and agents, mentions in
+        <code>CLAUDE.md</code>/<code>CHARTER.md</code>) and marks the ones scoring zero everywhere
+        with a headstone. Both are wired into <code>/prune</code>, the deliberate counterpart to
+        <code>/learn</code>.
+      </p>
+
+      <div class="callout">
+        <span class="label">Without it</span>
+        <p>
+          Run the flywheel for six months without a brake and the charter reaches the state every
+          long-lived one does: rules that contradict each other, rules whose globs point at
+          deleted directories, and a per-file load so large the agent's attention is spent reading
+          policy instead of code. The failure is invisible from inside — nothing errors. Quality
+          just quietly degrades, and the natural response is to write another rule.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">For the book</span>
+        <p>
+          The closed loop is the point, but the brake is the lesson. A charter is a codebase: it
+          accumulates, it rots, and it needs a deletion path with the same status as its addition
+          path. <code>/learn</code> and <code>/prune</code> are deliberately symmetric, both
+          approval-gated, both human-owned. And the load budget makes the abstract cost of
+          "one more rule" into a number attached to a specific file — which is the only form of
+          cost anyone actually acts on.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Five guardrails</strong> — worked examples drawn from a single production charter.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Rungs ascend by composition, not by size: 3 artifacts → 3 → 6 → 5 → 9, but each rung's
+      artifacts depend on the ones below.</div>
+    <div>Excerpts are drawn from a working charter, with module names, issue keys and domain
+      specifics generalised. Structure, thresholds and control flow are unchanged.
+      Colour encodes signal:
+      <span style="color:var(--brick)">block</span> ·
+      <span style="color:var(--gold)">warn</span> ·
+      <span style="color:var(--forest)">pass</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
