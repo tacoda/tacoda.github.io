@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who's Going to Be Senior in 2031? · Harness Engineering</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A leader-facing talk on the engineering seniority pipeline: why cutting junior intake looks free for six years, and what it costs after that. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/senior-2031/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Who's Going to Be Senior in 2031?">
+<meta property="og:description" content="Your 2031 senior bench is the offer letters you sign this year. Cutting junior intake looks free for six years, which is exactly what makes it dangerous.">
+<meta property="og:url" content="https://www.tacoda.dev/senior-2031/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Who's Going to Be Senior in 2031?">
+<meta name="twitter:description" content="Your 2031 senior bench is the offer letters you sign this year.">
+<style>
+  :root {
+    --ink: #10131a;
+    --bg: #ece9e2;
+    --panel: #f4f2ec;
+    --fg: #191c22;
+    --muted: #5c626e;
+    --faint: #8b909b;
+    --line: rgba(16,19,26,.14);
+    --line-strong: rgba(16,19,26,.28);
+    --signal: #b9761c;   /* amber — intake / juniors */
+    --signal-tint: rgba(185,118,28,.14);
+    --gate: #167e76;     /* teal — the senior bench */
+    --gate-tint: rgba(22,126,118,.12);
+    --stop: #b23a2e;     /* red — the cliff / comprehension debt */
+    --stop-tint: rgba(178,58,46,.10);
+    --grid: rgba(16,19,26,.06);
+
+    --font-display: -apple-system, "Segoe UI", system-ui, Roboto, sans-serif;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    --font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c0e14; --panel: #141821; --fg: #e6e6e0; --muted: #9aa0ad; --faint: #6b7280;
+      --line: rgba(255,255,255,.11); --line-strong: rgba(255,255,255,.22);
+      --signal: #e0952e; --signal-tint: rgba(224,149,46,.16);
+      --gate: #3fb1a6; --gate-tint: rgba(63,177,166,.15);
+      --stop: #d6584a; --stop-tint: rgba(214,88,74,.16);
+      --grid: rgba(255,255,255,.05);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c0e14; --panel: #141821; --fg: #e6e6e0; --muted: #9aa0ad; --faint: #6b7280;
+    --line: rgba(255,255,255,.11); --line-strong: rgba(255,255,255,.22);
+    --signal: #e0952e; --signal-tint: rgba(224,149,46,.16);
+    --gate: #3fb1a6; --gate-tint: rgba(63,177,166,.15);
+    --stop: #d6584a; --stop-tint: rgba(214,88,74,.16);
+    --grid: rgba(255,255,255,.05);
+  }
+  :root[data-theme="light"] {
+    --bg: #ece9e2; --panel: #f4f2ec; --fg: #191c22; --muted: #5c626e; --faint: #8b909b;
+    --line: rgba(16,19,26,.14); --line-strong: rgba(16,19,26,.28);
+    --signal: #b9761c; --signal-tint: rgba(185,118,28,.14);
+    --gate: #167e76; --gate-tint: rgba(22,126,118,.12);
+    --stop: #b23a2e; --stop-tint: rgba(178,58,46,.10);
+    --grid: rgba(16,19,26,.06);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+  body { font-family: var(--font-display); color: var(--fg); -webkit-font-smoothing: antialiased; }
+
+  #viewport { position: fixed; inset: 0; display: grid; place-items: center; background: var(--bg); }
+  #stage { width: 1280px; height: 720px; position: relative; transform-origin: center center; background: var(--bg); }
+
+  .slide { position: absolute; inset: 0; padding: 66px 84px 74px; display: none; flex-direction: column; background: var(--bg); }
+  .slide.active { display: flex; }
+
+  .eyebrow { font-family: var(--font-mono); font-size: 15px; letter-spacing: .22em; text-transform: uppercase; color: var(--faint); display: flex; align-items: center; gap: 12px; }
+  .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); flex: none; }
+  .eyebrow .dot.gate { background: var(--gate); }
+  .eyebrow .dot.stop { background: var(--stop); }
+
+  h1.title { font-size: 40px; line-height: 1.06; font-weight: 800; letter-spacing: -.02em; margin: 18px 0 0; text-wrap: balance; max-width: 20ch; }
+  h2 { font-size: 32px; line-height: 1.1; font-weight: 800; letter-spacing: -.015em; margin: 14px 0 0; text-wrap: balance; max-width: 24ch; }
+  .lede { font-family: var(--font-serif); font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 52ch; margin-top: 16px; }
+  .body { display: flex; flex: 1; min-height: 0; margin-top: 24px; gap: 40px; }
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .center { align-items: center; justify-content: center; }
+
+  p { margin: 0; }
+  .serif { font-family: var(--font-serif); }
+
+  ul.clean { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  ul.clean li { position: relative; padding-left: 26px; font-size: 20px; line-height: 1.4; color: var(--fg); }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: 11px; width: 11px; height: 2px; background: var(--signal); }
+  ul.clean li.gate::before { background: var(--gate); }
+  ul.clean li.stop::before { background: var(--stop); }
+  ul.clean li b { font-weight: 700; }
+  ul.clean li .muted { color: var(--muted); }
+
+  .pull { font-family: var(--font-serif); font-size: 29px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; text-wrap: balance; max-width: 26ch; border-left: 3px solid var(--signal); padding-left: 26px; }
+  .pull.gate { border-color: var(--gate); }
+  .pull.stop { border-color: var(--stop); }
+  .pull cite { display: block; font-family: var(--font-mono); font-style: normal; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin-top: 20px; }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 22px 24px; }
+  .kicker { font-family: var(--font-mono); font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+
+  code, pre { font-family: var(--font-mono); }
+  pre.code { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; font-size: 15.5px; line-height: 1.62; color: var(--fg); overflow: auto; margin: 0; }
+  pre.code .c { color: var(--faint); }
+  pre.code .k { color: var(--signal); }
+  pre.code .g { color: var(--gate); }
+  pre.code .s { color: var(--stop); }
+
+  .legend { display: flex; gap: 24px; font-family: var(--font-mono); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+  .legend .sw-signal { background: var(--signal); }
+  .legend .sw-gate { background: var(--gate); }
+  .legend .sw-stop { background: var(--stop); }
+
+  svg .s-signal { stroke: var(--signal); }
+  svg .f-signal { fill: var(--signal); }
+  svg .s-gate { stroke: var(--gate); }
+  svg .f-gate { fill: var(--gate); }
+  svg .s-stop { stroke: var(--stop); }
+  svg .f-stop { fill: var(--stop); }
+  svg .s-line { stroke: var(--line-strong); }
+  svg .s-faint { stroke: var(--line); }
+  svg .f-fg { fill: var(--fg); }
+  svg .f-muted { fill: var(--muted); }
+  svg .f-panel { fill: var(--panel); }
+  svg text { font-family: var(--font-mono); fill: var(--fg); }
+  svg .t-disp { font-family: var(--font-display); font-weight: 700; }
+  svg .t-muted { fill: var(--muted); }
+  svg .t-faint { fill: var(--faint); }
+
+  .stat { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  #band { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--grid); }
+  #band > i { display: block; height: 100%; background: linear-gradient(90deg, var(--gate), var(--signal)); transition: width .3s ease; }
+  #counter { position: absolute; right: 84px; bottom: 22px; font-family: var(--font-mono); font-size: 13px; letter-spacing: .12em; color: var(--faint); }
+  #brand { position: absolute; left: 84px; bottom: 20px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+
+  #help { position: fixed; right: 16px; top: 14px; z-index: 30; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--faint); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; opacity: .8; }
+
+  @media (prefers-reduced-motion: reduce) { #band > i { transition: none; } }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="stage">
+
+    <!-- 1 · TITLE -->
+    <section class="slide active">
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> Harness Engineering · A Talk for Leaders</div>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:940px;">
+          <h1 class="title" style="font-size:62px; max-width:22ch;">Who's going to be <span style="color:var(--gate)">senior</span> in 2031?</h1>
+          <p class="lede" style="font-size:24px; max-width:48ch; margin-top:24px;">The people you hire this year. There is no other supply. Cutting junior intake because the agent writes junior-tier code is a decision that looks free for six years, and six years is exactly how long it takes to become impossible to fix quickly.</p>
+          <div class="legend" style="margin-top:38px;">
+            <span><i class="sw-signal"></i> intake · who you hire</span>
+            <span><i class="sw-gate"></i> bench · who can judge</span>
+            <span><i class="sw-stop"></i> the cliff · and the debt</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · WHO'S TALKING -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Who's Talking</div>
+      <h2 style="font-size:42px;">Ian Johnson</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:18px; font-size:21px;">
+            <li>Staff software engineer at <b>Parento</b>, running agents against a real production codebase, daily.</li>
+            <li class="gate">Founder of <b>Fulcorum</b> <span class="muted">· fulcorum.com</span>, on-demand video courses on shipping AI-generated code that's production-grade.</li>
+            <li>Author of <b>Harness Engineering</b> and the open-source tool <b>Keystone</b>.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">I am not here to tell you the agent is overrated. I use it all day. I am here about the second-order effect on your org chart.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · THE DECISION -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> The Decision On The Table</div>
+      <h2>The case for cutting junior hiring is not stupid.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:18px;">
+            <li>The agent produces junior-tier output in minutes, at near-zero marginal cost.</li>
+            <li>A junior costs six figures, needs onboarding, and takes senior time you are already short of.</li>
+            <li>The saving is <b>visible this quarter</b>. It shows up in a headcount line that somebody is measured on.</li>
+            <li>Every peer company appears to be reaching the same conclusion, which makes it feel safe.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">Every part of that is true. It is still one of the worst trades available to you, and this talk is why.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · THE HALF THAT'S TRUE -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Concede It Fully</div>
+      <h2>The agent really has replaced junior output.</h2>
+      <div class="body">
+        <div class="col center">
+          <ul class="clean" style="gap:18px;">
+            <li>CRUD endpoints, form validation, test scaffolding, migrations, glue code.</li>
+            <li>Faster than a junior, at any hour, without asking a follow-up question.</li>
+            <li>Often <b>better</b> than a first-year engineer's first draft.</li>
+          </ul>
+          <p class="serif" style="font-size:18px; color:var(--muted); margin-top:26px; max-width:38ch;">If your argument for hiring juniors is that you need the code they produce, you have already lost that argument. Do not make it.</p>
+        </div>
+        <div class="col center">
+          <div class="pull stop">The output was never why juniors were valuable. It was the byproduct of the thing that was.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · THE HALF THAT'S FALSE -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> The Part The Business Case Misses</div>
+      <h2>A junior is not a cheap engineer. A junior is a senior under construction.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1000px;">
+          <svg viewBox="0 0 1000 300" style="width:100%; height:260px;">
+            <rect x="20" y="40" width="440" height="220" rx="10" class="f-panel" stroke="var(--line)"/>
+            <text x="44" y="74" class="t-faint" font-size="13" letter-spacing="2">WHAT YOU BUY</text>
+            <text x="44" y="118" class="t-disp f-fg" font-size="22">Junior-tier output</text>
+            <text x="44" y="150" class="t-muted" font-size="15">now replaceable, and honestly</text>
+            <text x="44" y="172" class="t-muted" font-size="15">it was never the point</text>
+            <text x="44" y="222" class="t-disp f-stop" font-size="17">the agent took this</text>
+
+            <rect x="540" y="40" width="440" height="220" rx="10" class="f-panel" stroke="var(--gate)" stroke-width="2"/>
+            <text x="564" y="74" class="t-faint" font-size="13" letter-spacing="2">WHAT YOU WERE ACTUALLY BUYING</text>
+            <text x="564" y="118" class="t-disp f-fg" font-size="22">A senior, in six years</text>
+            <text x="564" y="150" class="t-muted" font-size="15">judgment, context, the ability to</text>
+            <text x="564" y="172" class="t-muted" font-size="15">tell plausible from correct</text>
+            <text x="564" y="222" class="t-disp f-gate" font-size="17">nothing takes this</text>
+
+            <path d="M470 150 L530 150" class="s-line" stroke-width="2" marker-end="url(#a1)"/>
+            <defs><marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="f-muted"/></marker></defs>
+          </svg>
+          <p class="serif" style="font-size:19px; color:var(--muted); margin-top:14px; text-align:center;">You cancelled a subscription to the left-hand box. The invoice for the right-hand box arrives separately.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · WHERE SENIORS COME FROM -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> The Arithmetic</div>
+      <h2>Seniors are manufactured on a six-year lead time.</h2>
+      <div class="body">
+        <div class="col" style="flex:1;">
+          <div class="panel" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <div class="kicker" style="color:var(--gate)">The model, stated so you can attack it</div>
+            <ul class="clean" style="gap:12px; font-size:18px;">
+              <li class="gate">You hire <span class="stat"><b>100</b></span> juniors a year.</li>
+              <li class="gate">About <span class="stat"><b>40%</b></span> reach senior at your bar.</li>
+              <li class="gate">It takes about <span class="stat"><b>6 years</b></span>.</li>
+              <li class="gate">You lose about <span class="stat"><b>10%</b></span> of the senior bench a year.</li>
+            </ul>
+            <p class="serif" style="font-size:16px; color:var(--muted); margin-top:20px;">Steady state: a bench of <span class="stat">400</span>. Argue with any number you like. The shape below does not change for any lead time over four years, which is every version of this anyone has proposed.</p>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="pull gate">Nothing in your control shortens the six years. Not budget, not tooling, not a model release.</div>
+          <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:34ch;">You can make the six years better. You cannot make them shorter, because what is being built is calibrated instinct, and that is built out of reps.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · THE CHART -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span><span class="dot stop"></span> The Cliff</div>
+      <h2>Stop hiring juniors in 2025. Nothing happens until 2031.</h2>
+      <div class="body center" style="margin-top:4px;">
+        <svg viewBox="0 0 1080 330" style="width:100%; height:100%;">
+          <!-- gridlines -->
+          <line x1="70" y1="44"  x2="1020" y2="44"  class="s-faint"/>
+          <line x1="70" y1="106" x2="1020" y2="106" class="s-faint"/>
+          <line x1="70" y1="168" x2="1020" y2="168" class="s-faint"/>
+          <line x1="70" y1="230" x2="1020" y2="230" class="s-faint"/>
+          <line x1="70" y1="292" x2="1020" y2="292" class="s-line"/>
+          <text x="34" y="48"  class="t-faint" font-size="12">100%</text>
+          <text x="42" y="110" class="t-faint" font-size="12">75%</text>
+          <text x="42" y="172" class="t-faint" font-size="12">50%</text>
+          <text x="42" y="234" class="t-faint" font-size="12">25%</text>
+
+          <!-- the cut marker -->
+          <line x1="70" y1="30" x2="70" y2="292" class="s-signal" stroke-width="2" stroke-dasharray="4 5"/>
+          <text x="76" y="26" class="t-disp f-signal" font-size="13">2025 · intake cut</text>
+
+          <!-- the cliff marker -->
+          <line x1="426" y1="30" x2="426" y2="292" class="s-stop" stroke-width="2" stroke-dasharray="4 5"/>
+          <text x="432" y="26" class="t-disp f-stop" font-size="13">2031 · the bench starts falling</text>
+
+          <!-- keep hiring -->
+          <path d="M70 44 L1020 44" class="s-gate" stroke-width="2.5" fill="none"/>
+          <text x="1026" y="42" class="t-disp f-gate" font-size="13">keep</text>
+          <text x="1026" y="58" class="t-faint" font-size="11">hiring</text>
+
+          <!-- resume at first sign -->
+          <path d="M70 44 L129 44 L189 44 L248 44 L308 44 L367 44 L426 44 L486 69 L545 91 L604 111 L664 129 L723 146 L782 160 L842 149 L901 138 L961 129 L1020 120" class="s-signal" stroke-width="2.5" fill="none" stroke-dasharray="7 5"/>
+          <text x="1026" y="118" class="t-disp f-signal" font-size="13">resume</text>
+          <text x="1026" y="134" class="t-faint" font-size="11">in 2031</text>
+
+          <!-- never resume -->
+          <path d="M70 44 L129 44 L189 44 L248 44 L308 44 L367 44 L426 44 L486 69 L545 91 L604 111 L664 129 L723 146 L782 160 L842 173 L901 185 L961 196 L1020 206" class="s-stop" stroke-width="2.5" fill="none"/>
+          <text x="1026" y="204" class="t-disp f-stop" font-size="13">never</text>
+          <text x="1026" y="220" class="t-faint" font-size="11">resume</text>
+
+          <!-- x axis -->
+          <text x="70"  y="312" class="t-faint" font-size="12" text-anchor="middle">2025</text>
+          <text x="189" y="312" class="t-faint" font-size="12" text-anchor="middle">2027</text>
+          <text x="308" y="312" class="t-faint" font-size="12" text-anchor="middle">2029</text>
+          <text x="426" y="312" class="t-disp f-stop" font-size="12" text-anchor="middle">2031</text>
+          <text x="545" y="312" class="t-faint" font-size="12" text-anchor="middle">2033</text>
+          <text x="664" y="312" class="t-faint" font-size="12" text-anchor="middle">2035</text>
+          <text x="782" y="312" class="t-faint" font-size="12" text-anchor="middle">2037</text>
+          <text x="901" y="312" class="t-faint" font-size="12" text-anchor="middle">2039</text>
+          <text x="1020" y="312" class="t-faint" font-size="12" text-anchor="middle">2041</text>
+        </svg>
+      </div>
+      <div class="legend" style="justify-content:center; margin-top:2px;">
+        <span>senior bench, as a share of steady state</span>
+      </div>
+    </section>
+
+    <!-- 8 · THE FREE YEARS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> Why This One Gets Made</div>
+      <h2>The first six years look free. That is the trap, not a footnote.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:18px;">
+            <li><b>2025 to 2031:</b> the bench is flat. Cohorts hired before the cut are still arriving. The savings are real and the cost is invisible.</li>
+            <li class="stop"><b>2031:</b> the first year nothing arrives. The decline starts, and it will not stop on its own.</li>
+            <li class="stop"><b>2037:</b> down to <span class="stat"><b>53%</b></span> even if you reversed course the moment the decline appeared, because the fix also takes six years.</li>
+            <li class="stop"><b>2041:</b> <span class="stat"><b>35%</b></span> if you never reverse it.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull stop">By the time the metric moves, the correction is already six years late. There is no version of this you can fix in the year you notice it.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · THE ASYMMETRY -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> The Risk Profile</div>
+      <h2>Cheap to break. Slow to fix. No feedback in between.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1000px; display:grid; grid-template-columns:1fr 1fr; gap:26px;">
+          <div class="panel" style="border-left:3px solid var(--signal);">
+            <div class="kicker" style="color:var(--signal)">Breaking it</div>
+            <p style="font-size:20px; line-height:1.45;">One headcount decision. One quarter. Reversible on paper at any time, at no cost.</p>
+          </div>
+          <div class="panel" style="border-left:3px solid var(--stop);">
+            <div class="kicker" style="color:var(--stop)">Fixing it</div>
+            <p style="font-size:20px; line-height:1.45;">Six years of salary before the first return. Started in a year when the bench is already thin and everyone is busy.</p>
+          </div>
+          <div class="panel" style="grid-column:1 / -1; border-left:3px solid var(--gate);">
+            <div class="kicker" style="color:var(--gate)">And the part that makes it genuinely dangerous</div>
+            <p style="font-size:20px; line-height:1.45;">There is no signal in between. Six years of flat metrics is exactly what a correct decision and a catastrophic one both look like. You will not get evidence in time to act on it, so you have to decide this on structure rather than on data.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · WE'LL HIRE SENIORS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> The Obvious Objection</div>
+      <h2>"We'll just hire seniors instead."</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:18px;">
+            <li>That is not a hedge. It is the same bet everyone else is placing, at the same time.</li>
+            <li class="stop">If the industry stops manufacturing seniors, the shortage arrives <b>everywhere at once</b>, and your plan and your competitor's plan fail in the same quarter.</li>
+            <li class="stop">The people you plan to hire in 2031 are being trained, or not trained, <b>right now</b>, by companies making this same decision.</li>
+            <li>Poaching moves a senior between orgs. It does not create one. In aggregate the industry is buying from a pool nobody is refilling.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">You are not diversified. You are correlated. Every firm's fallback plan is to buy from a market that every firm stopped supplying.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · DEMAND FOR JUDGMENT -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> Demand Side</div>
+      <h2>The agent does not reduce the need for judgment. It multiplies it.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:18px;">
+            <li>Volume of change goes <b>up</b>. Ten times the diffs, same number of people who can evaluate one.</li>
+            <li class="gate">Every generated change still needs somebody to decide whether it is <b>correct here</b>, which is a question about your business that no model has the answer to.</li>
+            <li class="stop">The agent has no accountability. It is not paged, does not attend the postmortem, and does not answer for the outage.</li>
+            <li class="gate">Review capacity, not typing capacity, is now the binding constraint on how fast you can ship.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">You automated the abundant half of the job and left the scarce half untouched. Then you cut the supply of the scarce half.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · COMPREHENSION DEBT -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> Name The Failure Mode</div>
+      <h2>Comprehension debt.</h2>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:1000px;">
+          <div class="pull stop" style="font-size:32px; max-width:34ch;">Shipped, working, revenue-generating code that nobody currently on staff can explain.</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px; margin-top:34px;">
+            <div class="panel">
+              <div class="kicker">Technical debt</div>
+              <p style="font-size:18px; line-height:1.45;">Visible. Has a name, a backlog, an owner, and a budget line. Everyone agrees it exists.</p>
+            </div>
+            <div class="panel" style="border-left:3px solid var(--stop);">
+              <div class="kicker" style="color:var(--stop)">Comprehension debt</div>
+              <p style="font-size:18px; line-height:1.45;">Invisible. Every dashboard is green: tests pass, velocity is up, the code is clean. Nothing measures whether a human still understands it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · HOW IT SHOWS UP -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> The Symptoms, In Order</div>
+      <h2>You will not see it as a hiring problem. You will see it as a quality problem.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:16px;">
+            <li>Incident time-to-diagnosis climbs while time-to-fix stays flat. Nobody knows <b>where</b> to look anymore.</li>
+            <li>"I don't know why that's there" starts appearing in postmortems, about code written last year.</li>
+            <li class="stop">Changes get reverted more often, because the change was plausible and the reviewer had no basis to say otherwise.</li>
+            <li class="stop">Agent output quality degrades on its own, because the agent imitates the codebase, and the codebase is now full of things nobody vetted.</li>
+            <li class="stop">Your remaining seniors spend all day reviewing and none of it deciding, then leave.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull stop">Every one of these gets diagnosed as a process problem, and gets a process fix, and does not improve.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · TWO ORGS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> 2031, Two Companies</div>
+      <h2>Same tools. Same model. Different bench.</h2>
+      <div class="body center" style="flex-direction:column; gap:0;">
+        <div style="width:100%; max-width:1020px; display:grid; grid-template-columns:1fr 1fr; gap:28px;">
+          <div class="panel" style="border-left:3px solid var(--stop);">
+            <div class="kicker" style="color:var(--stop)">Company A · cut intake in 2025</div>
+            <ul class="clean" style="gap:12px; font-size:17px;">
+              <li class="stop">Bench flat until this year, now falling.</li>
+              <li class="stop">Competing for scarce seniors at auction prices.</li>
+              <li class="stop">Six years of agent output, thinly reviewed.</li>
+              <li class="stop">Nobody in the building trained on <b>this</b> codebase.</li>
+            </ul>
+          </div>
+          <div class="panel" style="border-left:3px solid var(--gate);">
+            <div class="kicker" style="color:var(--gate)">Company B · kept intake, ran a program</div>
+            <ul class="clean" style="gap:12px; font-size:17px;">
+              <li class="gate">Six cohorts trained on comprehension, on their own code.</li>
+              <li class="gate">Review capacity scaled with output volume.</li>
+              <li class="gate">A bench it grew at cost, not at market rate.</li>
+              <li class="gate">Institutional memory that is in people, not only in files.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="serif" style="font-size:19px; color:var(--muted); margin-top:24px; text-align:center; max-width:70ch;">Company B did not spend more. It spent about thirty minutes a week per junior, and it kept paying salaries that Company A stopped paying. That is the entire difference.</p>
+      </div>
+    </section>
+
+    <!-- 15 · FALSIFIABLE -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Where I Could Be Wrong</div>
+      <h2>This is an argument from pipeline structure. It is not a forecast.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <div class="panel" style="width:100%; border-left:3px solid var(--stop);">
+            <div class="kicker" style="color:var(--stop)">What would make me wrong</div>
+            <ul class="clean" style="gap:12px; font-size:18px;">
+              <li class="stop">If agents become <b>accountable</b>, not merely capable. If a model can be the party that answers for an outage, the need for a human bench collapses and so does this talk.</li>
+              <li class="stop">If seniority stops requiring reps. If judgment about a specific business can be installed rather than trained, the six-year lead time goes away.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="pull">I have no data about 2031. Nobody does. What I have is the structure of the pipeline, which has a six-year lag whether or not anyone believes in it.</div>
+          <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:34ch;">Notice that both ways I could be wrong argue for waiting to cut, not for cutting now. The cut is the irreversible move.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · WHAT MAKES A SENIOR -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> The Mechanism</div>
+      <h2>Seniority was never typing speed. The agent just made that impossible to hide.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:18px;">
+            <li>Writing code was always the means. The job is deciding what correct means <b>here</b>, for this business.</li>
+            <li class="gate">That judgment is built by being wrong, repeatedly, in front of someone who can say why.</li>
+            <li class="gate">The agent commoditized the means, which does not shrink the job. It <b>reveals</b> it.</li>
+            <li class="stop">And it offers, every single day, to skip the part where the judgment forms. It hands a junior working code faster than they can understand it.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">Left alone, the tool that makes juniors productive is the same tool that stops them becoming senior. That is the thing a program has to counteract.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 · THE JOB CHANGED -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> What You're Actually Hiring For Now</div>
+      <h2>The junior role changed. Reviewer first, author second.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1000px;">
+          <svg viewBox="0 0 1000 220" style="width:100%; height:190px;">
+            <text x="20" y="34" class="t-faint" font-size="13" letter-spacing="2">THEN</text>
+            <rect x="20" y="48" width="200" height="52" rx="8" class="f-panel" stroke="var(--line)"/>
+            <text x="120" y="80" class="t-disp f-fg" font-size="16" text-anchor="middle">junior writes</text>
+            <path d="M228 74 L288 74" class="s-line" stroke-width="2" marker-end="url(#a2)"/>
+            <rect x="296" y="48" width="230" height="52" rx="8" class="f-panel" stroke="var(--line)"/>
+            <text x="411" y="80" class="t-disp f-fg" font-size="16" text-anchor="middle">senior reviews code</text>
+            <text x="546" y="80" class="t-faint" font-size="13">~1 hour of the scarce person</text>
+
+            <text x="20" y="150" class="t-faint" font-size="13" letter-spacing="2">NOW</text>
+            <rect x="20" y="164" width="200" height="52" rx="8" class="f-panel" stroke="var(--signal)" stroke-width="2"/>
+            <text x="120" y="196" class="t-disp f-signal" font-size="16" text-anchor="middle">agent writes</text>
+            <path d="M228 190 L288 190" class="s-line" stroke-width="2" marker-end="url(#a2)"/>
+            <rect x="296" y="164" width="230" height="52" rx="8" class="f-panel" stroke="var(--line)"/>
+            <text x="411" y="196" class="t-disp f-fg" font-size="16" text-anchor="middle">junior reviews code</text>
+            <path d="M534 190 L594 190" class="s-gate" stroke-width="2" marker-end="url(#a3)"/>
+            <rect x="602" y="164" width="250" height="52" rx="8" class="f-panel" stroke="var(--gate)" stroke-width="2"/>
+            <text x="727" y="196" class="t-disp f-gate" font-size="16" text-anchor="middle">senior reviews the review</text>
+            <text x="866" y="196" class="t-faint" font-size="13">~15 min</text>
+            <defs>
+              <marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="f-muted"/></marker>
+              <marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="f-gate"/></marker>
+            </defs>
+          </svg>
+          <p class="serif" style="font-size:19px; color:var(--muted); margin-top:10px; text-align:center; max-width:74ch;">Grading the review instead of the code puts your scarcest person's attention on the only thing that transfers, and costs them a quarter of what it used to.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 · MOVE 1 -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> Move 1 Of 4</div>
+      <h2>Set a bar on what gets merged, not on who wrote it.</h2>
+      <div class="body">
+        <div class="col" style="flex:1.1;">
+          <pre class="code" style="height:100%; display:flex; flex-direction:column; justify-content:center;"><span class="c"># every pull request carries this, written by a human</span>
+<span class="k">comprehension:</span>
+  does:      <span class="c">what this change does to the system, one sentence</span>
+  seam:      <span class="c">where it enters -&gt; where it leaves</span>
+  policy:    <span class="c">the rule this obeys</span>  <span class="s">| CHARTER-GAP</span>
+  falsifier: <span class="c">the case that would make this wrong</span>
+             covered by: <span class="g">a test</span>       <span class="s">| NONE</span></pre>
+        </div>
+        <div class="col center">
+          <ul class="clean" style="gap:14px; font-size:19px;">
+            <li class="gate">Takes under a minute when you understand the change, and is genuinely hard when you don't. That asymmetry is the whole mechanism.</li>
+            <li class="gate">A CI gate can enforce that the claim was <b>made</b>. Only a person can check that it is <b>true</b>.</li>
+            <li><span class="stat">CHARTER-GAP</span> means nothing in the repo answers "why". That is a finding your org should want.</li>
+          </ul>
+          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:18px;">tacoda.dev/comprehension-standard</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 · MOVE 2 -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> Move 2 Of 4</div>
+      <h2>Thirty minutes a week, on the agent's code.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:16px;">
+            <li>The junior reviews a diff the agent produced. Cold, no explanation, five minutes.</li>
+            <li>Fifteen minutes to fill a card: verdict, defect class, proof, durable fix. Prediction written <b>before</b> running the tests.</li>
+            <li class="gate">Ten minutes defending it to a senior, who grades <b>the review</b> and never the code.</li>
+            <li class="gate">Progress is counted in documented catches, not tickets closed.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">Reviewing the agent is safe in a way reviewing your own work never is. Nothing is at stake, so people look harder.</div>
+          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:22px;">tacoda.dev/reverse-review</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 · MOVE 3 -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> Move 3 Of 4 · The One With Teeth</div>
+      <h2>Change what you promote on, or the other three are decoration.</h2>
+      <div class="body center" style="flex-direction:column; gap:0;">
+        <div style="width:100%; max-width:1020px; display:grid; grid-template-columns:1fr 1fr; gap:28px;">
+          <div class="panel" style="border-left:3px solid var(--stop);">
+            <div class="kicker" style="color:var(--stop)">If you promote on output</div>
+            <ul class="clean" style="gap:12px; font-size:17px;">
+              <li class="stop">The agent wins that contest, permanently.</li>
+              <li class="stop">You have told every junior that the fastest path is to merge more, faster, unread.</li>
+              <li class="stop">You are measuring the one part of the job you already automated.</li>
+            </ul>
+          </div>
+          <div class="panel" style="border-left:3px solid var(--gate);">
+            <div class="kicker" style="color:var(--gate)">Promote on these instead</div>
+            <ul class="clean" style="gap:12px; font-size:17px;">
+              <li class="gate">Catches: a defect named, classified, and proved.</li>
+              <li class="gate">Charter contributions: gaps found and rules written that stopped a whole class.</li>
+              <li class="gate">Reviews that changed a decision.</li>
+              <li class="gate">Incidents that did not happen because somebody asked.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="serif" style="font-size:19px; color:var(--muted); margin-top:24px; text-align:center; max-width:70ch;">People optimize what you count. Right now most orgs count the half the machine does better.</p>
+      </div>
+    </section>
+
+    <!-- 21 · MOVE 4 -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Move 4 Of 4</div>
+      <h2>Before you decide this on a vibe, run it for one sprint.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:16px;">
+            <li>Pre-register the hypothesis and the stopping rule <b>before</b> the first ticket, so nobody gets to reinterpret the result afterward.</li>
+            <li>Matched tickets: junior with an agent, senior alone. Score the outcomes <b>blind</b>.</li>
+            <li class="gate">Measure past throughput: defect escape rate, review rework, and a comprehension audit at 30 days. Can anyone still explain the change?</li>
+            <li class="stop">Tell people they are in an experiment, and never let the result touch an individual's review.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">My prediction, on the record: the junior loses on week-one speed and wins by day ninety. If that is wrong at your company, you should know it, and this is how.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 · WHAT IT COSTS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> The Bill</div>
+      <h2>The whole program, priced.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:960px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+            <div class="panel" style="border-left:3px solid var(--signal);">
+              <div class="kicker" style="color:var(--signal)">Per junior</div>
+              <div class="stat" style="font-size:34px; font-weight:800;">30 min</div>
+              <p style="font-size:16px; color:var(--muted); margin-top:6px;">per week, reviewing the agent</p>
+            </div>
+            <div class="panel" style="border-left:3px solid var(--gate);">
+              <div class="kicker" style="color:var(--gate)">Per senior</div>
+              <div class="stat" style="font-size:34px; font-weight:800;">15 min</div>
+              <p style="font-size:16px; color:var(--muted); margin-top:6px;">per week, grading the review</p>
+            </div>
+            <div class="panel" style="border-left:3px solid var(--line-strong);">
+              <div class="kicker">Setup</div>
+              <div class="stat" style="font-size:34px; font-weight:800;">1 day</div>
+              <p style="font-size:16px; color:var(--muted); margin-top:6px;">PR template, one CI gate, a written bar</p>
+            </div>
+          </div>
+          <div class="panel" style="margin-top:26px; border-left:3px solid var(--stop);">
+            <div class="kicker" style="color:var(--stop)">Compare against</div>
+            <p style="font-size:20px; line-height:1.45;">One senior hire in a market where nobody has been making seniors for six years. That is the alternative you are choosing between, and it is not close.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 · CLOSE -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> Close</div>
+      <div class="body center" style="gap:0;">
+        <div style="max-width:940px;">
+          <h1 class="title" style="font-size:46px; max-width:28ch;">The bench you'll have in 2031 is the <span style="color:var(--gate)">offer letters</span> you sign this year.</h1>
+          <p class="lede" style="font-size:21px; max-width:50ch; margin-top:22px;">The agent took the output, not the apprenticeship. Keep hiring, change what the first six years are for, and count the thing the machine cannot do. The cut is the only move here that you cannot take back.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24 · CONTACT -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> Contact</div>
+      <h2 style="font-size:40px;">Find me.</h2>
+      <div class="body center">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px 48px; width:100%; max-width:1000px;">
+          <div style="border-left:3px solid var(--gate); padding-left:18px;">
+            <div class="kicker" style="color:var(--gate)">Fulcorum</div>
+            <div class="stat" style="font-size:22px; font-weight:700;">fulcorum.com</div>
+          </div>
+          <div style="border-left:3px solid var(--gate); padding-left:18px;">
+            <div class="kicker" style="color:var(--gate)">Email</div>
+            <div class="stat" style="font-size:22px; font-weight:700;">ian@fulcorum.com</div>
+          </div>
+          <div style="border-left:3px solid var(--signal); padding-left:18px;">
+            <div class="kicker" style="color:var(--signal)">Site</div>
+            <div class="stat" style="font-size:22px; font-weight:700;">tacoda.dev</div>
+          </div>
+          <div style="border-left:3px solid var(--signal); padding-left:18px;">
+            <div class="kicker" style="color:var(--signal)">Book</div>
+            <div class="stat" style="font-size:17px; font-weight:700;">leanpub.com/harness-engineering</div>
+          </div>
+          <div style="border-left:3px solid var(--line-strong); padding-left:18px;">
+            <div class="kicker">LinkedIn · GitHub</div>
+            <div class="stat" style="font-size:18px; font-weight:700; line-height:1.5;">linkedin.com/in/tacoda<br>github.com/tacoda</div>
+          </div>
+          <div style="grid-column:1 / -1; border-left:3px solid var(--gate); padding-left:18px;">
+            <div class="kicker" style="color:var(--gate)">The four moves, in full</div>
+            <div style="display:flex; gap:40px; margin-top:4px;">
+              <div class="stat" style="font-size:19px; font-weight:700;">tacoda.dev/comprehension-standard</div>
+              <div class="stat" style="font-size:19px; font-weight:700;">tacoda.dev/reverse-review</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!--/stage-->
+</div><!--/viewport-->
+
+<div id="band"><i></i></div>
+<div id="counter">01 / 24</div>
+<div id="brand">Harness Engineering</div>
+<div id="help">← → move · T theme · F full</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0, total = slides.length;
+  var counter = document.getElementById('counter');
+  var bandFill = document.querySelector('#band > i');
+  var stage = document.getElementById('stage');
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function show(n) {
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    counter.textContent = pad(i + 1) + ' / ' + pad(total);
+    bandFill.style.width = (i / (total - 1) * 100) + '%';
+  }
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit); fit();
+
+  document.addEventListener('keydown', function (e) {
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': show(i + 1); e.preventDefault(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': show(i - 1); e.preventDefault(); break;
+      case 'Home': show(0); break;
+      case 'End': show(total - 1); break;
+      case 't': case 'T': {
+        var r = document.documentElement;
+        var cur = r.getAttribute('data-theme');
+        var dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        r.setAttribute('data-theme', dark ? 'light' : 'dark');
+        break;
+      }
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+        else document.exitFullscreen && document.exitFullscreen();
+        break;
+    }
+  });
+
+  document.getElementById('viewport').addEventListener('click', function (e) {
+    show(i + (e.clientX < window.innerWidth * 0.28 ? -1 : 1));
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>
