@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reverse-review: The Exercise · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A 30-minute weekly exercise: the junior reviews the agent's diff, and the senior reviews the review. Includes the defect taxonomy and the scoring rubric. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/reverse-review/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Reverse-review">
+<meta property="og:description" content="The junior reviews the agent. The senior reviews the review. Thirty minutes a week, one card, seven defect classes.">
+<meta property="og:url" content="https://www.tacoda.dev/reverse-review/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Reverse-review">
+<meta name="twitter:description" content="The junior reviews the agent. The senior reviews the review. Thirty minutes a week, one card, seven defect classes.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Reverse-review</span>
+      <span class="sep">/</span>
+      <span>30 minutes, weekly</span>
+    </div>
+    <h1>The junior reviews the agent. The senior reviews <em>the review</em>.</h1>
+    <p class="standfirst">
+      Code review was built for a world where a human wrote the code and the scarce thing was
+      correctness. The agent writes the code now, and the scarce thing is judgment. So point the
+      review the other way: the junior reviews the agent's diff, then defends that review, and the
+      senior grades the review rather than the code. It costs a senior fifteen minutes instead of an
+      hour, and the fifteen minutes land on the only thing that actually transfers.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      seeded diffs and answer keys · <a href="https://github.com/tacoda/fulcorum-reverse-review"><code>github.com/tacoda/fulcorum-reverse-review</code></a><br>
+      who it's for · early-career engineers, and the senior who has thirty minutes a week, not five hours<br>
+      what you need · one agent-written diff, one review card, one timer<br>
+      the bar it trains for · <a href="/comprehension-standard/">the Comprehension Standard</a>, L2 and up
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>The diff</dt>
+          <dd>What the agent produced. Plausible by construction, because that is what the model is good at.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>The catch</dt>
+          <dd>A defect named, classified, and located. A named class transfers to the next diff. A hunch does not.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>The proof</dt>
+          <dd>A test that goes red. Without it you have a suspicion, and suspicions do not survive a disagreement.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Exercise sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> The inversion</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The 30 minutes</a></li>
+      <li><a href="#s-2"><span class="n">2</span> The card</a></li>
+      <li><a href="#s-3"><span class="n">3</span> The taxonomy</a></li>
+      <li><a href="#s-4"><span class="n">4</span> The rubric</a></li>
+      <li><a href="#s-5"><span class="n">5</span> Senior's run sheet</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Without a senior</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Cadence</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Seeded diffs</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The idea">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The idea</span>
+      </div>
+      <div>
+        <h2>Turn the review around</h2>
+        <p class="thesis">
+          One diagram, and the rest of the page is how to run it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>where the senior's attention goes</span><span class="tag warn">the whole idea</span></figcaption>
+<pre><code><span class="c-dim">NORMAL REVIEW</span>
+  junior writes  ──▶  <span class="c-warn">senior reviews the code</span>
+                      <span class="c-dim">~1 hour, spent on one diff, mostly on defects</span>
+
+<span class="c-dim">REVERSE-REVIEW</span>
+  agent writes   ──▶  junior reviews the code
+                 ──▶  <span class="c-block">senior reviews the review</span>
+                      <span class="c-dim">~15 min, spent on judgment, which is the part that transfers</span></code></pre>
+      </figure>
+
+      <p>
+        The agent already writes acceptable code most of the time, so a senior line-editing that code
+        is spending scarce attention on the abundant thing. What is scarce is somebody who can look
+        at a fluent, passing, confident change and say "wait." That is not knowledge you can be
+        handed. It is trained by being wrong, repeatedly, in front of someone who can tell you why.
+        Reverse-review is a container for exactly that, with a fixed cost.
+      </p>
+
+      <p>
+        There is a second effect worth naming, because it is most of why this works in practice.
+        The junior is not defending their own code, so nothing about the exercise threatens them.
+        Being wrong about a diff the agent wrote is cheap and unembarrassing, and people look harder
+        when looking harder cannot backfire. Normal review has the opposite property, which is why
+        so much of it turns into negotiation.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The trade</span>
+        <p>
+          You give up some line-by-line senior scrutiny of the code. You get a junior who can supply
+          that scrutiny themselves within a couple of quarters. On any timescale longer than a
+          sprint, that is a good trade.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The loop">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The loop</span>
+      </div>
+      <div>
+        <h2>Thirty minutes, three roles</h2>
+        <p class="thesis">
+          Thirty minutes is the whole budget, and the timeboxes are not decorative. An exercise that
+          quietly grows to an hour is an exercise that gets cancelled in week five.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>dealer</b> picks the diff</span>
+          <span class="chip kind-agent"><b>reviewer</b> the junior</span>
+          <span class="chip kind-gate"><b>grader</b> the senior</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Before</span>
+          <span class="what"><strong>The dealer picks a diff.</strong> Either real agent output from this week's work, or a seeded diff from section 8. Under about 60 lines. The dealer does not say what is wrong with it, or whether anything is.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">0:00 → 0:05</span>
+          <span class="what"><strong>Read cold.</strong> No agent, no ticket summary, no running the tests. Just the diff and the surrounding code. Five minutes is deliberately not enough time to be thorough, which is the same condition a real review happens under.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">0:05 → 0:20</span>
+          <span class="what"><strong>Review.</strong> Fill the card (section 2). Write the prediction line <em>before</em> running anything. Then run the tests, read the callers, use the agent as a reference if you want. Fifteen minutes, then pens down whether or not you are finished.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">0:20 → 0:30</span>
+          <span class="what"><strong>Defend.</strong> The junior states the verdict first, in one sentence. The senior asks questions, does not lecture, and finishes by scoring the review against the rubric (section 4) and naming one thing to do differently next week.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Pens down means pens down</span>
+        <p>
+          A review that ran out of clock is a legitimate outcome, and worth saying out loud: "I did
+          not get to the migration, so I am not confident about the data path." That sentence is a
+          senior-shaped sentence. Knowing the edge of what you checked is a large part of the skill,
+          and an exercise with an unlimited clock never teaches it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="The artifact">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The artifact</span>
+      </div>
+      <div>
+        <h2>The review card</h2>
+        <p class="thesis">
+          One page, filled by hand, kept afterward. The top half is the comprehension block from the
+          standard. The bottom half is what makes it a review instead of a summary.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the review card</span><span class="tag warn">print it, fill it, keep it</span></figcaption>
+<pre><code>REVIEW CARD          diff: __________  reviewer: __________  date: ______
+
+<span class="c-warn">THE CLAIMS</span>  (what the author should have been able to say)
+  does:      ________________________________________________
+  seam:      __________________ -&gt; __________________
+  policy:    __________________________________  | CHARTER-GAP
+  falsifier: ________________________________________________
+             covered by: _____________________   | NONE
+
+<span class="c-block">THE REVIEW</span>
+  prediction:   what I expect to be wrong, written BEFORE I run anything
+                ______________________________________________
+  verdict:      ACCEPT  /  ACCEPT WITH CHANGE  /  REJECT
+  defect class: ______________________________  | NONE FOUND
+  proof:        failing test __________________ | unproved suspicion
+  durable fix:  fix the code / write the rule / add the hook / nothing
+                because: ____________________________________</code></pre>
+      </figure>
+
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">prediction</span>
+          <span class="what">Written first, before the tests run, before the agent is consulted. Being wrong on paper is free, and it is the only way to find out whether your instincts are calibrated. A reviewer who never predicts never learns that they are consistently wrong about the same class of thing.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">verdict</span>
+          <span class="what">Committed before the discussion, in one sentence. A verdict you can revise mid-conversation is not a verdict, it is agreement with whoever spoke last.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">defect class</span>
+          <span class="what">Named from the taxonomy in section 3. The class is what carries to the next diff. "There is a bug on line 40" teaches you about line 40; "this is a policy inversion" teaches you where to look forever.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">proof</span>
+          <span class="what">A test that goes red, or a concrete input and the wrong output it produces. Anything less is written down honestly as <em>unproved suspicion</em>, which is a perfectly respectable thing to hand a senior. It is not a catch.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">durable fix</span>
+          <span class="what">Which surface stops this from recurring: fix the code, write the rule the agent reads, add the hook that refuses it, or deliberately do nothing because the defect is not worth the constraint. Saying "nothing, because" is a real answer and often the right one.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="The taxonomy">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The taxonomy</span>
+      </div>
+      <div>
+        <h2>Seven ways agent code is plausible and wrong</h2>
+        <p class="thesis">
+          "Look harder" is not a technique. A named list of failure shapes is. These seven cover most
+          of what shows up in practice, and every one of them can ship with a green pipeline.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>the plausible-but-wrong taxonomy, v1</caption>
+          <thead>
+            <tr><th>Class</th><th>What it looks like</th><th>How you catch it</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1 · Policy inversion</strong></td>
+              <td>Textbook-correct behavior that is not <em>this business's</em> behavior. Rounds to the nearest nickel when the policy is round down, retries when the policy is fail fast.</td>
+              <td>Ask what the business rule is, not what the algorithm is. If nothing in the repo answers, you have found a charter gap, which is its own valuable result.</td>
+            </tr>
+            <tr>
+              <td><strong>2 · Silent representation change</strong></td>
+              <td>Integer cents become a float, a decimal becomes a string, a set becomes a list, a UTC timestamp becomes local.</td>
+              <td>Diff the types, not the logic. Scan for a new cast, a division, a bare numeric literal, a format call.</td>
+            </tr>
+            <tr>
+              <td><strong>3 · A test that cannot fail</strong></td>
+              <td>The assertion re-derives the implementation, or asserts against a mock the test itself configured. Reads like coverage, proves nothing.</td>
+              <td>Break the implementation on purpose. If the test stays green, it was never a test.</td>
+            </tr>
+            <tr>
+              <td><strong>4 · Swallowed error</strong></td>
+              <td><code>except: pass</code>, <code>.catch(() =&gt; null)</code>, a default value that hides a failed lookup, a log line where a raise belongs.</td>
+              <td>Find every place in the diff where a failure stops travelling. Ask what the caller now believes happened.</td>
+            </tr>
+            <tr>
+              <td><strong>5 · Scope creep</strong></td>
+              <td>The requested one-line fix arrives with an unrequested rename, reformat, or refactor riding along.</td>
+              <td>Read the ticket, then the diff. Anything not traceable to the ticket is a separate decision that nobody approved and nobody reviewed as a decision.</td>
+            </tr>
+            <tr>
+              <td><strong>6 · Invariant drift</strong></td>
+              <td>The code changed; the docstring, type hint, comment, or error message still promises the old contract.</td>
+              <td>Read the prose next to the code. When code and prose disagree, one of them just shipped a lie, and the prose is what the next reader will trust.</td>
+            </tr>
+            <tr>
+              <td><strong>7 · Imitation of the wrong pattern</strong></td>
+              <td>The change faithfully copies the dominant pattern in the codebase, and the dominant pattern violates the rule.</td>
+              <td>Compare the diff against the rule, never against its neighbors. The more non-compliant code exists, the more confidently the agent reproduces it.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">Why the suite does not save you</span>
+        <p>
+          Every one of these seven can pass a full test run. Some pass because the case was never
+          tested (1, 2, 6), some because the failure was caught and hidden (4), one because the test
+          is a decoration (3), and two because the code is doing exactly what the codebase told it to
+          (5, 7). Green means the tests that exist passed. It has never meant the code is correct,
+          and the agent has made the gap between those two statements much wider.
+        </p>
+      </div>
+
+      <p>
+        Seven is not a complete list and should not be treated as one. It is a starting vocabulary.
+        When your team catches something that does not fit, name it, write the row, and add it to
+        your fork. A team with its own eighth and ninth class is a team that has been paying
+        attention.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="The rubric">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">The rubric</span>
+      </div>
+      <div>
+        <h2>Score the review, not the diff</h2>
+        <p class="thesis">
+          Four points. The score itself does not matter much. Which point somebody loses, week after
+          week, is the entire diagnostic value.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>reverse-review rubric, 4 points</caption>
+          <thead>
+            <tr><th>Point</th><th>Earned when</th><th>Lost when</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Found</strong></td>
+              <td>Named a real defect, or correctly concluded there was not one.</td>
+              <td>Missed a planted defect, or raised one that is not there. A false positive costs exactly what a miss costs.</td>
+            </tr>
+            <tr>
+              <td><strong>Proved</strong></td>
+              <td>A failing test, or a specific input and the specific wrong output it produces.</td>
+              <td>"It feels off." Real instinct, zero points. Instinct is where a catch starts, not where it ends.</td>
+            </tr>
+            <tr>
+              <td><strong>Classified</strong></td>
+              <td>Named the class from the taxonomy.</td>
+              <td>Described the symptom only. The class is the part that generalizes to next week's diff.</td>
+            </tr>
+            <tr>
+              <td><strong>Durable fix</strong></td>
+              <td>Proposed the change that stops the class, and said which surface it belongs on.</td>
+              <td>Patched this instance and stopped. Or reached for a hook when a two-line code fix was the honest answer.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        A perfect four is rare and is not the goal. The useful signal is the pattern: a reviewer who
+        always loses <em>proved</em> needs practice writing failing tests, not more diffs. One who
+        always loses <em>durable fix</em> is reviewing code but not yet reviewing the system. Those
+        are different coaching problems and the rubric tells them apart in about three weeks.
+      </p>
+
+      <div class="callout">
+        <span class="label">Deal clean diffs, and do not announce it</span>
+        <p>
+          If every diff in the exercise contains a planted defect, you are not training reviewers,
+          you are training a false-positive machine that will find a bug in anything because it has
+          learned that finding one is how you pass. Roughly one in four should be genuinely clean.
+          Correctly accepting a clean diff, with reasons, is a full four points and should be praised
+          exactly as loudly as a catch.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Facilitation">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Facilitation</span>
+      </div>
+      <div>
+        <h2>The senior's run sheet</h2>
+        <p class="thesis">
+          Ten minutes of talking, and most of the skill is in what you do not say. The failure mode
+          is a well-meaning senior turning the defend phase into a lecture about the diff.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Don't</span>
+          <span class="what"><strong>Give the answer first.</strong> Ask instead: "what would have to be true for this to be wrong?" It is the question that generates the skill, and handing over the answer spends the whole exercise to save four minutes.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Don't</span>
+          <span class="what"><strong>React to the diff in front of them.</strong> The moment you frown at line 40, the search is over. Keep your face out of it until the verdict is committed.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Don't</span>
+          <span class="what"><strong>Let it become a code review.</strong> If you find yourself explaining how you would have written it, the exercise has reverted and the hour is gone. The diff is the material, not the subject.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Do</span>
+          <span class="what"><strong>Say what you distrusted, and why, after the verdict.</strong> Seniors flinch at certain diffs before they can articulate the reason. Articulating it afterward is the single most valuable thing you have to give, and it is exactly what never comes up in normal review.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Do</span>
+          <span class="what"><strong>Treat a <code>CHARTER-GAP</code> as your bug.</strong> If "why is it written this way" is not answered anywhere in the repo, the team owes them that answer, and it should be written down that day. This is the exercise paying rent back to the codebase.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Do</span>
+          <span class="what"><strong>End with one sentence.</strong> Which rubric point they lost and what to do differently next week. One. A list of five improvements is a list nobody acts on.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Fifteen minutes, protected</span>
+        <p>
+          Ten minutes in the room, five minutes picking the diff. If you are routinely spending an
+          hour, the exercise has drifted back into normal review, and the economics that made it
+          worth doing are gone.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="No senior">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">No senior</span>
+      </div>
+      <div>
+        <h2>Running it without a senior</h2>
+        <p class="thesis">
+          The senior is the scarce input, and plenty of teams do not have one with time to spare.
+          Here are the substitutes, in descending order of how well they work, and what none of them
+          replace.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Best</span>
+          <span class="what"><strong>Two juniors, same diff, separate cards.</strong> Fill them independently, then compare cards before comparing either to any answer key. Where you disagree is the lesson, and arguing a verdict with a peer is most of what the defend phase does anyway.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Workable</span>
+          <span class="what"><strong>Seeded diffs with a written key.</strong> Grade yourself against section 8. Weaker, because you know in advance that a defect exists, which is the single biggest thing the exercise is supposed to withhold. It still teaches the taxonomy, which is worth a lot on its own.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Workable</span>
+          <span class="what"><strong>The agent as adversary.</strong> Ask it to make a small change, then open a <em>fresh</em> session to review it. Never the same session: it defends its own work, agrees with its own reasoning, and will happily talk you out of a correct catch.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a substitute</span>
+          <span class="what"><strong>Someone who knows what correct means here.</strong> Policy inversion (class 1) is undetectable without knowing the business rule. That knowledge is local, undocumented more often than not, and lives in a person. No model has it, and no exercise manufactures it.</span>
+        </li>
+      </ol>
+
+      <p>
+        Which is worth saying plainly, because it is the honest limit of this page: reverse-review
+        makes a senior's time go about four times further. It does not create one out of nothing. If
+        your team has nobody who can say what the business rule actually is, that is a much larger
+        problem than your review process, and it will not be solved by an exercise.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Cadence">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Cadence</span>
+      </div>
+      <div>
+        <h2>Weekly, and measured in catches</h2>
+        <p class="thesis">
+          One card a week beats a heroic month and then nothing. Keep the cards; the stack is the
+          record of somebody becoming senior, and it is far better evidence than a ticket count.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A <strong>catch</strong> is a named class plus a proof. Not a comment, not a suspicion, not a
+        style objection. Counting catches instead of tickets changes what people optimize for, which
+        is the only reason to count anything.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">4 weeks</span>
+          <span class="what">Fills the card without prompting. Catches the loud classes: swallowed errors, scope creep, drifted docstrings. Still needs a nudge to write the proof.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">12 weeks</span>
+          <span class="what">Catches the quiet classes: policy inversion, imitation of the wrong pattern. Proves them with a failing test unprompted. Correctly accepts clean diffs, which is the harder half.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">6 months</span>
+          <span class="what">Reviews the diff and the charter at the same time. Files the <code>CHARTER-GAP</code> that stops the class for everyone, and can argue for doing nothing when a constraint would cost more than the defect.</span>
+        </li>
+      </ol>
+
+      <p>
+        Those timelines are what this has looked like in practice on small teams, not a measured
+        curve, and someone doing one card a week in a codebase they know well will move faster than
+        the numbers suggest. Treat them as a shape, not a schedule.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The habit is the deliverable</span>
+        <p>
+          No single catch matters. What matters is that thirty minutes a week goes to the one skill
+          the agent cannot supply, for long enough that it becomes how somebody reads code.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Seeded diffs">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Seeded diffs</span>
+      </div>
+      <div>
+        <h2>The seeded diffs</h2>
+        <p class="thesis">
+          One diff per defect class, plus clean ones, applied to the cash-register seed from the
+          junior-to-senior workshop. If you did that workshop you are already set up.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>seed</b> fulcorum-junior-to-senior-workshop/seed</span>
+          <span class="chip kind-gate"><b>diffs</b> fulcorum-reverse-review/diffs/</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>deal one diff</span><span class="tag block">green, and that proves nothing</span></figcaption>
+<pre><code>git clone https://github.com/tacoda/fulcorum-junior-to-senior-workshop.git
+git clone https://github.com/tacoda/fulcorum-reverse-review.git
+
+cd fulcorum-junior-to-senior-workshop/seed
+pytest                        <span class="c-pass"># 3 passed, this is your baseline</span>
+
+<span class="c-dim"># the dealer picks one and does not say which class it is</span>
+git apply ../../fulcorum-reverse-review/diffs/03-test-that-cannot-fail.diff
+pytest                        <span class="c-block"># still green. start the clock.</span>
+
+<span class="c-dim"># after the defend phase</span>
+git apply -R ../../fulcorum-reverse-review/diffs/03-test-that-cannot-fail.diff</code></pre>
+      </figure>
+
+      <h3 class="sub">What ships in the diffs folder</h3>
+      <ul>
+        <li><strong>Seven defective diffs</strong>, one per class in section 3, all of which leave the suite green.</li>
+        <li><strong>Three clean diffs</strong> that make a real, correct change. Deal these regularly and never flag them.</li>
+        <li><strong>Answer keys in a separate folder</strong> so the dealer can hand out a diff without reading its solution first. A dealer who knows the answer telegraphs it.</li>
+      </ul>
+
+      <p>
+        The filenames give away the class, which is fine for self-study and useless for a real
+        session. Rename them to <code>a.diff</code> through <code>j.diff</code> before you deal them,
+        or have the dealer apply the diff for the reviewer.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Better than the seed: your own repo</span>
+        <p>
+          Seeded diffs teach the taxonomy. Your own codebase teaches the thing that actually matters,
+          because class 1 and class 7 only exist relative to a real policy and a real prevailing
+          pattern. Once the vocabulary is in place, switch to reviewing actual agent output from last
+          week's work and never go back.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">Where this sits</span>
+        <p>
+          <a href="/comprehension-standard/">The Comprehension Standard</a> sets the bar this
+          exercise trains for. <a href="/junior-to-senior/">The junior-to-senior workshop</a> is the
+          one-hour lab that introduces the comprehension card, a green test suite, and a customer
+          quietly overcharged a nickel.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Reverse-review</strong>, a 30-minute weekly exercise.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Seeded diffs and answer keys ·
+      <a href="https://github.com/tacoda/fulcorum-reverse-review"><code>github.com/tacoda/fulcorum-reverse-review</code></a></div>
+    <div>Related · <a href="/comprehension-standard/">The Comprehension Standard</a> ·
+      <a href="/junior-to-senior/">Junior to senior in the age of AI</a></div>
+    <div>Colour encodes role:
+      <span style="color:var(--gold)">the diff</span> ·
+      <span style="color:var(--brick)">the catch</span> ·
+      <span style="color:var(--forest)">the proof</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>

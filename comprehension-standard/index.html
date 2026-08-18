@@ -1,0 +1,1283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Comprehension Standard v0.1 · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A short, forkable standard for teams shipping agent-written code: one law, four claims, four levels, and a merge bar. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/comprehension-standard/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Comprehension Standard">
+<meta property="og:description" content="Don't merge a change you can't explain. One law, four claims, four levels, and a merge bar a team can adopt in an afternoon.">
+<meta property="og:url" content="https://www.tacoda.dev/comprehension-standard/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Comprehension Standard">
+<meta name="twitter:description" content="Don't merge a change you can't explain. One law, four claims, four levels, and a merge bar a team can adopt in an afternoon.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>The Comprehension Standard</span>
+      <span class="sep">/</span>
+      <span>v0.1, forkable</span>
+    </div>
+    <h1>Don't merge a change you can't <em>explain</em></h1>
+    <p class="standfirst">
+      An agent can produce more correct-looking code in a day than a team can understand in a week.
+      Nothing stops that except a rule about what you are allowed to merge. Every team says it wants
+      to understand its own code. A standard is what turns that sentiment into something you can
+      adopt, cite in a policy, check in a pull request, and argue about when it gets inconvenient.
+      This is that document, and it is deliberately short.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      spec and reference implementation · <a href="https://github.com/tacoda/fulcorum-comprehension-standard"><code>github.com/tacoda/fulcorum-comprehension-standard</code></a><br>
+      who it's for · any team merging agent-written code, and the lead who has to set the bar<br>
+      adoption cost · one afternoon to wire up, then the ongoing cost of meaning it<br>
+      license · CC BY 4.0. Fork it, rename it, change the fields. Keep the law.
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>The claim</dt>
+          <dd>What the person merging asserts about the change. Four fields, written by a human, in a pull request.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>The gate</dt>
+          <dd>What the harness refuses. It can check that a claim was made. It cannot check that the claim is true.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>The evidence</dt>
+          <dd>The test that goes red if the claim is wrong. This is the part that turns an opinion into a fact.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Standard sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> Adopt it</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The law</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Four claims</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Four levels</a></li>
+      <li><a href="#s-4"><span class="n">4</span> The merge bar</a></li>
+      <li><a href="#s-5"><span class="n">5</span> Conformance</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Reference impl</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Non-goals</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Version &amp; fork</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="Adoption">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Adoption</span>
+      </div>
+      <div>
+        <h2>Adopt it in an afternoon</h2>
+        <p class="thesis">
+          The whole standard is one law, one block of four fields, and a bar for when it's enforced.
+          Three moves put it into a repo. Read the rest of the page afterward if you want the
+          reasoning.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>file</b> .github/pull_request_template.md</span>
+          <span class="chip kind-hook"><b>gate</b> hooks/comprehension-gate.py</span>
+          <span class="chip kind-rule"><b>charter</b> CLAUDE.md</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the three moves</span><span class="tag pass">one afternoon</span></figcaption>
+<pre><code>git clone https://github.com/tacoda/fulcorum-comprehension-standard.git
+
+<span class="c-dim"># 1. the claim: every PR now asks for four fields</span>
+cp fulcorum-comprehension-standard/.github/pull_request_template.md .github/
+
+<span class="c-dim"># 2. the gate: refuse a PR whose block is missing or unfilled</span>
+cp fulcorum-comprehension-standard/hooks/comprehension-gate.py .github/scripts/
+
+<span class="c-dim"># 3. the law: put it where the agent reads it, not just where people do</span>
+cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
+      </figure>
+
+      <p>
+        Then decide one thing as a team and write it down: <strong>which changes require which
+        level</strong> (section 4). That decision is the standard. Everything else is plumbing.
+      </p>
+
+      <div class="callout">
+        <span class="label">The honest cost</span>
+        <p>
+          Wiring this up takes an afternoon. Meaning it takes longer, because the first week it will
+          block a change somebody wants merged, and the standard is only worth anything if it holds
+          that week. A gate the team routinely waves through is worse than no gate: it teaches
+          people that written rules here are decorative.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The law">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The law</span>
+      </div>
+      <div>
+        <h2>One law, and it is not negotiable</h2>
+        <p class="thesis">
+          Everything below is machinery for enforcing a single sentence.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="callout">
+        <span class="label">The law</span>
+        <p>
+          <strong>Don't merge a change you can't explain.</strong> Not to a reviewer, not to the
+          agent, not out loud in your own words. If you cannot say what it does, you have not
+          finished reading it.
+        </p>
+      </div>
+
+      <p>
+        "Explain" is doing real work in that sentence, so pin it down. Explaining is not summarizing
+        the diff back. A diff summary is a restatement of syntax, and the agent will write you a
+        beautiful one on request. Explaining means you can say what the change <em>does to the
+        system</em>, where it enters and where it leaves, what rule it obeys, and what would have to
+        be true for it to be wrong. Those four things are section 2.
+      </p>
+
+      <p>
+        The law binds the person who merges, not the person or process that wrote the code. This is
+        the point. When an agent writes the change, authorship stops being a useful place to put
+        accountability, because the author has none: it doesn't get paged, doesn't sit in the
+        postmortem, doesn't answer for the outage. Merging is the last human decision in the chain,
+        so that is where the obligation lands.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Why a law and not a guideline</span>
+        <p>
+          Guidelines lose to deadlines, quietly and every time. The one obligation that cannot be
+          delegated to a tool is the obligation to understand, so it gets stated as an absolute and
+          the exceptions get written down in advance (section 4) rather than invented under
+          pressure.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="The claims">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The claims</span>
+      </div>
+      <div>
+        <h2>Four claims, made in the pull request</h2>
+        <p class="thesis">
+          "I understand it" is unfalsifiable. Four short fields are not. This block goes in the
+          pull request body, written by the person asking for the merge.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the comprehension block</span><span class="tag warn">written by a human, in the PR</span></figcaption>
+<pre><code><span class="c-warn">comprehension:</span>
+  does:      &lt;what this change does to the system, in one sentence&gt;
+  seam:      &lt;where it enters&gt; -&gt; &lt;where it leaves&gt;
+  policy:    &lt;the rule or doc this obeys&gt;   | CHARTER-GAP
+  falsifier: &lt;the case that would make this wrong&gt;
+             covered by: &lt;test name&gt;         | NONE</code></pre>
+      </figure>
+
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">does</span>
+          <span class="what"><strong>One sentence, about behavior, not about code.</strong> "Adds a helper and updates two callers" is a description of the diff. "Cash totals now round down to the nickel instead of to the nearest one" is a description of the change. If the sentence needs an "and" you may be merging two changes.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">seam</span>
+          <span class="what"><strong>Entry and exit.</strong> Where does data reach this code, and where does the effect land: a response, a row, a file, a charge. This is the field that catches "I read the function but not its callers," which is the most common way a change looks understood and is not.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">policy</span>
+          <span class="what"><strong>Cite the rule this obeys.</strong> A charter rule, a doc, a ticket, an ADR. If nothing anywhere in the repo answers "why is it written this way," write <code>CHARTER-GAP</code> and open the gap as an issue. That is a finding, not a failure, and it is one of the more valuable things a junior produces.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">falsifier</span>
+          <span class="what"><strong>Name the case that would make this wrong, then name the test that covers it.</strong> This is the field that separates reading from understanding. If you cannot describe a world in which this change is incorrect, you don't yet know what it does. <code>NONE</code> is permitted, and it means you shipped a declared risk instead of a hidden one.</span>
+        </li>
+      </ol>
+
+      <p>
+        Four fields, well under a minute when you actually understand the change, and genuinely hard
+        when you don't. That asymmetry is the entire mechanism. The block is not paperwork about the
+        work, it is the shortest test that the work was understood.
+      </p>
+
+      <div class="callout">
+        <span class="label">Don't let the agent fill this in</span>
+        <p>
+          Asking the agent to write your comprehension block produces four fluent, plausible, often
+          correct sentences and teaches you nothing, which inverts the point of the exercise. Write
+          it first, in your own words. Then, if you like, ask the agent to argue with it. Getting
+          corrected after you have committed to an answer is how the judgment actually forms.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="The levels">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The levels</span>
+      </div>
+      <div>
+        <h2>Four levels of comprehension</h2>
+        <p class="thesis">
+          Understanding is not binary, so the standard grades it. Each level is defined by evidence
+          somebody else can check, not by how confident the author feels.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>CS v0.1 comprehension levels</caption>
+          <thead>
+            <tr><th>Level</th><th>The claim</th><th>Observable evidence</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>L0</strong> Passing</td>
+              <td>"The tests passed."</td>
+              <td>A green pipeline. No claim is made about the change itself, and none should be inferred from green.</td>
+            </tr>
+            <tr>
+              <td><strong>L1</strong> Restatement</td>
+              <td>"I can say what it does and where it lands."</td>
+              <td><code>does</code> and <code>seam</code> filled and accurate. The author can restate both without opening the diff again.</td>
+            </tr>
+            <tr>
+              <td><strong>L2</strong> Falsification</td>
+              <td>"I can say how it would be wrong, and I checked."</td>
+              <td>All four fields filled. <code>falsifier</code> is covered by a named test, and that test goes red when the change is reverted or broken.</td>
+            </tr>
+            <tr>
+              <td><strong>L3</strong> Defense</td>
+              <td>"I can say why this way and not the other way."</td>
+              <td>L2, plus the author names the alternative that was not taken and why this one is the choice the codebase's policy requires. Survives a reviewer arguing the alternative.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The jump from L1 to L2 is the one that matters and the one people skip. L1 is a description,
+        and an agent can hand you a correct description of code that is quietly wrong. L2 requires
+        you to have imagined the failure and gone looking for it. That is the habit the whole
+        standard exists to install, and it is exactly the habit that shipping-fast erodes first.
+      </p>
+
+      <p>
+        L3 is where architecture lives. Most contested engineering decisions have several answers
+        that all work, and the right one is the one consistent with how this system already does
+        things. An agent optimizes for a working answer and has no stake in that consistency, which
+        is why drift compounds silently in agent-heavy codebases.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Levels grade diffs, not people</span>
+        <p>
+          A level describes a change at merge time, not an engineer's seniority. A staff engineer
+          merges an L1 dependency bump on Tuesday. A first-year engineer merges an L3 change to a
+          pricing rule on Wednesday. Reading the levels as a career ladder is the fastest way to
+          turn a useful tool into an insult.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="The bar">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">The bar</span>
+      </div>
+      <div>
+        <h2>The merge bar, and its exemptions</h2>
+        <p class="thesis">
+          A standard that demands maximum rigor everywhere gets ignored everywhere. Set the bar at
+          L2, raise it to L3 where being wrong is expensive, and write the exemptions down before
+          you need them.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Default</span>
+          <span class="what"><strong>L2 for ordinary changes.</strong> All four fields, a real falsifier, a test that covers it. This is the working bar and it should feel routine, not ceremonial.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Raise to L3</span>
+          <span class="what"><strong>Money, security and authorization, data integrity and migrations, anything with a written policy, and anything you cannot cheaply roll back.</strong> These are the changes where a plausible answer and a correct answer diverge quietly and expensively.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Drop to L1</span>
+          <span class="what"><strong>Changes with no semantics:</strong> formatting, generated files, copy edits, dependency bumps with an unchanged lock. Name the categories explicitly in your charter. An unwritten exemption list expands to fit the deadline.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">Never L0</span>
+          <span class="what">L0 is a description of what green means, not a bar anyone is allowed to merge at. It exists in this document so that "the tests passed" has a name and can be recognized as the non-claim it is.</span>
+        </li>
+      </ol>
+
+      <p>
+        One rule of thumb keeps the L3 list honest: ask what the cost is of being confidently wrong.
+        If the answer is a refund program, an incident, a regulator, or a migration you cannot
+        reverse, it is L3. If the answer is a follow-up commit, it is L2.
+      </p>
+
+      <div class="callout">
+        <span class="label">The failure mode to watch</span>
+        <p>
+          The bar does not erode by being argued down. It erodes by exemption creep: one urgent
+          change waved through, then the next one citing the first as precedent. If you skip the
+          bar, record that you skipped it and why, in the PR, in the same block. A logged exception
+          is a decision. An unlogged one is a new default.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Conformance">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Conformance</span>
+      </div>
+      <div>
+        <h2>What it means to conform</h2>
+        <p class="thesis">
+          Conformance is a property of a team's process. There is no auditor, no badge, and no way
+          to fail it other than by not doing it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>A team conforms to <strong>CS v0.1</strong> if all five of these hold:</p>
+
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">1 · The law</span>
+          <span class="what">The law is written in the charter <em>the agent reads</em>, not only in a wiki page humans have bookmarked. If the agent never sees it, it is not part of the system.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">2 · The claim</span>
+          <span class="what">Every merged pull request carries a filled comprehension block, written by the person requesting the merge.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">3 · The bar</span>
+          <span class="what">The merge bar is written down, including the L3 list and the exemption list, and exceptions are logged in the PR rather than taken silently.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">4 · The gaps</span>
+          <span class="what"><code>CHARTER-GAP</code> is routed somewhere a human owns and answers. If it is only typed into a box and never read, field three of the block is theater.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">5 · The review</span>
+          <span class="what">Reviews examine the claims, not only the diff. A reviewer who never disputes a <code>falsifier</code> is not reviewing comprehension. <a href="/reverse-review/">Reverse-review</a> is the exercise that trains this.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Team-level, on purpose</span>
+        <p>
+          Every conformance item describes something the team does, never something a person scores.
+          This is not politeness. A standard that produces per-person numbers becomes a performance
+          instrument within a quarter, and the moment it does, people optimize the number instead of
+          the understanding, and you have paid for the ceremony without buying the comprehension.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Reference implementation">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Reference impl</span>
+      </div>
+      <div>
+        <h2>Reference implementation</h2>
+        <p class="thesis">
+          A template that asks for the claim, and a gate that refuses a pull request without one.
+          Both are short enough to read in full, which is deliberate.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>template</b> .github/pull_request_template.md</span>
+          <span class="chip kind-gate"><b>gate</b> comprehension-gate.py</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">1 · The template asks</h3>
+      <figure class="code">
+        <figcaption><span>.github/pull_request_template.md</span><span class="tag warn">the claim</span></figcaption>
+<pre><code>## What and why
+
+&lt;!-- Required by the Comprehension Standard v0.1. Write this yourself,
+     before you ask the agent for anything. Level: L2 default, L3 for
+     money, security, data integrity, or a written policy. --&gt;
+
+```comprehension
+does:
+seam:
+policy:
+falsifier:
+           covered by:
+```
+
+level: L2
+exception: none</code></pre>
+      </figure>
+
+      <h3 class="sub">2 · The gate refuses</h3>
+      <figure class="code">
+        <figcaption><span>hooks/comprehension-gate.py, run in CI on the PR body</span><span class="tag block">exit 1 blocks the merge</span></figcaption>
+<pre><code>import re, sys
+
+REQUIRED = ("does", "seam", "policy", "falsifier")
+PLACEHOLDER = re.compile(r"^(todo|tbd|n/?a|\.+|\?+)$", re.I)
+
+def check(body):
+    block = re.search(r"```comprehension\n(.*?)```", body, re.S)
+    if not block:
+        return ["no comprehension block in the PR body"]
+
+    text = block.group(1)
+    <span class="c-dim"># [ \t] not \s: \s spans newlines, so an empty field eats the next one</span>
+    fields = dict(re.findall(r"^[ \t]*(\w+):[ \t]*(.*)$", text, re.M))
+    problems = []
+    for name in REQUIRED:
+        value = fields.get(name, "").strip()
+        if not value:
+            problems.append(f"{name}: empty")
+        elif PLACEHOLDER.match(value):
+            problems.append(f"{name}: placeholder ({value!r})")
+
+    falsifier = fields.get("falsifier", "").strip()
+    if falsifier and falsifier.upper() != "NONE":
+        if not re.search(r"covered by:[ \t]*\S+", text):
+            problems.append("falsifier: named, but no covering test")
+    return problems
+
+if __name__ == "__main__":
+    found = check(sys.stdin.read())
+    for p in found:
+        print(f"<span class="c-block">comprehension-gate: {p}</span>")
+    sys.exit(1 if found else 0)</code></pre>
+      </figure>
+
+      <p>
+        Roughly twenty-five lines, and that is the whole enforceable surface. Everything else in this
+        document is a decision a team makes, which is the correct division of labor: machines are
+        good at insisting a step happened, and bad at judging whether it happened well.
+      </p>
+
+      <div class="callout">
+        <span class="label">What this gate cannot do</span>
+        <p>
+          It checks that four fields exist and are not placeholders. It has no opinion about whether
+          the sentences are true. A confident, articulate, entirely wrong block passes cleanly, and
+          any honest description of this standard has to say so. The gate buys one thing: nobody
+          merges without <em>making</em> the claim, and a claim on the record is something a reviewer
+          can dispute. Disputing it is human work.
+          <a href="/reverse-review/">Reverse-review</a> is how a team gets good at that work.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Non-goals">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Non-goals</span>
+      </div>
+      <div>
+        <h2>Scope, non-goals, and known weaknesses</h2>
+        <p class="thesis">
+          What this standard refuses to be, and where it is most likely to fail you. Both stated
+          before you adopt it rather than after.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Non-goals</h3>
+      <ul>
+        <li><strong>Not a certification.</strong> No badge, no exam, no auditor, no registry. If someone sells you compliance with this, they made that up.</li>
+        <li><strong>Not a performance metric.</strong> Block fill rate never belongs in a review packet. Score it and you will get four true sentences guarding a change nobody read.</li>
+        <li><strong>Not a replacement</strong> for tests, types, static analysis, or review. It sits on top of those and assumes they exist.</li>
+        <li><strong>Not a maturity model.</strong> There are no organizational tiers to ascend. A team either does the five things in section 5 or does not.</li>
+        <li><strong>Not anti-agent.</strong> Use the agent for everything, including as a tutor on the code it just wrote. The standard governs what you merge, not what you generate.</li>
+      </ul>
+
+      <h3 class="sub">Where it is weakest</h3>
+      <ul>
+        <li><strong><code>falsifier</code> is the field people fake first.</strong> The tell is a falsifier that restates the happy path inverted ("it would be wrong if it returned the wrong value"). A real falsifier names a specific input and a specific wrong outcome.</li>
+        <li><strong>It is uncomfortable on very large diffs.</strong> One sentence for a 900-line change is either a lie or an argument for splitting the change. Usually the second.</li>
+        <li><strong>It does nothing for code already merged.</strong> This is a bar on new changes. Comprehension debt already in the tree needs a different instrument.</li>
+        <li><strong>v0.1 is small-team evidence.</strong> It has been used on small teams. There is no data on how it behaves across a large organization, and claiming otherwise would be exactly the kind of plausible, unfalsifiable statement this document exists to catch.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">The one thing it does grade</span>
+        <p>
+          Diffs and reviews. Never people. If your adoption of this standard ends with a dashboard
+          ranking engineers, you have built something else and should stop calling it this.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Version and fork">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Version</span>
+      </div>
+      <div>
+        <h2>Version, license, and how to fork it</h2>
+        <p class="thesis">
+          v0.1, CC BY 4.0. Forking is the expected case, not the exception.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Forking</h3>
+      <ul>
+        <li><strong>Keep the law.</strong> Everything else is implementation. A fork that drops the law is a different document and should have a different name.</li>
+        <li><strong>Change the fields to fit your domain.</strong> A team shipping infrastructure might swap <code>seam</code> for <code>blast-radius</code>. A team on regulated data might add <code>data-class</code>. Four to five fields is the working range; past that, people stop reading them.</li>
+        <li><strong>Set your own L3 list.</strong> The one in section 4 is a starting point, not a claim about your business.</li>
+        <li><strong>Version your fork and date it.</strong> A standard nobody can cite by version cannot be argued with, and being arguable is most of the value.</li>
+      </ul>
+
+      <h3 class="sub">What would move this to v0.2</h3>
+      <ul>
+        <li>Field names that survived contact with teams that did not write them.</li>
+        <li>An exemption list that stopped needing constant patching, which is the signal it finally describes reality.</li>
+        <li>Actual evidence about faking: how often blocks are filled fluently and wrongly, and whether reviewers catch it. That is the number that decides whether this standard does anything at all.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Where to go next</span>
+        <p>
+          The standard sets the bar. <a href="/reverse-review/">Reverse-review</a> is the weekly
+          exercise that trains people to clear it and to dispute a claim that only looks cleared.
+          <a href="/junior-to-senior/">The junior-to-senior workshop</a> is the one-hour lab where
+          the whole idea starts, with a green test suite and a customer quietly overcharged a nickel.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The Comprehension Standard</strong>, v0.1, CC BY 4.0.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Spec and reference implementation ·
+      <a href="https://github.com/tacoda/fulcorum-comprehension-standard"><code>github.com/tacoda/fulcorum-comprehension-standard</code></a></div>
+    <div>Related · <a href="/reverse-review/">Reverse-review</a> ·
+      <a href="/junior-to-senior/">Junior to senior in the age of AI</a></div>
+    <div>Colour encodes role:
+      <span style="color:var(--gold)">the claim</span> ·
+      <span style="color:var(--brick)">the gate</span> ·
+      <span style="color:var(--forest)">the evidence</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>

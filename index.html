@@ -310,7 +310,7 @@
         class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-8"
       >
         <a
-          href="#/"
+          href="/"
           class="group flex items-center gap-2 text-white"
           data-link
         >
@@ -325,19 +325,19 @@
         <nav
           class="glass hidden items-center gap-8 rounded-full px-6 py-2.5 text-sm font-medium sm:flex"
         >
-          <a href="#/" class="nav-link" data-link data-route="/">Home</a>
-          <a href="#/about" class="nav-link" data-link data-route="/about"
+          <a href="/" class="nav-link" data-link data-route="/">Home</a>
+          <a href="/about" class="nav-link" data-link data-route="/about"
             >About</a
           >
           <a
-            href="#/projects"
+            href="/projects"
             class="nav-link"
             data-link
             data-route="/projects"
             >Projects</a
           >
           <a
-            href="#/resources"
+            href="/resources"
             class="nav-link"
             data-link
             data-route="/resources"
@@ -382,25 +382,25 @@
         class="mx-6 hidden overflow-hidden rounded-2xl glass sm:hidden"
       >
         <a
-          href="#/"
+          href="/"
           class="block px-6 py-3 text-sm text-slate-200 hover:bg-white/5"
           data-link
           >Home</a
         >
         <a
-          href="#/about"
+          href="/about"
           class="block px-6 py-3 text-sm text-slate-200 hover:bg-white/5"
           data-link
           >About</a
         >
         <a
-          href="#/projects"
+          href="/projects"
           class="block px-6 py-3 text-sm text-slate-200 hover:bg-white/5"
           data-link
           >Projects</a
         >
         <a
-          href="#/resources"
+          href="/resources"
           class="block px-6 py-3 text-sm text-slate-200 hover:bg-white/5"
           data-link
           >Resources</a
@@ -451,13 +451,13 @@
             style="animation-delay: 160ms;"
           >
             <a
-              href="#/projects"
+              href="/projects"
               data-link
               class="btn-primary rounded-full px-6 py-3 text-sm font-semibold text-white"
               >Explore projects →</a
             >
             <a
-              href="#/about"
+              href="/about"
               data-link
               class="btn-ghost rounded-full px-6 py-3 text-sm font-semibold text-white"
               >About me</a
@@ -857,6 +857,52 @@
                 </p>
               </div>
             </a>
+
+            <a href="/comprehension-standard/" class="glass glass-hover reveal group relative overflow-hidden rounded-2xl p-6" style="transition-delay:240ms">
+              <div class="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 opacity-20 blur-2xl transition-opacity duration-500 group-hover:opacity-40"></div>
+              <div class="relative">
+                <div class="flex items-center justify-between">
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-slate-300">
+                    Standard
+                  </span>
+                  <span class="text-slate-500 transition group-hover:translate-x-0.5 group-hover:text-white">↗</span>
+                </div>
+                <h3 class="mt-6 text-2xl font-bold tracking-tight text-white">
+                  <span class="bg-gradient-to-r from-rose-400 to-pink-500 bg-clip-text text-transparent">The Comprehension Standard</span>
+                </h3>
+                <p class="mt-3 text-sm leading-6 text-slate-400">
+                  Don't merge a change you can't explain. One law, four claims,
+                  four levels, and a merge bar a team can adopt in an afternoon.
+                  Forkable, CC BY.
+                </p>
+                <p class="mt-4 font-mono text-[11px] text-slate-500">
+                  Spec repo: github.com/tacoda/fulcorum-comprehension-standard
+                </p>
+              </div>
+            </a>
+
+            <a href="/reverse-review/" class="glass glass-hover reveal group relative overflow-hidden rounded-2xl p-6" style="transition-delay:300ms">
+              <div class="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-sky-400 to-indigo-500 opacity-20 blur-2xl transition-opacity duration-500 group-hover:opacity-40"></div>
+              <div class="relative">
+                <div class="flex items-center justify-between">
+                  <span class="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-slate-300">
+                    Exercise
+                  </span>
+                  <span class="text-slate-500 transition group-hover:translate-x-0.5 group-hover:text-white">↗</span>
+                </div>
+                <h3 class="mt-6 text-2xl font-bold tracking-tight text-white">
+                  <span class="bg-gradient-to-r from-sky-400 to-indigo-500 bg-clip-text text-transparent">Reverse-review</span>
+                </h3>
+                <p class="mt-3 text-sm leading-6 text-slate-400">
+                  The junior reviews the agent, the senior reviews the review.
+                  Thirty minutes a week, one card, seven ways agent code is
+                  plausible and wrong.
+                </p>
+                <p class="mt-4 font-mono text-[11px] text-slate-500">
+                  Diffs repo: github.com/tacoda/fulcorum-reverse-review
+                </p>
+              </div>
+            </a>
           </div>
         </div>
       </section>
@@ -873,7 +919,7 @@
             That route doesn't exist. Head back home.
           </p>
           <a
-            href="#/"
+            href="/"
             data-link
             class="btn-primary mt-8 inline-block rounded-full px-6 py-3 text-sm font-semibold text-white"
             >← Home</a
@@ -1010,8 +1056,7 @@
       };
 
       function currentRoute() {
-        const hash = location.hash.replace(/^#/, '') || '/';
-        return hash;
+        return location.pathname.replace(/\/+$/, '') || '/';
       }
 
       function render() {
@@ -1038,20 +1083,26 @@
         window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
       }
 
-      window.addEventListener('hashchange', render);
+      window.addEventListener('popstate', render);
       window.addEventListener('DOMContentLoaded', () => {
-        if (!location.hash) location.hash = '#/';
+        // Deep links land on 404.html, which stashes the path and bounces to /
+        const deep = sessionStorage.getItem('spaPath');
+        if (deep) {
+          sessionStorage.removeItem('spaPath');
+          history.replaceState(null, '', deep);
+        }
         render();
       });
 
-      // Intercept internal links so hash routing works cleanly
+      // Intercept internal links so the router owns them instead of the network
       document.addEventListener('click', (e) => {
         const a = e.target.closest('a[data-link]');
-        if (!a) return;
+        if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
         const href = a.getAttribute('href');
-        if (href && href.startsWith('#/')) {
-          // let the browser update the hash normally; hashchange handles render
-        }
+        if (!href || !href.startsWith('/')) return;
+        e.preventDefault();
+        if (href !== location.pathname) history.pushState(null, '', href);
+        render();
       });
 
       // Mobile menu

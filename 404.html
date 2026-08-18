@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ian Johnson</title>
+    <style>
+      html { background: #020617; }
+    </style>
+    <script>
+      // GitHub Pages has no rewrite rules, so a deep link like /resources lands
+      // here. Stash the path and bounce to the app, which restores it via
+      // history.replaceState before the first render.
+      sessionStorage.setItem('spaPath', location.pathname + location.search);
+      location.replace('/');
+    </script>
+  </head>
+  <body></body>
+</html>
