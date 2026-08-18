@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Junior to Senior in the Age of AI — Workshop · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A workshop on the structured refusal to skip comprehension: one rule, five questions, five moves, and the two loops a charter is built from. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/junior-to-senior/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="How to Grow from Junior to Senior in the Age of AI">
+<meta property="og:description" content="The agent produces plausible code fast. Seniority is the judgment to tell plausible from correct, and that judgment is trained, not downloaded.">
+<meta property="og:url" content="https://www.tacoda.dev/junior-to-senior/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How to Grow from Junior to Senior in the Age of AI">
+<meta name="twitter:description" content="The agent produces plausible code fast. Seniority is the judgment to tell plausible from correct, and that judgment is trained, not downloaded.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Workshop</span>
+      <span class="sep">/</span>
+      <span>One hour, one lab</span>
+    </div>
+    <h1>How to grow from junior to senior in the <em>age of AI</em></h1>
+    <p class="standfirst">
+      The agent changes what it means to be junior more than what it means to be senior. A senior
+      already has the judgment the tool can't supply. A junior is building that judgment at the
+      exact moment the tool offers to skip it: it hands you working code faster than you can
+      understand it, and the whole pull is to accept the diff and move on. This workshop is the
+      structured refusal to skip.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">— author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      seed repo · <a href="https://github.com/tacoda/fulcorum-junior-to-senior-workshop"><code>github.com/tacoda/fulcorum-junior-to-senior-workshop</code></a><br>
+      who it's for · early-career engineers working with an AI coding tool, and the leads who mentor them<br>
+      what you leave with · the comprehension card (one rule, five questions, five moves) and a habit you can run Monday morning<br>
+      the seam · the agent produces plausible code fast; seniority is the judgment to tell plausible from correct
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Feedforward</dt>
+          <dd>A rule the agent reads. Shapes the code <em>before</em> it is written. A nudge, not a guarantee.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Feedback</dt>
+          <dd>A hook that checks the result <em>after</em> and refuses a bad one. A guarantee, not a nudge.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>The code</dt>
+          <dd>What already exists in the tree, which the agent imitates. The surface juniors forget.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Workshop sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> Get to green</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The card</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Spring the trap</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Five questions</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Prove it wrong</a></li>
+      <li><a href="#s-5"><span class="n">5</span> Rule &amp; hook</a></li>
+      <li><a href="#s-6"><span class="n">6</span> The two knobs</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Policy change</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Three surfaces</a></li>
+      <li><a href="#s-9"><span class="n">9</span> Take-home lab</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="Pre-flight">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Pre-flight</span>
+      </div>
+      <div>
+        <h2>Before you start, get to green</h2>
+        <p class="thesis">
+          You can read code and you've used an AI coding tool once. That's enough. Run this first
+          and confirm a green suite. Nobody debugs their environment on lab time.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>seed</b> seed/</span>
+          <span class="chip kind-cmd"><b>tool</b> your AI coding agent</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>pre-flight — send it ahead in the calendar invite</span><span class="tag pass">green before we start</span></figcaption>
+<pre><code>git clone https://github.com/tacoda/fulcorum-junior-to-senior-workshop.git
+cd fulcorum-junior-to-senior-workshop/seed
+pip install pytest &amp;&amp; pytest      <span class="c-pass"># 3 passed — you're ready</span></code></pre>
+      </figure>
+
+      <p>
+        <strong>⟲ No local setup?</strong> Pair with someone who's green, or run it in any browser
+        Python sandbox. The seed is two small files.
+      </p>
+
+      <p>
+        <strong>For step 5</strong> you'll also use your AI coding tool (Claude Code, for example)
+        opened on the <code>seed/</code> folder. Have it installed and working before the session,
+        not during it.
+      </p>
+
+      <h3 class="sub">What you'll work on</h3>
+      <p>
+        The seed is a tiny cash-register service: it settles a bill for cash and prints a receipt.
+        Pennies are discontinued, so cash totals round to a nickel, and the decision that matters is
+        <em>which way they round</em>. The charter's policy is <em>round down, in the customer's
+        favor</em>: they never pay more than the marked total. That single policy is what makes a
+        plausible-but-wrong change catchable.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The method, one page">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The method</span>
+      </div>
+      <div>
+        <h2>Your tool: the comprehension card</h2>
+        <p class="thesis">
+          The whole method on one page. You'll use it in the lab and keep it next to your keyboard
+          after.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the comprehension card</span><span class="tag warn">print it, keep it</span></figcaption>
+<pre><code><span class="c-warn">THE DAILY RULE</span>
+  Don't merge a change you can't explain — to the agent, out loud, in your own words.
+  Green pipeline = permission to proceed. Red = a lesson before a human had to teach it.
+
+<span class="c-warn">FIVE QUESTIONS</span> (comprehension in — ask these of any diff)
+  1. What does this do, in one sentence?
+  2. Where does the change enter the system, and where does it leave?
+  3. Why is it written this way? (If neither a rule nor a doc answers, you found a charter gap.)
+  4. Is it consistent with the rest of the codebase? Which nearby code disagrees?
+  5. Which part would I call slop if an agent wrote it — plausible, passing, quietly wrong?
+
+<span class="c-warn">FIVE MOVES</span> (comprehension out — the junior→senior cases)
+  1. Characterize before you change — pin current behavior in a test before you touch it.
+  2. Rename in anger — fix the worst-named thing everywhere; watch it clarify.
+  3. Make it boring — rewrite the clever version as the one you'd rather debug at 3 a.m.
+  4. Predict the failure — write how you expect it to fail, then run it. Were you right?
+  5. Catch the agent being wrong — find the confident, fluent, wrong answer. Prove it.</code></pre>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step 1 of the lab">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Baseline</span>
+      </div>
+      <div>
+        <h2>Baseline, then spring the trap</h2>
+        <p class="thesis">
+          Everything is in <code>seed/</code>. Copy-paste this block and read the comments as you go.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>file</b> seed/money.py</span>
+          <span class="chip kind-gate"><b>plant</b> patches/plausible-but-wrong.diff</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>seed/ — the trap in six lines</span><span class="tag block">green, and wrong</span></figcaption>
+<pre><code>cd seed
+pytest                                       <span class="c-pass"># 3 passed</span>
+python app.py                                <span class="c-pass"># cash total $10.80  ← rounded down, customer's favor</span>
+
+git apply patches/plausible-but-wrong.diff   <span class="c-dim"># a diff "an agent handed you" — looks cleaner</span>
+pytest                                       <span class="c-block"># still 3 passed  ← the trap</span>
+python app.py                                <span class="c-block"># cash total $10.85  ← a nickel overcharged</span></code></pre>
+      </figure>
+
+      <p>
+        Look at those last two lines. The test suite is <strong>green</strong>, and yet the customer
+        is now billed a nickel more than the correct cash total. This is the one idea the whole
+        session is built on:
+      </p>
+
+      <div class="callout">
+        <span class="label">The one idea</span>
+        <p>
+          Green means "the tests that exist passed," not "the code is correct."
+        </p>
+      </div>
+
+      <p>
+        A nickel doesn't sound like much. It's a nickel on 40% of cash totals, every register, every
+        day, taken from customers who trusted the marked price. That's the bug that becomes a refund
+        program. The shipped suite only used totals that round the same way either direction, so it
+        never noticed the flip. The diff rounds to the <em>nearest</em> nickel, the textbook
+        cash-rounding scheme, written with a <code>float</code>, instead of <em>down</em>, the
+        charter's customer's-favor policy.
+      </p>
+
+      <p>Leave the diff applied. You'll investigate it next.</p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step 2 of the lab">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Comprehension in</span>
+      </div>
+      <div>
+        <h2>Run the five questions</h2>
+        <p class="thesis">
+          Open <code>seed/money.py</code> and read the change you just applied. With a partner if
+          you can, work down the five questions from the card, out loud. Write your answers down.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Question 1</span>
+          <span class="what"><strong>What does it do, in one sentence?</strong> <code>round_cash</code> now rounds to the <em>nearest</em> nickel, not down.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">Question 2</span>
+          <span class="what"><strong>Where does it enter and leave?</strong> Trace it from <code>app.py</code> into <code>money.py</code> and back to the printed cash total.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Question 3</span>
+          <span class="what"><strong>Why is it written this way?</strong> The comment says "simplified." Rounding to nearest <em>is</em> the textbook cash scheme, but is it <em>this business's</em> policy? And why is there suddenly a <code>float</code>?</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Question 4</span>
+          <span class="what"><strong>Is it consistent?</strong> The docstring still promises cash rounds "in the customer's favor," and the charter's iron law says integer cents only. The code now breaks both. Which do you trust?</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Question 5</span>
+          <span class="what"><strong>What would you call slop?</strong> Name the exact line that is plausible, passing, and quietly wrong.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Deliverable</span>
+        <p>
+          A filled card is your first deliverable, and everyone reaches it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step 3 of the lab">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Comprehension out</span>
+      </div>
+      <div>
+        <h2>Prove it wrong</h2>
+        <p class="thesis">
+          Suspicion isn't a catch. Turn it into a test that fails.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A $10.83 total is 1083¢. Customer's favor rounds <strong>down</strong> to <code>1080</code>
+        ($10.80). The "simplified" code rounds to nearest: <code>1085</code> ($10.85), a nickel the
+        customer never owed. Write one test asserting cash never rounds <em>up</em>, using totals
+        whose last digit forces the direction, the case the shipped suite skipped:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the test the shipped suite didn't have</span><span class="tag block">goes red on the diff</span></figcaption>
+<pre><code>def test_cash_never_rounds_up():
+    for total in [1083, 1084, 999]:
+        assert round_cash(total) == total - (total % 5)</code></pre>
+      </figure>
+
+      <p>
+        Run <code>pytest</code>. It goes <strong>red</strong> on the diff. You just caught a
+        confident, fluent, wrong answer and proved it. That red test is the day you stop being
+        junior, in miniature. Reset before the next step:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>reset</span><span class="tag pass">back to baseline</span></figcaption>
+<pre><code>git apply -R patches/plausible-but-wrong.diff</code></pre>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Step 4 of the lab">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The two loops</span>
+      </div>
+      <div>
+        <h2>A rule and a hook</h2>
+        <p class="thesis">
+          You caught the overcharge by hand. Now let the <em>charter</em> catch it for you, with the
+          two mechanisms every charter is built from.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>feedforward</b> CLAUDE.md</span>
+          <span class="chip kind-hook"><b>feedback</b> .claude/hooks/</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <strong>Feedforward</strong> is a <em>rule</em> in <code>CLAUDE.md</code> that shapes the
+        code <em>before</em> it's written. <strong>Feedback</strong> is a <em>hook</em> in
+        <code>.claude/hooks/</code> that checks the result <em>after</em> and refuses a bad one.
+        Both are already on. Open the <code>seed/</code> folder in your agent and run two quick
+        prompts.
+      </p>
+
+      <h3 class="sub">1 · The rule steers (feedforward)</h3>
+      <figure class="code">
+        <figcaption><span>ask your agent, verbatim</span><span class="tag warn">shapes the draft</span></figcaption>
+<pre><code>Show me how you'd implement `round_cash(total_cents)` — round a cash total
+to a nickel now that pennies are gone.</code></pre>
+      </figure>
+      <p>
+        With the rounding rule in <code>CLAUDE.md</code>, it rounds <strong>down</strong>, in the
+        customer's favor (<code>total_cents - total_cents % 5</code>). Without that rule a capable
+        agent rounds to the <em>nearest</em> nickel, the overcharge from step 2. The rule is the
+        difference.
+      </p>
+
+      <h3 class="sub">2 · The hook catches (feedback)</h3>
+      <figure class="code">
+        <figcaption><span>now ask it to write the bad version anyway</span><span class="tag block">refused on save</span></figcaption>
+<pre><code>Simplify `round_cash` to round to the nearest nickel: `round(total_cents / 5) * 5`.</code></pre>
+      </figure>
+      <p>The moment it saves <code>money.py</code>, the hook fires and blocks it:</p>
+      <figure class="code">
+        <figcaption><span>round-gate — the refusal, told to the agent</span><span class="tag block">exit 2</span></figcaption>
+<pre><code><span class="c-block">round-gate (edit): round_cash(1083) = 1085, but the customer's-favor
+amount is 1080 — cash rounded against the customer.</span></code></pre>
+      </figure>
+      <p>
+        Told <em>why</em>, the agent puts it back. The same gate also blocks at
+        <code>git commit</code>, so a bad version can't be saved <em>or</em> shipped.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">One rule, one hook</span>
+        <p>
+          The rule shaped the draft, the hook caught the one that slipped. That's the whole toolkit
+          a charter uses to bound what an agent does.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="How it works">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The tradeoffs</span>
+      </div>
+      <div>
+        <h2>How it works: the two knobs</h2>
+        <p class="thesis">
+          You just used one setting of each loop. Both have a design choice, and the seed ships two
+          examples of each so you can feel the tradeoff, not just read it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Feedforward — the rule's specificity</h3>
+      <p>A rule you cannot fail is a rule that cannot steer.</p>
+      <div class="tablewrap">
+        <table>
+          <caption>seed/.claude/rules/</caption>
+          <thead>
+            <tr><th>Rule</th><th>What it says</th><th>Tradeoff</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>cash-vague.md</code></td>
+              <td>"Round cash fairly to a nickel."</td>
+              <td>Cheap, universal, ages well, and exerts almost no force. Nearest-nickel reads as compliant.</td>
+            </tr>
+            <tr>
+              <td><code>cash-concrete.md</code></td>
+              <td>"Round <em>down</em> to the nickel; 1083¢ settles at 1080, not 1085; integer math."</td>
+              <td>More work, narrower scope, but it decides a contested choice the agent would otherwise make for you.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">Feedback — the gate's position</h3>
+      <p>Same check, different distance from the mistake. The earlier the loop closes, the cheaper the fix.</p>
+      <div class="tablewrap">
+        <table>
+          <caption>seed/.claude/hooks/</caption>
+          <thead>
+            <tr><th>Hook</th><th>Event</th><th>Speed / consequence</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>round-gate-edit.py</code></td>
+              <td><code>PostToolUse</code> on <code>Edit</code>/<code>Write</code></td>
+              <td><strong>Fast.</strong> Fires the instant <code>money.py</code> is saved; agent corrected mid-task, fix is local. The bad code did exist on disk for a moment.</td>
+            </tr>
+            <tr>
+              <td><code>round-gate-commit.py</code></td>
+              <td><code>PreToolUse</code> on <code>git commit</code></td>
+              <td><strong>Late.</strong> Fires only at ship time; nothing bad ever lands, but the mistake may be buried under later work, so the fix costs more.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">When to reach for which loop</h3>
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">Feedforward</span>
+          <span class="what">For <em>contested decisions the model won't guess right</em>. Rounding direction is one: left alone, a capable agent rounds to nearest (with a float) every time. The rule is what makes it round your way.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Feedback</span>
+          <span class="what">For <em>invariants the model must never violate</em>, whether or not it usually gets them right. A hook is a guarantee; a rule is only a nudge.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">Try the variants (optional)</h3>
+      <p>Each swap is one step; undo it when done.</p>
+      <ul>
+        <li><strong>Weak rule.</strong> Replace the rounding line in <code>CLAUDE.md</code> with the line from <code>.claude/rules/cash-vague.md</code>, restart the agent, and re-run the first prompt above. Watch the vague rule fail to steer.</li>
+        <li><strong>Commit gate alone.</strong> Delete the <code>PostToolUse</code> block from <code>.claude/settings.json</code> so only the late gate is wired, then re-run the second prompt. The bad edit now sails through and is caught only at commit. That gap between "caught on save" and "caught at ship" is the cost of a slow loop.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Together</span>
+        <p>
+          A rule without a hook is a suggestion; a hook without a rule is a gate no one explained.
+          Together, guidance you write and enforcement you run, they're the smallest whole unit of a
+          charter, and the two mechanisms to reach for first.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Discussion">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Discussion</span>
+      </div>
+      <div>
+        <h2>Think it through: the policy just changed</h2>
+        <p class="thesis">
+          The company changes its mind: cash should now always round <strong>up</strong>, the
+          merchant's favor, never the customer's. You want the agent to write round-<em>up</em> code
+          from now on. <strong>What has to change?</strong> Talk it out before you read the answer.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The tempting answer is "edit the rule." That is necessary but <em>not sufficient</em>, and
+        the gap is the whole lesson. Three things describe the rounding policy, and all three have to
+        move together.
+      </p>
+
+      <h3 class="sub">1 · The rule (feedforward)</h3>
+      <p><code>CLAUDE.md</code> and <code>.claude/rules/cash-concrete.md</code>. Change "round down, customer's favor" to "round up, merchant's favor":</p>
+      <figure class="code">
+        <figcaption><span>CLAUDE.md</span><span class="tag warn">feedforward</span></figcaption>
+<pre><code>Rounding policy: cash totals round UP to the next nickel (5 cents), in the
+merchant's favor. Never round down, and never round to the nearest nickel.</code></pre>
+      </figure>
+
+      <h3 class="sub">2 · The code (imitation)</h3>
+      <p><code>seed/money.py</code>. This is the one people forget, and it's the one that matters most. Change the implementation <em>and</em> its docstring:</p>
+      <figure class="code">
+        <figcaption><span>seed/money.py</span><span class="tag pass">the surface the agent imitates</span></figcaption>
+<pre><code>def round_cash(total_cents):
+    """Round a cash total UP to the next nickel (5 cents), in the merchant's favor."""
+    return -(-total_cents // 5) * 5    <span class="c-dim"># integer ceil to a nickel</span></code></pre>
+      </figure>
+
+      <h3 class="sub">3 · The hook (feedback)</h3>
+      <p>Both files in <code>.claude/hooks/</code>. Flip the check from floor to ceil so it now blocks anything that <em>doesn't</em> round up:</p>
+      <figure class="code">
+        <figcaption><span>.claude/hooks/round-gate-*.py</span><span class="tag block">feedback</span></figcaption>
+<pre><code>want = -(-total // 5) * 5      <span class="c-dim"># was: total - (total % 5)</span>
+if got != want:                <span class="c-dim"># block when the code failed to round up</span></code></pre>
+      </figure>
+
+      <h3 class="sub">Why you still have to change the code</h3>
+      <p>
+        At the size of this seed the rule is right in front of the agent and the contradiction is
+        glaring, so a capable agent follows the rule and even flags the stale code as wrong. (We
+        tested exactly this contradiction on fresh agents, rule says up, code says down, and they
+        rounded up every time, one of them explicitly calling out the old code as non-compliant.)
+        <strong>The imitation problem is a scale effect.</strong> In a real codebase, thousands of
+        lines, the rule one entry in a long charter, round-down rounding repeated across dozens of
+        call sites, the <em>prevailing pattern in the code</em> becomes the strongest signal the
+        agent has, and it copies that pattern past a rule it barely weighs. The lab is too small to
+        reproduce this; the takeaway is what it points at.
+      </p>
+
+      <div class="callout">
+        <span class="label">Where it bites hardest</span>
+        <p>
+          Rounding direction is a simple, local decision the model can derive from the rule alone,
+          which is exactly why the lab agents got it right. The rules imitation actually defeats are
+          the <em>design-level</em> ones, where most of a charter's rules live: "use ports and
+          adapters," "no business logic in controllers," "depend on interfaces, not concretes." There
+          is no one-line correct answer to copy; the agent infers "how we do it here" from the
+          surrounding code. If most of the codebase ignores the rule, the counterexamples <em>are</em>
+          the pattern, and the agent replicates them. The more non-compliant code, the stronger the
+          pull. The cost of a rule the code contradicts isn't a wrong penny; it's an architecture that
+          drifts further from its own charter with every change.
+        </p>
+      </div>
+
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">The defect</span>
+          <span class="what">A rule is a promise about <em>future</em> code. It doesn't retroactively fix <code>round_cash</code>, which keeps rounding down in production until someone edits it.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">The pattern</span>
+          <span class="what">At scale, the code is what the agent imitates. Leave a round-down implementation in the tree and you've planted the pattern the next change copies. The more of it there is, the louder it gets.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">The durable fix</span>
+        <p>
+          The hook removes the gamble: it blocks any round-down result regardless of what the agent
+          weighed, in the lab and at scale alike. But the hook is a backstop. The durable fix is to
+          <strong>make the code correct</strong>. When nothing in the tree rounds down, there is no
+          contradictory pattern to imitate and no defect left in production. Feedforward, feedback,
+          <em>and</em> the code itself have to agree.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="The bigger picture">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Bigger picture</span>
+      </div>
+      <div>
+        <h2>Three surfaces, spent sparingly</h2>
+        <p class="thesis">
+          Step back from the pennies. Everything in this session is about the surfaces that bound
+          what an agent does. There are three, and you just met all of them.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the behavior band</span><span class="tag warn">reliability is a tight band</span></figcaption>
+<pre><code>  <span class="c-warn">Instruction</span> (charter prose) ─┐
+  <span class="c-pass">The code</span> (imitation) ───────┼──▶  Agent  ──▶  <span class="c-dim">Behavior band</span>
+  <span class="c-block">Feedback</span> (sensors, gates) ──┘                 <span class="c-dim">(how tight = reliability)</span></code></pre>
+      </figure>
+
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">Instruction</span>
+          <span class="what">The charter prose the agent reads: rules, <code>CLAUDE.md</code>. This is feedforward.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">The code</span>
+          <span class="what">What already exists in the repo, which the agent imitates. The surface juniors forget, and the one that dominates at scale.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Feedback</span>
+          <span class="what">The sensors and gates that check the result: tests, hooks. This is feedback.</span>
+        </li>
+      </ol>
+
+      <p>
+        Each surface narrows the <strong>behavior band</strong>, the range of things the agent might
+        do. Reliability is just a tight band. Add a surface and the band gets narrower.
+      </p>
+
+      <div class="callout">
+        <span class="label">The honest part</span>
+        <p>
+          This lab is a toy. A two-line <code>round_cash</code> does not deserve a rule and two
+          hooks. In real life you'd read it once and move on; you would never gate something this
+          small. Every rule and hook costs effort to write and, worse, to keep true as the code
+          changes. So the goal is never <em>the most</em> constraints. It's <strong>the fewest
+          constraints that buy a tight-enough band</strong>: you add one only when something real
+          needs it. Money, security, data integrity, a policy with legal or financial weight.
+        </p>
+      </div>
+
+      <p>
+        Where does that pay for itself? Not here, in a production app. Many files, many tests, many
+        policies and requirements, many contributors, an agent making changes all day. There the code
+        surface is huge, no human reads every diff, and comprehension alone can't scale. A few
+        well-placed rules and hooks on the things that actually carry risk keep the band tight when
+        nothing else can. That is when the two mechanisms you practiced today earn their cost, and
+        knowing <em>when not</em> to reach for them is as much the senior's job as knowing how.
+      </p>
+
+      <h3 class="sub">What you leave with</h3>
+      <ul>
+        <li>The comprehension card: the daily rule, the five questions, the five moves.</li>
+        <li>A filled card applied to a real agent diff.</li>
+        <li>A test you wrote that catches the planted overcharge.</li>
+        <li>A working mental model: three surfaces bound an agent, the rule you write (instruction), the code it imitates, and the hook that checks it (feedback), and reliability is just a tight behavior band.</li>
+      </ul>
+
+      <p>
+        But the card is only the method. What carries it into Monday is a handful of shifts in how
+        you <em>think</em>, and not one of them is about typing faster. The agent already types
+        faster than you. Your edge is everything it can't do: knowing what "correct" means here, and
+        noticing when the fluent answer isn't it.
+      </p>
+
+      <p>
+        Start from what the job actually is. Writing code was never the point, it was always the
+        means. The job is solving a business problem: someone needs a bill settled correctly, a
+        customer not overcharged, a policy honored. Code is how we've done that, but the "round down,
+        customer's favor" policy is the <em>why</em> the code exists at all. The agent commoditizes
+        the means, it produces the code faster than you can, which doesn't shrink your job, it
+        <em>reveals</em> it. What's left when the typing is free is the part that was always the real
+        work: understanding the problem well enough to know what correct even means. Seniority was
+        always that understanding, not the typing speed. The agent just made it impossible to hide
+        behind the keyboard.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">The shift</span>
+          <span class="what"><strong>From "does it work?" to "how would I know?"</strong> The junior question is <em>did the tests pass.</em> The senior question is <em>what would have to be true for this to be wrong, and did I check it?</em> Step 2 lived in that gap. Distrust the green until you've named the case it doesn't cover.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">The shift</span>
+          <span class="what"><strong>From "it's done" to "I can explain it."</strong> Working code you can't explain is a debt with your name on it. If you can't say what it does, where it enters and leaves, and why, out loud, in your own words, you haven't finished reading.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">The shift</span>
+          <span class="what"><strong>Confusion is a signal, not a shame.</strong> A stall means the charter never explained it (a gap the <em>team</em> owes you) or you haven't understood it yet (a gap <em>you</em> close by asking). Name which. Juniors hide it and merge; point at the line instead and say "I don't get this yet."</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">The shift</span>
+          <span class="what"><strong>The agent is a tutor, not an oracle.</strong> Use it to <em>explain</em>, never to <em>skip</em>. Form your own answer before you accept its. Pasting a diff you couldn't defend hands it the judgment that was supposed to be yours.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">The shift</span>
+          <span class="what"><strong>You own the change the moment you merge it.</strong> The agent has no accountability. It doesn't get paged, doesn't sit in the review, doesn't answer for the overcharge in production. Once it lands under your name it's <em>your</em> code: your bug, your behavior, your 3 a.m. page. "The agent wrote it" is not a defense.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Three things to run this week</span>
+        <p>
+          <strong>Explain-back before merge</strong> (say what a diff does in one sentence; where the
+          sentence goes vague is where you don't understand it). <strong>Predict, then run</strong>
+          (write how you expect it to fail first; being wrong on paper is free). <strong>One move a
+          day</strong> (the habit is the deliverable, not any single catch).
+        </p>
+      </div>
+
+      <p>
+        And the highest-leverage hour you have: <strong>pair with a senior, and mine the
+        <em>why</em>, not the answer.</strong> The <em>what</em> is on the screen; the <em>why</em>
+        is in their head. Bring a filled card and ask about the question you stalled on, not a blank
+        "explain this." Watch what they distrust: seniors flinch at certain diffs before they can say
+        why, and that trained suspicion is exactly what you're building. Study their rejections; a
+        diff sent back is a free worked example of the plausible-but-wrong. Then reverse the chair
+        and explain <em>your</em> change to them. Where you start hand-waving is where your
+        understanding runs out, and now someone's there to catch it before production does. You bring
+        comprehension; the team keeps the charter and harness good enough to guard you. Pairing is
+        where both halves meet.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="After the workshop">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Take-home</span>
+      </div>
+      <div>
+        <h2>After the workshop: the take-home lab</h2>
+        <p class="thesis">
+          The session gives you the card and one rep on a toy repo. Judgment comes from reps on real
+          code you didn't write. This lab is yours to run afterward: no instructor, no answer key. Do
+          it on a project you'll never ship to, so you can be wrong for free.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <strong>Why an open-source project.</strong> A toy seed can't teach you scale, history, or
+        the weight of code other people depend on. A real project can: it's readable at your own
+        pace, its commit history records why every line is the way it is, and its test suite shows
+        what "proven correct" actually looks like. The five questions and five moves are the same;
+        only the code got real.
+      </p>
+
+      <h3 class="sub">Why SQLite is the one to start on</h3>
+      <ul>
+        <li><strong>Small enough to hold.</strong> One file's worth of public API, legible in an afternoon.</li>
+        <li><strong>Famous for its tests.</strong> It ships far more test code than library code, and documents <em>how</em> it's tested, the discipline this workshop trains, at professional scale. (<a href="https://www.sqlite.org/testing.html">sqlite.org/testing.html</a>)</li>
+        <li><strong>The docs explain the <em>why</em></strong>, which is question 3 on your card, answered for you.</li>
+        <li><strong>Self-contained C.</strong> Legible and dependency-free; you see exactly where a change enters and leaves.</li>
+      </ul>
+      <p>
+        Source and docs: <a href="https://www.sqlite.org/">sqlite.org</a> · source at
+        <a href="https://www.sqlite.org/src/">sqlite.org/src</a> · a readable mirror lives on GitHub.
+      </p>
+
+      <h3 class="sub">Run the card on real code</h3>
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Rep 1</span>
+          <span class="what"><strong>Read one design doc, explain it back.</strong> Pick a page from the SQLite docs, read it, then explain it to your agent in your own words. Where you stall is where you didn't understand.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">Rep 2</span>
+          <span class="what"><strong>Comprehension pass.</strong> Choose one self-contained function. Run all five questions against it. Use the agent as a tutor, ask <em>what</em>, <em>where</em>, <em>why</em>, but form your own answer first.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Rep 3</span>
+          <span class="what"><strong>Predict the failure (move 4).</strong> Pick one test. Before reading it, predict what input would break the code it guards. Then read the test. Were you right?</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Rep 4</span>
+          <span class="what"><strong>Catch the agent wrong (move 5).</strong> Ask your agent to "simplify" or "optimize" one small function. Run the five questions on its diff. Prove it correct, or prove it wrong with a test.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Rep 5</span>
+          <span class="what"><strong>Legibility read (move 3).</strong> Find the best-named and worst-named thing you can. Ask why the good one is good. That instinct is what you're building.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">The habit</span>
+        <p>
+          Repeat rep 4 weekly on any codebase you touch. The habit is the deliverable, not any one
+          catch.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>How to Grow from Junior to Senior in the Age of AI</strong> — a one-hour workshop.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Seed repo and run sheet ·
+      <a href="https://github.com/tacoda/fulcorum-junior-to-senior-workshop"><code>github.com/tacoda/fulcorum-junior-to-senior-workshop</code></a></div>
+    <div>Colour encodes surface:
+      <span style="color:var(--gold)">instruction / feedforward</span> ·
+      <span style="color:var(--brick)">feedback / gates</span> ·
+      <span style="color:var(--forest)">the code / sanctioned</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
