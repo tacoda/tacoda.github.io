@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Harness with pi · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A coding agent with the coding removed. Strip the builtin tools, replace the system prompt, register domain tools, and serve it at a URL. A worked non-coding harness built on pi's extension surfaces. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/pi-harness/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Building a Harness with pi">
+<meta property="og:description" content="A coding agent with the coding removed. Six extension surfaces turn a terminal coding agent into a read-only SQL analytics service for people who do not write SQL.">
+<meta property="og:url" content="https://www.tacoda.dev/pi-harness/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Building a Harness with pi">
+<meta name="twitter:description" content="A coding agent with the coding removed. Six extension surfaces, one Docker belt, one URL.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Building a harness with pi</span>
+      <span class="sep">/</span>
+      <span>A coding agent with the coding removed</span>
+    </div>
+    <h1>The harness was already there. Take the <em>coding</em> out.</h1>
+    <p class="standfirst">
+      A terminal coding agent is a loop, a tool registry, a context assembler, a permission layer,
+      and a renderer. Only one of those has anything to do with code. Strip the builtin tools,
+      replace the system prompt, register tools for a different domain, and you have a harness for
+      something else entirely. This is that move carried all the way to a URL: a read-only SQL
+      analytics service for people who cannot write SQL, built on pi's extension surfaces with no
+      fork and no from-scratch agent loop.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      companion repo · <a href="https://github.com/tacoda/pi-harness-sql-analytics"><code>github.com/tacoda/pi-harness-sql-analytics</code></a><br>
+      substrate · <a href="https://www.npmjs.com/package/@earendil-works/pi-coding-agent">pi</a> · six extension surfaces, zero forks · <code>ANTHROPIC_API_KEY</code><br>
+      the harness · plain-English question in, one sentence and a number out, every query audited<br>
+      the belts · Docker (read-only rootfs, dropped caps) · <code>--no-builtin-tools</code> · read-only SQLite · SELECT-only guard<br>
+      substitutions · SQLite = your read replica · <code>analytics.example.com</code> = wherever you put it
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Instruction</dt>
+          <dd>What the model reads: the replacement system prompt, the skill, the prompt template.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Refused</dt>
+          <dd>What the harness will not do: dropped builtin tools, the SELECT guard, the container's dropped capabilities.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Recorded</dt>
+          <dd>What survives the session: the audit log and the findings file, both outside the container's control.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Building the harness">
+    <ol>
+      <li><a href="#rung-0"><span class="n">0</span> The premise</a></li>
+      <li><a href="#rung-1"><span class="n">1</span> Strip &amp; replace</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> Domain tools</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> The guard</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> Teach the loop</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> Containerize</a></li>
+      <li><a href="#front-door"><span class="n">6</span> Front door</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 0 ============ -->
+  <section class="rung" id="rung-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The premise</span>
+      </div>
+      <div>
+        <h2>What is actually coding-specific about a coding agent?</h2>
+        <p class="thesis">
+          Almost nothing. Take the inventory honestly and the coding is a thin layer of tools and a
+          system prompt sitting on top of machinery that does not care what domain it is in.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>a terminal coding agent, part by part</caption>
+          <thead>
+            <tr><th>Part</th><th>Coding-specific?</th><th>What it actually is</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>The agent loop</td><td>No</td><td>Sample, call tools, feed results back, repeat until done</td></tr>
+            <tr><td>Context assembly</td><td>No</td><td>System prompt, project files, skills, history, compaction</td></tr>
+            <tr><td>Permission layer</td><td>No</td><td>Which tools may run, and what has to be confirmed</td></tr>
+            <tr><td>Session and renderer</td><td>No</td><td>A terminal UI, a transcript, a resumable tree</td></tr>
+            <tr class="flag"><td>Builtin tools</td><td><strong>Yes</strong></td><td>read, write, edit, bash, glob, grep</td></tr>
+            <tr class="flag"><td>System prompt</td><td><strong>Yes</strong></td><td>"You are a coding agent working in a repository"</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Two rows are domain-specific and the rest is general infrastructure that took real work to
+        build. The interesting question is not "how do I write an agent loop" but "why would I write
+        a second one". If a coding agent exposes its extension surfaces properly, the fastest path
+        to a non-coding harness is to remove the two coding-specific parts and supply your own.
+      </p>
+
+      <h3 class="sub">The harness this builds</h3>
+      <p>
+        The user is a support lead, an ops person, or a PM. They have a question in plain English,
+        <em>"how many accounts churned in June?"</em>, and no SQL. The harness inspects the schema,
+        writes one guarded read-only <code>SELECT</code>, runs it against a replica, sanity-checks
+        the result, and answers in a sentence with the number in it. Every question and every query
+        that ran is written to an audit log.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the whole user experience</span><span class="tag pass">no SQL involved</span></figcaption>
+<pre><code>$ ./bin/pi-sql -- "how many accounts churned in June 2026?"
+
+<span class="c-dim">→ list_tables()          accounts, subscriptions, plans, events</span>
+<span class="c-dim">→ describe_table(events)  id, account_id, kind, occurred_at</span>
+<span class="c-dim">→ run_query(SELECT COUNT(DISTINCT account_id) FROM events</span>
+<span class="c-dim">             WHERE kind='churn' AND occurred_at &gt;= '2026-06-01' …)</span>
+
+<span class="c-pass">142 accounts churned in June 2026.</span></code></pre>
+      </figure>
+
+      <div class="callout">
+        <span class="label">Why this shape is worth knowing</span>
+        <p>
+          Every organization has a queue of "could an AI just answer this" questions that are not
+          coding questions: analytics, triage, log spelunking, document lookup. The instinct is to
+          build a bespoke agent for each. A coding agent you have already paid for, adopted, and
+          learned to operate is usually the better substrate, and the work is subtraction rather
+          than construction.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Step 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Strip &amp; replace</span>
+      </div>
+      <div>
+        <h2>Remove the coding, then say what the job is instead</h2>
+        <p class="thesis">
+          One flag deletes the coding half. One file supplies the replacement. These two moves are
+          the entire conversion, and everything after them is refinement.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>flag</b> --no-builtin-tools</span>
+          <span class="chip kind-rule"><b>strategy A</b> .pi/SYSTEM.md</span>
+          <span class="chip kind-rule"><b>context</b> AGENTS.md</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <code>--no-builtin-tools</code> drops <code>read</code>, <code>write</code>,
+        <code>edit</code>, and <code>bash</code> at the pi layer. This is not cosmetic. It means the
+        agent has no general-purpose way to touch the filesystem or shell out, so the only verbs it
+        has are the ones you register. An agent whose entire vocabulary is four domain tools cannot
+        wander, because there is nowhere to wander to.
+      </p>
+
+      <p>
+        The replacement system prompt lives in <code>.pi/SYSTEM.md</code> and pi loads it from the
+        project. Note what the launcher therefore does <em>not</em> need to do:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>bin/pi-sql</span><span class="tag warn">the prompt comes from the repo</span></figcaption>
+<pre><code><span class="c-dim"># No --system-prompt here: pi loads the replacement prompt from</span>
+<span class="c-dim"># .pi/SYSTEM.md on the mounted repo (strategy A).</span></code></pre>
+      </figure>
+
+      <p>
+        That comment is doing more work than it looks like. Because the prompt is a file in the
+        project rather than a flag in a launcher, it is reviewable, diffable, and versioned with the
+        tools it describes. A system prompt passed as a command-line argument is a system prompt
+        nobody reviews.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The general move</span>
+        <p>
+          Subtract the domain, then declare the new one. If your substrate has no equivalent of
+          <code>--no-builtin-tools</code>, that is a strong signal it will fight you: a harness you
+          cannot narrow is a harness whose blast radius you do not control.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Domain tools</span>
+      </div>
+      <div>
+        <h2>Four verbs, and nothing else</h2>
+        <p class="thesis">
+          With the builtins gone, the tool registry <em>is</em> the harness's capability surface.
+          Four tools is the whole vocabulary, and each one is narrow on purpose.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>strategy E</b> .pi/extensions/sql-analytics.ts</span>
+          <span class="chip kind-cmd"><b>command</b> /ask</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">list_tables</span>
+          <span class="what">Tables plus row counts. The agent has no <code>ls</code>, so this is how it finds out what exists at all.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">describe_table</span>
+          <span class="what">Columns and types for one table, and only for a name that appears in the live schema. Introspection without a path to arbitrary interpolation.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">run_query</span>
+          <span class="what">A single <code>SELECT</code>, capped in rows and bytes, audited on every call. The one tool with real power, and therefore the one with the guard on it (rung 3).</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">save_finding</span>
+          <span class="what">Append a record to <code>sql-output/findings.jsonl</code>. The only write in the whole harness, and it writes to a mounted output directory rather than anywhere the data lives.</span>
+        </li>
+      </ol>
+
+      <p>
+        Registration is ordinary and that is the point. <code>pi.registerTool</code> five times and
+        <code>pi.registerCommand("ask", …)</code> once, in a single TypeScript file. There is no
+        agent loop in that file, no retry logic, no context management, no renderer. All of that is
+        inherited.
+      </p>
+
+      <div class="callout">
+        <span class="label">The design test for a tool set</span>
+        <p>
+          Ask what the agent could do that you have not thought about. With four narrow tools the
+          answer is genuinely short, and you can enumerate it. With <code>bash</code> in the
+          registry the answer is "anything the container can do", and you are back to relying on
+          isolation for everything. Narrow tools are cheaper than sandboxes and easier to reason
+          about.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The guard</span>
+      </div>
+      <div>
+        <h2>Three belts, because network egress is not optional</h2>
+        <p class="thesis">
+          A file-only harness can be air-gapped with <code>--network none</code>. This one cannot:
+          the model API is on the network. So the containment has to live at the data layer instead,
+          and it is layered so that no single mistake exposes a write.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>strategy D</b> tool gate</span>
+          <span class="chip kind-gate"><b>belt 1</b> readOnly: true</span>
+          <span class="chip kind-gate"><b>belt 2</b> checkReadOnly()</span>
+          <span class="chip kind-gate"><b>belt 3</b> schema whitelist</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Belt 1</span>
+          <span class="what"><strong>The connection.</strong> <code>node:sqlite</code> opened with <code>readOnly: true</code>. SQLite rejects every write at the engine level. This is the belt that holds even if the other two have a bug.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Belt 2</span>
+          <span class="what"><strong>The statement guard.</strong> A single <code>SELECT</code> or <code>WITH</code> only. Defense in depth, and it gives the model a clean reason string instead of a raw SQLite error it will flail against.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Belt 3</span>
+          <span class="what"><strong>The whitelist.</strong> Table names are checked against the live schema before they are ever interpolated, so schema introspection cannot be turned into a string-building primitive.</span>
+        </li>
+      </ol>
+
+      <p>
+        The guard is worth reading closely, because the interesting part is not the keyword list. It
+        is the scrubbing that happens first.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>.pi/extensions/sql-analytics.ts</span><span class="tag block">defense in depth</span></figcaption>
+<pre><code>function scrub(sql: string): string {
+	<span class="c-dim">// Neutralize comments and string/identifier literals so keywords or</span>
+	<span class="c-dim">// semicolons *inside* them don't trip the checks below.</span>
+	return sql
+		.replace(/--[^\n]*/g, " ")
+		.replace(/\/\*[\s\S]*?\*\//g, " ")
+		.replace(/'(?:''|[^'])*'/g, "''")
+		.replace(/"(?:""|[^"])*"/g, '""');
+}
+
+function checkReadOnly(sql: string): { ok: boolean; reason?: string } {
+	const raw = sql.trim().replace(/;+\s*$/, "");   <span class="c-dim">// allow one trailing ';'</span>
+	if (!raw) return { ok: false, reason: "empty query" };
+	const scrubbed = scrub(raw);
+	if (scrubbed.includes(";"))
+		return { ok: false, <span class="c-block">reason: "multiple statements are not allowed"</span> };
+	const head = scrubbed.replace(/^[\s(]+/, "").toUpperCase();
+	if (!/^(SELECT|WITH)\b/.test(head))
+		return { ok: false, <span class="c-block">reason: "only SELECT / WITH queries are allowed"</span> };
+	if (FORBIDDEN.test(scrubbed.toUpperCase()))
+		return { ok: false, <span class="c-block">reason: "query contains a forbidden keyword"</span> };
+	return { ok: true };
+}</code></pre>
+      </figure>
+
+      <p>
+        Without <code>scrub</code>, a legitimate query containing the word "update" inside a string
+        literal gets rejected, and a semicolon inside a literal reads as statement stacking. A guard
+        that produces false refusals on valid work is a guard the operator eventually removes, so
+        the scrubbing is not a nicety. It is what keeps the belt in place.
+      </p>
+
+      <h3 class="sub">The guard has a runnable spec</h3>
+      <p>
+        The rules are duplicated as plain JavaScript in <code>docker/sql-guard.test.mjs</code>. The
+        source carries a comment saying so, and saying that changing one means changing the other.
+        That duplication is a deliberate trade: a security rule with an executable spec you can run
+        in the container is worth more than a rule with a single definition and no test.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Match the belt to the threat</span>
+        <p>
+          The reflex answer for agent isolation is the network sandbox. It does not apply here,
+          because the harness must reach the model API. Naming the belts honestly, and knowing which
+          one is load-bearing (the read-only connection) rather than assuming the container is doing
+          the work, is the difference between security and the feeling of it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Teach the loop</span>
+      </div>
+      <div>
+        <h2>A skill for the method, a template for the kickoff</h2>
+        <p class="thesis">
+          Tools give the agent verbs. They do not give it a method. The answer loop is a skill the
+          model loads when the question arrives, and <code>/ask</code> is the one-line entry point a
+          non-engineer actually types.
+        </p>
+        <div class="chips">
+          <span class="chip kind-skill"><b>strategy C</b> skills/analytics-playbook/SKILL.md</span>
+          <span class="chip kind-cmd"><b>strategy B</b> prompts/ask.md</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Skills load on demand, so the method costs nothing on turns that do not need it. The
+        description is the trigger, and it is written as a set of conditions rather than a topic:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>.pi/skills/analytics-playbook/SKILL.md</span><span class="tag warn">loaded on demand</span></figcaption>
+<pre><code>name: analytics-playbook
+description: Plain-English-to-SQL answer loop (understand the question →
+  inspect schema with list_tables/describe_table → write one guarded SELECT →
+  run_query capped → sanity-check → answer in one sentence and save_finding).
+  <span class="c-warn">Load when the user asks a data/business question, asks for a</span>
+  <span class="c-warn">count/total/breakdown, or invokes `/ask`.</span></code></pre>
+      </figure>
+
+      <p>
+        Two details in that description are worth stealing. The loop is spelled out as an arrow
+        chain, so the model has the whole method before it reads the body. And the load condition
+        names three concrete triggers rather than saying "load when relevant", which is the
+        instruction that produces skills that never load or always do.
+      </p>
+
+      <h3 class="sub">Where the method lives, and why not in the system prompt</h3>
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">System prompt</span>
+          <span class="what">Who the agent is and what it must never do. Always resident, so it stays short.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Skill</span>
+          <span class="what">How to do the job, in detail, including the sanity-check step. Loaded only when a data question arrives.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Prompt template</span>
+          <span class="what"><code>/ask</code>. The user-facing surface. It exists so a non-engineer has one thing to type and does not have to phrase a good agent prompt.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">The step people leave out</span>
+        <p>
+          The playbook's loop includes <em>sanity-check</em> before <em>answer</em>. A query that
+          runs is not a query that answers the question asked, and the failure mode of this harness
+          is not a crash: it is a confident sentence containing the wrong number. That step is
+          cheap, and it is the only thing standing between a fluent answer and a wrong one.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 5 ============ -->
+  <section class="rung" id="rung-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Step 5 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Containerize</span>
+      </div>
+      <div>
+        <h2>One command, and an outer belt</h2>
+        <p class="thesis">
+          A harness a colleague cannot start is a demo. The launcher collapses build, seed, and run
+          into one command, and the container is the belt that sits outside everything the extension
+          does.
+        </p>
+        <div class="chips">
+          <span class="chip kind-cmd"><b>strategy F</b> bin/pi-sql</span>
+          <span class="chip kind-gate"><b>outer belt</b> docker/</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>bin/pi-sql · the container flags</span><span class="tag block">outer belt</span></figcaption>
+<pre><code>docker_args=(
+	run --rm -i
+	<span class="c-block">--read-only</span>                       <span class="c-dim"># rootfs is immutable</span>
+	--tmpfs /tmp:rw,size=64m           <span class="c-dim"># the only scratch space</span>
+	<span class="c-block">--cap-drop ALL</span>
+	<span class="c-block">--security-opt no-new-privileges</span>
+	-v "$here":/work
+	<span class="c-block">-v "$db_path":/data/analytics.db:ro</span>   <span class="c-dim"># the one host artifact, read-only</span>
+	-e ANTHROPIC_API_KEY
+	<span class="c-dim">…runs as a non-root user</span>
+)</code></pre>
+      </figure>
+
+      <p>
+        Read the mount list rather than the flags. Exactly one host artifact is visible to the
+        harness, mounted read-only, and it is a database file. Not a home directory, not a source
+        tree, not an SSH agent socket. Most of what makes a container safe is what you decline to
+        mount into it.
+      </p>
+
+      <h3 class="sub">Ergonomics that decide whether it gets used</h3>
+      <ul>
+        <li><strong>Builds on first run.</strong> No separate build step to forget.</li>
+        <li><strong>Seeds the sample database on first run</strong>, as the host user, so the resulting file is owned by you and can then be mounted read-only.</li>
+        <li><strong>Allocates a TTY only when stdout is one</strong>, which is what lets the same launcher work interactively and in CI.</li>
+        <li><strong>Takes a different database as an argument</strong>, so pointing it at a real replica is a path, not a rebuild.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">The launcher is part of the harness</span>
+        <p>
+          Every one of those bullets is a reason someone does not fall back to running the thing
+          unguarded on their laptop "just this once". Convenience is a security property when the
+          alternative to your safe path is a fast unsafe one.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FRONT DOOR ============ -->
+  <section class="rung" id="front-door">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="The front door">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Front door</span>
+      </div>
+      <div>
+        <h2>Put a URL in front of it</h2>
+        <p class="thesis">
+          The user is not an engineer, so a terminal on their machine was never the delivery
+          mechanism. Two adapters over the same harness process, behind TLS and basic auth.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>deploy</b> compose.yml</span>
+          <span class="chip kind-config"><b>ws</b> ttyd</span>
+          <span class="chip kind-config"><b>rest</b> shell2http</span>
+          <span class="chip kind-gate"><b>edge</b> nginx · TLS · basic auth</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">WebSocket</span>
+          <span class="what">A live terminal in the browser. For the person who wants to ask follow-up questions and watch the agent work. <code>ttyd</code> in front of the same launcher.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">REST</span>
+          <span class="what">One question in, a text answer out, no session. For scripts, dashboards, and the Slack bot somebody will inevitably build. <code>shell2http</code> in front of the one-shot mode.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Edge</span>
+          <span class="what">nginx terminates TLS, enforces basic auth, and routes both paths. The harness itself has no idea authentication exists, which is the correct division.</span>
+        </li>
+      </ol>
+
+      <p>
+        The one-shot mode built for CI in rung 5 is what makes the REST adapter a configuration file
+        rather than a service rewrite. That was not planned in advance; it is what happens when the
+        launcher is written to work when stdout is not a terminal.
+      </p>
+
+      <h3 class="sub">The six surfaces, end to end</h3>
+      <div class="tablewrap">
+        <table>
+          <caption>every piece, and the pi surface it uses</caption>
+          <thead>
+            <tr><th>Piece</th><th>pi strategy</th><th>File</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Replacement system prompt</td><td>A · repo context</td><td><code>.pi/SYSTEM.md</code>, <code>AGENTS.md</code></td></tr>
+            <tr><td>Kickoff command</td><td>B · prompt template</td><td><code>.pi/prompts/ask.md</code></td></tr>
+            <tr><td>The answer loop</td><td>C · skill</td><td><code>.pi/skills/analytics-playbook/SKILL.md</code></td></tr>
+            <tr><td>SELECT guard and audit log</td><td>D · tool gate</td><td><code>.pi/extensions/sql-analytics.ts</code></td></tr>
+            <tr><td>Domain tools and <code>/ask</code></td><td>E · custom tools/commands</td><td><code>.pi/extensions/sql-analytics.ts</code></td></tr>
+            <tr><td>Single-command launch</td><td>F · launch profile</td><td><code>bin/pi-sql</code></td></tr>
+            <tr><td>Isolation</td><td>outside pi</td><td><code>docker/</code></td></tr>
+            <tr><td>Service front door</td><td>outside pi</td><td><code>deploy/</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">Where this sits</h3>
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">Guardrails</span>
+          <span class="what"><a href="/guardrails/">Five guardrails</a> constrains a stock coding agent doing coding work. Same substrate, unchanged job.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">This page</span>
+          <span class="what">Same class of substrate, <em>different job</em>. The extension surfaces are used to change what the agent is for, not to fence in what it already does.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Neighbours</span>
+          <span class="what"><a href="/harness/">Promotion to the harness</a> builds an agent loop from parts instead of inheriting one. <a href="/iii-harness/">Building a harness with iii</a> is the other direction again: many small durable nodes rather than one reshaped agent.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">The one-sentence version</span>
+        <p>
+          If a coding agent exposes a system prompt, a tool registry, a way to drop the builtins,
+          and a launch profile, it is a general agent harness wearing a coding costume. Take the
+          costume off before you write a new one.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Building a Harness with pi</strong>, a coding agent with the coding removed.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Companion repo ·
+      <a href="https://github.com/tacoda/pi-harness-sql-analytics"><code>github.com/tacoda/pi-harness-sql-analytics</code></a></div>
+    <div>Related · <a href="/iii-harness/">Building a harness with iii</a> ·
+      <a href="/harness/">Promotion to the harness</a> ·
+      <a href="/guardrails/">Five guardrails</a></div>
+    <div>Colour encodes the surface:
+      <span style="color:var(--gold)">instruction</span> ·
+      <span style="color:var(--brick)">refused</span> ·
+      <span style="color:var(--forest)">recorded</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>

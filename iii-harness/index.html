@@ -1,0 +1,1271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building a Harness with iii · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="The harness is the graph, not the agent. Six worker nodes over a durable queue turn a topic into a briefing on its neighboring disciplines, with exactly one agent loop in the whole system. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/iii-harness/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Building a Harness with iii">
+<meta property="og:description" content="The harness is the graph, not the agent. Six worker nodes, one durable queue, and exactly one agent loop in the whole system.">
+<meta property="og:url" content="https://www.tacoda.dev/iii-harness/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Building a Harness with iii">
+<meta name="twitter:description" content="The harness is the graph, not the agent. Six nodes, one durable queue, one agent loop.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Building a harness with iii</span>
+      <span class="sep">/</span>
+      <span>Six nodes, one queue</span>
+    </div>
+    <h1>The harness is the <em>graph</em>, not the agent</h1>
+    <p class="standfirst">
+      The default mental picture of an AI system is one agent with many tools. The other shape is
+      many small nodes with one job each, wired together through a durable queue, where the model
+      call is just what happens inside some of them. This is that shape built end to end: a topic
+      goes in, a briefing on its neighboring disciplines comes out, and there is exactly one agent
+      loop in the entire system.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      companion repo · <a href="https://github.com/tacoda/iii-concept-expander"><code>github.com/tacoda/iii-concept-expander</code></a><br>
+      substrate · <a href="https://iii.dev">iii</a> · 6 pipeline nodes (1 TypeScript, 5 Python) · 5 managed infra workers · <code>ANTHROPIC_API_KEY</code><br>
+      the job · intake a topic, research it, name the adjacent disciplines, write the briefing<br>
+      the shape · asynchronous end to end · <code>/expand</code> returns immediately · poll <code>/result</code> to watch the stage advance<br>
+      substitutions · web search = whatever tool your domain needs · the four LLM nodes = your own stages
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Node</dt>
+          <dd>A worker with one job. Registers functions, subscribes to a topic, and knows nothing about its neighbours.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Queue</dt>
+          <dd>The durable handoff. A published topic is the only way one node reaches the next.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>State &amp; traces</dt>
+          <dd>The job object every node reads and writes, and the spans and logs that make the run legible afterward.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Building the harness">
+    <ol>
+      <li><a href="#rung-0"><span class="n">0</span> The shape</a></li>
+      <li><a href="#rung-1"><span class="n">1</span> The engine</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> A node</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> The handoff</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> The agent node</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> Driving it</a></li>
+      <li><a href="#tradeoffs"><span class="n">6</span> Tradeoffs</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 0 ============ -->
+  <section class="rung" id="rung-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The shape">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The shape</span>
+      </div>
+      <div>
+        <h2>One agent with six tools, or six nodes with one job each</h2>
+        <p class="thesis">
+          Both shapes solve this problem. They fail differently, and the failure modes are the
+          reason to choose deliberately rather than by habit.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the pipeline</span><span class="tag block">every arrow is a durable publish</span></figcaption>
+<pre><code>POST /expand {topic}
+      │
+      ▼
+  <span class="c-warn">api-worker</span> ──publish──► expand.plan
+                              │
+  <span class="c-warn">planner-worker</span>   (LLM: topic → research angles) ──► expand.research
+                              │
+  <span class="c-pass">research-worker</span>  (agent loop: tools::web_search ×N) ──► expand.neighbors
+                              │
+  <span class="c-warn">neighbors-worker</span> (LLM: adjacent disciplines) ──► expand.synthesis
+                              │
+  <span class="c-warn">synthesis-worker</span> (LLM: related topics + how they relate) ──► state: done
+                              │
+POST /result {job_id} ◄── <span class="c-warn">api-worker</span> reads state</code></pre>
+      </figure>
+
+      <p>
+        Notice how little of this is agentic. Four of the five model-calling nodes are a single
+        constrained LLM call with a fixed input and a fixed output shape. Only
+        <code>research-worker</code> runs a real loop, because only research genuinely needs one:
+        the number of searches is not knowable in advance. Everything else is a transformation that
+        happens to use a model.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>the two shapes, honestly compared</caption>
+          <thead>
+            <tr><th>Property</th><th>One agent, six tools</th><th>Six nodes, one queue</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Time to first version</td><td><strong>Faster.</strong> One file, one prompt</td><td>Slower. Six workers and a config</td></tr>
+            <tr><td>Where a failure lands</td><td>Somewhere in a long transcript</td><td><strong>On one node, with its topic and job id</strong></td></tr>
+            <tr><td>Retry granularity</td><td>The whole task</td><td><strong>The failed step</strong></td></tr>
+            <tr><td>Crash mid-run</td><td>The run is gone</td><td><strong>The queue still holds the handoff</strong></td></tr>
+            <tr><td>Cost control</td><td>One model for everything</td><td><strong>Per-node model and effort</strong></td></tr>
+            <tr><td>Long-running work</td><td>Bounded by one session</td><td><strong>Bounded by nothing; it is a queue</strong></td></tr>
+            <tr class="flag"><td>Where reasoning happens</td><td>Everywhere, continuously</td><td>Only where you put it, which is also the cost</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">The honest case against this shape</span>
+        <p>
+          That last row cuts both ways. A pipeline cannot decide it needs a seventh stage; you
+          decided the stages when you drew the graph. If the work genuinely varies in structure from
+          run to run, a single agent with good tools will beat a fixed graph, and no amount of
+          durability makes up for a topology that does not match the problem. Reach for this when
+          the <em>stages</em> are stable and the <em>content</em> is not.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Step 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The engine</span>
+      </div>
+      <div>
+        <h2>What you get before you write anything</h2>
+        <p class="thesis">
+          The infrastructure a pipeline like this needs is queue, state, HTTP, configuration, and
+          observability. In iii those are workers you declare rather than services you stand up.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>engine</b> config.yaml</span>
+          <span class="chip kind-config"><b>per-worker</b> config/*.yaml</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>config.yaml · the entire infrastructure declaration</span><span class="tag pass">five managed workers</span></figcaption>
+<pre><code><span class="c-dim"># Only managed infrastructure workers live here. The 6 custom pipeline nodes</span>
+<span class="c-dim"># (api, planner, research, neighbors, synthesis, tools) self-connect as local</span>
+<span class="c-dim"># processes so their ANTHROPIC_API_KEY comes from the host env, never git.</span>
+workers:
+  - name: iii-observability
+  - name: configuration
+  - name: state
+  - name: queue
+  - name: http</code></pre>
+      </figure>
+
+      <p>
+        Five lines. Each expands into a real subsystem configured in <code>config/</code>: the HTTP
+        server binds <code>0.0.0.0:3111</code> with a request timeout and a concurrency limit, the
+        state store enables trigger fan-out, the queue picks a persistence adapter, and
+        observability turns on traces, metrics, and logs under the service name
+        <code>concept-expander</code>.
+      </p>
+
+      <p>
+        The comment matters as much as the config. The pipeline nodes are deliberately <em>not</em>
+        declared here, because they need <code>ANTHROPIC_API_KEY</code> and this file is in git. They
+        self-connect as local processes and read the key from the host environment. When you want a
+        node running as an engine-managed microVM instead, it ships an <code>iii.worker.yaml</code>
+        and the key is injected through the manifest's <code>env:</code> map.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The line worth drawing</span>
+        <p>
+          Declared infrastructure goes in the repo. Anything that needs a secret stays out of it
+          until there is a manifest to inject the secret properly. That split is visible in this
+          config, and getting it wrong is how keys end up in git history.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">A node</span>
+      </div>
+      <div>
+        <h2>Register a function, subscribe to a topic, publish the next one</h2>
+        <p class="thesis">
+          A node is not a class hierarchy or a framework subclass. It is a connection, a handler,
+          and a trigger. Five Python nodes and one TypeScript node in this pipeline share the same
+          three-line skeleton.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>py</b> register_worker · InitOptions</span>
+          <span class="chip kind-agent"><b>ts</b> registerWorker</span>
+          <span class="chip kind-config"><b>trigger</b> durable:subscriber</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>workers/planner-worker/src/planner_worker.py</span><span class="tag warn">a whole node</span></figcaption>
+<pre><code><span class="c-dim">"""Node 1: break the incoming topic into concrete research angles."""</span>
+import os
+
+import anthropic
+from iii import register_worker, InitOptions
+from iii_helpers.observability import Logger
+
+worker = register_worker(
+    os.environ.get("III_URL", "ws://localhost:49134"),
+    InitOptions(worker_name="planner-worker"),
+)
+logger = Logger()
+client = anthropic.Anthropic()      <span class="c-dim"># ANTHROPIC_API_KEY from host env</span>
+
+
+def get_job(job_id: str) -&gt; dict:
+    return worker.trigger(
+        {"function_id": "state::get", "payload": {"scope": "jobs", "key": job_id}}
+    ) or {}
+
+
+def publish(topic: str, job_id: str) -&gt; None:
+    worker.trigger(
+        {"function_id": "<span class="c-block">iii::durable::publish</span>",
+         "payload": {"topic": topic, "data": {"job_id": job_id}}}
+    )</code></pre>
+      </figure>
+
+      <p>
+        Everything a node can do to the outside world goes through <code>worker.trigger</code> with
+        a <code>function_id</code>. Reading state is <code>state::get</code>. Writing it is
+        <code>state::set</code>. Handing off is <code>iii::durable::publish</code>. Calling another
+        node's capability is that node's function id. One verb, and the id says which subsystem you
+        are talking to.
+      </p>
+
+      <p>
+        The consequence is that nodes have no imports of each other. <code>planner-worker</code> does
+        not know <code>research-worker</code> exists. It publishes to <code>expand.research</code>
+        and stops caring. That is what makes a node independently restartable, independently
+        deployable, and independently rewritable in a different language, which is exactly why one
+        of these six is TypeScript and the other five are Python without that being a problem.
+      </p>
+
+      <div class="callout">
+        <span class="label">The tradeoff hiding in that decoupling</span>
+        <p>
+          Nothing checks that <code>expand.research</code> has a subscriber. Publish to a topic
+          nobody listens to and the job simply stops advancing, with no error anywhere. That is the
+          cost of a string-keyed graph, and it is why the <code>stage</code> field on the job object
+          in rung 3 is not optional bookkeeping.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The handoff</span>
+      </div>
+      <div>
+        <h2>The queue carries a job id, and nothing else</h2>
+        <p class="thesis">
+          Every message on the wire is <code>{"job_id": "..."}</code>. The actual work product lives
+          in the state store under that id, and each node reads it, adds its piece, and advances the
+          stage.
+        </p>
+        <div class="chips">
+          <span class="chip kind-block"><b>topic</b> expand.plan → research → neighbors → synthesis</span>
+          <span class="chip kind-make"><b>state</b> scope: jobs · key: job_id</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>workers/api-worker/src/worker.ts · intake</span><span class="tag block">202, then the queue takes over</span></figcaption>
+<pre><code>const jobId = randomUUID();
+logger.info('accepted expand job', { jobId, topic });
+
+await worker.trigger({
+  function_id: 'state::set',
+  payload: {
+    scope: 'jobs', key: jobId,
+    value: { status: 'pending', topic, <span class="c-pass">stage: 'plan'</span> },
+  },
+});
+
+<span class="c-dim">// Hand off to the first pipeline node via the durable queue.</span>
+await worker.trigger({
+  function_id: '<span class="c-block">iii::durable::publish</span>',
+  payload: { topic: 'expand.plan', data: { job_id: jobId } },
+});
+
+return {
+  <span class="c-pass">status_code: 202</span>,
+  body: { job_id: jobId, status: 'pending' },
+  headers: { 'Content-Type': 'application/json' },
+};</code></pre>
+      </figure>
+
+      <p>
+        The <code>202</code> is the design. The request does not wait for research to finish, and it
+        could not: this pipeline runs for minutes. The caller gets an id, the queue drives the rest,
+        and <code>/result</code> reports where it has got to.
+      </p>
+
+      <h3 class="sub">Why the payload is a pointer and not the data</h3>
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Message size</span>
+          <span class="what">Research findings are long. Putting them on the queue makes every message large, and every retry re-delivers all of it.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">One writer</span>
+          <span class="what">The job object has a single owner at a time, the node currently handling that stage. Reading and writing it is a get and a set, not a merge.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Inspectable</span>
+          <span class="what">The whole state of a run is one key in one scope. Polling <code>/result</code> is just reading it, and so is debugging.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">The catch</span>
+          <span class="what">Two nodes handling the same job concurrently would clobber each other. This pipeline is strictly sequential, so that does not arise. A fan-out stage would need the merge this design avoids.</span>
+        </li>
+      </ol>
+
+      <p>
+        The <code>stage</code> field is what makes a stalled run diagnosable. A job sitting at
+        <code>research</code> for ten minutes tells you which node to look at, and a job sitting at a
+        stage whose subscriber never started tells you why nothing is happening. Without it, a
+        pipeline that stops looks exactly like a pipeline that is slow.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">The agent node</span>
+      </div>
+      <div>
+        <h2>One node runs a loop, and its tool is another node</h2>
+        <p class="thesis">
+          <code>research-worker</code> is the only node that cannot know in advance how much work it
+          needs. It gets a real agent loop, and the tool that loop calls is a function id on a
+          different worker.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>node</b> research-worker</span>
+          <span class="chip kind-cmd"><b>tool</b> tools::web_search</span>
+          <span class="chip kind-config"><b>loop</b> tool_runner · until_done</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>workers/research-worker/src/research_worker.py</span><span class="tag pass">the tool is a node</span></figcaption>
+<pre><code>@beta_tool
+def web_search(query: str) -&gt; str:
+    """Search the web for current information about a query.
+
+    Args:
+        query: A focused search query.
+    """
+    logger.info(f"web_search -&gt; tools-worker: {query!r}")
+    return worker.trigger(
+        {"function_id": "<span class="c-warn">tools::web_search</span>", "payload": {"query": query},
+         "timeout_ms": 170_000}
+    ) or ""
+
+
+def research_handler(payload: dict) -&gt; None:
+    ...
+    runner = client.beta.messages.tool_runner(
+        model=MODEL,
+        max_tokens=8000,
+        output_config={"effort": "high"},
+        tools=[web_search],
+        system=(
+            "You are a research agent. Investigate the topic along the given angles, "
+            "using the web_search tool as needed to ground yourself in current, factual "
+            "information. Produce concise notes capturing key concepts, findings, and any "
+            "fields or disciplines the topic touches. <span class="c-warn">Do not write a final essay yet.</span>"
+        ),
+        messages=[{"role": "user", "content": f"Topic: {topic}\n\nResearch angles:\n{angle_list}"}],
+    )
+    final = runner.until_done()
+    findings = "".join(b.text for b in final.content if b.type == "text")
+
+    job["findings"] = findings
+    job["stage"] = "neighbors"
+    set_job(job_id, job)
+    <span class="c-block">publish("expand.neighbors", job_id)</span></code></pre>
+      </figure>
+
+      <p>
+        The tool function body is one <code>worker.trigger</code>. The model thinks it is calling
+        <code>web_search</code>; what actually happens is a message to <code>tools-worker</code>,
+        which owns the search capability for the whole system. Swapping the search provider is a
+        change in one node that no other node notices, and the generous
+        <code>timeout_ms</code> is there because a cross-node tool call is a network round trip, not
+        a function call.
+      </p>
+
+      <h3 class="sub">The sentence doing the most work</h3>
+      <p>
+        <strong>"Do not write a final essay yet."</strong> Without it, a capable model reads
+        "research this topic" and delivers a polished writeup, which then becomes the input to three
+        more stages that each want to write their own. The instruction that keeps a pipeline stage in
+        its lane is usually a prohibition, not a description, and each node's prompt in this repo
+        carries one.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Put the loop where the uncertainty is</span>
+        <p>
+          Agent loops are expensive and hard to observe. Four of these six nodes do not need one, so
+          they do not get one. Deciding per-node, rather than making the whole system agentic
+          because one part of it has to be, is most of what keeps this shape affordable and
+          debuggable.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 5 ============ -->
+  <section class="rung" id="rung-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Step 5 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Driving it</span>
+      </div>
+      <div>
+        <h2>Three ways in, one of them for debugging</h2>
+        <p class="thesis">
+          The same pipeline is reachable over HTTP, from the CLI one node at a time, and through a
+          script that does the whole thing. The middle one is the one you will actually use while
+          building.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>http</b> :3111/expand · /result</span>
+          <span class="chip kind-cmd"><b>cli</b> iii trigger</span>
+          <span class="chip kind-make"><b>script</b> scripts/expand.sh</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>two terminals, then a topic</span><span class="tag pass">local development</span></figcaption>
+<pre><code>export ANTHROPIC_API_KEY=sk-ant-...
+
+<span class="c-dim"># terminal 1 — start the engine + managed infra workers</span>
+iii --config config.yaml
+
+<span class="c-dim"># terminal 2 — start the 6 pipeline nodes (installs deps on first run)</span>
+./scripts/dev.sh
+
+<span class="c-dim"># one-shot: kick off a topic, poll to completion, print the summary</span>
+./scripts/expand.sh "cellular automata"</code></pre>
+      </figure>
+
+      <p>
+        The interesting entry point is not the HTTP one. It is this:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>call one node directly, through the engine</span><span class="tag warn">the debugging affordance</span></figcaption>
+<pre><code>iii trigger http::expand --json '{"body":{"topic":"cellular automata"}}'
+iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
+      </figure>
+
+      <p>
+        Any node's function can be invoked by id with a synthetic payload, without the HTTP layer and
+        without the stages before it. That means a broken synthesis step is reproduced by triggering
+        <code>synthesis</code> against a job id that already has findings, instead of re-running four
+        minutes of research to get back to the failure. In a monolithic agent the equivalent is
+        replaying a transcript and hoping.
+      </p>
+
+      <h3 class="sub">What the observability config buys</h3>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Traces</span>
+          <span class="what">OpenTelemetry spans at full sampling, exported to memory for local work. A run is a tree across six processes rather than six unrelated log streams.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Logs</span>
+          <span class="what">Every node uses the same <code>Logger</code> helper, so <code>logger.info("research complete; handing to neighbors node")</code> lands correlated with the span that emitted it.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">The default</span>
+          <span class="what">Exporter is <code>memory</code> and sampling is <code>1.0</code>. Correct for development, wrong for production on both counts, and worth changing before this ever handles real volume.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ TRADEOFFS ============ -->
+  <section class="rung" id="tradeoffs">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Tradeoffs">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Tradeoffs</span>
+      </div>
+      <div>
+        <h2>When to reach for a graph, and when not to</h2>
+        <p class="thesis">
+          This shape is not better than one agent with good tools. It is better at specific things,
+          and worse at others, and the honest version of that list is short.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Reach for it when</h3>
+      <ul>
+        <li><strong>The stages are stable.</strong> You can name them before you start, and they do not change per run.</li>
+        <li><strong>The work outlives a session.</strong> Minutes to hours, where "keep an agent loop open" stops being an answer.</li>
+        <li><strong>Steps deserve different budgets.</strong> A planner is a cheap call; research is expensive. One model and one effort level for both is waste at one end and a constraint at the other.</li>
+        <li><strong>Partial progress is worth keeping.</strong> If losing four minutes of research to a crash in synthesis is unacceptable, the durable handoff is the whole reason to be here.</li>
+      </ul>
+
+      <h3 class="sub">Do not reach for it when</h3>
+      <ul>
+        <li><strong>The structure varies per run.</strong> A fixed graph cannot decide it needs a different shape today. This is the disqualifying condition.</li>
+        <li><strong>The whole thing takes ten seconds.</strong> The queue, the state store, and six processes are pure overhead against one call that finishes before the infrastructure finishes starting.</li>
+        <li><strong>You have not proved the pipeline yet.</strong> Write it as one agent first. Split it when a stage starts deserving its own budget, its own retry, or its own language.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The failure this shape does not fix</span>
+        <p>
+          Durability protects the handoff, not the content. If <code>neighbors-worker</code> returns
+          a confident list of disciplines that are subtly wrong, the queue delivers that wrongness to
+          synthesis with perfect reliability, and the briefing at the end is fluent and incorrect.
+          Every node is still a place where a model can be plausibly wrong, and nothing about the
+          topology changes that. It only changes how easily you can find which node did it.
+        </p>
+      </div>
+
+      <h3 class="sub">Where this sits</h3>
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">pi</span>
+          <span class="what"><a href="/pi-harness/">Building a harness with pi</a> is the opposite construction: take one existing agent and subtract until it fits a new domain. One process, one loop, six extension surfaces.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">This page</span>
+          <span class="what">Compose from parts instead. Many processes, one loop total, and the wiring is the artifact you are actually designing.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">The factory</span>
+          <span class="what"><a href="/factory/">A lights-on factory</a> is this shape applied to software delivery, with governance gates and provenance on a queue that takes a tracker card and returns a merged pull request.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">The one-sentence version</span>
+        <p>
+          When the stages are known and the content is not, make the wiring durable and put the
+          agent loop only where the uncertainty actually lives.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Building a Harness with iii</strong>, six nodes and one queue.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Companion repo ·
+      <a href="https://github.com/tacoda/iii-concept-expander"><code>github.com/tacoda/iii-concept-expander</code></a></div>
+    <div>Related · <a href="/pi-harness/">Building a harness with pi</a> ·
+      <a href="/harness/">Promotion to the harness</a> ·
+      <a href="/factory/">The factory</a></div>
+    <div>Colour encodes the part:
+      <span style="color:var(--gold)">node</span> ·
+      <span style="color:var(--brick)">queue</span> ·
+      <span style="color:var(--forest)">state &amp; traces</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
