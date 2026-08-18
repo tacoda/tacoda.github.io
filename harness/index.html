@@ -1,0 +1,1463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Promotion to the Harness · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Building a coding agent of your own: one rule followed up five mount points in LangChain, LangGraph, and deepagents. The predicate never changes, only where it lives. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/harness/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Promotion to the Harness">
+<meta property="og:description" content="Building a coding agent of your own. One rule, five mount points: injected prose, tool schema, tool-call middleware, graph node, subagent boundary.">
+<meta property="og:url" content="https://www.tacoda.dev/harness/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Promotion to the Harness">
+<meta name="twitter:description" content="Building a coding agent of your own. One rule, five mount points, in LangChain, LangGraph, and deepagents.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Promotion to the harness</span>
+      <span class="sep">/</span>
+      <span>One rule, five mount points</span>
+    </div>
+    <h1>The journey of a rule that got <em>promoted</em></h1>
+    <p class="standfirst">
+      You are building your own coding agent, not configuring someone else's. That changes what a
+      rule is: not a line of prose you hope the model weighs, but a decision about <em>where in your
+      own code</em> the constraint lives. A custom harness has five distinct places to put one, and
+      choosing between them is the engineering. This follows a single rule up all five, in
+      LangChain, LangGraph, and deepagents. The predicate never changes. Only its mount point does,
+      and each move buys something the rung below it could not.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      companion repo · <a href="https://github.com/tacoda/fulcorum-harness-promotion"><code>github.com/tacoda/fulcorum-harness-promotion</code></a><br>
+      runtime · Python 3.11+ · <code>langchain[anthropic]</code> · <code>langgraph</code> · <code>deepagents</code> · one env var, <code>ANTHROPIC_API_KEY</code><br>
+      the rule under promotion · <em>money is integer cents, never float</em> · 40 lines of predicate, 5 mount points, 1 ledger<br>
+      who it's for · engineers building a coding agent of their own, deciding where a constraint belongs in their code<br>
+      substitutions · <code>money.py</code> = your highest-risk module · the predicate = whatever invariant you actually carry
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Feedforward</dt>
+          <dd>Prose the model reads before it writes. Shapes the draft. A nudge, never a guarantee.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Enforced</dt>
+          <dd>The harness refuses. Runs whether or not the agent read anything, in code the agent never sees.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Sanctioned &amp; recorded</dt>
+          <dd>The escape hatch the gate deliberately leaves open, and the ledger line it writes when taken.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="The promotion path">
+    <ol>
+      <li><a href="#rung-0"><span class="n">0</span> The candidate</a></li>
+      <li><a href="#rung-1"><span class="n">1</span> Injected prose</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> Tool design</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> Middleware</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> Graph node</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> Subagent &amp; ledger</a></li>
+      <li><a href="#demotion"><span class="n">6</span> Demotion</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 0 ============ -->
+  <section class="rung" id="rung-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="Before the ladder">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The candidate</span>
+      </div>
+      <div>
+        <h2>What earns a rule a promotion, and what does not</h2>
+        <p class="thesis">
+          Most rules should stay prose forever. Promotion costs code, and code you have to keep true
+          as the system changes. A rule earns the next rung only by failing at the one it is on, in
+          a way you can point at.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>rule</b> money is integer cents, never float</span>
+          <span class="chip kind-gate"><b>predicate</b> gate.py · check()</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The rule this page follows is one sentence: <strong>money is integer cents, never
+        float.</strong> It is a good candidate for exactly three reasons, and if a rule of yours
+        cannot make all three claims, leave it as prose and spend the effort somewhere it matters.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Consequential</span>
+          <span class="what">Being wrong costs money, and it costs it silently. A float that drifts a hundredth of a cent does not raise, does not fail a test, and does not appear in a log. It appears in a reconciliation report six weeks later.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Recurrent</span>
+          <span class="what">It has been violated more than once, by different people and different agents, in the same module. A rule broken once is an incident. A rule broken four times is a rule the prose is not carrying.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Decidable</span>
+          <span class="what">A machine can settle it. "No float in the money module" is a predicate over a syntax tree. "Use ports and adapters" is not, and no amount of promotion will make it one.</span>
+        </li>
+      </ol>
+
+      <p>
+        That third test is the one that disqualifies most candidates, and it is worth being blunt
+        about. The design rules that matter most to a codebase, the ones about layering and
+        dependency direction and where business logic is allowed to live, are exactly the rules a
+        gate cannot decide. They stay in prose, and they are carried by the code the agent imitates
+        and by the humans who review it. Promotion is not a general answer to rule-following. It is
+        a narrow tool for the small set of invariants that are both expensive and mechanical.
+      </p>
+
+      <h3 class="sub">The predicate, once</h3>
+      <p>
+        Everything below mounts this same function. It parses a source file, walks the tree, and
+        returns a list of strings. It knows nothing about agents, tools, graphs, or models, which is
+        the entire reason it can be mounted in five places without modification.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>gate.py · the whole enforceable surface</span><span class="tag block">40 lines, no dependencies</span></figcaption>
+<pre><code>import ast
+
+ALLOW = "money-gate: allow"          <span class="c-dim"># the sanctioned escape, per line</span>
+
+def check(source: str, filename: str = "&lt;source&gt;") -&gt; list[str]:
+    """Return one message per float-shaped money expression. Empty list = clean."""
+    lines = source.splitlines()
+    problems = []
+
+    def allowed(node) -&gt; bool:
+        line = lines[node.lineno - 1] if node.lineno &lt;= len(lines) else ""
+        return ALLOW in line
+
+    for node in ast.walk(ast.parse(source, filename)):
+        if allowed(node):
+            continue
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+            problems.append(f"{filename}:{node.lineno}: `/` yields a float; use `//`")
+        elif isinstance(node, ast.Call) and getattr(node.func, "id", None) == "float":
+            problems.append(f"{filename}:{node.lineno}: float() in a money path")
+        elif isinstance(node, ast.Constant) and isinstance(node.value, float):
+            problems.append(f"{filename}:{node.lineno}: float literal {node.value!r}")
+
+    return problems</code></pre>
+      </figure>
+
+      <div class="callout">
+        <span class="label">Stated ceiling</span>
+        <p>
+          This predicate is a syntactic heuristic, not a proof. It cannot see a float arriving from
+          a JSON payload, a database driver, or a function in another module. It is deliberately
+          crude, because a gate that is hard to explain is a gate people route around. Its job is to
+          catch the overwhelmingly common case (someone typed <code>/</code> where they meant
+          <code>//</code>) at a cost of forty lines. Anything subtler than that is a test's job, or
+          a type's.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Complexity 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">One sentence</span>
+      </div>
+      <div>
+        <h2>Prose, but injected by your own code</h2>
+        <p class="thesis">
+          Where every rule starts. In a stock agent it is a static line in a charter file. In a
+          harness you wrote, you build the system message yourself, which means you can decide
+          per-turn whether the rule is worth its tokens.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>surface</b> the system message you assemble</span>
+          <span class="chip kind-gate"><b>hook</b> @wrap_model_call</span>
+          <span class="chip kind-rule"><b>loop</b> feedforward</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The rule itself is one paragraph, and a capable model reading it writes <code>//</code>
+        most of the time. <strong>Most of the time</strong> is the operative phrase, and it is why
+        there are four more rungs. What owning the harness changes is not the sentence, it is that
+        you get to choose when it is present.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>rung1_prompt.py · conditional feedforward</span><span class="tag warn">shapes the draft</span></figcaption>
+<pre><code>from langchain.agents.middleware import wrap_model_call
+from langchain_core.messages import SystemMessage
+
+MONEY_RULE = (
+    "Money is integer cents. Never float, never Decimal, never a string. "
+    "Division is `//`. If you need a fraction of a cent you need a different "
+    "function and a conversation, not a `/`."
+)
+
+@wrap_model_call
+def inject_money_rule(request, handler):
+    <span class="c-dim">"""Append the rule to the system message, but only when it is relevant."""</span>
+    if not touches_money(request.messages):
+        return handler(request)                <span class="c-dim"># spend the budget elsewhere</span>
+
+    base = request.system_message
+    text = base.content if isinstance(base, SystemMessage) else (base or "")
+    joined = f"{text}\n\n## Money\n{MONEY_RULE}".strip()
+    return handler(request.<span class="c-warn">override</span>(system_message=SystemMessage(content=joined)))</code></pre>
+      </figure>
+
+      <p>
+        A charter file is unconditional: every rule pays for itself in context on every turn,
+        including the turns about CSS. Assembling the prompt in code lets a rule cost nothing until
+        it is relevant, which in practice is how you keep a growing rule set from crowding out the
+        task. It is a small win, and it is the only thing rung 1 gains from being in a custom
+        harness.
+      </p>
+
+      <h3 class="sub">What rung 1 buys</h3>
+      <ul>
+        <li><strong>Universality.</strong> It applies to every task, including the ones you did not anticipate. A gate only fires where you mounted it; prose reaches everywhere the prompt goes.</li>
+        <li><strong>The <em>why</em>.</strong> A gate says no. Prose says why, and the why is what stops the agent from working around the no.</li>
+        <li><strong>Zero maintenance drift.</strong> A sentence cannot break when you rename a module.</li>
+      </ul>
+
+      <h3 class="sub">What it cannot buy</h3>
+      <ul>
+        <li><strong>A guarantee.</strong> The rule competes for attention with everything else in the prompt, and it loses that competition on long tasks.</li>
+        <li><strong>Reach past the context window.</strong> If the rule is not in what the model read, the rule does not exist for that turn.</li>
+        <li><strong>Any force at all against the code.</strong> If the tree is full of <code>/</code>, imitation beats instruction, and the rule loses to the surrounding code every time.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Promotion trigger</span>
+        <p>
+          You have written the rule clearly, it is reaching the model, and it was violated anyway.
+          Not once under time pressure, but repeatedly, on a module where the cost is real. That is
+          the only evidence that justifies the next rung, and asking for it before you climb is how
+          you avoid a harness made entirely of gates.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Complexity 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Tool design</span>
+      </div>
+      <div>
+        <h2>Make the violation unrepresentable</h2>
+        <p class="thesis">
+          The cheapest enforcement in a custom harness is not a gate at all. It is a tool whose
+          schema cannot express the thing you are forbidding. You only get this rung because you own
+          the tool surface, and it is the one most people skip straight past.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>surface</b> the tools you define</span>
+          <span class="chip kind-make"><b>mechanism</b> the signature</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Look at two tools that do roughly the same job. One needs every rung above it. The other
+        needs none of them.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>rung2_tools.py · the same job, two surfaces</span><span class="tag pass">the rule is the type</span></figcaption>
+<pre><code>@tool
+def write_file(path: str, content: str) -&gt; str:
+    """Write content to a path in the working tree."""
+    <span class="c-block"># `content` is a string, so any rule about what may be inside it</span>
+    <span class="c-block"># has to be enforced somewhere else. This tool forces rung 3.</span>
+
+@tool
+def set_price(sku: str, <span class="c-pass">cents: int</span>) -&gt; str:
+    """Set a product's price, in integer cents."""
+    <span class="c-pass"># There is no float-shaped argument to pass. The violation this</span>
+    <span class="c-pass"># page is about cannot be expressed. No middleware, no ledger,</span>
+    <span class="c-pass"># no retry loop, nothing to keep true as the code changes.</span>
+    if cents &lt; 0:
+        raise ValueError("price cannot be negative")</code></pre>
+      </figure>
+
+      <p>
+        A narrow tool is enforcement that costs nothing to run, cannot drift out of sync with the
+        rule, and produces a validation error the model can act on without any code of yours firing.
+        Before you write a gate, it is worth asking whether the tool that permits the violation
+        needed to be that wide in the first place. Frequently the honest answer is that
+        <code>write_file</code> exists because it was easy, not because the agent needs arbitrary
+        writes.
+      </p>
+
+      <h3 class="sub">Where the ceiling is</h3>
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">Coercion</span>
+          <span class="what">A schema is not a proof. <code>cents: int</code> rejects <code>1080.5</code>, but a whole-valued float like <code>1080.0</code> is silently coerced to <code>1080</code> by validation. That is harmless here and would not be in every domain. Check what your validator actually does rather than assuming.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Irreducible width</span>
+          <span class="what">Some tools genuinely have to take arbitrary text. A coding agent that edits source cannot be handed a schema that expresses "valid money code". That is precisely the case rung 3 exists for.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not retrofittable</span>
+          <span class="what">Narrowing a tool changes the agent's whole vocabulary and every prompt that assumed the old one. Cheap when you are designing the surface, expensive once a system depends on it.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">The trigger for rung 3</span>
+        <p>
+          You reach rung 3 the moment the tool cannot be narrowed further and still do its job. For
+          a coding agent that is almost immediately, because the whole point of the tool is to write
+          arbitrary source. Everything above this line is about the case where the schema ran out of
+          road, which for agents that edit code is the normal case rather than the exception.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Complexity 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The promotion</span>
+      </div>
+      <div>
+        <h2>Into the harness: a tool-call gate the agent cannot see</h2>
+        <p class="thesis">
+          This is the actual promotion, and it is a smaller code change than it sounds. The
+          predicate moves out of the agent's environment and into the orchestration layer, where it
+          runs on every tool call the harness brokers, in every run the harness drives.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>dep</b> langchain[anthropic]</span>
+          <span class="chip kind-gate"><b>hook</b> @wrap_tool_call</span>
+          <span class="chip kind-config"><b>env</b> ANTHROPIC_API_KEY</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        LangChain's agent middleware wraps the tool-call boundary. A decorated function receives the
+        request and a <code>handler</code>, and decides whether to call it. Refusing means returning
+        a different <code>ToolMessage</code> instead of invoking the handler, so the reason travels
+        back to the model as an ordinary tool result and it keeps working with the specifics in
+        hand.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>rung3_middleware.py</span><span class="tag block">the tool call never happens</span></figcaption>
+<pre><code>from langchain.agents import create_agent
+from langchain.agents.middleware import wrap_tool_call
+from langchain_core.messages import ToolMessage
+
+from gate import check, guards
+from ledger import record
+from rung2_tools import write_file
+
+@wrap_tool_call
+def money_gate(request, handler):
+    <span class="c-dim">"""Refuse a write that puts a float in a money path."""</span>
+    call = request.tool_call                   <span class="c-dim"># {"name", "args", "id"}</span>
+    if call["name"] != "write_file":
+        return handler(request)
+
+    path = call["args"].get("path", "")
+    if not guards(path):
+        return handler(request)
+
+    problems = check(call["args"].get("content", ""), path)
+    if problems:
+        record("blocked", rule="money-cents", path=path, detail=problems)
+        return <span class="c-block">ToolMessage(</span>
+            content=(f"REFUSED by money-gate: {'; '.join(problems)}. "
+                     "Money is integer cents. Use `//`, not `/`."),
+            tool_call_id=call["id"],
+            <span class="c-block">status="error",</span>
+        )
+
+    record("passed", rule="money-cents", path=path)
+    return handler(request)                    <span class="c-pass"># clean; let the write happen</span>
+
+agent = create_agent(model="claude-opus-5",    <span class="c-dim"># reads ANTHROPIC_API_KEY</span>
+                     tools=[write_file], middleware=[money_gate])</code></pre>
+      </figure>
+
+      <p>
+        Read the refusal branch again, because the whole rung is in it. The gate does not warn the
+        model, or ask it to reconsider, or add a line to a system prompt hoping it lands. It returns
+        before <code>handler(request)</code> is ever called. There is no write to undo, because
+        there was no write. The bad state never existed.
+      </p>
+
+      <h3 class="sub">What promotion actually bought</h3>
+      <div class="tablewrap">
+        <table>
+          <caption>the same rule, at the three rungs so far</caption>
+          <thead>
+            <tr><th>Property</th><th>1 · Prose</th><th>2 · Tool schema</th><th>3 · Middleware</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Holds when the model ignores it</td>
+              <td>No</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>Works on arbitrary source edits</td>
+              <td>Yes, weakly</td>
+              <td>No. A schema cannot express "valid money code"</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>Survives a model swap</td>
+              <td>Depends on the new model</td>
+              <td>Yes</td>
+              <td>Yes. It is not in the prompt, so the model is irrelevant to it</td>
+            </tr>
+            <tr>
+              <td>Reachable by prompt injection</td>
+              <td>Yes</td>
+              <td>No</td>
+              <td>No</td>
+            </tr>
+            <tr>
+              <td>Explains itself</td>
+              <td>Yes, that is its whole job</td>
+              <td>Only as a validation error</td>
+              <td>Yes, in the refusal text</td>
+            </tr>
+            <tr class="flag">
+              <td>Cost</td>
+              <td>Tokens</td>
+              <td>Free, where it fits at all</td>
+              <td>Code to keep true as the rule changes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The property worth naming</span>
+        <p>
+          At rung 3 the constraint stops being part of the conversation. Prompt injection cannot
+          reach it, a long context cannot crowd it out, and a persuasive intermediate step cannot
+          talk it down, because it is not a claim the model is weighing. It is a branch in your
+          code. That is the whole difference between a rule the agent follows and an invariant the
+          system has.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Complexity 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">A graph node</span>
+      </div>
+      <div>
+        <h2>The gate becomes a node with a bounded retry</h2>
+        <p class="thesis">
+          Middleware refuses and hopes the agent recovers inside its own loop. A graph makes the
+          recovery explicit: the gate is a node, the failure is a value in state, and the retry is
+          an edge you can count and cap.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>dep</b> langgraph</span>
+          <span class="chip kind-gate"><b>node</b> gate</span>
+          <span class="chip kind-config"><b>edge</b> add_conditional_edges</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>rung4_graph.py</span><span class="tag block">fail closed after N attempts</span></figcaption>
+<pre><code>from typing import Annotated, TypedDict
+from langgraph.graph import END, START, StateGraph
+from langgraph.graph.message import AnyMessage, add_messages
+
+from gate import check
+from ledger import record
+
+MAX_ATTEMPTS = 3
+
+class State(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+    draft: str            <span class="c-dim"># the candidate source</span>
+    problems: list[str]   <span class="c-dim"># why the gate refused, fed back to the writer</span>
+    attempts: int
+
+def write(state: State) -&gt; dict:
+    <span class="c-dim">"""Ask the model for money.py. state["problems"] is the feedback channel."""</span>
+    ...
+
+def gate(state: State) -&gt; dict:
+    problems = check(state["draft"], "money.py")
+    record("blocked" if problems else "passed", rule="money-cents",
+           path="money.py", detail=problems)
+    return {"problems": problems, "attempts": state["attempts"] + 1}
+
+def route(state: State) -&gt; str:
+    if not state["problems"]:
+        return "accept"                       <span class="c-pass"># clean</span>
+    if state["attempts"] &gt;= MAX_ATTEMPTS:
+        return "give_up"                      <span class="c-block"># fail closed, do not ship</span>
+    return "write"                            <span class="c-warn"># retry with the reason in state</span>
+
+builder = StateGraph(State)
+builder.add_node("write", write)
+builder.add_node("gate", gate)
+builder.add_node("give_up", lambda s: {"messages": ["money-gate: unresolved"]})
+
+builder.add_edge(START, "write")
+builder.add_edge("write", "gate")
+builder.add_conditional_edges("gate", route, {
+    "accept": END,
+    "write": "write",
+    "give_up": "give_up",
+})
+builder.add_edge("give_up", END)
+
+graph = builder.compile()</code></pre>
+      </figure>
+
+      <p>
+        Three things changed, and only one of them is about enforcement.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">The loop is bounded</span>
+          <span class="what">An agent left to recover on its own can retry the same wrong idea until it exhausts a budget. <code>MAX_ATTEMPTS</code> is a number, in your code, that a persuasive model cannot renegotiate.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Failure is a route</span>
+          <span class="what">Giving up is a node, not an exception. It can notify, open a ticket, hand to a human, or write a record. Compare the factory's governance gates, which are the same idea at a larger grain.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">The loop is legible</span>
+          <span class="what">Someone can read the graph and see exactly how many times a violation can recur before the system stops. At rung 3 that behavior existed, but only in the agent's judgment.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Do not climb here by default</span>
+        <p>
+          Rung 4 buys control over the <em>recovery</em>, not stronger enforcement. Rung 3 already
+          made the violation impossible; the graph makes the response to it explicit and bounded.
+          If your agents recover fine on their own and you have never watched one thrash against a
+          gate, this rung is ceremony. Climb it when you have seen the thrash, or when the give-up
+          path genuinely needs to do something other than stop.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 5 ============ -->
+  <section class="rung" id="rung-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Complexity 5 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Isolation &amp; evidence</span>
+      </div>
+      <div>
+        <h2>Gate the subagent, and write the ledger</h2>
+        <p class="thesis">
+          At the top of the ladder the gate does two things it could not do below: it keeps a bad
+          result out of the planner's context entirely, and it leaves enough evidence behind to
+          decide whether the rule still deserves to be here.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>dep</b> deepagents</span>
+          <span class="chip kind-agent"><b>subagent</b> money-writer</span>
+          <span class="chip kind-make"><b>evidence</b> ledger.jsonl</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A subagent is a context boundary. Work happens in its own window and only a summary returns
+        to the planner. That boundary is a mount point: apply the gate to what the subagent
+        <em>returns</em>, and a violating result never enters the planner's history at all. The
+        planner cannot later imitate a mistake it never saw.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>rung5_deepagent.py</span><span class="tag block">gated at the boundary</span></figcaption>
+<pre><code>from deepagents import create_deep_agent
+
+from rung2_tools import write_file
+from rung3_middleware import money_gate       <span class="c-dim"># the same gate object, unchanged</span>
+
+money_writer = {
+    "name": "money-writer",
+    "description": "Writes and edits anything under the money module.",
+    "system_prompt": (
+        "Money is integer cents. Never float. Division is `//`. "     <span class="c-warn"># rung 1 is still here</span>
+        "A money-gate refusal names the exact line; fix that line."
+    ),
+    "tools": [write_file],
+}
+
+agent = create_deep_agent(
+    model="anthropic:claude-opus-5",           <span class="c-dim"># reads ANTHROPIC_API_KEY</span>
+    tools=[write_file],
+    subagents=[money_writer],
+    middleware=[money_gate],
+)</code></pre>
+      </figure>
+
+      <p>
+        Notice what did not disappear. The system prompt still carries the rule in prose, because
+        rung 1 never stopped being useful. A gated agent that has not been told the rule burns turns
+        rediscovering it by trial and error. <strong>The rungs accumulate; they do not
+        replace.</strong> By rung 5 the same invariant is stated in prose, enforced at the tool
+        boundary, bounded in the graph, and recorded on every firing, and each of those is doing a
+        different job.
+      </p>
+
+      <h3 class="sub">The ledger, which is the actual point of rung 5</h3>
+      <p>
+        Every firing appends one line. It is deliberately boring, and it is the only thing on this
+        page that tells you whether any of the preceding work was worth doing.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>ledger.jsonl · one line per decision</span><span class="tag pass">evidence</span></figcaption>
+<pre><code>{"ts":"2026-08-18T14:02:11Z","rule":"money-cents","outcome":"<span class="c-block">blocked</span>","path":"billing/money.py",
+ "detail":["billing/money.py:14: `/` yields a float; use `//`"],"run":"a41f"}
+{"ts":"2026-08-18T14:02:19Z","rule":"money-cents","outcome":"<span class="c-pass">passed</span>","path":"billing/money.py","run":"a41f"}
+{"ts":"2026-08-18T16:40:03Z","rule":"money-cents","outcome":"<span class="c-pass">allowed</span>","path":"billing/report.py",
+ "detail":["line 88 carries `# money-gate: allow`"],"run":"b07c"}</code></pre>
+      </figure>
+
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">blocked</span>
+          <span class="what">The gate refused. A rule with a healthy block rate is doing work. A rule that has never blocked anything is a candidate for demotion.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">passed</span>
+          <span class="what">The gate ran and found nothing. Counting these is what turns "it feels like this fires a lot" into a rate you can act on.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">allowed</span>
+          <span class="what">Someone took the <code>money-gate: allow</code> escape. This is the most valuable line in the file: a rising allow rate means the rule no longer matches the code, and the rule is what needs fixing.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Why evidence is the top rung</span>
+        <p>
+          Rungs 1 through 4 add constraint. Rung 5 adds the only thing that lets you ever take
+          constraint away. Without a ledger, every gate you write is permanent by default, because
+          nobody can argue it is not pulling its weight. That is how a harness silently accretes
+          into something nobody wants to touch.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEMOTION ============ -->
+  <section class="rung" id="demotion">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="The other direction">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Down the ladder</span>
+      </div>
+      <div>
+        <h2>The move nobody makes: demotion</h2>
+        <p class="thesis">
+          Every team that adopts gates gets good at adding them. Almost none get good at removing
+          them, and a harness that only accumulates is a harness that eventually gets bypassed
+          wholesale.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Read the ledger quarterly. It takes ten minutes and answers a question the team is otherwise
+        guessing at.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>reading the ledger, and what each pattern means</caption>
+          <thead>
+            <tr><th>Pattern over a quarter</th><th>What it means</th><th>Move</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Blocks steady, allows near zero</td>
+              <td>The rule is live and correctly scoped. It is catching real attempts.</td>
+              <td>Leave it. This is a gate earning its keep.</td>
+            </tr>
+            <tr>
+              <td>Zero blocks, many passes</td>
+              <td>Nothing has tried to violate it in months. The code and the models have both settled.</td>
+              <td><strong>Demote to prose.</strong> Delete the mount, keep the sentence. Re-promote if it comes back.</td>
+            </tr>
+            <tr class="flag">
+              <td>Allows climbing</td>
+              <td>The predicate no longer matches how the code legitimately works. People are routing around it correctly.</td>
+              <td>Fix the predicate, or narrow its scope. Do not tighten the gate.</td>
+            </tr>
+            <tr>
+              <td>Blocks on the same line repeatedly</td>
+              <td>The gate is fighting the tree. Some existing code teaches the pattern the gate refuses.</td>
+              <td>Fix the code. A gate cannot out-argue imitation forever.</td>
+            </tr>
+            <tr>
+              <td>Never fired at all</td>
+              <td>The mount point is wrong, or the path filter never matches. The gate is decorative.</td>
+              <td>Verify with a deliberate violation, then fix the mount or delete it.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        That second row is the one worth internalizing, because it is the one people resist. A gate
+        that has not blocked anything in a quarter is not proof the gate is working. It is equally
+        consistent with the gate being unnecessary, and the only way to tell is to remove it and
+        watch. Demotion is cheap and reversible: the sentence stays in the charter, the predicate
+        stays in the repo, and re-promoting is a three-line change you have already done once.
+      </p>
+
+      <h3 class="sub">Where this page sits</h3>
+      <p>
+        There is deliberate overlap with two other write-ups here. They are not three points on one
+        ladder; they are three different questions about whose code the constraint lives in.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">Guardrails</span>
+          <span class="what"><strong>Constraining a stock coding agent.</strong> <a href="/guardrails/">Five guardrails</a> is what you do when the agent is someone else's: you shape it through the surfaces it exposes, its charter, its rules, its hook contract. You are a configurer.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">This page</span>
+          <span class="what"><strong>Building a coding agent of your own.</strong> No hook contract to conform to, because the loop is yours. The constraint is a branch in your code, and the engineering is choosing which of five mount points it belongs at.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">The factory</span>
+          <span class="what"><strong>Running any coding agent.</strong> <a href="/factory/">A lights-on factory</a> sits above both: it takes a tracker card and returns a merged pull request, and it does not care whether the agent inside is stock or custom. Its gates are at the grain of whole jobs, not single tool calls.</span>
+        </li>
+      </ol>
+
+      <p>
+        The rungs on this page therefore have no equivalent in the other two. A stock agent gives you
+        rung 1 and a hook, and nothing between them. A factory gates the job, not the
+        <code>write_file</code> call inside it. Owning the loop is what puts tool schemas, tool-call
+        interception, graph topology, and the subagent boundary on the table at all.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The one-sentence version</span>
+        <p>
+          Promote a rule only when the rung it is on has demonstrably failed, mount the same
+          predicate rather than writing a new one, keep every rung below it in place, and record
+          enough to argue for taking it back down.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Promotion to the Harness</strong>, one rule, five mount points.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Companion repo ·
+      <a href="https://github.com/tacoda/fulcorum-harness-promotion"><code>github.com/tacoda/fulcorum-harness-promotion</code></a></div>
+    <div>Related · <a href="/guardrails/">Five guardrails</a> ·
+      <a href="/factory/">The factory</a> ·
+      <a href="/comprehension-standard/">The Comprehension Standard</a></div>
+    <div>Colour encodes the loop:
+      <span style="color:var(--gold)">feedforward / prose</span> ·
+      <span style="color:var(--brick)">enforced / refused</span> ·
+      <span style="color:var(--forest)">sanctioned / recorded</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
