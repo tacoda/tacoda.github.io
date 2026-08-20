@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The First Ninety Days · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A ninety-day curriculum for a new junior in the agent era: three phases, a weekly cadence, an exit bar, and under fifteen hours of senior time. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/first-ninety-days/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The First Ninety Days">
+<meta property="og:description" content="Comprehend, catch, author. A ninety-day curriculum for a new junior, and the exit bar it has to clear.">
+<meta property="og:url" content="https://www.tacoda.dev/first-ninety-days/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The First Ninety Days">
+<meta name="twitter:description" content="Comprehend, catch, author. A ninety-day curriculum for a new junior, and the exit bar it has to clear.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>The First Ninety Days</span>
+      <span class="sep">/</span>
+      <span>a curriculum</span>
+    </div>
+    <h1>Ninety days to a junior who can say <em>wait</em>.</h1>
+    <p class="standfirst">
+      The pieces already exist: a standard that says what a merge requires, an exercise that trains
+      the catch, a lab that shows what a plausible wrong answer feels like from the inside. What is
+      missing is the order. Handed all four at once on day one, a new engineer reads them as opinions.
+      Sequenced, they are a ladder. Three phases, one hour of senior time a week, and a bar at the end
+      that you either clear or repeat.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · the lead who just hired a junior, and the junior who wants the ninety days to count<br>
+      what you need · one senior, one hour a week, an agent the junior is already using<br>
+      it assembles · <a href="/comprehension-standard/">the Comprehension Standard</a> ·
+      <a href="/reverse-review/">Reverse-review</a> ·
+      <a href="/junior-to-senior/">the Junior to Senior workshop</a><br>
+      total senior cost · under fifteen hours across ninety days
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Phase one · comprehend</dt>
+          <dd>Days 1 to 30. Nothing merges that they cannot explain out loud. Output is deliberately small.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Phase two · catch</dt>
+          <dd>Days 31 to 60. Weekly reps against code that is fluent, passing, and wrong.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Phase three · author</dt>
+          <dd>Days 61 to 90. They stop changing the code and start changing the system that writes it.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Curriculum sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> Why order matters</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The shape</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Days 1–10</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Days 11–30</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Days 31–45</a></li>
+      <li><a href="#s-5"><span class="n">5</span> Days 46–60</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Days 61–75</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Days 76–90</a></li>
+      <li><a href="#s-8"><span class="n">8</span> The ledger</a></li>
+      <li><a href="#s-9"><span class="n">9</span> The exit bar</a></li>
+      <li><a href="#s-10"><span class="n">10</span> Failure modes</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The premise</span>
+      </div>
+      <div>
+        <h2>Four good parts, no assembly order</h2>
+        <p class="thesis">
+          A curriculum is not a reading list. The difference is that a curriculum says what has to be
+          true before the next thing lands.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Every part of this already works on its own. A team can adopt the Comprehension Standard in an
+        afternoon. Reverse-review runs in thirty minutes a week. The workshop is one hour. Send a new
+        hire all three on their first morning and you will get polite agreement and no behavior change,
+        because none of it is load-bearing yet. They have not been fooled. Nothing in their week
+        depends on any of it.
+      </p>
+      <p>
+        The sequence below exists to make each piece land at the moment it becomes obvious. The
+        workshop is a revelation at day thirty-five and trivia at day one, and the reason is simply
+        that by day thirty-five they have personally shipped something they did not understand and
+        watched a senior find it in ninety seconds. The material has not changed. The reader has.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The organizing rule</span>
+        <p>
+          Teach the rule after the pain, not before it. Every phase boundary below is placed where the
+          junior has just accumulated enough evidence to want the next rule.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The shape">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">All ninety</span>
+      </div>
+      <div>
+        <h2>Comprehend, catch, author</h2>
+        <p class="thesis">
+          Three phases of thirty days. Each one ends when a specific thing is demonstrable, not when
+          the calendar says so.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the ninety days at a glance</span><span class="tag pass">the whole shape</span></figcaption>
+<pre><code><span class="c-dim">DAYS 1–30</span>   <span class="c-block">COMPREHEND</span>
+              small changes, spoken claims, agent allowed
+              <span class="c-dim">ends when: four claims land without notes, twice running</span>
+
+<span class="c-dim">DAYS 31–60</span>  <span class="c-warn">CATCH</span>
+              seeded diffs → live diffs, weekly, classified not guessed
+              <span class="c-dim">ends when: three live catches, one held under pushback</span>
+
+<span class="c-dim">DAYS 61–90</span>  <span class="c-pass">AUTHOR</span>
+              one charter rule merged, one change owned end to end
+              <span class="c-dim">ends when: the exit bar in §9 clears, or the phase repeats</span></code></pre>
+      </figure>
+
+      <p>
+        The phases are ordered by what they cost the junior to fake. Comprehension can be faked for
+        about a week. Catching can be faked for roughly one diff, because the classification asks
+        <em>which kind</em> of wrong it is and a guess does not survive that question. Authoring
+        cannot be faked at all: either a rule they wrote is running in the team's harness or it is not.
+      </p>
+      <p>
+        Nothing here removes the agent. The junior uses it from day one, all day, the same as everyone
+        else. What the ninety days build is the part of the job the agent does not do, which is
+        deciding whether what it produced should exist.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Days one to ten">
+          <i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Days 1–10</span>
+      </div>
+      <div>
+        <h2>The floor: nothing merges that you cannot explain</h2>
+        <p class="thesis">
+          One law, adopted before anything else, because every later phase is a way of raising this
+          same bar.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>rule</b> four claims, spoken</span>
+          <span class="chip kind-gate"><b>gate</b> L1 of the standard</span>
+          <span class="chip kind-config"><b>cost</b> 10 min per change</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Day one, the junior reads <a href="/comprehension-standard/">the Comprehension Standard</a>
+        and the team commits to it out loud. Not as an aspiration: as the merge bar for this person,
+        starting now. Their changes for these two weeks are deliberately small, because the point is
+        not throughput. The point is that a change and an explanation arrive together, every time,
+        until the pairing stops feeling like an extra step.
+      </p>
+
+      <h3 class="sub">The daily loop</h3>
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Morning</span>
+          <span class="what">Junior picks up a scoped change. Small: one behavior, one file where possible. They drive the agent however they like.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Before review</span>
+          <span class="what">They write nothing. They walk to the senior, or open a call, and <strong>say</strong> the four claims aloud: what changed, why it is correct, what it could break, and how they would know if it broke.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">On a stumble</span>
+          <span class="what">The senior stops at the first claim that wobbles and sends them back. No hints. The wobble is the lesson, and it costs about ninety seconds.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">On four clean claims</span>
+          <span class="what">Merge. Total senior time: under ten minutes, and it replaces a line-by-line read they were doing anyway.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Why spoken, not written</span>
+        <p>
+          A written explanation can be generated by the same agent that wrote the change, and it will
+          be a good one. Speech is not pasteable. For the first two weeks the claims are verbal
+          specifically to close that door, and the door can be reopened at day fifteen once the habit
+          is real.
+        </p>
+      </div>
+
+      <p>
+        Expect the first three days to be uncomfortable and the change volume to look bad. It is
+        supposed to. A junior who ships six understood changes in week one is ahead of one who ships
+        twenty that a senior will be maintaining alone in March.
+      </p>
+
+      <h3 class="sub">Phase gate</h3>
+      <p>
+        Move on when the four claims land clean on two consecutive changes without prompting. For most
+        people that is somewhere between day eight and day fourteen. If it is day twenty, that is
+        information worth having early, and it is much cheaper to learn now than at the end of a
+        probation period.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Days eleven to thirty">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Days 11–30</span>
+      </div>
+      <div>
+        <h2>First reps, against a known answer</h2>
+        <p class="thesis">
+          Reverse-review starts here, on seeded diffs with an answer key, because a rep you cannot
+          score is not a rep.
+        </p>
+        <div class="chips">
+          <span class="chip kind-skill"><b>exercise</b> reverse-review</span>
+          <span class="chip kind-config"><b>cadence</b> 30 min, weekly</span>
+          <span class="chip kind-gate"><b>graded on</b> classification</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        From week three, one fixed slot a week: the junior gets an agent-written diff that contains a
+        planted defect, thirty minutes, one review card. They fill the card, then defend it. The
+        senior grades the review, not the code. The mechanics are in
+        <a href="/reverse-review/">the exercise itself</a>; what matters at this stage is which diffs
+        you use.
+      </p>
+      <p>
+        Use seeded diffs with answer keys for the whole of this phase. Live diffs feel more real and
+        are much worse for training, because when a junior misses something in a live diff nobody can
+        say with certainty what was there to be missed. With a seeded diff the miss is unambiguous, and
+        so is the near-miss, which is the more useful signal: they saw the right line and named the
+        wrong class.
+      </p>
+
+      <h3 class="sub">What gets scored</h3>
+      <div class="tablewrap">
+        <table>
+          <caption>a rep is worth more the further right it lands</caption>
+          <thead>
+            <tr><th>Outcome</th><th>What it shows</th><th>Transfers?</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Missed it</td><td>Nothing yet. Normal in weeks three and four.</td><td>—</td></tr>
+            <tr><td>"Something feels off here"</td><td>Attention landed correctly. Vocabulary has not.</td><td>Weakly</td></tr>
+            <tr><td>Named the defect</td><td>They can see it in this diff.</td><td>Partly</td></tr>
+            <tr class="total"><td>Named the class</td><td>They will see it in the next diff, which is the entire point.</td><td>Yes</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Keep a running list of every class they have caught. It has two uses later: it is the raw
+        material for the charter rule in phase three, and it is the evidence base for the promotion
+        conversation that a junior in the agent era otherwise struggles to build.
+      </p>
+
+      <h3 class="sub">Phase gate</h3>
+      <p>
+        Four reps completed, at least two with a correct classification. Their claims from days 1 to 10
+        continue throughout; they can now be written rather than spoken.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Days thirty-one to forty-five">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Days 31–45</span>
+      </div>
+      <div>
+        <h2>The lab, now that it will land</h2>
+        <p class="thesis">
+          One hour, green tests, and a quietly overcharged customer. Run it in week five or six, never
+          in week one.
+        </p>
+        <div class="chips">
+          <span class="chip kind-skill"><b>workshop</b> junior to senior</span>
+          <span class="chip kind-config"><b>duration</b> 1 hour</span>
+          <span class="chip kind-rule"><b>output</b> two loops</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <a href="/junior-to-senior/">The workshop</a> puts the junior in front of a change where every
+        test passes and the behavior is wrong in a way that costs money. Read cold on day one, it is a
+        clever puzzle. Read at day thirty-five, after four weeks of defending claims and four reps of
+        finding planted defects, it is the moment the whole thing clicks, because they recognize the
+        shape from their own week.
+      </p>
+      <p>
+        The workshop's second half is where the ninety days turn. It moves from "how do I catch this"
+        to "what would have caught this without me", which is the first time the junior is asked to
+        think about the system rather than the diff. That question is what phase three is built on, so
+        do not skip the second half for time.
+      </p>
+
+      <h3 class="sub">The rest of the fortnight</h3>
+      <ul>
+        <li>Weekly reverse-review continues, still seeded, one notch harder.</li>
+        <li>Change size comes off the leash. They are trusted with multi-file work now.</li>
+        <li>They start keeping the defect list themselves rather than the senior keeping it for them.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Placement, not content</span>
+        <p>
+          Nothing about the workshop changes between day one and day thirty-five. The only variable
+          you control is whether the person in the chair has already been fooled twice. Spend that
+          variable well.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Days forty-six to sixty">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Days 46–60</span>
+      </div>
+      <div>
+        <h2>Live diffs, and holding a position</h2>
+        <p class="thesis">
+          Two changes at once: the answer key goes away, and the senior starts arguing the wrong side
+          on purpose.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>switch</b> seeded → live</span>
+          <span class="chip kind-hook"><b>drill</b> deliberate pushback</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Reverse-review now runs on real diffs off the team's queue. The miss rate goes up and the
+        confidence goes down, both correctly. Live diffs mostly contain nothing wrong, which is itself
+        the lesson: a clean review that says "I looked at these four things and they are fine, here is
+        why" is a real deliverable, and a junior who cannot produce one will start inventing findings
+        to look useful.
+      </p>
+
+      <h3 class="sub">The pushback drill</h3>
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">Setup</span>
+          <span class="what">Roughly one review in three, the senior pushes back on a <em>correct</em> finding. Calmly, with a plausible reason. No tell.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Fold</span>
+          <span class="what">If the junior withdraws a correct finding under mild social pressure, that is the finding of the session, and it is more important than the defect was.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Hold</span>
+          <span class="what">If they hold, they must hold with evidence: a test that goes red, a trace, a line of the spec. "I still think so" is not holding, it is stubbornness with better timing.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">Reveal</span>
+          <span class="what">Always tell them afterwards that the pushback was deliberate. The drill only works if trust survives it, and it only survives if you say so every time.</span>
+        </li>
+      </ol>
+
+      <p>
+        This drill exists because the failure mode it targets is the expensive one. A junior who cannot
+        find defects is a junior. A junior who finds them and then abandons them when a confident
+        person disagrees will still be doing that at eight years in, and by then nobody is checking.
+      </p>
+
+      <h3 class="sub">Phase gate</h3>
+      <p>
+        Three catches in live diffs, and at least one correct position held under deliberate pushback,
+        with evidence.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Days sixty-one to seventy-five">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Days 61–75</span>
+      </div>
+      <div>
+        <h2>Author one rule</h2>
+        <p class="thesis">
+          The first time they change the thing that writes the code instead of the code. One merged
+          rule, with the incident that caused it attached.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>deliverable</b> one charter rule</span>
+          <span class="chip kind-gate"><b>bar</b> it must have fired</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Pull out the defect list from the last two months and find a class that shows up more than
+        once. Recurrence is the whole selection criterion: a defect that happened once is a story, a
+        defect that happened three times is a missing rule. The junior then writes it as a constraint
+        the team's harness actually applies, at whichever altitude fits.
+      </p>
+
+      <h3 class="sub">Pick the cheapest altitude that holds</h3>
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Charter line</span>
+          <span class="what">A sentence in <code>CLAUDE.md</code> or the equivalent. Cheapest, weakest, and correct when the class is a judgment call.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Check</span>
+          <span class="what">A test, a lint rule, a schema constraint. Correct when the class is mechanically detectable.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Gate</span>
+          <span class="what">A hook or a CI job that refuses. Correct when the class already reached production once and everyone remembers it.</span>
+        </li>
+      </ol>
+
+      <p>
+        The deliverable is a merged pull request against the team's own configuration, and the body of
+        that PR names the incident. Not "we should validate inputs here" but "on the fourteenth this
+        class silently double-charged a test account for six hours; this is the constraint that would
+        have refused it". That sentence is what makes the rule survive the next person who finds it
+        annoying.
+      </p>
+
+      <div class="callout">
+        <span class="label">Do not skip this</span>
+        <p>
+          A junior who never authors a rule stays a person who changes code, and there are now a great
+          many very fast tools that also change code. Authoring the constraint is the first piece of
+          work in the ninety days that an agent could not have done, because it requires knowing what
+          went wrong here, to us, and why the last three fixes did not hold.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Days seventy-six to ninety">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Days 76–90</span>
+      </div>
+      <div>
+        <h2>Own one change, end to end</h2>
+        <p class="thesis">
+          Ticket to production, agent-driven, with the junior acting as their own first reviewer.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>mode</b> full autonomy</span>
+          <span class="chip kind-make"><b>output</b> shipped change plus trail</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The last fortnight is one real piece of work, chosen to be genuinely useful and genuinely
+        reversible. They scope it, drive the agent, and ship it. The senior reviews once, at the end,
+        as they would for anyone.
+      </p>
+
+      <h3 class="sub">Two conditions</h3>
+      <ul>
+        <li>
+          <strong>They reverse-review themselves first.</strong> Before requesting review they fill out
+          the same card they have been filling out for ten weeks, against their own diff, and they
+          attach it. This is the transfer moment: the exercise stops being a weekly ritual and becomes
+          how they read a change.
+        </li>
+        <li>
+          <strong>The trail survives them.</strong> Anyone should be able to reconstruct why the change
+          looks the way it does from the PR alone: what was tried, what was rejected, what the agent
+          suggested that they turned down and why. That last item matters most. A record of rejections
+          is the clearest evidence that judgment was applied.
+        </li>
+      </ul>
+
+      <p>
+        If it ships, it ships. If it does not, that is still a complete result at day ninety, and it is
+        a far better one than a change that shipped and nobody can explain.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="The senior's cost">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The cost</span>
+      </div>
+      <div>
+        <h2>What it costs the senior</h2>
+        <p class="thesis">
+          The objection to any mentoring program is that seniors do not have the time. So here is the
+          bill, in hours.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>senior hours, ninety days, one junior</caption>
+          <thead>
+            <tr><th>Phase</th><th>Activity</th><th class="num">Hrs/week</th><th class="num">Total</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Days 1–10</td><td>Spoken claims, ~10 min per change</td><td class="num">1.0</td><td class="num">1.5</td></tr>
+            <tr><td>Days 11–30</td><td>Reverse-review, 15 min · claims, written</td><td class="num">1.0</td><td class="num">3.0</td></tr>
+            <tr><td>Days 31–45</td><td>Workshop (one hour, once) · weekly rep</td><td class="num">1.0</td><td class="num">2.5</td></tr>
+            <tr><td>Days 46–60</td><td>Live reps plus the pushback drill</td><td class="num">1.0</td><td class="num">2.0</td></tr>
+            <tr><td>Days 61–75</td><td>Rule selection and PR review</td><td class="num">0.75</td><td class="num">1.5</td></tr>
+            <tr><td>Days 76–90</td><td>One ordinary review at the end</td><td class="num">0.5</td><td class="num">1.0</td></tr>
+            <tr class="total"><td>Ninety days</td><td>All of it</td><td class="num">~1.0</td><td class="num">11.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Roughly one hour a week, and most of it is not additional. The claims replace a code read the
+        senior was doing anyway; the final review is the review they would have done regardless. The
+        genuinely new spend is about four hours across three months, which is the reverse-review slot
+        and the workshop.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The comparison that matters</span>
+        <p>
+          Four hours of new senior time against the alternative, which is a year of reviewing changes
+          that nobody on the team can explain, then absorbing that maintenance yourself. The cheap
+          option is the one with the schedule attached.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="The exit bar">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The bar</span>
+      </div>
+      <div>
+        <h2>Day ninety: five things, all demonstrable</h2>
+        <p class="thesis">
+          Not a feeling about someone's trajectory. Five artifacts that either exist or do not.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Explains</span>
+          <span class="what">States the four claims on <em>somebody else's</em> change, out loud, agent closed. Their own work is a lower bar and does not count here.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Catches</span>
+          <span class="what">Eight or more defects caught and classified across the ninety days, at least three of them in live diffs.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Holds</span>
+          <span class="what">At least one correct position defended with evidence against a senior arguing the other way.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Authors</span>
+          <span class="what">One rule merged into the team's harness, with the incident named in the pull request.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Ships</span>
+          <span class="what">One change owned end to end, self-reviewed first, with a trail that includes what they turned down.</span>
+        </li>
+      </ol>
+
+      <p>
+        Clearing all five puts them at roughly L3 of the Comprehension Standard: trusted to merge
+        agent-written work without a second reader on ordinary changes. That is the honest ceiling for
+        ninety days, and it is a real one.
+      </p>
+
+      <div class="callout">
+        <span class="label">If they miss one</span>
+        <p>
+          Repeat the phase that produced the gap. Do not extend the timeline uniformly and do not wave
+          it through on the grounds that the other four look strong. The missing item is exactly the
+          thing that will be missing in eighteen months, when the stakes are higher and nobody is
+          watching for it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 ============ -->
+  <section class="rung" id="s-10">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">10</span>
+        <div class="meter" role="img" aria-label="Failure modes">
+          <i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Where it breaks</span>
+      </div>
+      <div>
+        <h2>Five ways this goes wrong</h2>
+        <p class="thesis">
+          All five are things a well-meaning team does on purpose.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Front-load it</span>
+          <span class="what">Handing over all the material in week one. It reads as philosophy, gets agreed with, and changes nothing. The pain has to come first.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Score the catch</span>
+          <span class="what">Grading whether they found the bug rather than whether they named the class. Rewards luck, and luck does not compound.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Skip the seeds</span>
+          <span class="what">Starting reverse-review on live diffs because it feels more real. Without an answer key nobody can tell a miss from a clean diff, so nothing is calibrated.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Drop the rule</span>
+          <span class="what">Cutting phase three for delivery pressure. It is the only phase that produces something an agent could not have produced, and it is the first one cut every time.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Stretch instead of repeat</span>
+          <span class="what">Turning ninety days into a hundred and fifty to avoid a hard conversation. Repeating one phase is honest and fast. Extending everything is neither.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Where to start</span>
+        <p>
+          If you only take one thing: adopt the day one to ten loop and nothing else. Four spoken
+          claims before every merge, for two weeks. It costs ten minutes a change and it is where most
+          of the ninety days' value actually comes from.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The First Ninety Days</strong>, a curriculum for early-career engineers.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>It assembles · <a href="/comprehension-standard/">The Comprehension Standard</a> ·
+      <a href="/reverse-review/">Reverse-review</a> ·
+      <a href="/junior-to-senior/">Junior to senior in the age of AI</a></div>
+    <div>Related · <a href="/senior-2031/">Who's going to be senior in 2031?</a></div>
+    <div>Colour encodes phase:
+      <span style="color:var(--brick)">comprehend</span> ·
+      <span style="color:var(--gold)">catch</span> ·
+      <span style="color:var(--forest)">author</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
