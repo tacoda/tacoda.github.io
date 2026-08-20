@@ -1,0 +1,1243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Migration Harness · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Ten thousand call sites, one semantic change. The census, the codemod that does the mechanical majority, the agent fan-out for the residue, and the differential oracle that proves it. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/migration-harness/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Migration Harness">
+<meta property="og:description" content="Ten thousand files. Nine thousand of them are a codemod. The other thirteen hundred are the actual work.">
+<meta property="og:url" content="https://www.tacoda.dev/migration-harness/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Migration Harness">
+<meta name="twitter:description" content="Ten thousand files. Nine thousand of them are a codemod. The other thirteen hundred are the actual work.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>The Migration Harness</span>
+      <span class="sep">/</span>
+      <span>worked example</span>
+    </div>
+    <h1>Ten thousand files. <em>Nine thousand are a codemod.</em></h1>
+    <p class="standfirst">
+      Large mechanical migrations are the best thing agents do, and the way most teams attempt them
+      throws that advantage away. Pointing an agent at ten thousand call sites is slow, expensive,
+      non-deterministic and unreviewable, and it spends the judgment-capable tool on work a syntax tree
+      handles perfectly. The design that works splits by determinism: a codemod takes the mechanical
+      majority in one reviewable diff, and the agent gets only the residue that needed a decision.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · anyone facing a five-figure number of call sites and a deadline<br>
+      the migration below · float dollars to integer cents. The follow-on work from the rule in <a href="/anatomy-of-a-charter/">the charter</a><br>
+      pairs with · <a href="/factory/">The Factory</a> (the queue) · <a href="/guardrails/">Five Guardrails</a> (the gates) · <a href="/audit-trail/">The Audit Trail</a><br>
+      the honest limit · §8, including the case where you should not do this at all
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Mechanical</dt>
+          <dd>A deterministic transform with one correct output. Codemod. One diff, reviewed in bulk by shape.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Residue</dt>
+          <dd>Needs a decision the syntax tree cannot make. One agent unit each, reviewed individually.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Policy</dt>
+          <dd>A question for a human before any code runs. Not a coding task at all, and the thing that sinks migrations.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Build sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> The trap</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The census</a></li>
+      <li><a href="#s-2"><span class="n">2</span> The codemod</a></li>
+      <li><a href="#s-3"><span class="n">3</span> The unit</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Fan-out</a></li>
+      <li><a href="#s-5"><span class="n">5</span> The oracle</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Landing it</a></li>
+      <li><a href="#s-7"><span class="n">7</span> The ledger</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Don't</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The trap">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The trap</span>
+      </div>
+      <div>
+        <h2>The obvious approach is the expensive one</h2>
+        <p class="thesis">
+          "Fan an agent out over the whole codebase" sounds like the thing agents are for. It is the
+          one design that gets you the worst properties of both tools.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Run an agent over ten thousand files and every single one becomes non-deterministic. Two runs
+        produce different diffs. A file that was correct on Tuesday gets rewritten differently on
+        Thursday. Nothing is reviewable in bulk, because no two changes are textually identical even
+        where the transformation was identical. And you have paid a per-file inference cost for nine
+        thousand transformations that a syntax tree would have done perfectly, for free, in eleven
+        seconds.
+      </p>
+      <p>
+        The opposite failure is just as common. A team writes a codemod, it handles eighty percent, and
+        the remaining two thousand sites become a spreadsheet that three engineers grind through for a
+        quarter. That is the work agents are genuinely good at, and it is being done by hand because
+        the codemod was framed as the whole solution rather than the first stage.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>three designs, one of them works</span><span class="tag warn">split by determinism</span></figcaption>
+<pre><code><span class="c-block">ALL AGENT</span>      10,412 units · non-deterministic · unreviewable in bulk
+                <span class="c-dim">pays inference for 9,100 transforms an AST does for free</span>
+
+<span class="c-block">ALL CODEMOD</span>    9,100 done in one diff · 1,312 left in a spreadsheet
+                <span class="c-dim">a quarter of three engineers grinding the tail by hand</span>
+
+<span class="c-pass">SPLIT</span>          codemod: 9,100 in one reviewable diff, deterministic
+                agent:   1,312 units, one decision each, individually reviewed
+                <span class="c-dim">the expensive tool only touches the expensive problem</span></code></pre>
+      </figure>
+
+      <div class="takeaway">
+        <span class="label">The organising principle</span>
+        <p>
+          Split the work by whether it has one correct answer, not by directory, team, or file count. A
+          transformation with one correct output belongs in a codemod forever, however many of them
+          there are. A transformation that requires choosing belongs to an agent, however few.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Step one">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Census</span>
+      </div>
+      <div>
+        <h2>Count the shapes before writing anything</h2>
+        <p class="thesis">
+          You do not have one migration. You have four, and two of them are not migrations at all.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Before any transform, write a script that classifies every call site into a shape. Not a
+        sample: all of them. This costs an afternoon and it is the difference between a plan and a
+        hope.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>census · float dollars to integer cents · 10,412 sites</caption>
+          <thead>
+            <tr><th>Shape</th><th>Example</th><th class="num">Sites</th><th>Class</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A · arithmetic</td>
+              <td><code>total * qty</code>, <code>a + b</code> on money fields</td>
+              <td class="num">6,800</td>
+              <td>mechanical</td>
+            </tr>
+            <tr>
+              <td>B · display</td>
+              <td><code>f"${total:.2f}"</code>, division by 100 for output</td>
+              <td class="num">2,300</td>
+              <td>mechanical</td>
+            </tr>
+            <tr class="flag">
+              <td>C · boundary rounding</td>
+              <td>invoice totals, carrier settlement, tax lines</td>
+              <td class="num">890</td>
+              <td>residue</td>
+            </tr>
+            <tr class="flag">
+              <td>D · tolerance comparison</td>
+              <td><code>abs(a - b) &lt; 0.01</code></td>
+              <td class="num">422</td>
+              <td>residue</td>
+            </tr>
+            <tr class="total">
+              <td colspan="2">mechanical 9,100 (87%) · residue 1,312 (13%)</td>
+              <td class="num">10,412</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">What the census actually tells you</h3>
+      <ul>
+        <li><strong>Shape D is not a migration.</strong> Every one of those tolerance comparisons exists because somebody was papering over float error. In integer cents the tolerance is meaningless, and each site is a question: was this hiding a real discrepancy? Some of them were. That is a bug hunt wearing a migration's clothes.</li>
+        <li><strong>Shape C is a policy question first.</strong> Where exactly does rounding happen, and in whose favour? Until a human answers that, no tool of any kind can do the work correctly. This is the brick-coloured category and it is what actually sinks migrations.</li>
+        <li><strong>The ratio is the plan.</strong> 87/13 says write the codemod. If the census had come back 40/60 the whole approach would be wrong, and you would want to know that before building anything.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">Resolve the policy before the code</span>
+        <p>
+          The 890 boundary sites cannot start until someone with authority writes down the rounding
+          rule. Attempting them first produces 890 individually plausible decisions that are mutually
+          inconsistent, which is worse than the float problem you started with and much harder to
+          detect.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step two">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">9,100</span>
+      </div>
+      <div>
+        <h2>The codemod, and its refusal list</h2>
+        <p class="thesis">
+          The most important thing the codemod does is decline to touch anything it is not certain
+          about, and write down what it declined.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the transform, with an explicit bail-out</span><span class="tag pass">deterministic</span></figcaption>
+<pre><code>def transform(node, ctx):
+    if not is_money_expr(node):
+        return None                      <span class="c-dim"># not ours</span>
+
+    if has_tolerance_compare(node) or crosses_boundary(node, ctx):
+        <span class="c-warn">ctx.refuse(node, reason="shape-C" if ... else "shape-D")</span>
+        return None                      <span class="c-block"># hand to the agent, do not guess</span>
+
+    return to_cents(node)                <span class="c-pass"># one correct output</span></code></pre>
+      </figure>
+
+      <p>
+        A codemod that tries hard produces the worst outcome available: a diff where most changes are
+        provably correct and a few are silently wrong, mixed together, at a scale nobody can review. A
+        codemod that refuses cleanly produces two artifacts, one of which you can review in bulk and
+        one of which is a worklist.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>refusals.jsonl · the agent's input queue</span><span class="tag warn">the handoff</span></figcaption>
+<pre><code>{"path":"billing/invoice.py","line":211,"reason":"shape-C",
+ "expr":"round(subtotal * tax_rate, 2)","sha":"6c1a2e0"}
+{"path":"billing/recon.py","line":88,"reason":"shape-D",
+ "expr":"abs(paid - owed) &lt; 0.01","sha":"91be004"}</code></pre>
+      </figure>
+
+      <div class="takeaway">
+        <span class="label">Review the mechanical diff by shape, not by file</span>
+        <p>
+          Nine thousand changes are reviewable if they are textually uniform: read twenty of shape A,
+          confirm they are identical in form, and the argument covers all 6,800. That property is
+          exactly what an agent-produced diff destroys, and it is the single biggest reason to keep
+          this stage deterministic.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step three">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The unit</span>
+      </div>
+      <div>
+        <h2>One file, one commit, one decision</h2>
+        <p class="thesis">
+          The unit of agent work is the smallest thing that can be independently correct, reviewed,
+          and reverted.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Scope</span>
+          <span class="what">One file. Not one module, not one "area". A unit that touches four files cannot be reverted without considering the other three.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Input</span>
+          <span class="what">The refusal record, the file, the policy decision from §1, and nothing else. No repository-wide context: it is not needed and it is where scope creep enters.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Output</span>
+          <span class="what">One commit, plus a one-line justification naming which policy branch it applied. That line is what makes 1,312 reviews survivable.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Escape hatch</span>
+          <span class="what">The unit may return <code>UNCLEAR</code> with a question. Roughly one in twenty will, and those are the genuinely interesting ones. An agent forced to always produce a change will produce a plausible wrong one.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">The escape hatch is not optional</span>
+        <p>
+          Without it, every ambiguous site gets a confident answer, and confident answers to ambiguous
+          questions are indistinguishable from correct ones in a diff. With it, you get a shortlist of
+          sixty sites that need a human and eleven hundred that do not, which is the whole value
+          proposition of the exercise.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step four">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Fan-out</span>
+      </div>
+      <div>
+        <h2>A queue, and one writer per file</h2>
+        <p class="thesis">
+          This is <a href="/factory/">the factory</a> pointed at a finite backlog. The only new problem
+          is that the backlog is finite, which makes idempotence cheap and restarts routine.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the worker loop</span><span class="tag pass">restartable by construction</span></figcaption>
+<pre><code>def work(item):
+    <span class="c-dim"># idempotence key: path + the sha it was queued against</span>
+    key = f"{item.path}@{item.sha}"
+    if done.has(key):
+        return SKIP                       <span class="c-pass"># re-runs are free</span>
+
+    if head_sha(item.path) != item.sha:
+        return REQUEUE                    <span class="c-warn"># file moved under us</span>
+
+    result = agent_unit(item)
+    if result.status == "UNCLEAR":
+        dlq.put(item, result.question)    <span class="c-block"># human worklist</span>
+        return
+
+    commit(result.diff, msg=f"cents: {item.path} ({result.branch})")
+    done.put(key)</code></pre>
+      </figure>
+
+      <h3 class="sub">Four properties that make this survivable</h3>
+      <ul>
+        <li><strong>One writer per file.</strong> Partition the queue by path. Two workers on one file is the only true race here, and partitioning removes it without locks.</li>
+        <li><strong>Idempotence on path plus sha.</strong> A rerun is a no-op, so you can kill the whole fleet at any moment and start it again. Migrations run for days; this will happen.</li>
+        <li><strong>Requeue on drift.</strong> The repository keeps moving while you work. A file whose sha changed goes back in the queue rather than getting a diff computed against a stale reading.</li>
+        <li><strong>The dead-letter queue is the deliverable.</strong> Not a failure log. It is the ranked list of sites that genuinely need a person, which is the output you actually wanted from the whole exercise.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Bounded concurrency, and not for cost reasons</span>
+        <p>
+          Twenty workers, not two hundred. The limit that binds first is human review throughput: there
+          is no value in generating fourteen hundred commits on Monday if the team can review sixty a
+          day. Match the fleet to the reviewers and the queue drains at exactly the same date, with
+          less rework.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Step five">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The oracle</span>
+      </div>
+      <div>
+        <h2>The old implementation is still there. Use it.</h2>
+        <p class="thesis">
+          A migration is the one situation in software where you have a perfect reference implementation
+          of the correct behaviour, and almost nobody exploits it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Unit tests check the cases somebody thought of. A differential test checks the cases that
+        actually happen, which for a billing system means a year of real transactions. Replay them
+        through both implementations and compare.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>differential replay · the strongest check available here</span><span class="tag pass">the real gate</span></figcaption>
+<pre><code>for txn in replay(last_365_days):          <span class="c-dim"># 4.1M recorded inputs</span>
+    old = legacy.total(txn)                <span class="c-dim"># float dollars</span>
+    new = cents.total(txn) / 100           <span class="c-dim"># integer cents, for compare</span>
+
+    if abs(old - new) &gt; 0.005:
+        report(txn, old, new)              <span class="c-block"># a real behaviour change</span>
+
+<span class="c-dim"># Expected output is not "zero differences". It is a small set of</span>
+<span class="c-dim"># differences you can explain one by one, because the point of the</span>
+<span class="c-dim"># migration was that the old behaviour was wrong.</span></code></pre>
+      </figure>
+
+      <div class="callout">
+        <span class="label">Zero differences means you have not migrated anything</span>
+        <p>
+          If the new implementation agrees with the old one everywhere, either the migration is
+          cosmetic or the replay is not exercising the paths that matter. The valuable output is a
+          list of two hundred transactions where the answers differ, each of which you either explain
+          ("old code lost a cent on this rounding, that was the bug") or investigate.
+        </p>
+      </div>
+
+      <p>
+        Where no recorded inputs exist, generate them: property-based testing over the input domain,
+        comparing old and new. Weaker than real traffic and vastly stronger than the unit tests you
+        already have, because both implementations are available to disagree with each other.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Step six">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Landing</span>
+      </div>
+      <div>
+        <h2>Never one pull request</h2>
+        <p class="thesis">
+          A ten thousand file change cannot be reverted usefully, which means it cannot be merged
+          safely, however green it is.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">First</span>
+          <span class="what">Add the new representation alongside the old. A <code>total_cents</code> field written in parallel with <code>total</code>, both maintained. Nothing reads the new one yet.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Then</span>
+          <span class="what">Migrate leaves before callers. Modules nobody imports go first, so each merge has the smallest possible blast radius and the dependency order does the sequencing for you.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Per merge</span>
+          <span class="what">One shape, one module, differential replay attached to the pull request. Reviewers read twenty representative changes plus every residue commit individually.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Last</span>
+          <span class="what">Delete the old field. This is the only irreversible step and it happens weeks after the code is done, once the parallel writes have agreed in production for long enough to believe them.</span>
+        </li>
+      </ol>
+
+      <p>
+        Running both representations in parallel feels wasteful and is the cheapest insurance
+        available. It gives you a production differential test: every write compares the two answers,
+        and a mismatch alerts. That catches the paths your replay corpus missed, which are precisely
+        the paths nobody thought about.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The migration is done when the old field is deleted</span>
+        <p>
+          Not when the new one works. Teams routinely reach ninety-five percent, declare victory, and
+          leave both representations in place forever, which is strictly worse than either one alone.
+          Put the deletion on the calendar at the start, with a name against it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Step seven">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The ledger</span>
+      </div>
+      <div>
+        <h2>What the split actually bought</h2>
+        <p class="thesis">
+          The interesting number is not the time saved. It is where the human attention went.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>where the effort landed, 10,412 sites</caption>
+          <thead>
+            <tr><th>Stage</th><th class="num">Sites</th><th>Machine</th><th>Human</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Census</td><td class="num">10,412</td><td>1 script, minutes</td><td>half a day reading the output</td></tr>
+            <tr><td>Policy decision</td><td class="num">890</td><td>none</td><td>one meeting, one written rule</td></tr>
+            <tr><td>Codemod</td><td class="num">9,100</td><td>seconds per run</td><td>2 days to write, 1 day to review by shape</td></tr>
+            <tr><td>Agent residue</td><td class="num">1,252</td><td>1,252 units</td><td>~5 days of individual review</td></tr>
+            <tr class="flag"><td>Escalated UNCLEAR</td><td class="num">60</td><td>none</td><td>2 days, and worth every hour</td></tr>
+            <tr class="total"><td>Total</td><td class="num">10,412</td><td>—</td><td>~11 working days</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Two thirds of the human time went to the thirteen percent that needed judgment, and the sixty
+        escalations got two full days. That distribution is the entire point. The comparison is not
+        against doing it by hand, it is against the all-agent version, which would have cost eight
+        times the inference to produce a diff nobody could review in bulk and would have answered those
+        sixty questions confidently rather than asking them.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Don't">
+          <i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Don't</span>
+      </div>
+      <div>
+        <h2>Four migrations that do not want a harness</h2>
+        <p class="thesis">
+          The reflex to reach for agents on anything large is the mirror of the reflex to reach for a
+          gate when a sentence would do.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Purely mechanical</span>
+          <span class="what">If the census comes back 100% mechanical, you need a codemod and a reviewer, and nothing else. Building a fan-out for it is elaborate procrastination.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">A rename</span>
+          <span class="what">Your language server does this correctly, instantly, for free, with full type awareness. There is no version of this where an agent is the right answer.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">No oracle</span>
+          <span class="what">No recorded inputs, no old implementation to compare against, no property you can state. Then nothing verifies the result at scale and you are shipping ten thousand unreviewed changes with extra steps. Build the oracle first or do not start.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Unresolved policy</span>
+          <span class="what">The 890-site question from §1, unanswered. No amount of tooling substitutes for somebody deciding where rounding happens, and starting anyway produces inconsistency that is far harder to find than the original problem.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Where to start</span>
+        <p>
+          Write the census script and nothing else. One afternoon, no commitment, and it answers the
+          only question that determines the shape of the entire project: what fraction of this has one
+          correct answer? Everything on this page follows from that number, and teams that skip it
+          are choosing an architecture before they have the fact that decides it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The Migration Harness</strong>, a worked example.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/factory/">The Factory</a> (the queue and the one-writer rule) ·
+      <a href="/guardrails/">Five Guardrails</a> ·
+      <a href="/audit-trail/">The Audit Trail</a></div>
+    <div>The rule this migration serves · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> ·
+      <a href="/eval-loop/">The Eval Loop</a></div>
+    <div>Colour encodes class:
+      <span style="color:var(--forest)">mechanical</span> ·
+      <span style="color:var(--gold)">residue</span> ·
+      <span style="color:var(--brick)">policy</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
