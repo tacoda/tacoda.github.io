@@ -1,0 +1,1263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hiring Juniors in the Age of AI · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="The coding exercise stopped measuring anything. An interview loop built on comprehension instead: hand them agent output and ask whether it should merge. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/hiring-juniors/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Hiring Juniors in the Age of AI">
+<meta property="og:description" content="Stop asking if they can build it. Hand them agent output and ask whether it should merge.">
+<meta property="og:url" content="https://www.tacoda.dev/hiring-juniors/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hiring Juniors in the Age of AI">
+<meta name="twitter:description" content="Stop asking if they can build it. Hand them agent output and ask whether it should merge.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Hiring Juniors</span>
+      <span class="sep">/</span>
+      <span>the interview kit</span>
+    </div>
+    <h1>Stop asking whether they can <em>build it</em>.</h1>
+    <p class="standfirst">
+      The junior loop rested on one signal: give them a small problem, see if working code comes back.
+      That signal is gone. Allow the agent and everyone passes; ban it and you are deliberately
+      measuring the one condition that will never occur again in their career. Most teams picked the
+      ban and are now screening hard for a skill they do not want. The replacement is not a harder
+      puzzle. It is handing them code the agent wrote and asking whether it should merge.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · the lead designing a junior loop, and the hiring manager who has to defend it<br>
+      assumes · you have already decided to hire juniors. That argument is <a href="/senior-2031/">a separate talk</a><br>
+      reuses · the defect taxonomy and rubric from <a href="/reverse-review/">reverse-review</a>, as the interview instrument<br>
+      costs · about 90 minutes of candidate time, and rather more of yours
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Visible in an hour</dt>
+          <dd>Reading a change, naming a failure class, asking before assuming, holding a position. Test these.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Visible over weeks</dt>
+          <dd>Follow-through, coachability, whether feedback lands twice. No interview format reaches these.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Never visible</dt>
+          <dd>Rate of improvement, the single most predictive variable for a junior. §9 is what to do about that.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Document sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> The broken signal</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The take-home is dead</a></li>
+      <li><a href="#s-2"><span class="n">2</span> What a stage can see</a></li>
+      <li><a href="#s-3"><span class="n">3</span> The core exercise</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Scoring it</a></li>
+      <li><a href="#s-5"><span class="n">5</span> The rest of the loop</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Stop screening for</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Start screening for</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Noise and fairness</a></li>
+      <li><a href="#s-9"><span class="n">9</span> The real fix</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The broken signal">
+          <i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The break</span>
+      </div>
+      <div>
+        <h2>Both branches are bad, and everyone took the worse one</h2>
+        <p class="thesis">
+          The coding exercise measured production. Production is now free, so the exercise measures
+          either nothing or the wrong thing, depending on which rule you picked.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>what the classic junior screen now measures</span><span class="tag warn">pick one</span></figcaption>
+<pre><code><span class="c-dim">AGENT ALLOWED</span>
+  everybody produces working code
+  <span class="c-warn">→ measures: prompting speed, and only at the low end</span>
+  <span class="c-warn">→ discriminates: barely, and mostly on typing</span>
+
+<span class="c-dim">AGENT BANNED</span>
+  some produce working code from memory
+  <span class="c-block">→ measures: unassisted recall under observation</span>
+  <span class="c-block">→ a condition that will never recur in the job you are hiring for</span></code></pre>
+      </figure>
+
+      <p>
+        The banned branch feels rigorous, which is why it won. It is worth stating what it actually
+        does: it selects for the candidates who best simulate a working environment that no longer
+        exists, and it selects against people who have already adapted to the one that does. If your
+        team writes code with an agent every day, an interview that forbids one is not a higher bar. It
+        is a different bar, pointed somewhere else.
+      </p>
+      <p>
+        The way out is not a cleverer puzzle. It is to notice that the thing you were using production
+        as a proxy for was never production. You wanted to know whether this person will eventually be
+        able to tell right from plausible. That is directly testable, in forty-five minutes, and it
+        always was. Nobody bothered because the proxy used to be cheaper.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The reframe</span>
+        <p>
+          Old question: can you produce a correct change? New question: can you tell whether a change is
+          correct? The second one was always the job. It just used to be inseparable from the first.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Take-home">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Retire it</span>
+      </div>
+      <div>
+        <h2>The unsupervised take-home cannot be saved</h2>
+        <p class="thesis">
+          Not because candidates cheat. Because authorship is no longer attributable, and no honour
+          system fixes an unfalsifiable claim.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A take-home now returns a well-structured, tested, documented submission from almost everyone,
+        and you cannot tell from the artifact who understood it. Asking candidates not to use an agent
+        puts the honest ones at a disadvantage against the rest, which is a bad design in any process
+        and an especially bad one in a process about integrity.
+      </p>
+      <p>
+        There is a partial rescue that some teams use: let them use anything, then spend thirty minutes
+        interrogating the submission. That works, and it is strictly worse than skipping the take-home
+        and spending the same thirty minutes on material you prepared. You lose nothing and you stop
+        asking for six hours of unpaid work whose output you have decided to ignore.
+      </p>
+
+      <div class="callout">
+        <span class="label">What the take-home was really doing</span>
+        <p>
+          Filtering by willingness to spend a weekend, which correlated with enthusiasm and also with
+          not having caring responsibilities, a second job, or a current employer. That was always a
+          cost. It is now a cost with no matching signal, which makes the decision easy.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="What a stage can see">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Bandwidth</span>
+      </div>
+      <div>
+        <h2>Be honest about what each stage can see</h2>
+        <p class="thesis">
+          An interview is a low-bandwidth, high-noise channel. It always was. The useful move is
+          matching each stage to something it can actually resolve.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>resolution by stage</caption>
+          <thead>
+            <tr><th>Stage</th><th>Can resolve</th><th>Cannot</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Résumé</td>
+              <td>Exposure. Whether they finished something hard once.</td>
+              <td>Anything about judgment. Stop reading it for that.</td>
+            </tr>
+            <tr class="flag">
+              <td>Unsupervised take-home</td>
+              <td>Nothing attributable.</td>
+              <td>Everything. See §1.</td>
+            </tr>
+            <tr>
+              <td>Comprehension exercise</td>
+              <td>Reading, classification, hedging behaviour, whether they check.</td>
+              <td>Whether they improve with feedback.</td>
+            </tr>
+            <tr>
+              <td>Pushback probe</td>
+              <td>Whether a position survives disagreement.</td>
+              <td>Whether it survives disagreement from their manager, six months in.</td>
+            </tr>
+            <tr>
+              <td>Ambiguity probe</td>
+              <td>Whether they ask before assuming.</td>
+              <td>Whether they keep asking once it is socially expensive.</td>
+            </tr>
+            <tr class="total">
+              <td>Every stage combined</td>
+              <td>A rough floor on comprehension today.</td>
+              <td>Rate of improvement, which is what you are actually buying.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        That last row is the honest summary of the whole page. You are hiring a junior for their
+        trajectory, and trajectory is a derivative that no single point can show you. Everything below
+        is about extracting the best available point estimate, and §9 is about the fact that the point
+        estimate was never going to be enough.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="The exercise">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">45 minutes</span>
+      </div>
+      <div>
+        <h2>Forty-five minutes on code they did not write</h2>
+        <p class="thesis">
+          One agent-written change with one planted defect. Agent fully available. The question is not
+          "fix it". The question is "should this merge?"
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>agent</b> allowed, encouraged</span>
+          <span class="chip kind-gate"><b>ask</b> should this merge</span>
+          <span class="chip kind-rule"><b>defect</b> exactly one, sometimes zero</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Sent ahead</span>
+          <span class="what">Tell them the format in advance, in writing. Surprise measures composure, not judgment, and you are not hiring for composure under surprise.</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">0:00 → 0:05</span>
+          <span class="what">Context: what the program is for, what the ticket asked for, what the business rule is. Give the business rule explicitly. Withholding it tests telepathy.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">0:05 → 0:25</span>
+          <span class="what">They read. Anything goes: run it, test it, ask the agent, ask you. Say out loud that using the agent is expected, because half of them will assume it is a trap.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">0:25 → 0:40</span>
+          <span class="what">The verdict, and the defense. Merge or not, and why. Then you push, once, on whatever they were most confident about.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">0:40 → 0:45</span>
+          <span class="what">Tell them the answer, and what you were watching for. Every candidate leaves knowing something. This costs five minutes and is the reason people speak well of your process.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">Choosing the material</h3>
+      <ul>
+        <li><strong>Self-contained, ~60 lines, common language.</strong> Offer a choice of two languages. A defect in your stack tests familiarity with your stack, which is not what a junior is being hired for.</li>
+        <li><strong>One defect, from the taxonomy.</strong> A policy inversion or a test that cannot fail are the two best for this purpose: both are invisible to the suite and neither requires local knowledge once you have stated the business rule.</li>
+        <li><strong>Roughly one candidate in four gets a clean diff.</strong> And you say nothing about it. Correctly approving a clean change, with reasons, is a full pass and is the single most informative outcome you can get.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The clean diff is not a trick</span>
+        <p>
+          If every candidate's diff is defective, word gets out within a month and you are then testing
+          whether people have been briefed. More importantly, a candidate who finds a bug in a correct
+          change has told you something serious: they will do that to their colleagues' work every week
+          for years.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Scoring">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Four points</span>
+      </div>
+      <div>
+        <h2>Score it on the rubric you already train with</h2>
+        <p class="thesis">
+          Same four points as reverse-review, which gives the interview a property most interviews
+          lack: it predicts performance on the programme they will actually be put through.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>what to write down, per candidate</caption>
+          <thead>
+            <tr><th>Point</th><th>For a junior hire, read as</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Found</td><td>Baseline. Nice to have, and the least predictive of the four at this level.</td></tr>
+            <tr><td>Proved</td><td>Did they check, or assert? A candidate who says "let me run it" unprompted is showing you a habit, not a result.</td></tr>
+            <tr><td>Classified</td><td>Rare in a junior and a genuine signal when present. Do not require it.</td></tr>
+            <tr class="total"><td>Durable fix</td><td>Almost never present, and that is expected. If someone asks "what would stop this happening again", that is a strong hire signal on its own.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Weight <em>proved</em> above <em>found</em> for a junior. Finding the defect is partly luck at
+        this level; going and checking before committing to an answer is a disposition, and disposition
+        is what survives training. A candidate who misses the defect, says "I am not sure about this
+        line, here is how I would find out", and is then right about the method is a better outcome
+        than one who spots it and cannot say why.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Two people, written first</span>
+        <p>
+          Two interviewers, independent written scores before discussion, same as the calibration drill
+          in <a href="/mentors-playbook/">the mentor's playbook</a>. Interview debriefs anchor even
+          harder than review sessions do, because the second person usually has less material.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="The loop">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">90 minutes</span>
+      </div>
+      <div>
+        <h2>The rest of the loop, in two more stages</h2>
+        <p class="thesis">
+          Ninety minutes of candidate time, total. If your loop is six hours, the extra five are
+          measuring stamina.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">25 min · one thing</span>
+          <span class="what">One thing they built or worked on. Not "tell me about it": <em>what would you do differently, and what did you not understand at the time?</em> The second half of that question is the one that separates people, and it is answerable honestly by someone whose project was mostly agent-written.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">20 min · ambiguity</span>
+          <span class="what">Hand over a two-sentence spec with a hole in it. Not a puzzle, a genuine omission: what happens to a refund on a cancelled order. Watch for whether they ask or assume. Assuming is not disqualifying; assuming <em>silently</em> is the signal.</span>
+        </li>
+      </ol>
+
+      <p>
+        That plus the exercise is the loop. Everything else people put in a junior process, the system
+        design round, the second technical screen, the culture panel, is measuring something you cannot
+        act on or something you already know. Cutting them costs you nothing and buys you a candidate
+        pool that has not been ground down before day one.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Stop">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Cut these</span>
+      </div>
+      <div>
+        <h2>Five things that have stopped carrying information</h2>
+        <p class="thesis">
+          Some were always weak. All five are now close to zero, and two of them are actively
+          misleading.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Syntax recall</span>
+          <span class="what">Whiteboard-from-memory API questions. Weak in 2015, worthless now, and negatively correlated with people who have spent their time on harder things.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Algorithm puzzles</span>
+          <span class="what">Measures preparation, and preparation is now nearly free and thoroughly automated. You are ranking candidates on how recently they ground through a practice set.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Build a small app</span>
+          <span class="what">Measures prompting. Fine as a warm-up if you enjoy it. Not evidence.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Side-project portfolio</span>
+          <span class="what">Once a decent proxy for curiosity. Now a proxy for having had unstructured time, since the artifact costs a weekend to produce regardless of understanding. Ask about one project in depth instead of counting them.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">"Explain this code" as a quiz</span>
+          <span class="what">Asking someone to narrate what a function does tests the same thing the agent does best. Ask what would make it <em>wrong</em>, which is the question the model cannot answer for you.</span>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Start">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Watch for</span>
+      </div>
+      <div>
+        <h2>Five things worth more than they used to be</h2>
+        <p class="thesis">
+          All five are observable in the ninety minutes above, and none of them require the candidate
+          to already be good at your stack.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Calibrated doubt</span>
+          <span class="what">"I don't know" followed immediately by how they would find out. The pair is the signal; either half alone is not.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Observed vs inferred</span>
+          <span class="what">Do they distinguish "I ran it and saw" from "I think it does"? People who keep that boundary clean under mild pressure are rare and trainable into everything else.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Asks about the rule</span>
+          <span class="what">Reaching for the business rule rather than the algorithm. The single most transferable instinct on this list, and the one the agent structurally lacks.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Holds, or folds well</span>
+          <span class="what">Under one round of pushback: do they either hold with a reason or concede with a reason? Both are fine. Silent capitulation is the thing to note.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Notices the hole</span>
+          <span class="what">Spots the missing case in the spec without being led there. Cheap to test, hard to fake, and it is most of what a first year of usefulness consists of.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">One question that does a lot of work</span>
+        <p>
+          "What would have to be true for this to be wrong?" Ask it in the exercise and again about
+          their own past project. It is the same question the mentor asks in reverse-review, which
+          means a strong answer here genuinely forecasts a strong first quarter rather than merely
+          correlating with one.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Noise">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Noise</span>
+      </div>
+      <div>
+        <h2>What you will accidentally measure instead</h2>
+        <p class="thesis">
+          A comprehension exercise has its own biases. They are manageable, and only if you name them
+          first.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ul>
+        <li>
+          <strong>Familiarity with your stack.</strong> Offer two languages, keep the program
+          self-contained, and state the business rule out loud. Anything the candidate has to already
+          know about your domain is measuring prior access, not aptitude.
+        </li>
+        <li>
+          <strong>Thinking aloud.</strong> Fluent narration is a separate skill from reading carefully,
+          and it is unevenly distributed for reasons that have nothing to do with engineering. Let
+          people work in silence and ask at the end. Read the written verdict, not the monologue.
+        </li>
+        <li>
+          <strong>Surprise.</strong> Send the format in advance. A candidate who has been told what to
+          expect shows you their judgment; one who has not shows you their startle response.
+        </li>
+        <li>
+          <strong>Your own defect.</strong> If you wrote the planted defect and find it obvious, you
+          have lost the ability to judge its difficulty. Have someone else on the team attempt it cold
+          first, and time them.
+        </li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The one that will bite you</span>
+        <p>
+          Interviewers who cannot themselves name the defect class will grade on whether the candidate
+          reached their conclusion. Anyone running this exercise should have run the exercise, from the
+          other chair, at least once.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="The real fix">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The payoff</span>
+      </div>
+      <div>
+        <h2>The interview is not where the accuracy comes from</h2>
+        <p class="thesis">
+          You cannot see rate of improvement in ninety minutes. You can see it clearly in thirty days.
+          Spend accordingly.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Every organisation that is unhappy with its junior hiring responds by lengthening the
+        interview, and it does not work, because the variable that actually decides the outcome is not
+        present in the room. How fast does this person improve when told something? No format resolves
+        that from a single sitting, and a sixth round does not get you closer to it.
+      </p>
+      <p>
+        What does resolve it is a first month with a gate in it. If a new engineer is doing spoken
+        claims from day one and a weekly rep from week three, you will know by day thirty whether
+        feedback lands, and you will know it from evidence rather than impression. That is a far better
+        instrument than any interview, and it is available to anyone willing to run the first month on
+        purpose.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>where to put the effort</span><span class="tag pass">the conclusion</span></figcaption>
+<pre><code><span class="c-dim">TYPICAL</span>
+  6-stage loop, 6 hours       ──▶  hire  ──▶  <span class="c-warn">unstructured first 90 days</span>
+  <span class="c-dim">high cost, low resolution</span>          <span class="c-dim">problems surface at month 7</span>
+
+<span class="c-dim">BETTER</span>
+  2-stage loop, 90 minutes    ──▶  hire  ──▶  <span class="c-pass">a first month with a gate</span>
+  <span class="c-dim">low cost, honest resolution</span>       <span class="c-dim">problems surface at day 30, cheaply</span></code></pre>
+      </figure>
+
+      <p>
+        This is not an argument for a careless interview. It is an argument that the marginal hour is
+        worth far more after the offer than before it, and that a team with a real
+        <a href="/first-ninety-days/">first ninety days</a> can afford a shorter loop precisely because
+        it is no longer asking the interview to do something interviews cannot do.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Where to start</span>
+        <p>
+          Replace the take-home with the forty-five minute exercise and change nothing else. It costs
+          less of everyone's time than what it replaces, it produces a scored artifact two people can
+          disagree about productively, and it is the only stage in most loops that is measuring the
+          thing the job now consists of.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Hiring Juniors in the Age of AI</strong>, an interview kit.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Assumes · <a href="/senior-2031/">Who's going to be senior in 2031?</a>, which is the argument for hiring at all</div>
+    <div>Uses · <a href="/reverse-review/">Reverse-review</a> (taxonomy and rubric) ·
+      <a href="/mentors-playbook/">The Mentor's Playbook</a> (calibration)</div>
+    <div>Leads into · <a href="/first-ninety-days/">The First Ninety Days</a> ·
+      <a href="/seniority-ladder/">The Seniority Ladder</a></div>
+  </footer>
+
+</div>
+</body>
+</html>
