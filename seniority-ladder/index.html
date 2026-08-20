@@ -1,0 +1,1319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Seniority Ladder v0.1 · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Five rungs on one axis: what you are trusted to be the last check on. Observable behaviors, the tell for each rung, and the artifact that settles it. Forkable, CC BY. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/seniority-ladder/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Seniority Ladder">
+<meta property="og:description" content="Five rungs on one axis: what you are trusted to be the last check on. Explains, merges, reviews, constrains, scopes.">
+<meta property="og:url" content="https://www.tacoda.dev/seniority-ladder/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Seniority Ladder">
+<meta name="twitter:description" content="Five rungs on one axis: what you are trusted to be the last check on. Explains, merges, reviews, constrains, scopes.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>The Seniority Ladder</span>
+      <span class="sep">/</span>
+      <span>v0.1, forkable</span>
+    </div>
+    <h1>Seniority is <em>what you are the last check on</em>.</h1>
+    <p class="standfirst">
+      Every proxy the industry used for seniority ran through output, and an agent now produces
+      output. So the ladder has to run through something the agent cannot supply. This one uses a
+      single axis, applied five times: at each rung, name the thing where you are the final human
+      check before it is real. Five rungs, each with behaviors you can watch, a tell for how the rung
+      gets faked, and one artifact that settles the question.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · the lead writing a promotion case, and the engineer who wants to know what is actually being measured<br>
+      what it is not · a compensation band, a performance review, or a way to grade a diff<br>
+      pairs with · <a href="/comprehension-standard/">the Comprehension Standard</a> (which grades diffs, not people)<br>
+      license · CC BY 4.0. Fork it, rename the rungs, change the artifacts. Keep the axis.
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>The behaviors</dt>
+          <dd>What the rung looks like from the outside. Watchable by someone who has seen the work, without a survey.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>The tell</dt>
+          <dd>How the rung gets faked. Every rung has a convincing counterfeit, and it is usually more comfortable than the real thing.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>The artifact</dt>
+          <dd>The one thing that settles it. No artifact, no rung, however strongly everyone feels.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Ladder sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> Two bars</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The axis</a></li>
+      <li><a href="#s-2"><span class="n">2</span> R1 Explains</a></li>
+      <li><a href="#s-3"><span class="n">3</span> R2 Merges</a></li>
+      <li><a href="#s-4"><span class="n">4</span> R3 Reviews</a></li>
+      <li><a href="#s-5"><span class="n">5</span> R4 Constrains</a></li>
+      <li><a href="#s-6"><span class="n">6</span> R5 Scopes</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Dead proxies</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Calibration</a></li>
+      <li><a href="#s-9"><span class="n">9</span> Regression</a></li>
+      <li><a href="#s-10"><span class="n">10</span> Non-goals</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The distinction">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The pairing</span>
+      </div>
+      <div>
+        <h2>One bar grades the change. This one grades the person.</h2>
+        <p class="thesis">
+          They are different documents on purpose, and collapsing them ruins both.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <a href="/comprehension-standard/">The Comprehension Standard</a> is explicit that its levels
+        grade diffs and not people: a staff engineer merges an L1 dependency bump on Tuesday, a
+        first-year engineer merges an L3 change to a pricing rule on Wednesday. Read as a career
+        ladder, it becomes an insult and stops being usable as a merge bar.
+      </p>
+      <p>
+        But teams still need to answer the other question, because somebody has to decide who is
+        trusted with what. Left unwritten, that decision gets made by tenure, by volume, or by who
+        speaks confidently in meetings. This document exists so the second question has its own
+        vocabulary and stops borrowing the first one's.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>two documents, two questions</caption>
+          <thead>
+            <tr><th></th><th>The Comprehension Standard</th><th>This ladder</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Grades</td><td>A change, at merge time</td><td>A person, over a quarter</td></tr>
+            <tr><td>Asks</td><td>Is this change understood?</td><td>Who is trusted to be the last check?</td></tr>
+            <tr><td>Changes</td><td>Every pull request</td><td>Rarely, and in both directions</td></tr>
+            <tr><td>Lives in</td><td>The repo, enforced by the harness</td><td>A quarterly conversation, enforced by nobody</td></tr>
+            <tr class="flag"><td>Confusing them</td><td colspan="2">Reading "L3" as a seniority level. Makes the standard an insult and the ladder unfalsifiable.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The relationship, stated once</span>
+        <p>
+          The standard says what a check consists of. The ladder says who is trusted to be the last
+          one. A team needs both, and neither substitutes for the other.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="All five rungs">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The axis</span>
+      </div>
+      <div>
+        <h2>Five rungs, one question</h2>
+        <p class="thesis">
+          Not five skills. One question asked about five progressively larger things.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>what you are the last human check on</span><span class="tag pass">the whole ladder</span></figcaption>
+<pre><code><span class="c-dim">R1</span>  EXPLAINS     <span class="c-dim">last check on ·</span> nothing yet
+                 <span class="c-dim">every change of theirs gets a second reader</span>
+
+<span class="c-dim">R2</span>  MERGES       <span class="c-dim">last check on ·</span> their own ordinary change
+                 <span class="c-dim">"ordinary" is whatever the charter says it is</span>
+
+<span class="c-dim">R3</span>  REVIEWS      <span class="c-dim">last check on ·</span> somebody else's change
+                 <span class="c-warn">the rung where approving becomes a decision</span>
+
+<span class="c-dim">R4</span>  CONSTRAINS   <span class="c-dim">last check on ·</span> the rules that check everyone
+                 <span class="c-warn">stops changing code, starts changing the system</span>
+
+<span class="c-dim">R5</span>  SCOPES       <span class="c-dim">last check on ·</span> whether the work should exist
+                 <span class="c-block">the only rung whose main output is deletion</span></code></pre>
+      </figure>
+
+      <p>
+        A single axis is a constraint worth defending. Most ladders are a list of adjectives, and a
+        list of adjectives can be argued into any conclusion the room already wanted. "Last check on
+        what" has the useful property of being answerable by looking at what actually happens when
+        this person is on holiday.
+      </p>
+      <p>
+        The rungs are cumulative in trust but not in activity. An R4 still merges their own changes and
+        still reviews other people's. What changed is that something new now stops with them.
+      </p>
+
+      <div class="callout">
+        <span class="label">One rung at a time</span>
+        <p>
+          Nobody skips. A person who has never held a correct finding under pushback is not going to
+          author the team's constraints well, because authoring a rule is holding a position against
+          everyone who finds it inconvenient, permanently, in writing.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Rung one of five">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">R1 · explains</span>
+      </div>
+      <div>
+        <h2>R1 · Explains</h2>
+        <p class="thesis">
+          Last check on nothing. Everything they produce has a second reader, and the work of this
+          rung is becoming worth reading.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>typical</b> weeks, not months</span>
+          <span class="chip kind-gate"><b>exit</b> four claims, unprompted, twice</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Looks like</h3>
+      <ul>
+        <li>Asked "what happens if this runs twice", they answer from the code rather than from the agent's summary of the code.</li>
+        <li>Their spoken explanation and their pull request description are not the same text, because a person read the diff in between.</li>
+        <li>They ask for a second reader on something that scared them, without being told to.</li>
+        <li>They can point at the line they were least sure about. Everyone has one. Being able to name it is the skill.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The tell</span>
+        <p>
+          Complete fluency about what the change does, total silence about how it could be wrong. The
+          description is excellent, the mechanism is understood, and the question "what would make
+          this fail" produces a pause and then a guess. That is a person describing code, not a person
+          who has examined it.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The artifact</span>
+        <p>
+          Two consecutive changes where all four claims land without prompting: what changed, why it is
+          correct, what it could break, how you would know. Not written down anywhere special. Said
+          out loud, to a person, twice running.
+        </p>
+      </div>
+
+      <p>
+        Someone sitting at R1 nine months in is almost never a talent problem. It is nearly always a
+        team that never asked anybody to explain anything, and the fix is on the team's side of the
+        table. <a href="/first-ninety-days/">The first ninety days</a> exists mostly to keep this rung
+        short.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Rung two of five">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">R2 · merges</span>
+      </div>
+      <div>
+        <h2>R2 · Merges</h2>
+        <p class="thesis">
+          Last check on their own ordinary change. Nobody reads it after them, which means the rung is
+          defined by what they refuse rather than what they produce.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>scope</b> ordinary changes only</span>
+          <span class="chip kind-gate"><b>excluded</b> money, auth, migrations</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        "Ordinary" is not a vibe. It is the exemption list already written in the charter: the changes
+        the team has decided do not need the raised bar. Money, authorization, data integrity, and
+        anything that cannot be cheaply rolled back stay off this rung no matter how good the person
+        is, because that is a property of the change and not of them.
+      </p>
+
+      <h3 class="sub">Looks like</h3>
+      <ul>
+        <li>They reject agent output unprompted, and the pull request shows what was rejected and why.</li>
+        <li>They scope their own work small enough to stay checkable, without being asked to split it.</li>
+        <li>They write the falsifier before the fix, because they want to watch it go red.</li>
+        <li>They escalate their own change to the higher bar occasionally, having noticed it stopped being ordinary partway through.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The tell</span>
+        <p>
+          Throughput climbs and escaped defects climb with it. They are merging what passes rather
+          than what is right, and green is doing the deciding. The quieter version of the same tell:
+          six months of history with no record of ever turning down anything the agent proposed. Nobody
+          is that well served by a model.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The artifact</span>
+        <p>
+          Sixty days of self-merged ordinary changes with no defect that a second reader would have
+          caught, plus at least one change they voluntarily raised to the higher bar. The second half
+          matters more: it shows the exemption list is being applied by a person and not skipped.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Rung three of five">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">R3 · reviews</span>
+      </div>
+      <div>
+        <h2>R3 · Reviews</h2>
+        <p class="thesis">
+          Last check on somebody else's change. The first rung where approving is a decision with a
+          cost attached to their name.
+        </p>
+        <div class="chips">
+          <span class="chip kind-skill"><b>trains via</b> reverse-review</span>
+          <span class="chip kind-hook"><b>requires</b> one bad approval, owned</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Looks like</h3>
+      <ul>
+        <li>They write clean reviews. "I checked these four things, here is why they are fine" is a deliverable, and a review with no findings is not a wasted review.</li>
+        <li>They name the class rather than the instance, so the feedback survives contact with the next diff.</li>
+        <li>They approve a change carrying a known residual risk and say which risk, rather than pretending the risk away or blocking until it is impossible.</li>
+        <li>They hold a correct finding under pushback, with a red test or a line of the spec, not with volume.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The tell, in two symmetric forms</span>
+        <p>
+          Findings that are only ever stylistic: a way of participating in review without ever being
+          accountable for the semantics. And its mirror, the review that never ends, where every
+          approval is deferred behind one more question. Both are strategies for never being the
+          person who said yes to the thing that broke.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The artifact</span>
+        <p>
+          One catch in production-bound code that a reasonable person would have missed. And, harder
+          to obtain and more diagnostic, one approval that later broke, handled by naming what they
+          would check next time rather than by relitigating whose change it was.
+        </p>
+      </div>
+
+      <p>
+        The weekly rep for this rung is <a href="/reverse-review/">reverse-review</a>, which exists to
+        produce these two artifacts on a schedule instead of by accident.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Rung four of five">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">R4 · constrains</span>
+      </div>
+      <div>
+        <h2>R4 · Constrains</h2>
+        <p class="thesis">
+          Last check on the rules that check everyone else. The first rung whose output is not code.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>output</b> rules, at the right altitude</span>
+          <span class="chip kind-make"><b>discriminator</b> deletes rules too</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Looks like</h3>
+      <ul>
+        <li>They convert a recurring defect into a constraint at the cheapest altitude that actually holds: a sentence in the charter, a check, or a gate that refuses. Reaching for a gate where a sentence would do is a real error, not caution.</li>
+        <li>They delete rules that stopped firing, and can say when each one last mattered.</li>
+        <li>They can state what a rule costs in friction, not only what it prevents. A rule with an unknown cost has never been evaluated.</li>
+        <li>When a rule of theirs gets in someone's way, they take the report seriously instead of defending the artifact.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The tell</span>
+        <p>
+          The charter only ever grows. Every incident adds a paragraph and nothing is ever removed,
+          until it is long enough that nobody finishes reading it, at which point it has stopped
+          applying to anything. The person producing that outcome usually feels the most responsible
+          in the room, which is what makes this tell hard to raise.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The artifact</span>
+        <p>
+          One rule merged with the incident named in the pull request. One rule deleted with the reason
+          named. The deletion is the discriminator: writing rules is a thing enthusiasm produces, and
+          removing one requires knowing what the system is actually catching.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Rung five of five">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">R5 · scopes</span>
+      </div>
+      <div>
+        <h2>R5 · Scopes</h2>
+        <p class="thesis">
+          Last check on whether the work should exist. Measured mostly in things that never got built.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>output</b> deletion, early</span>
+          <span class="chip kind-hook"><b>cost</b> unpopularity, absorbed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        This rung got more valuable, not less, when generation got cheap. When building something took
+        a quarter, the cost of a bad idea was visible and someone usually stopped it. When a plausible
+        implementation appears in an afternoon, nothing external stops it, and the only remaining brake
+        is a person willing to say the work should not exist while everyone is already excited about it.
+      </p>
+
+      <h3 class="sub">Looks like</h3>
+      <ul>
+        <li>They kill proposed work in writing, with the reason, early enough that nobody built it yet.</li>
+        <li>They routinely turn a six-week plan into a two-day change, and can show the reasoning rather than just asserting the smaller number.</li>
+        <li>They absorb the unpopularity of a correct no without needing to be proven right out loud afterwards.</li>
+        <li>People bring them proposals before building rather than after, which is the clearest signal on the whole ladder and cannot be manufactured.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The tell, again in two forms</span>
+        <p>
+          The reflexive no, which is cheap, feels rigorous, and is indistinguishable from judgment for
+          about a year. And the reflexive yes rebranded as enablement, which is the same abdication
+          wearing a friendlier word. Both are ways of not deciding, and both scale badly.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The artifact</span>
+        <p>
+          A written record of scope calls, including at least one they got wrong and reversed in
+          public. A ledger with no reversals in it is a ledger nobody was checking.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Dead proxies">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Dead proxies</span>
+      </div>
+      <div>
+        <h2>What stopped signalling</h2>
+        <p class="thesis">
+          The ladder needs a new axis because the old signals were all downstream of typing speed, and
+          typing is now free.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>proxies, before and after</caption>
+          <thead>
+            <tr><th>Proxy</th><th>What it used to approximate</th><th>What it measures now</th></tr>
+          </thead>
+          <tbody>
+            <tr class="flag"><td>Changes merged per week</td><td>Capacity, roughly</td><td>Prompting speed</td></tr>
+            <tr class="flag"><td>Time to first working version</td><td>Familiarity with the codebase</td><td>Model latency</td></tr>
+            <tr class="flag"><td>Breadth of API recall</td><td>Years of exposure</td><td>Nothing at all</td></tr>
+            <tr class="flag"><td>Lines of code</td><td>Very little, even then</td><td>Less</td></tr>
+            <tr><td>Rejection rate, with reasons</td><td>—</td><td>Whether judgment is being applied</td></tr>
+            <tr><td>Escape rate on self-merged work</td><td>—</td><td>Whether R2 is real</td></tr>
+            <tr><td>Do others' changes improve after this person touches them</td><td>—</td><td>Whether R3 is real</td></tr>
+            <tr class="total"><td>Does work get smaller when they scope it</td><td>—</td><td>Whether R5 is real</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Notice that every surviving signal is about subtraction: what got rejected, what did not escape,
+        what got smaller. That is not an aesthetic preference. It is a consequence of the fact that
+        production is the part that got automated, so the remaining human contribution shows up in the
+        difference between what was produced and what shipped.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Calibration">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">30 minutes</span>
+      </div>
+      <div>
+        <h2>Running a calibration</h2>
+        <p class="thesis">
+          Quarterly, thirty minutes, two people who have actually seen the work. Not a committee.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Name it</span>
+          <span class="what">Each reviewer writes down a rung independently, before discussing. Simultaneous reveal. Anchoring is the main failure mode of every calibration ever run.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Produce it</span>
+          <span class="what">Whoever claims the higher rung produces the artifact for it. Not a story about the person, the artifact: the pull request, the deleted rule, the reversed scope call.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Disagree</span>
+          <span class="what">If no artifact appears, the lower rung wins. This is uncomfortable and it is the only thing keeping the ladder from drifting upward every quarter.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Write the gap</span>
+          <span class="what">One sentence: which artifact is missing, and what work would produce it. The person leaves knowing exactly what the next rung costs.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Two hard rules</span>
+        <p>
+          Never calibrate a person against another person, only against the artifact list. And never
+          run this in the same meeting as compensation, because the moment a rung is worth money the
+          artifacts start being manufactured and the whole instrument goes blind.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="Regression">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Both ways</span>
+      </div>
+      <div>
+        <h2>Rungs are held, not earned</h2>
+        <p class="thesis">
+          A rung describes what someone is doing now. It is not a possession, and it moves down as
+          well as up.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The common regressions are specific and recognisable. An R4 who has not deleted a rule in a
+        year has drifted back to R3 with extra paperwork. An R2 who stopped rejecting agent output
+        during a hard quarter is not R2 any more, whatever the tenure says. An R5 who has said yes to
+        everything since the reorg is doing a different job now, and it may be a fine job, but the
+        ladder should say so.
+      </p>
+      <p>
+        Say it plainly, early, and reversibly. A rung is not a title, does not appear in anyone's
+        email signature, and does not move compensation on its own. That is what makes it safe to move
+        it down, and being safe to move down is the entire reason it means anything when it moves up.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The failure this prevents</span>
+        <p>
+          Ladders that only ratchet upward produce teams with six senior engineers and no last check,
+          which is exactly the shape that agent-written code punishes fastest.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 ============ -->
+  <section class="rung" id="s-10">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">10</span>
+        <div class="meter" role="img" aria-label="Non-goals">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Non-goals</span>
+      </div>
+      <div>
+        <h2>What this is not, and how to fork it</h2>
+        <p class="thesis">
+          Four things it should never be used for, and one thing to keep if you rewrite it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Not comp</span>
+          <span class="what">Compensation is a market question. This is a trust question. They correlate loosely and coupling them destroys the instrument, as covered in §8.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a diff grade</span>
+          <span class="what">Use <a href="/comprehension-standard/">the Comprehension Standard</a> for that. It grades changes, deliberately, and says so.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a hiring rubric</span>
+          <span class="what">Every artifact here takes months of observed work to produce. An interview cannot see any of them, and pretending otherwise produces a bad interview.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a headcount plan</span>
+          <span class="what">A team needs people at every rung. A team of five R5s cannot ship, and would be an expensive way to discover that.</span>
+        </li>
+      </ol>
+
+      <p>
+        Fork it freely. Rename the rungs to match your vocabulary, cut R5 if your team has no scoping
+        authority, add one if you have a layer this misses. The single thing worth keeping is the axis:
+        one question, asked about progressively larger things, answerable by looking at what stops with
+        this person. The moment a rung starts being described with adjectives instead, it has become
+        unfalsifiable and it will drift.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Where to start</span>
+        <p>
+          Take one person and answer the single question honestly: what is the last thing that stops
+          with them? Most teams find at least one person whose real rung and assumed rung are two apart,
+          and the surprise is roughly as often upward as downward.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The Seniority Ladder</strong>, v0.1. CC BY 4.0.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/comprehension-standard/">The Comprehension Standard</a> ·
+      <a href="/first-ninety-days/">The First Ninety Days</a> ·
+      <a href="/reverse-review/">Reverse-review</a></div>
+    <div>Related · <a href="/senior-2031/">Who's going to be senior in 2031?</a></div>
+    <div>Colour encodes evidence:
+      <span style="color:var(--forest)">the behaviors</span> ·
+      <span style="color:var(--gold)">the tell</span> ·
+      <span style="color:var(--brick)">the artifact</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
