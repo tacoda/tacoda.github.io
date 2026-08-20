@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Audit Trail · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="One agent decision replayed end to end: the provenance schema, what to record at each step, a gate firing mid-run, and the replay test that tells you whether you have an audit trail or just logs. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/audit-trail/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Audit Trail">
+<meta property="og:description" content="Why does this line exist? One agent decision replayed end to end, and the schema that makes the answer recoverable a year later.">
+<meta property="og:url" content="https://www.tacoda.dev/audit-trail/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Audit Trail">
+<meta name="twitter:description" content="Why does this line exist? One agent decision replayed end to end, and the schema that makes the answer recoverable a year later.">
+<style>
+:root {
+  --bg:#0f1117; --panel:#171a23; --panel2:#12141c; --sel:#1f2430;
+  --fg:#d7dce5; --dim:#7b8494; --line:#262b38;
+  --purple:#a78bfa;
+  --lit:#fb923c;
+  --ok:#4ade80;
+  --bad:#f87171;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+p { margin: 0; }
+a { color: var(--purple); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 2px solid var(--lit); outline-offset: 2px; border-radius: 4px; }
+
+.app { max-width: 1400px; margin: 0 auto; padding: 16px; }
+
+/* ---------- header ---------- */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+header .brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+header .brand b { font-weight: 700; letter-spacing: .02em; }
+header .brand .sub { color: var(--dim); }
+header .who { color: var(--dim); font-size: 11px; text-align: right; }
+header .who b { color: var(--fg); font-weight: 600; }
+
+h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--dim);
+  font-weight: 600;
+  margin: 24px 0 8px;
+}
+h3 { font-size: 12px; color: var(--dim); font-weight: 600; margin: 0 0 6px; }
+
+/* ---------- intro / notes ---------- */
+.note {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--purple);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--dim);
+  margin: 12px 0;
+}
+.note b { color: var(--fg); font-weight: 600; }
+.note .lbl {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--purple);
+  margin-bottom: 4px;
+}
+.note p + p { margin-top: 8px; }
+.note.warn { border-left-color: var(--lit); }
+.note.warn .lbl { color: var(--lit); }
+.note.bad  { border-left-color: var(--bad); background: #1a0f0f; }
+.note.bad .lbl { color: var(--bad); }
+.note.ok   { border-left-color: var(--ok); }
+.note.ok .lbl { color: var(--ok); }
+
+/* ---------- metrics ---------- */
+.metrics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.metric {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-width: 90px;
+  flex: 1 1 90px;
+}
+.metric b { display: block; font-size: 20px; font-weight: 700; line-height: 1.2; }
+.metric span { display: block; font-size: 11px; color: var(--dim); }
+.metric.bad b { color: var(--bad); }
+.metric.ok  b { color: var(--ok); }
+.metric.lit b { color: var(--lit); }
+
+/* ---------- flow ---------- */
+.flow {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.step {
+  flex: 1 0 128px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.step:hover { border-color: var(--lit); }
+.step.selected { background: var(--sel); border-color: var(--purple); }
+.step.done    { border-color: var(--ok); }
+.step.blocked { border-color: var(--bad); }
+.step.running { border-color: var(--lit); }
+.step .n { font-size: 10px; color: var(--dim); letter-spacing: .05em; }
+.step .t { display: block; margin: 3px 0; }
+.step .ms { font-size: 10px; color: var(--dim); }
+
+/* ---------- badges ---------- */
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.badge.reject  { background:#7f1d1d; color:#fecaca; }
+.badge.changes { background:#78350f; color:#fde68a; }
+.badge.accept  { background:#064e3b; color:#a7f3d0; }
+.badge.waiting { background:#1e293b; color:var(--dim); }
+
+/* ---------- two-column ---------- */
+.cols { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(0,1fr); gap: 12px; }
+@media (max-width: 900px) { .cols { grid-template-columns: minmax(0,1fr); } }
+
+.panel {
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* ---------- record ---------- */
+.rec { margin: 0; }
+.rec .row {
+  display: flex;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.rec .row:last-child { border-bottom: 0; }
+.rec .k { flex: 0 0 130px; color: var(--dim); font-size: 11px; }
+.rec .v { flex: 1 1 auto; min-width: 0; word-break: break-word; }
+.rec .v.ok  { color: var(--ok); }
+.rec .v.bad { color: var(--bad); }
+.rec .v.lit { color: var(--lit); }
+.detailpane { display: none; }
+.detailpane.on { display: block; }
+
+pre {
+  margin: 8px 0 0;
+  padding: 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow-x: auto;
+  font: inherit;
+  font-size: 12px;
+  color: var(--fg);
+}
+code { font: inherit; }
+.dim { color: var(--dim); }
+.ok  { color: var(--ok); }
+.bad { color: var(--bad); }
+.lit { color: var(--lit); }
+.pur { color: var(--purple); }
+
+/* ---------- diff ---------- */
+.filediff { border: 1px solid var(--line); border-radius: 6px; margin-bottom: 8px; overflow: hidden; }
+.filediff summary {
+  padding: 7px 10px;
+  background: var(--panel);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filediff summary::-webkit-details-marker { display: none; }
+.filediff summary .path { color: var(--fg); }
+.filediff summary .stat { font-size: 11px; color: var(--dim); }
+.diff { margin: 0; padding: 0; background: var(--bg); }
+.dl { padding: 1px 10px; white-space: pre; overflow-x: auto; font-size: 12px; }
+.dl.add  { background:#062e1f; color:#a7f3d0; }
+.dl.del  { background:#2e0d0d; color:#fecaca; }
+.dl.hunk { color:#7dd3fc; }
+
+/* ---------- logs ---------- */
+.logs {
+  max-height: 340px;
+  overflow: auto;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+}
+.log {
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--line);
+}
+.log:last-child { border-bottom: 0; }
+.log .ts  { flex: 0 0 78px; color: var(--dim); }
+.log .ev  { flex: 0 0 118px; }
+.log .jid { flex: 0 0 78px; color: var(--dim); }
+.log .data { flex: 1 1 auto; min-width: 0; color: var(--dim); word-break: break-word; }
+.log.bad .ev { color: var(--bad); }
+.log.ok  .ev { color: var(--ok); }
+.log.lit .ev { color: var(--lit); }
+
+/* ---------- table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 12px; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--dim); background: var(--panel); }
+tbody tr:last-child td { border-bottom: 0; }
+td.k { color: var(--purple); white-space: nowrap; }
+tr.req td.k { color: var(--lit); }
+
+/* ---------- findings ---------- */
+.finding {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.finding.high { border-left-color: var(--bad); }
+.finding.medium { border-left-color: var(--lit); }
+.finding.low { border-left-color: var(--ok); }
+.finding .h { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 3px; }
+.finding .h b { font-weight: 600; }
+.finding p { color: var(--dim); }
+
+ul { margin: 6px 0 0; padding-left: 18px; color: var(--dim); }
+li { margin-bottom: 4px; }
+li b { color: var(--fg); font-weight: 600; }
+
+footer {
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--dim);
+  font-size: 11px;
+  display: grid;
+  gap: 4px;
+}
+footer b { color: var(--fg); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <b>AUDIT TRAIL</b>
+      <span class="sub">/ run <span class="pur">8f2c41d9</span> / BILL-4471 add refund endpoint</span>
+      <span class="badge accept">merged</span>
+    </div>
+    <div class="who">
+      <b>Ian Johnson</b> · Harness Engineering · tacoda.dev<br>
+      a worked example, rendered as the thing itself
+    </div>
+  </header>
+
+  <div class="note">
+    <span class="lbl">What this page is</span>
+    <p>
+      An audit trail exists to answer one question, asked by someone who was not there:
+      <b>why does this line exist?</b> Below is a single agent run, recorded end to end, including
+      the moment a gate refused its first attempt. Click any step to see what was written down at
+      that point, and why that field is in the schema.
+    </p>
+    <p>
+      Everything here is fabricated to be representative. The schema in the right-hand column is the
+      part to steal.
+    </p>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><b>9</b><span>steps</span></div>
+    <div class="metric"><b>14</b><span>tool calls</span></div>
+    <div class="metric lit"><b>4</b><span>gates fired</span></div>
+    <div class="metric bad"><b>1</b><span>blocked</span></div>
+    <div class="metric ok"><b>1</b><span>self-corrected</span></div>
+    <div class="metric"><b>3m42s</b><span>wall clock</span></div>
+    <div class="metric"><b>6</b><span>files read</span></div>
+    <div class="metric"><b>2</b><span>files written</span></div>
+  </div>
+
+  <h2>Run pipeline · click a step</h2>
+  <div class="flow" id="flow">
+    <button class="step done" data-step="1"><span class="n">01</span><span class="t">intake</span><span class="ms">40ms</span></button>
+    <button class="step done" data-step="2"><span class="n">02</span><span class="t">context</span><span class="ms">2.1s</span></button>
+    <button class="step done" data-step="3"><span class="n">03</span><span class="t">plan</span><span class="ms">11s</span></button>
+    <button class="step done" data-step="4"><span class="n">04</span><span class="t">edit</span><span class="ms">48s</span></button>
+    <button class="step blocked selected" data-step="5"><span class="n">05</span><span class="t">gate: money</span><span class="ms">18ms</span></button>
+    <button class="step done" data-step="6"><span class="n">06</span><span class="t">revise</span><span class="ms">31s</span></button>
+    <button class="step done" data-step="7"><span class="n">07</span><span class="t">gate: re-run</span><span class="ms">16ms</span></button>
+    <button class="step done" data-step="8"><span class="n">08</span><span class="t">verify</span><span class="ms">1m04s</span></button>
+    <button class="step done" data-step="9"><span class="n">09</span><span class="t">propose</span><span class="ms">2.8s</span></button>
+  </div>
+
+  <div class="cols">
+
+    <!-- ===================== LEFT: step detail ===================== -->
+    <div class="panel">
+
+      <div class="detailpane" data-pane="1">
+        <h3>01 · INTAKE <span class="badge accept">ok</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">run_id</span><span class="v pur">8f2c41d9</span></div>
+          <div class="row"><span class="k">parent_run_id</span><span class="v dim">null <span class="dim">(top-level)</span></span></div>
+          <div class="row"><span class="k">initiated_by</span><span class="v">u/priya · human · web</span></div>
+          <div class="row"><span class="k">ticket</span><span class="v">BILL-4471</span></div>
+          <div class="row"><span class="k">model</span><span class="v">claude-sonnet-5</span></div>
+          <div class="row"><span class="k">harness_version</span><span class="v">2.4.1</span></div>
+          <div class="row"><span class="k">charter_sha</span><span class="v lit">a91f3c2</span></div>
+          <div class="row"><span class="k">repo_sha</span><span class="v">4d7e0b8</span></div>
+        </div>
+        <div class="note warn">
+          <span class="lbl">The field everyone forgets</span>
+          <p>
+            <b>charter_sha.</b> Without it you cannot answer "which rules were in force when this ran",
+            and a year from now the charter will have moved thirty times. It also makes every run
+            joinable against the eval history, so a regression in output quality can be traced to the
+            exact rule edit that preceded it.
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane" data-pane="2">
+        <h3>02 · CONTEXT <span class="badge accept">ok</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">files_read</span><span class="v">6</span></div>
+          <div class="row"><span class="k">at_sha</span><span class="v">4d7e0b8</span></div>
+          <div class="row"><span class="k">bytes_in</span><span class="v">41,880</span></div>
+          <div class="row"><span class="k">retrieval</span><span class="v">grep + explicit paths, no vector store</span></div>
+        </div>
+        <pre><code>billing/refund.py          <span class="dim">sha 6c1a…  read</span>
+billing/order.py           <span class="dim">sha 91be…  read</span>
+billing/money.py           <span class="dim">sha 0f4d…  read</span>
+tests/test_refund.py       <span class="dim">sha aa20…  read</span>
+CHARTER.md                 <span class="dim">sha a91f…  read</span>
+.claude/rules/money.md     <span class="dim">sha 77c9…  read</span></code></pre>
+        <div class="note">
+          <span class="lbl">Record references, not contents</span>
+          <p>
+            Store path plus content hash plus the repo sha. Never the file body. Bodies make the trail
+            enormous, duplicate your source of truth, and turn a log store into somewhere secrets go to
+            live forever. The hash is enough to prove what was read, and the repo already has the text.
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane" data-pane="3">
+        <h3>03 · PLAN <span class="badge accept">ok</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">prompt_sha</span><span class="v">d3f9a11</span></div>
+          <div class="row"><span class="k">tokens_in / out</span><span class="v">12,404 / 806</span></div>
+          <div class="row"><span class="k">alternatives</span><span class="v lit">2 considered, 1 rejected</span></div>
+        </div>
+        <pre><code><span class="ok">CHOSEN</span>   extend refund_for_order(), branch on order.status
+<span class="bad">REJECTED</span> new refund_cancelled_order() entry point
+         <span class="dim">reason: duplicates the discount reconciliation</span>
+         <span class="dim">        block; charter §consistency</span></code></pre>
+        <div class="note ok">
+          <span class="lbl">Log the road not taken</span>
+          <p>
+            The rejected alternative is the highest-value row in the whole trail and the one almost no
+            system records. It is what makes a review possible six months later, and it is the same
+            artifact an engineer needs for
+            <a href="/evidence-of-judgment/">evidence of judgment</a>. Capture it here and it is
+            produced automatically instead of remembered.
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane" data-pane="4">
+        <h3>04 · EDIT <span class="badge accept">ok</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">tool</span><span class="v">edit_file</span></div>
+          <div class="row"><span class="k">target</span><span class="v">billing/refund.py</span></div>
+          <div class="row"><span class="k">pre_sha</span><span class="v">6c1a2e0</span></div>
+          <div class="row"><span class="k">post_sha</span><span class="v">b30f9c4</span></div>
+          <div class="row"><span class="k">lines</span><span class="v">+22 −3</span></div>
+        </div>
+        <div class="note">
+          <span class="lbl">Pre and post, always both</span>
+          <p>
+            Recording only the result makes concurrent edits unresolvable. With the pre-image hash you
+            can prove the agent edited the file it thought it was editing, which is the failure that
+            appears the moment two runs touch one repo.
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane on" data-pane="5">
+        <h3>05 · GATE money_is_integer <span class="badge reject">blocked</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">rule_id</span><span class="v lit">money.integer-cents</span></div>
+          <div class="row"><span class="k">defined_in</span><span class="v">.claude/rules/money.md:12</span></div>
+          <div class="row"><span class="k">altitude</span><span class="v">gate <span class="dim">(refuses, does not warn)</span></span></div>
+          <div class="row"><span class="k">verdict</span><span class="v bad">BLOCK</span></div>
+          <div class="row"><span class="k">matched</span><span class="v">billing/refund.py:48</span></div>
+          <div class="row"><span class="k">surfaced_to_agent</span><span class="v ok">true</span></div>
+        </div>
+        <pre><code><span class="bad">✗ money.integer-cents</span>
+  billing/refund.py:48
+      <span class="bad">- refund_total = order.total * (1 - discount_pct / 100)</span>
+                                              <span class="bad">^^^^^^^^^^^^^^^^^</span>
+  <span class="dim">float division on a money path. Charter §money:</span>
+  <span class="dim">"money is integer cents everywhere; percentages resolve</span>
+  <span class="dim">via Decimal, then round half-up to cents."</span></code></pre>
+        <div class="note bad">
+          <span class="lbl">This is the row the whole trail exists for</span>
+          <p>
+            A gate that blocks and is never recorded looks, from the outside, exactly like a gate that
+            never fired. Six months later nobody can tell whether the rule is load-bearing or dead
+            weight, and dead rules are what
+            <a href="/seniority-ladder/">R4</a> is supposed to delete.
+          </p>
+          <p>
+            <b>Record every firing, including the ones that pass.</b> The pass count is what tells you a
+            rule still earns its place; the block count is what tells you it is doing work today.
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane" data-pane="6">
+        <h3>06 · REVISE <span class="badge changes">retry 1 of 2</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">trigger</span><span class="v bad">gate block · money.integer-cents</span></div>
+          <div class="row"><span class="k">retry_index</span><span class="v">1</span></div>
+          <div class="row"><span class="k">retry_budget</span><span class="v">2 <span class="dim">(then escalate to human)</span></span></div>
+          <div class="row"><span class="k">post_sha</span><span class="v">e77a015</span></div>
+        </div>
+        <pre><code><span class="dim">agent received the gate output verbatim and revised:</span>
+
+  <span class="ok">+ pct = Decimal(discount_pct) / Decimal(100)</span>
+  <span class="ok">+ refund_total = round_half_up(order.total_cents * (1 - pct))</span></code></pre>
+        <div class="note warn">
+          <span class="lbl">Bound the retries, and record the bound</span>
+          <p>
+            An unbounded correction loop burns budget and eventually talks itself into satisfying the
+            gate rather than solving the problem. Two attempts, then a human. The budget belongs in
+            the trail so that "why did this escalate" has an answer that is not somebody's memory.
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane" data-pane="7">
+        <h3>07 · GATE re-run <span class="badge accept">pass</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">money.integer-cents</span><span class="v ok">PASS</span></div>
+          <div class="row"><span class="k">scope.allowed-paths</span><span class="v ok">PASS <span class="dim">2 files, both in billing/</span></span></div>
+          <div class="row"><span class="k">test.must-fail-when-reverted</span><span class="v ok">PASS</span></div>
+          <div class="row"><span class="k">secrets.no-literals</span><span class="v ok">PASS</span></div>
+        </div>
+        <div class="note ok">
+          <span class="lbl">Passes are data too</span>
+          <p>
+            Four rules ran, four are written down. A trail that records only failures cannot answer the
+            most useful maintenance question there is: which of our rules has not blocked anything in
+            twelve months?
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane" data-pane="8">
+        <h3>08 · VERIFY <span class="badge accept">ok</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">suite</span><span class="v">pytest · 412 passed · 0 failed</span></div>
+          <div class="row"><span class="k">new_test</span><span class="v">tests/test_refund.py::test_cancelled_with_discount</span></div>
+          <div class="row"><span class="k">revert_check</span><span class="v ok">test goes red when refund.py is reverted</span></div>
+          <div class="row"><span class="k">duration</span><span class="v">64.2s</span></div>
+        </div>
+        <div class="note">
+          <span class="lbl">Record the falsifier, not just the green</span>
+          <p>
+            "412 passed" is the non-claim. The line that matters is the revert check: proof the new test
+            can fail. Without it the trail records a green pipeline, which has never meant the code is
+            correct.
+          </p>
+        </div>
+      </div>
+
+      <div class="detailpane" data-pane="9">
+        <h3>09 · PROPOSE <span class="badge accept">merged</span></h3>
+        <div class="rec">
+          <div class="row"><span class="k">pr</span><span class="v">#2291</span></div>
+          <div class="row"><span class="k">diff_sha</span><span class="v">e77a015</span></div>
+          <div class="row"><span class="k">human_reviewer</span><span class="v">u/dev-marcus</span></div>
+          <div class="row"><span class="k">merged_at</span><span class="v">2026-08-14T11:22:07Z</span></div>
+          <div class="row"><span class="k">trail_url</span><span class="v pur">/audit/8f2c41d9</span></div>
+        </div>
+        <div class="note ok">
+          <span class="lbl">Put the trail link in the pull request</span>
+          <p>
+            A trail nobody can find is a trail nobody uses. One line in the PR body, pointing at this
+            view, is what converts the store from compliance furniture into the thing a reviewer opens
+            when a diff looks odd.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===================== RIGHT: schema ===================== -->
+    <div class="panel">
+      <h3>THE RECORD · one row per step</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>field</th><th>why it is there</th></tr></thead>
+          <tbody>
+            <tr class="req"><td class="k">run_id</td><td>Joins everything. Generate before the first token.</td></tr>
+            <tr class="req"><td class="k">parent_run_id</td><td>Subagents. Without it a fan-out is unreconstructable.</td></tr>
+            <tr class="req"><td class="k">initiated_by</td><td>A human is accountable for every run. Name them.</td></tr>
+            <tr class="req"><td class="k">model</td><td>Exact id. "the model" is not a value.</td></tr>
+            <tr class="req"><td class="k">charter_sha</td><td>Which rules were in force. The most-forgotten field.</td></tr>
+            <tr class="req"><td class="k">repo_sha</td><td>What the world looked like going in.</td></tr>
+            <tr><td class="k">prompt_sha</td><td>Hash, not text. Proves sameness without storing it.</td></tr>
+            <tr><td class="k">context_refs</td><td>path + content hash. Never bodies.</td></tr>
+            <tr><td class="k">tool_calls[]</td><td>name, args (redacted), result hash, ms.</td></tr>
+            <tr class="req"><td class="k">gates[]</td><td>rule_id, verdict, matched location. Passes included.</td></tr>
+            <tr class="req"><td class="k">alternatives[]</td><td>What was rejected and why. The rarest, most valuable.</td></tr>
+            <tr><td class="k">retry_index</td><td>With the budget, so escalations explain themselves.</td></tr>
+            <tr><td class="k">pre_sha / post_sha</td><td>Both. One of them is useless alone.</td></tr>
+            <tr><td class="k">outcome</td><td>pr number, merge sha, or the reason it stopped.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn">
+        <span class="lbl">Never write these</span>
+        <p>
+          Raw prompts containing customer data, tool arguments carrying credentials or personal
+          information, whole file bodies, and full model outputs. Hash or redact at the point of
+          capture, not in a cleanup job later. An audit store is append-only by design, which means a
+          mistake in it is permanent by design.
+        </p>
+      </div>
+
+      <div class="note">
+        <span class="lbl">Three readers, three needs</span>
+        <ul>
+          <li><b>Tomorrow · the debugger.</b> Wants tool args and error strings. Short retention, high detail.</li>
+          <li><b>Next week · the reviewer.</b> Wants alternatives and gate verdicts. This is the one most systems fail.</li>
+          <li><b>Next year · the auditor.</b> Wants actor, charter version, and immutability. Low detail, long retention.</li>
+        </ul>
+        <p>
+          Different retention per tier is what keeps the store affordable: 30 days for tool detail,
+          forever for the step summary.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <h2>Changes produced by this run</h2>
+  <details class="filediff" open>
+    <summary><span class="path">billing/refund.py</span><span class="stat">+22 −3 · post e77a015</span></summary>
+    <div class="diff">
+      <div class="dl hunk">@@ -44,9 +44,12 @@ def refund_for_order(order, reason):</div>
+      <div class="dl">     if order.status == Status.CANCELLED:</div>
+      <div class="dl del">-        refund_total = order.total * (1 - discount_pct / 100)</div>
+      <div class="dl add">+        pct = Decimal(discount_pct) / Decimal(100)</div>
+      <div class="dl add">+        refund_total = round_half_up(order.total_cents * (1 - pct))</div>
+      <div class="dl">         return Refund(cents=refund_total, reason=reason)</div>
+    </div>
+  </details>
+  <details class="filediff">
+    <summary><span class="path">tests/test_refund.py</span><span class="stat">+18 −0 · post 9a1c447</span></summary>
+    <div class="diff">
+      <div class="dl hunk">@@ -0,0 +1,18 @@</div>
+      <div class="dl add">+def test_cancelled_with_discount_refunds_full_paid_amount():</div>
+      <div class="dl add">+    order = make_order(total_cents=10_000, discount_pct=15)</div>
+      <div class="dl add">+    order.cancel()</div>
+      <div class="dl add">+    assert refund_for_order(order, "cancelled").cents == 8_500</div>
+    </div>
+  </details>
+
+  <h2>Event log</h2>
+  <div class="logs">
+    <div class="log"><span class="ts">11:18:02.4</span><span class="ev">run.start</span><span class="jid">8f2c41d9</span><span class="data">actor=u/priya ticket=BILL-4471 charter=a91f3c2</span></div>
+    <div class="log"><span class="ts">11:18:02.5</span><span class="ev">context.read</span><span class="jid">8f2c41d9</span><span class="data">6 files, 41880 bytes, at repo_sha=4d7e0b8</span></div>
+    <div class="log lit"><span class="ts">11:18:04.6</span><span class="ev">plan.alternative</span><span class="jid">8f2c41d9</span><span class="data">rejected=new_entry_point reason=duplicates_reconciliation</span></div>
+    <div class="log"><span class="ts">11:18:15.9</span><span class="ev">tool.edit_file</span><span class="jid">8f2c41d9</span><span class="data">billing/refund.py pre=6c1a2e0 post=b30f9c4 +22-3</span></div>
+    <div class="log bad"><span class="ts">11:19:03.8</span><span class="ev">gate.block</span><span class="jid">8f2c41d9</span><span class="data">rule=money.integer-cents at=billing/refund.py:48</span></div>
+    <div class="log lit"><span class="ts">11:19:03.9</span><span class="ev">agent.notified</span><span class="jid">8f2c41d9</span><span class="data">gate output surfaced verbatim, retry 1/2</span></div>
+    <div class="log"><span class="ts">11:19:35.1</span><span class="ev">tool.edit_file</span><span class="jid">8f2c41d9</span><span class="data">billing/refund.py pre=b30f9c4 post=e77a015 +3-2</span></div>
+    <div class="log ok"><span class="ts">11:19:35.2</span><span class="ev">gate.pass</span><span class="jid">8f2c41d9</span><span class="data">money.integer-cents scope.allowed-paths secrets.no-literals</span></div>
+    <div class="log ok"><span class="ts">11:20:39.4</span><span class="ev">verify.revert</span><span class="jid">8f2c41d9</span><span class="data">new test goes red on revert — falsifier confirmed</span></div>
+    <div class="log ok"><span class="ts">11:20:42.2</span><span class="ev">run.propose</span><span class="jid">8f2c41d9</span><span class="data">pr=#2291 diff_sha=e77a015</span></div>
+    <div class="log"><span class="ts">11:22:07.0</span><span class="ev">human.merge</span><span class="jid">8f2c41d9</span><span class="data">reviewer=u/dev-marcus</span></div>
+  </div>
+
+  <h2>The replay test</h2>
+  <div class="cols">
+    <div class="panel">
+      <div class="note ok">
+        <span class="lbl">One question, run quarterly</span>
+        <p>
+          Pick a merged change from three months ago at random. Using only the trail, answer:
+          <b>why does this line look like this?</b> If you can name the alternative that was rejected,
+          the rule that constrained it, and the human who is accountable, you have an audit trail. If
+          you can only see what happened and in what order, you have logs.
+        </p>
+      </div>
+      <div class="finding high">
+        <div class="h"><b>Fails the test</b><span class="badge reject">logs only</span></div>
+        <p>Timestamps, tool names, token counts. Answers "what happened". Cannot answer "why this and not the other thing".</p>
+      </div>
+      <div class="finding medium">
+        <div class="h"><b>Partial</b><span class="badge changes">no charter version</span></div>
+        <p>Gates recorded but not which charter produced them. You know a rule fired; you cannot reconstruct the ruleset it belonged to.</p>
+      </div>
+      <div class="finding low">
+        <div class="h"><b>Passes</b><span class="badge accept">audit trail</span></div>
+        <p>Alternatives, gate verdicts including passes, charter sha, accountable human. Reconstructable by a stranger.</p>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>WHERE TO START</h3>
+      <p class="dim">
+        Do not build a store. Append one JSON line per run to a file, with eight fields:
+      </p>
+      <pre><code>{"run_id","initiated_by","model","charter_sha",
+ "repo_sha","gates","alternatives","outcome"}</code></pre>
+      <p class="dim" style="margin-top:8px">
+        That is an afternoon, it fits in the repo, and it passes the replay test. Everything on this
+        page is what you add after the cheap version has proved somebody actually opens it.
+      </p>
+      <div class="note warn" style="margin-top:12px">
+        <span class="lbl">The trap</span>
+        <p>
+          Teams build the dashboard first and the schema second, and end up with a beautiful view over
+          data that cannot answer the only question that matters. The schema is the product. This page
+          is just a way of looking at it.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div><b>The Audit Trail</b>, a worked example rendered as the artifact.
+      <b>Ian Johnson</b>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/guardrails/">Five Guardrails</a> (the gates that fire here) ·
+      <a href="/factory/">The Factory</a> (the record after the action) ·
+      <a href="/eval-loop/">The Eval Loop</a> (joins on charter_sha)</div>
+    <div>Related · <a href="/evidence-of-judgment/">Evidence of Judgment</a> ·
+      <a href="/seniority-ladder/">The Seniority Ladder</a></div>
+    <div>State is carried by border colour:
+      <span class="ok">passed</span> ·
+      <span class="lit">in progress</span> ·
+      <span class="bad">blocked</span>.</div>
+  </footer>
+
+</div>
+
+<script>
+// ponytail: one listener, one class swap. No framework, no state library.
+const flow = document.getElementById('flow');
+flow.addEventListener('click', e => {
+  const btn = e.target.closest('.step');
+  if (!btn) return;
+  flow.querySelectorAll('.step').forEach(s => s.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.querySelectorAll('.detailpane').forEach(p => {
+    p.classList.toggle('on', p.dataset.pane === btn.dataset.step);
+  });
+});
+</script>
+
+</body>
+</html>
