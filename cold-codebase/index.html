@@ -1,0 +1,1294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cold Codebase · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A one-week exercise for your first days in a system you didn't write: one trace, a hand-drawn map, a budget of twenty agent questions, and a claim you defend. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/cold-codebase/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Cold Codebase">
+<meta property="og:description" content="You can now change code you cannot name. A one-week exercise that makes comprehension deliberate again.">
+<meta property="og:url" content="https://www.tacoda.dev/cold-codebase/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Cold Codebase">
+<meta name="twitter:description" content="You can now change code you cannot name. A one-week exercise that makes comprehension deliberate again.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Cold Codebase</span>
+      <span class="sep">/</span>
+      <span>one week</span>
+    </div>
+    <h1>You can now change code you <em>cannot name</em>.</h1>
+    <p class="standfirst">
+      Unfamiliarity used to be self-limiting. You could not produce a plausible change to a system you
+      had not read, so reading happened whether or not anyone planned it. That is no longer true, and
+      the first casualty is the week where a new engineer built a model of the thing. This exercise
+      puts that week back and gives it deliverables: one trace, one map you draw by hand, twenty
+      questions, and a claim you have to defend on Friday.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · anyone in their first week on an unfamiliar system, and the person hosting them<br>
+      what you need · the system, a host with forty-five minutes across the week, and paper<br>
+      the agent · open, and rationed. Twenty questions. §4 is about which twenty<br>
+      pairs with · <a href="/reverse-review/">Reverse-review</a> (reading a change) · <a href="/bisect-drill/">the Bisect Drill</a> (hunting through history)
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Where questions</dt>
+          <dd>"Where is discount logic handled?" The agent is genuinely excellent at these. Spend freely.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>What questions</dt>
+          <dd>"What does this function do?" Usually right, occasionally confidently wrong. Verify by reading after.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Why questions</dt>
+          <dd>"Why is it written this way?" You will get a fluent answer that is not evidence. The real answer is local, historical, and often in nobody's head.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Exercise sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> What changed</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The week</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Seams, one trace</a></li>
+      <li><a href="#s-3"><span class="n">3</span> The map</a></li>
+      <li><a href="#s-4"><span class="n">4</span> The budget</a></li>
+      <li><a href="#s-5"><span class="n">5</span> The claim</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Defense &amp; gaps</a></li>
+      <li><a href="#s-7"><span class="n">7</span> The memory test</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Running it</a></li>
+      <li><a href="#s-9"><span class="n">9</span> Failure modes</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The premise</span>
+      </div>
+      <div>
+        <h2>Comprehension used to be a byproduct</h2>
+        <p class="thesis">
+          Nobody designed the first week. It worked anyway, because producing anything required
+          understanding something first.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The old sequence was enforced by physics. To change a function you had to find it, and to find
+        it you had to learn the layout. To make the change compile you had to learn the types. To make
+        it pass you had to learn what the tests believed. None of that was a curriculum. It was the
+        toll you paid on the way to your first merged change, and everybody paid it.
+      </p>
+      <p>
+        The toll is now optional. An agent will locate the function, match the surrounding style,
+        satisfy the types, and get the suite green, in a system the person driving it could not draw on
+        a napkin. The change is often fine. The problem is what did not happen: no model got built, and
+        the second week starts from the same place as the first.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the sequence that stopped being mandatory</span><span class="tag warn">what to restore deliberately</span></figcaption>
+<pre><code><span class="c-dim">BEFORE</span>
+  need to change X  ──▶  find X  ──▶  read around X  ──▶  <span class="c-pass">model forms</span>  ──▶  change X
+                         <span class="c-dim">comprehension was the toll, and it was compulsory</span>
+
+<span class="c-dim">NOW</span>
+  need to change X  ──▶  <span class="c-warn">change X</span>
+                         <span class="c-block">model never forms, and nothing reports its absence</span></code></pre>
+      </figure>
+
+      <p>
+        This is not an argument for working without the agent. It is an argument that one specific
+        thing which used to be free now has to be bought on purpose, and that a week is a fair price
+        for a system you will work in for two years.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The inversion this exercise runs on</span>
+        <p>
+          For one week the agent is a comprehension instrument, not a production instrument. You are
+          allowed to ask it anything and not allowed to ship anything. That constraint is the entire
+          design.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The week">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Five days</span>
+      </div>
+      <div>
+        <h2>Three deliverables, one budget</h2>
+        <p class="thesis">
+          Roughly ninety minutes a day. The rest of the week is whatever onboarding you already do.
+        </p>
+        <div class="chips">
+          <span class="chip kind-make"><b>deliver</b> one map</span>
+          <span class="chip kind-make"><b>deliver</b> one claim</span>
+          <span class="chip kind-make"><b>deliver</b> one gap list</span>
+          <span class="chip kind-gate"><b>budget</b> 20 questions</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Monday</span>
+          <span class="what">Find the seams. Pick one trace with the host. Follow it end to end, by hand.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Tuesday</span>
+          <span class="what">Draw the map. On paper, one page, boxes for things that own state or make decisions.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Wednesday</span>
+          <span class="what">Spend the question budget on what the map cannot answer. Redraw it afterwards.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Thursday</span>
+          <span class="what">Write one falsifiable claim about the system's behavior. Then run it and find out.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Friday</span>
+          <span class="what">Thirty minutes with the host: defend the map, report the claim, hand over the gap list.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">The one prohibition</span>
+        <p>
+          No production changes this week. Not a typo fix, not a dependency bump, not the small ticket
+          somebody offers you on Wednesday to make you feel useful. The offer will come, it will be
+          kindly meant, and accepting it converts the week back into ordinary onboarding, where the
+          model does not get built.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Monday">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Monday</span>
+      </div>
+      <div>
+        <h2>Seams first, then exactly one trace</h2>
+        <p class="thesis">
+          The instinct is to read the source tree. The source tree is organised for the people who
+          already have the model.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A system's shape is defined at its boundaries, not in its middle. Before opening any business
+        logic, answer two questions: where does data get in, and where does it get out. Everything
+        between those is detail you can acquire later, and most of it you never will, correctly.
+      </p>
+
+      <h3 class="sub">The seams, in about twenty minutes</h3>
+      <ul>
+        <li><strong>In:</strong> HTTP routes, queue consumers, scheduled jobs, CLI entry points, webhooks. Find the file where these are registered. Every system has one and it is the most informative file in the repo.</li>
+        <li><strong>Out:</strong> the database client, the outbound HTTP client, the queue publisher, anything that sends mail or money. Grep for the client, not for the concept.</li>
+        <li><strong>State:</strong> the schema, or the migrations directory. Table names are the closest thing most systems have to an honest domain glossary.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Then: one trace, all the way down</span>
+        <p>
+          Pick one real request or job with the host. Follow it from the entry point to the last write
+          it causes, reading every layer it passes through. One vertical slice beats a horizontal
+          survey of any single layer, because it is the only way to learn how the layers actually
+          relate rather than what the directory names claim.
+        </p>
+      </div>
+
+      <p>
+        Choose the trace for centrality, not simplicity. The health check endpoint is easy and teaches
+        nothing. The thing the business would notice within ten minutes if it stopped is the right
+        pick, and the host should be choosing it on that basis in their fifteen minutes on Monday.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Tuesday">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Tuesday</span>
+      </div>
+      <div>
+        <h2>Draw it by hand, and draw it badly</h2>
+        <p class="thesis">
+          A generated diagram lists everything. A model is mostly a decision about what to leave out,
+          and the leaving out is the part you have to do yourself.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>rule</b> one page, by hand</span>
+          <span class="chip kind-rule"><b>rule</b> boxes own state or decide</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        You could ask the agent for an architecture diagram in ten seconds, and it would be accurate,
+        comprehensive, and useless. Accurate because it can read every import. Useless because a map
+        of everything has no viewpoint, and a viewpoint is what you are trying to acquire. Drawing it
+        badly, by hand, forces the only question that matters: what is central here?
+      </p>
+
+      <h3 class="sub">Rules for the map</h3>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">One page</span>
+          <span class="what">If it does not fit, you are drawing files. Zoom out until it fits, then stop.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Boxes</span>
+          <span class="what">A box owns state or makes a decision. Helpers, utils, formatters and adapters are not boxes. Most of the source tree is not on this map, and that is correct.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Arrows</span>
+          <span class="what">Label every arrow with <em>what flows</em>, not with "uses". "order id" and "signed token" are labels. An unlabeled arrow means you have not actually followed it.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Question marks</span>
+          <span class="what">Anything you cannot name gets a box marked "?". These are the most valuable marks on the page and they drive Wednesday. Do not fill them in from a guess.</span>
+        </li>
+      </ol>
+
+      <p>
+        Do not tidy it. A map with three crossings out and a question mark in the corner is doing its
+        job; a clean one drawn on the second attempt has usually had its uncertainty edited out, which
+        is the only information it contained that nobody else already had.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Wednesday">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Wednesday</span>
+      </div>
+      <div>
+        <h2>Twenty questions, and three kinds of answer</h2>
+        <p class="thesis">
+          Unlimited questions produce a transcript. A budget produces a decision about what you
+          actually do not know.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Twenty is arbitrary and the arbitrariness is fine; scarcity is the mechanism, not the number.
+        What matters far more is that the three kinds of question have wildly different reliability,
+        and treating them as one kind is how people end the week confidently misinformed.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>what the agent is worth, by question type</caption>
+          <thead>
+            <tr><th>Kind</th><th>Example</th><th>Reliability</th><th>What to do with it</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Where</td>
+              <td>"Where is the retry policy applied?"</td>
+              <td>High</td>
+              <td>Take it. Then open the file, because the answer is a pointer and not a fact.</td>
+            </tr>
+            <tr>
+              <td>What</td>
+              <td>"What does <code>reconcile()</code> do?"</td>
+              <td>Mostly</td>
+              <td>Use as a reading aid. Read the function afterwards and check the summary against it.</td>
+            </tr>
+            <tr class="flag">
+              <td>Why</td>
+              <td>"Why does this bypass the queue?"</td>
+              <td>None</td>
+              <td>Never accept. Go looking in the repo. If the repo cannot answer, it is a gap (§6).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">Why the why questions are poison here</span>
+        <p>
+          The agent will answer them, fluently, in the same register as the other two. But the reason a
+          particular thing is written a particular way is local and historical: an incident in March, a
+          contract clause, a database that used to be somewhere else. That information is in commit
+          messages, issues, and people. When the model supplies a plausible reason instead, you have
+          acquired a false belief that will feel like knowledge for months.
+        </p>
+      </div>
+
+      <p>
+        Spend the budget on the question marks from Tuesday, mostly on <em>where</em>. Then redraw the
+        map. The second map is the one you keep, and comparing it to the first is a useful thing to
+        show the host on Friday: it shows what you thought the system was on Tuesday.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Thursday">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Thursday</span>
+      </div>
+      <div>
+        <h2>One claim that could be wrong</h2>
+        <p class="thesis">
+          A model you cannot test is a feeling about a system. Thursday converts it into something with
+          an outcome.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Write down one prediction about behavior, specific enough to be falsified, before running
+        anything. Then run it.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the claim, written before it is tested</span><span class="tag warn">falsifiable or it doesn't count</span></figcaption>
+<pre><code><span class="c-dim">CLAIM</span>
+  If I submit an order with two line items and a discount code
+  that has already been redeemed, then:
+    · the order is created                       <span class="c-dim">← I think</span>
+    · no discount row is written                 <span class="c-dim">← I think</span>
+    · the customer sees the full price           <span class="c-dim">← I think</span>
+    · nothing is logged at warn or above         <span class="c-dim">← least sure</span>
+
+<span class="c-dim">RESULT</span>
+  <span class="c-pass">✓</span> order created
+  <span class="c-pass">✓</span> no discount row
+  <span class="c-block">✗</span> customer saw the discounted price anyway  <span class="c-block">← model was wrong</span>
+  <span class="c-pass">✓</span> nothing logged
+
+<span class="c-dim">WHAT I HAD WRONG</span>
+  Price display reads a cached total written before validation.
+  The cache is a box I did not have on my map at all.</code></pre>
+      </figure>
+
+      <p>
+        Mark the line you are least sure about before running. That is the honest part of the exercise
+        and it is what makes the result informative either way: being right about the thing you flagged
+        as shaky is worth something, and being wrong about a line you were confident in is worth a
+        great deal more.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Wrong is the good outcome</span>
+        <p>
+          A claim that comes back entirely correct usually means it was too safe. The purpose is to
+          find the edge of the model on a Thursday in week one, in a scratch environment, rather than
+          in March in production.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Friday">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Friday</span>
+      </div>
+      <div>
+        <h2>The defense, and the asset that expires</h2>
+        <p class="thesis">
+          Thirty minutes. Twenty of them are the map, and ten are the most valuable list nobody
+          collects.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Twenty minutes on the map</h3>
+      <p>
+        Walk the host through it, then let them ask. The useful questions are all of one shape: point
+        at an arrow and ask what flows across it, point at a box and ask what happens when it fails.
+        Anything answered with "I think" gets circled, and circles are a fine result. The map is being
+        graded on whether it is honest, not on whether it is complete.
+      </p>
+
+      <h3 class="sub">Ten minutes on the gaps</h3>
+      <p>
+        Hand over the list of every question the codebase could not answer. Every "why is this like
+        this" with no answer in a comment, a commit message, an issue, or a charter rule.
+      </p>
+
+      <div class="callout">
+        <span class="label">This list is a depreciating asset</span>
+        <p>
+          A new person is the only one who can see what is undocumented, and the ability lasts about
+          three weeks. After that the gaps become invisible, not because they were filled but because
+          the person stopped noticing them. Every engineer who joins and does not write this list down
+          is an audit of the codebase that was performed and then thrown away.
+        </p>
+      </div>
+
+      <p>
+        The host owes an answer or an admission on each item, that day. "Nobody knows, it predates all
+        of us" is a legitimate answer and should be written into the repo as exactly that, because the
+        next person will otherwise spend the same afternoon on it. This is where the exercise pays rent
+        back to the codebase rather than only consuming senior time.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="The test">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The check</span>
+      </div>
+      <div>
+        <h2>Cover it and redraw it</h2>
+        <p class="thesis">
+          One test, five minutes, and it is not negotiable with yourself.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Put the map face down. Redraw it from memory on a blank sheet, five minutes, no looking. Then
+        compare.
+      </p>
+      <p>
+        What survives the redraw is your model. What does not survive was a diagram you made, which is
+        a different thing that feels identical while you are holding it. Most people lose about a third
+        on the first attempt, and the third they lose is informative: it is usually the part they
+        copied from the agent rather than the part they traced by hand.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The bar for the week</span>
+        <p>
+          Redraw the trace path and the boxes it touches, from memory, correctly. Not the whole system.
+          The one path you followed on Monday, and what it touches, is a fair definition of having
+          arrived.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Running it">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">45 min</span>
+      </div>
+      <div>
+        <h2>The host's forty-five minutes, and two variants</h2>
+        <p class="thesis">
+          The host's main job is resisting the urge to give a tour.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">Mon · 15 min</span>
+          <span class="what">Pick the trace together. Name the entry point and the last write, and stop talking. Do not explain the middle: the middle is the exercise.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Fri · 30 min</span>
+          <span class="what">Take the defense. Ask about arrows and failure modes, answer the gap list, and write the answers into the repo the same day.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Why not the tour</span>
+        <p>
+          The two-hour whiteboard walkthrough is the default, it feels generous, and almost none of it
+          is retained, because it arrives before there are any hooks to hang it on. The same two hours
+          spent on Friday, answering questions the person actually generated, lands completely
+          differently. Same information, same senior, opposite retention.
+        </p>
+      </div>
+
+      <h3 class="sub">Two variants</h3>
+      <ul>
+        <li>
+          <strong>No host.</strong> Use an open source repo and let the issue tracker be the oracle.
+          Pick a closed bug, predict from your map which files the fix touched, then open the pull
+          request and see. It is a weaker exercise on gaps and a surprisingly good one on claims.
+        </li>
+        <li>
+          <strong>Two people, one system.</strong> Two new engineers, same trace, separate maps, no
+          comparing until Friday. Two honest maps of one system look substantially different, and
+          discovering that in week one is a durable lesson about what a map is.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="Failure modes">
+          <i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Where it breaks</span>
+      </div>
+      <div>
+        <h2>Six ways the week evaporates</h2>
+        <p class="thesis">
+          Every one of them is someone being helpful.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">The small ticket</span>
+          <span class="what">Offered Wednesday so the new person feels productive. It converts the week into ordinary onboarding, and it is the single most common way this fails.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">The tour</span>
+          <span class="what">A generous senior explains the architecture on Monday morning. Nothing sticks, and worse, the person now has borrowed vocabulary that hides which parts they cannot actually name.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Breadth-first</span>
+          <span class="what">Reading the source tree top to bottom. Produces familiarity with names and no model of behavior. One trace, all the way down, beats it every time.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">The generated diagram</span>
+          <span class="what">Comprehensive, accurate, viewpointless. If it did not cost you a decision about what to omit, it is not your map.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Accepting a why</span>
+          <span class="what">Taking the agent's account of why something is the way it is. A confident false history is worse than a known gap, because gaps get filled and false history does not.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">The gap list nobody reads</span>
+          <span class="what">Collected on Friday, filed nowhere. Do this twice and people correctly stop writing it, and you have lost the only audit of your documentation you were ever going to get for free.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">Where to start</span>
+        <p>
+          If you adopt one piece of this, adopt Monday: one trace, entry point to last write, followed
+          by hand. It is ninety minutes, it needs no host beyond picking the trace, and it produces
+          more usable model than the rest of the week combined.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Cold Codebase</strong>, a one-week exercise.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/reverse-review/">Reverse-review</a> ·
+      <a href="/bisect-drill/">The Bisect Drill</a> ·
+      <a href="/first-ninety-days/">The First Ninety Days</a></div>
+    <div>Related · <a href="/comprehension-standard/">The Comprehension Standard</a> ·
+      <a href="/seniority-ladder/">The Seniority Ladder</a></div>
+    <div>Colour encodes question type:
+      <span style="color:var(--forest)">where</span> ·
+      <span style="color:var(--gold)">what</span> ·
+      <span style="color:var(--brick)">why</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
