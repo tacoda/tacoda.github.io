@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evidence of Judgment · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="How to build a promotion case when the diff was agent-written: six classes of evidence, the rejection log, where to store it so it survives, and what managers should ask for instead. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/evidence-of-judgment/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Evidence of Judgment">
+<meta property="og:description" content="The work that proves you're senior leaves no trace unless you leave one. Six classes of evidence and where to keep them.">
+<meta property="og:url" content="https://www.tacoda.dev/evidence-of-judgment/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Evidence of Judgment">
+<meta name="twitter:description" content="The work that proves you're senior leaves no trace unless you leave one. Six classes of evidence and where to keep them.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Evidence of Judgment</span>
+      <span class="sep">/</span>
+      <span>the promotion case</span>
+    </div>
+    <h1>The work that proves you're senior <em>leaves no trace</em>.</h1>
+    <p class="standfirst">
+      A merged pull request is a record. A suggestion you turned down is not. Neither is the feature
+      that shrank from six weeks to two days, or the incident that did not happen because you refused
+      something in March. As soon as the code is agent-written, "look at my commits" stops being an
+      argument, and everything that replaces it is subtractive: what got rejected, what did not escape,
+      what got smaller. None of it is recorded by default. This is how to record it without turning
+      your job into bookkeeping.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · the engineer assembling a case, and the manager who has to read forty of them<br>
+      time cost · about a minute a day, if it happens at the moment rather than in review season<br>
+      what counts · defined by <a href="/seniority-ladder/">the Seniority Ladder</a>. This page is about having it when asked<br>
+      what it is not · a way to look busy. §7 is the list of ways this goes wrong
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Leaves a trace</dt>
+          <dd>Merged code, closed tickets, shipped features. Abundant now, and therefore no longer discriminating.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Traceable only on purpose</dt>
+          <dd>Rejections, scope reductions, catches before merge. Real work, invisible unless written down within the hour.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>The absence</dt>
+          <dd>The incident that never happened. Your best work produces nothing observable, which is why it needs an argument rather than a link.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Document sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> The problem</a></li>
+      <li><a href="#s-1"><span class="n">1</span> Six classes</a></li>
+      <li><a href="#s-2"><span class="n">2</span> The rejection log</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Put it in the artifact</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Reconstructing</a></li>
+      <li><a href="#s-5"><span class="n">5</span> The packet</a></li>
+      <li><a href="#s-6"><span class="n">6</span> The other side</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Anti-patterns</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Minimum version</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The problem">
+          <i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The problem</span>
+      </div>
+      <div>
+        <h2>Your evidence used to be a side effect of working</h2>
+        <p class="thesis">
+          Nobody kept a portfolio. The commit history was the portfolio, and it was produced for free
+          by the act of doing the job.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        That worked because writing the code and demonstrating you could write the code were the same
+        motion. The artifact and the evidence were one object. Now the artifact is largely produced by
+        something else, and what you contributed sits in the difference between what was produced and
+        what shipped. Differences are not stored anywhere.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>where the evidence went</span><span class="tag warn">the whole problem</span></figcaption>
+<pre><code><span class="c-dim">WHAT THE SYSTEM RECORDS</span>
+  the commit that shipped  ·  the ticket that closed  ·  the review you approved
+
+<span class="c-dim">WHAT IT DOESN'T</span>
+  <span class="c-warn">the version you rejected, and why</span>
+  <span class="c-warn">the six weeks of work you argued down to two days</span>
+  <span class="c-warn">the thing you asked about that nobody had considered</span>
+  <span class="c-block">the outage that therefore did not occur</span>
+
+<span class="c-dim">The bottom line has no artifact at all. It is a counterfactual,</span>
+<span class="c-dim">and counterfactuals need an argument rather than a link.</span></code></pre>
+      </figure>
+
+      <p>
+        There is a second-order effect worth naming, because it decides how urgent this is. Reviewers
+        are already noticing that shipped volume has stopped correlating with quality, and the
+        institutional response is to reach for something else to count. If nobody supplies a better
+        measure, they will settle on whatever is easiest to extract from the tooling, which will be
+        worse than what it replaced. Supplying the better measure is partly your job now.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Six classes">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">What counts</span>
+      </div>
+      <div>
+        <h2>Six classes, and the rung each one argues for</h2>
+        <p class="thesis">
+          Not a list of everything good you did. Six shapes of evidence, each of which supports a
+          specific claim about what you can be trusted with.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>evidence classes, strongest first</caption>
+          <thead>
+            <tr><th>Class</th><th>The artifact</th><th>Argues for</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Rejections</td>
+              <td>Agent output you turned down, with the reason and the cost had you been wrong.</td>
+              <td>R2 · trusted to merge alone</td>
+            </tr>
+            <tr>
+              <td>Catches</td>
+              <td>Defects found before merge, with the class named, not just the instance.</td>
+              <td>R3 · trusted on others' work</td>
+            </tr>
+            <tr>
+              <td>Escapes owned</td>
+              <td>Something you approved that broke, and the specific thing you changed afterwards.</td>
+              <td>R3 · credibility</td>
+            </tr>
+            <tr>
+              <td>Constraints</td>
+              <td>A rule merged into the harness with the incident named. A rule deleted, with the reason.</td>
+              <td>R4 · trusted with the rules</td>
+            </tr>
+            <tr>
+              <td>Reductions</td>
+              <td>Work that got smaller or did not happen, with the before and after.</td>
+              <td>R5 · trusted with scope</td>
+            </tr>
+            <tr class="total">
+              <td>Positions held</td>
+              <td>A correct call defended with evidence when someone senior disagreed. Or correctly abandoned.</td>
+              <td>All of them</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">The counterintuitive one</span>
+        <p>
+          Escapes owned belongs in the packet, near the top. Every other packet the reviewer reads that
+          week contains no failures at all, which they know is false. A specific approval that went
+          wrong, followed by the specific thing you now check, is the cheapest credibility available
+          and it makes the five claims around it readable as honest rather than curated.
+        </p>
+      </div>
+
+      <p>
+        Notice what is not on the list: features delivered, tickets closed, lines written, systems
+        launched. Those are not worthless, but they no longer distinguish anybody, and a packet built
+        on them reads as a report on how much the agent produced while you were nearby.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="The log">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">15 seconds</span>
+      </div>
+      <div>
+        <h2>The rejection log</h2>
+        <p class="thesis">
+          One line, written in the moment. The moment is not negotiable: nobody has ever successfully
+          remembered these on a Sunday in November.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>rate</b> one to three a week</span>
+          <span class="chip kind-gate"><b>field</b> cost if wrong</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>~/judgment.md · plain text, yours, portable</span><span class="tag warn">one line each</span></figcaption>
+<pre><code>2026-03-04  <span class="c-dim">#412</span>  agent used a float for the refund amount; switched to
+                  integer cents. <span class="c-block">wrong → silent rounding loss on every refund</span>
+
+2026-03-11  <span class="c-dim">#418</span>  agent retried the payment call on timeout; we fail fast
+                  here by policy. <span class="c-block">wrong → duplicate charges</span>
+
+2026-03-12  <span class="c-dim">—</span>     talked the export feature down from a scheduled pipeline
+                  to a signed URL. <span class="c-warn">6 weeks → 2 days, no new infra</span>
+
+2026-03-19  <span class="c-dim">#431</span>  approved the cache change; it broke stale reads in prod.
+                  <span class="c-pass">now: any cache PR gets an explicit invalidation claim</span></code></pre>
+      </figure>
+
+      <h3 class="sub">The one field that matters</h3>
+      <p>
+        <strong>Cost if wrong.</strong> Without it a rejection log is a list of preferences and reads
+        like fussiness. With it, each line becomes an argument. Turning down a suggestion that would
+        have cost nothing is housekeeping and does not belong in the file. Turning down one that would
+        have double-charged customers is the entire job, and the difference between those two is
+        exactly what a reviewer is trying to establish.
+      </p>
+
+      <h3 class="sub">Two practical rules</h3>
+      <ul>
+        <li>
+          <strong>Keep it somewhere you own.</strong> A plain file in your own notes or a personal repo,
+          not a company wiki you lose access to on your last day. The evidence should outlive the job,
+          because the next conversation about your seniority may not be at this company.
+        </li>
+        <li>
+          <strong>One to three lines a week is the honest rate.</strong> If you are writing twenty, you
+          are logging keystrokes rather than judgment, and the file will be useless because nobody
+          including you will read it. If you are writing zero for a month, that is a genuine finding
+          about the month and worth sitting with.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="In the artifact">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Durable</span>
+      </div>
+      <div>
+        <h2>The strongest version is not a log at all</h2>
+        <p class="thesis">
+          Write the rejection into the pull request, at the time. Then the record is dated by the
+          version control system rather than by you.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A private log kept diligently all year and a private log written the week before review look
+        identical on the page. That is a real problem and it is worth solving structurally rather than
+        by asking people to trust you. A sentence in a pull request body from March is timestamped,
+        public, and was written when you had nothing to gain from it.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>three lines at the bottom of a PR description</span><span class="tag pass">the durable record</span></figcaption>
+<pre><code>## What the agent proposed, and what I did instead
+
+- Proposed a retry with backoff on the charge call. Replaced with
+  fail-fast: this path is not idempotent, so a retry risks a double
+  charge. See CHARTER.md §payments.
+- Proposed caching the tax lookup for 24h. Left uncached; rates
+  change intraday during the state transition window in April.</code></pre>
+      </figure>
+
+      <p>
+        This costs nothing extra, because you already made both decisions. It also does a second job
+        immediately: it is the most useful thing a reviewer can read, since it tells them where you
+        deviated from the obvious path and why. Teams that adopt this as a norm find review gets
+        faster, which is a better argument for adopting it than the promotion one.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Then the private log is just an index</span>
+        <p>
+          With the durable record living in pull requests, your own file shrinks to a list of pointers
+          plus the things that have no pull request: scope conversations, meetings where you talked
+          something down, questions you asked that changed a plan. Those still need writing down by
+          hand, and they are frequently the most valuable entries you have.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Reconstructing">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Salvage</span>
+      </div>
+      <div>
+        <h2>Reconstructing a year you did not record</h2>
+        <p class="thesis">
+          Most people read this in month eleven. Here is what can be recovered, and an honest estimate
+          of how much.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>starting points, if you use GitHub</span><span class="tag warn">archaeology</span></figcaption>
+<pre><code><span class="c-dim"># your merged PRs with bodies, to find the ones where you explained a choice</span>
+gh pr list --author "@me" --state merged --limit 200 \
+  --json number,title,body,mergedAt
+
+<span class="c-dim"># PRs you reviewed: where your catches live</span>
+gh search prs --reviewed-by "@me" --merged --merged-at "&gt;2026-01-01"
+
+<span class="c-dim"># discussions you weighed into that were not yours</span>
+gh search prs --commenter "@me" --merged-at "&gt;2026-01-01"</code></pre>
+      </figure>
+
+      <h3 class="sub">Then, in descending order of yield</h3>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Best</span>
+          <span class="what">Review comments that were followed by a change. A comment plus the commit that answered it is a documented catch, and the timestamps prove it happened before merge.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Good</span>
+          <span class="what">Design documents where the final scope differs from the first draft. The diff between versions is a reduction you can point at, and version history usually survives.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Good</span>
+          <span class="what">Incidents you were on. Look for what you changed afterwards, not for how fast it was resolved.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Underrated</span>
+          <span class="what">Ask two colleagues: "what is something I stopped from happening?" People remember your refusals far better than you do, because they experienced them and you have moved on.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Lost</span>
+          <span class="what">Nearly every rejection that never reached a pull request. This is the bulk of it, and it is gone.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Say which it is</span>
+        <p>
+          Archaeology recovers maybe a third, and reconstructed evidence is legitimate as long as it is
+          labelled. "Reconstructed from PR history in October" is fine and honest. Presenting it as a
+          log you kept all year is a small lie about exactly the trait you are claiming, which is a
+          bad trade at any odds.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="The packet">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">One page</span>
+      </div>
+      <div>
+        <h2>The packet: six claims, one page</h2>
+        <p class="thesis">
+          A packet that needs eight pages is a packet whose author could not identify the six things
+          that mattered, which is itself a demonstration.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        One pattern, repeated six times: a claim in the vocabulary of the ladder, the evidence, and
+        the consequence. Nothing else.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the shape of an entry</span><span class="tag pass">claim · evidence · consequence</span></figcaption>
+<pre><code><span class="c-pass">CLAIM</span>        I am the last check on payment-path changes.
+<span class="c-warn">EVIDENCE</span>     PR #418, #431, #447 — three agent-proposed retries
+             rejected on the non-idempotent path, each with the
+             policy cited in the PR body.
+<span class="c-block">CONSEQUENCE</span>  A retry on that path double-charges. We have shipped
+             none since March.
+
+<span class="c-pass">CLAIM</span>        I approved something that broke, and changed how I review.
+<span class="c-warn">EVIDENCE</span>     PR #431, incident 2026-03-19.
+<span class="c-block">CONSEQUENCE</span>  Every cache change now needs an explicit invalidation
+             claim. Two caught since, #455 and #470.</code></pre>
+      </figure>
+
+      <h3 class="sub">Four rules for the page</h3>
+      <ul>
+        <li><strong>Lead with the escape.</strong> It buys the credibility that carries the other five.</li>
+        <li><strong>No feature lists.</strong> If a line could have been written by anyone who was staffed on the same project, cut it.</li>
+        <li><strong>Consequence in the domain, not the codebase.</strong> "Prevents duplicate charges" beats "improves correctness". The reader is deciding what to trust you with, not admiring the fix.</li>
+        <li><strong>Link, do not paste.</strong> Six links they can check beats six paragraphs they have to believe.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Managers">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The reader</span>
+      </div>
+      <div>
+        <h2>If you are the one reading forty of these</h2>
+        <p class="thesis">
+          Two obligations, and the second is the one that gets skipped.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Ask for different things</h3>
+      <ul>
+        <li>What did you turn down, and what would it have cost if you had been wrong?</li>
+        <li>What got smaller because you were in the room?</li>
+        <li>What did you approve that broke, and what do you check now that you did not check before?</li>
+        <li>Which rule in our harness exists because of you? Which one did you remove?</li>
+      </ul>
+      <p>
+        And stop asking for impact denominated in shipped work. Volume now measures how fast somebody
+        can drive a model, which is a real skill, an easily acquired one, and not the thing a
+        promotion is supposed to be recognising.
+      </p>
+
+      <div class="callout">
+        <span class="label">The obligation that gets skipped</span>
+        <p>
+          If you start asking for rejection logs without warning, you will not select for judgment. You
+          will select for people who happened to keep notes, and you will disproportionately miss the
+          people least likely to self-promote, which is the failure mode every review process already
+          has. Announce it a full cycle ahead, and put the pull request practice from §3 into the
+          team's norms so the evidence accumulates for everyone by default rather than for the diligent
+          only.
+        </p>
+      </div>
+
+      <p>
+        The structural fix is worth more than the request. When "what the agent proposed and what I did
+        instead" is a standing section in the pull request template, every engineer produces this
+        evidence as a byproduct of working, which is exactly the property the old commit history had
+        and the thing we are trying to get back.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Anti-patterns">
+          <i class="on"></i><i></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Five ways</span>
+      </div>
+      <div>
+        <h2>Five ways this turns into theatre</h2>
+        <p class="thesis">
+          The last one is fatal and is usually introduced by a well-meaning process improvement.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Inflation</span>
+          <span class="what">Logging every rejected autocomplete. Fifty entries of no consequence dilute four that mattered to zero, because the reader stops reading at entry six.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Borrowed credit</span>
+          <span class="what">"I shipped forty pull requests" where the agent wrote them. Reviewers can tell, and the claim contaminates the true ones sitting next to it.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">The wall of links</span>
+          <span class="what">Thirty URLs and no claims. It asks the reader to do your synthesis, which they will not, so they will fall back on their prior impression of you.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Dressed-up archaeology</span>
+          <span class="what">Reconstruction presented as a contemporaneous log. See §4: label it and it is fine, hide it and you have misrepresented the exact trait under discussion.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Rejections as a metric</span>
+          <span class="what">The moment rejection <em>rate</em> is counted, rejections get manufactured, and the manufactured ones are indistinguishable from the real ones on any dashboard. Goodhart arrives here faster than almost anywhere else, because the supply is unlimited and free.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Why the last one deserves a fight</span>
+        <p>
+          Everything on this page works as evidence read by a human who can evaluate whether a specific
+          refusal was wise. None of it works as a number on a dashboard. If someone proposes tracking
+          rejections per engineer per sprint, the correct response is that you have just described a
+          way to make the signal worthless within one quarter, and to offer the qualitative version
+          instead.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Start">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Today</span>
+      </div>
+      <div>
+        <h2>The version that takes a minute a day</h2>
+        <p class="thesis">
+          Two habits. Everything else on this page is elaboration on these.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Habit one</span>
+          <span class="what">On the next pull request you open, add one sentence: the agent proposed X, I did Y, because Z. Repeat on every pull request where that sentence is not trivial.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Habit two</span>
+          <span class="what">Keep one plain file. Add a line whenever you turn something down or talk something smaller, with the cost had you been wrong. One to three lines a week.</span>
+        </li>
+      </ol>
+
+      <p>
+        In a year that is roughly a hundred and twenty lines, most of them timestamped by a system you
+        do not control, describing precisely the work that used to be invisible. It is also, separately
+        from any promotion, the most useful document you will own: it is the only honest record of
+        what you were actually deciding while the code was being written by something else.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The real reason to keep it</span>
+        <p>
+          Reviewing your own file after six months tells you something no performance cycle will. If
+          the entries are all small, your judgment is not being exercised on anything that matters, and
+          that is a fact about your role rather than about you. Finding that out in month six is worth
+          considerably more than winning the promotion in month twelve.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Evidence of Judgment</strong>, building a case when the diff was agent-written.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/seniority-ladder/">The Seniority Ladder</a> (what counts) ·
+      <a href="/reverse-review/">Reverse-review</a> (where catches come from)</div>
+    <div>Related · <a href="/first-ninety-days/">The First Ninety Days</a> ·
+      <a href="/senior-2031/">Who's going to be senior in 2031?</a></div>
+    <div>Colour encodes visibility:
+      <span style="color:var(--forest)">leaves a trace</span> ·
+      <span style="color:var(--gold)">only on purpose</span> ·
+      <span style="color:var(--brick)">the absence</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
