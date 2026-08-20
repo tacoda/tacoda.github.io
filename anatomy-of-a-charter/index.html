@@ -1,0 +1,1269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anatomy of a Charter · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A real team charter, annotated line by line: every rule with the incident that caused it, the altitude it is enforced at, and the date it gets deleted. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/anatomy-of-a-charter/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Anatomy of a Charter">
+<meta property="og:description" content="Every line in a charter is a scar. A real one annotated, with the incident behind each rule and the ritual that deletes them.">
+<meta property="og:url" content="https://www.tacoda.dev/anatomy-of-a-charter/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Anatomy of a Charter">
+<meta name="twitter:description" content="Every line in a charter is a scar. A real one annotated, with the incident behind each rule and the ritual that deletes them.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Anatomy of a Charter</span>
+      <span class="sep">/</span>
+      <span>reference</span>
+    </div>
+    <h1>Every line in a charter is <em>a scar</em>.</h1>
+    <p class="standfirst">
+      Most teams write their charter on day one, from best practices, in one sitting. That document is
+      a list of guesses, and it will be argued away the first time it is inconvenient, because nobody
+      can say what it cost to learn. Good charters are not authored. They accrete, one incident at a
+      time, and every rule carries the date and the damage that put it there. Here is one, in full,
+      annotated line by line.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · anyone maintaining a <code>CLAUDE.md</code>, a rules directory, or a system prompt<br>
+      the charter below · a billing team's. The same rules that fire in <a href="/audit-trail/">the audit trail</a> and get measured in <a href="/eval-loop/">the eval loop</a><br>
+      the shape it argues for · forty lines, every rule dated, adding requires removing<br>
+      license · CC BY 4.0. Fork it, change every rule, keep the annotation format
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>The incident</dt>
+          <dd>What went wrong, when, and what it cost. A rule without one is a preference wearing a uniform.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>The altitude</dt>
+          <dd>Sentence, check, or gate. Stated explicitly, and always the cheapest one that actually holds.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>The expiry</dt>
+          <dd>When this gets reviewed for deletion. A rule that cannot expire is a rule nobody will ever remove.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Reference sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> Accrete, don't author</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The whole thing</a></li>
+      <li><a href="#s-2"><span class="n">2</span> One rule, dissected</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Three scars</a></li>
+      <li><a href="#s-4"><span class="n">4</span> The unenforceable one</a></li>
+      <li><a href="#s-5"><span class="n">5</span> What's not in it</a></li>
+      <li><a href="#s-6"><span class="n">6</span> The budget</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Deletion day</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Start empty</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The premise</span>
+      </div>
+      <div>
+        <h2>A charter written in advance is a list of guesses</h2>
+        <p class="thesis">
+          The best practices you would put in it on day one are the ones the model already follows. The
+          rules that matter are the ones your codebase taught you, and you cannot know those yet.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Watch what happens to a day-one charter. It says "write clean, maintainable code" and "follow
+        existing patterns" and "add tests". Every line is true, none of it changes any behaviour,
+        because the model was already doing roughly that. Then a real problem arrives, somebody adds a
+        paragraph about it, and now the document is nine tenths ornament and one tenth load-bearing,
+        with no way to tell which is which from the inside.
+      </p>
+      <p>
+        The alternative is uncomfortable and works: start with nothing, and add a rule only after
+        something has gone wrong. The resulting document is shorter, every line has a story, and when
+        someone proposes dropping one under deadline pressure there is an answer that is not an
+        opinion.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>two documents of the same length</span><span class="tag warn">only one survives a crunch</span></figcaption>
+<pre><code><span class="c-dim">AUTHORED</span>
+  "Prefer clear names."           <span class="c-block">← already true. costs nothing, does nothing</span>
+  "Handle errors appropriately."  <span class="c-block">← unfalsifiable</span>
+  "Write maintainable code."      <span class="c-block">← nobody has ever done otherwise on purpose</span>
+
+<span class="c-dim">ACCRETED</span>
+  "Money is integer cents."       <span class="c-pass">← #412, silent rounding loss on refunds</span>
+  "Payment calls fail fast."      <span class="c-pass">← INC-88, 1,140 double charges</span>
+  "Only paths named in the ticket."<span class="c-pass">← #388, unreviewed rename broke two teams</span></code></pre>
+      </figure>
+
+      <div class="takeaway">
+        <span class="label">The test for any line you are about to add</span>
+        <p>
+          Can you name the specific thing that went wrong without it? If not, you are writing a wish.
+          Wishes are free to add and impossible to remove, which is the exact combination that produces
+          a charter nobody reads.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The artifact">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">In full</span>
+      </div>
+      <div>
+        <h2>The whole charter, forty lines</h2>
+        <p class="thesis">
+          A billing team, three years in, after roughly a dozen incidents. This is what is left after
+          the deletions.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>CHARTER.md</span><span class="tag pass">the artifact</span></figcaption>
+<pre><code><span class="c-dim"># Billing · agent charter</span>
+<span class="c-dim">#</span>
+<span class="c-dim"># Every rule names the incident that caused it. No incident, no rule.</span>
+<span class="c-dim"># Adding one requires removing or merging one. Reviewed each January.</span>
+
+<span class="c-block">## Money</span>
+Money is integer cents. Percentages resolve through Decimal, then
+round half-up to cents. Never float on a money path.
+  <span class="c-warn">gate</span> money.integer-cents
+  <span class="c-dim">2026-03-04 · #412 · float refund rounding, ~$40/day lost silently</span>
+
+<span class="c-block">## Failure</span>
+Payment calls fail fast. No retries on any non-idempotent path.
+  <span class="c-warn">gate</span> payments.no-retry
+  <span class="c-dim">2025-11-22 · INC-88 · retry storm double-charged 1,140 customers</span>
+
+<span class="c-block">## Scope</span>
+A change touches only paths named in the ticket. Renames, reformats
+and refactors are separate changes with their own review.
+  <span class="c-warn">check</span> scope.allowed-paths
+  <span class="c-dim">2025-08-09 · #388 · a rename rode along and broke two other teams</span>
+
+<span class="c-block">## Tests</span>
+Every behaviour change ships a test that goes red when the change is
+reverted. A test that cannot fail is not a test.
+  <span class="c-warn">check</span> test.must-fail-when-reverted
+  <span class="c-dim">2026-01-15 · #401 · 300 lines of coverage asserting against its own mock</span>
+
+<span class="c-block">## Secrets</span>
+Never read .env, credentials, or key material. Never write a literal
+token, even in a fixture.
+  <span class="c-warn">gate</span> secrets.no-read · secrets.no-literals
+  <span class="c-dim">2025-06-30 · INC-71 · test fixture key leaked to a public fork</span>
+
+<span class="c-block">## Comprehension</span>
+Don't merge a change you can't explain. Four claims, in the PR.
+  <span class="c-warn">human</span> see the Comprehension Standard
+  <span class="c-dim">2025-04-02 · standing · adopted team-wide, not incident-driven</span>
+
+<span class="c-block">## Refusal</span>
+When the ticket and the code disagree about what the rule is, stop
+and ask. Do not pick the one that is easier to implement.
+  <span class="c-warn">none</span> unenforceable, and the most valuable line here
+  <span class="c-dim">2026-02-11 · INC-94 · agent implemented the ticket; the ticket was wrong</span></code></pre>
+      </figure>
+
+      <p>
+        Seven sections, six of them traceable to a specific bad day. Notice how much is absent: nothing
+        about style, nothing about naming, nothing about architecture, no instructions to be careful or
+        thorough. §5 is about why.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="One rule">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The unit</span>
+      </div>
+      <div>
+        <h2>Four parts, and none of them optional</h2>
+        <p class="thesis">
+          The rule text is the part everyone writes and the least important of the four.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the annotation format</span><span class="tag warn">steal this, not the rules</span></figcaption>
+<pre><code>Money is integer cents. Percentages resolve through Decimal,
+then round half-up to cents. Never float on a money path.
+<span class="c-dim">└─ 1. THE RULE — behavioural, testable, and about this codebase</span>
+
+  gate money.integer-cents
+<span class="c-dim">   └─ 2. THE ALTITUDE — where it is enforced, and its identifier</span>
+
+  2026-03-04 · #412
+<span class="c-dim">   └─ 3. THE DATE AND THE LINK — so it can be looked up</span>
+
+  float refund rounding, ~$40/day lost silently
+<span class="c-dim">   └─ 4. THE DAMAGE — in the units the business uses</span></code></pre>
+      </figure>
+
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">The rule</span>
+          <span class="what">Behavioural and specific to this system. "Money is integer cents" is a rule. "Be careful with money" is a mood.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">The altitude</span>
+          <span class="what">One of <code>gate</code>, <code>check</code>, <code>human</code>, or <code>none</code>. Writing it down forces the question "is this actually enforced anywhere", which is uncomfortable roughly a third of the time.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">The date and link</span>
+          <span class="what">Makes the rule auditable and makes §7 possible. Also tells a reader instantly whether this rule is from a world that still exists.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">The damage</span>
+          <span class="what">In money, customers, or hours. This is the part that wins the argument in a crunch, and it is the part that always gets dropped when people are in a hurry to write the rule.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Why "~$40/day" and not "a bug"</span>
+        <p>
+          Six months from now somebody will propose relaxing this rule because it is inconvenient in
+          one place. "It caused a bug" loses that argument. "It quietly cost forty dollars a day for
+          three weeks before anyone noticed" wins it, and more importantly it lets you lose the
+          argument correctly on the occasions when forty dollars a day is genuinely the right price.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Three scars">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Three scars</span>
+      </div>
+      <div>
+        <h2>Why these three are at three different altitudes</h2>
+        <p class="thesis">
+          Same document, three enforcement strengths, and the choice is not about how much the team
+          cares. It is about what the failure is shaped like.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>picking the cheapest altitude that actually holds</caption>
+          <thead>
+            <tr><th>Rule</th><th>Altitude</th><th>Why not lower</th><th>Why not higher</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Money is integer cents</td>
+              <td>gate</td>
+              <td>Reached production once and cost money. Prose already failed here.</td>
+              <td>Nothing higher exists.</td>
+            </tr>
+            <tr>
+              <td>Only paths in the ticket</td>
+              <td>check</td>
+              <td>Happens constantly; prose alone was ignored under deadline.</td>
+              <td>Legitimate exceptions exist, so a hard refusal would be routinely overridden, and a gate everyone overrides is worse than a check.</td>
+            </tr>
+            <tr class="total">
+              <td>Stop and ask when the ticket is wrong</td>
+              <td>none</td>
+              <td>Nothing lower than prose.</td>
+              <td>Not mechanically detectable. A gate here would be a lie. §4.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">The rule for choosing</h3>
+      <ul>
+        <li><strong>Start at prose.</strong> Most rules never need to leave. Promotion costs engineering time and adds friction to every future change.</li>
+        <li><strong>Promote on evidence, not on fear.</strong> A rule earns a check when prose demonstrably failed, and a gate when the failure reached production. Both of those are facts you can point at, not predictions.</li>
+        <li><strong>Do not gate what has legitimate exceptions.</strong> A refusal that gets overridden weekly teaches everyone that refusals are negotiable, and it damages the gates that are not.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Demotion is a move too</span>
+        <p>
+          A gate whose rule has become second nature can go back down to a check, or out entirely.
+          Almost nobody does this, which is why charters only grow. See
+          <a href="/harness/">the demotion section</a> for the version of this argument that applies
+          to harness code.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Unenforceable">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The best line</span>
+      </div>
+      <div>
+        <h2>The most valuable rule is the one you cannot enforce</h2>
+        <p class="thesis">
+          "When the ticket and the code disagree about the rule, stop and ask." No gate can detect
+          this. It stays anyway, and it is the line that has prevented the most expensive failures.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        INC-94 is worth telling in full because it is the failure mode that survives every mechanical
+        control on this page. A ticket asked for discount codes to apply to shipping. The code had a
+        rule, three years old and undocumented, that shipping is never discounted because of how the
+        carrier contract settles. The agent implemented the ticket. Every test passed, every gate
+        passed, review approved it, and the company spent five weeks under-billing carriers before
+        anyone connected the two.
+      </p>
+      <p>
+        No gate catches this. The change was correct with respect to the ticket, correct with respect
+        to the tests, and consistent with the codebase style. The only thing that catches it is
+        somebody noticing that two sources of truth disagree and stopping to ask which one is wrong.
+        That is the whole skill, and it is why the exercises in this catalog exist.
+      </p>
+
+      <div class="callout">
+        <span class="label">Do not delete the rules you cannot enforce</span>
+        <p>
+          There is a tidy-minded instinct to strip a charter down to only the mechanically enforced
+          rules, on the grounds that the rest is decoration. Resist it. The unenforceable lines are
+          where the expensive failures live, precisely because they are the ones no gate is watching.
+          Marking them <code>none</code> is honest. Removing them is not.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">What to do instead of enforcing it</span>
+        <p>
+          Train for it. A rule marked <code>none</code> is a standing instruction to the humans, and
+          the way it gets installed is <a href="/reverse-review/">reverse-review</a> and
+          <a href="/junior-to-senior/">the workshop</a>, not a hook. Charter rules at the
+          <code>none</code> altitude should each point at how the team practises them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Absent">
+          <i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Absent</span>
+      </div>
+      <div>
+        <h2>Six things deliberately not in there</h2>
+        <p class="thesis">
+          A charter is defined by its omissions. Every line you add dilutes the ones that matter, so
+          the omissions have to be argued for as carefully as the inclusions.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Style</span>
+          <span class="what">Line length, quote style, import order. The formatter already does this deterministically and for free. A charter rule here spends attention to duplicate a solved problem.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Type-enforced facts</span>
+          <span class="what">"Always return a Result type." If the compiler enforces it, saying it again buys nothing and dates badly when the types change.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Generic virtue</span>
+          <span class="what">"Write clean, maintainable, well-documented code." Unfalsifiable, universally agreed, and changes no output. The most common filler in the genre.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Things done well already</span>
+          <span class="what">Instructions the model follows at a high rate unprompted. Measure before adding: if it is already at 95%, the rule is buying the last five points at the cost of diluting everything else.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Architecture essays</span>
+          <span class="what">Three paragraphs on the service topology. This is documentation, it belongs in the repo, and the agent can read it when the task calls for it. A charter is rules, not context.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Anything about tone</span>
+          <span class="what">How the agent should phrase things. Occasionally worth having, almost never worth the space it takes at the top of a document whose lower half is already weakly followed.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Ordering is a real effect, and a reason to stay short</span>
+        <p>
+          Instructions near the top of a long document are followed more reliably than instructions near
+          the bottom. You can respond to that by carefully ordering a long charter, or by keeping it
+          short enough that ordering does not matter much. The second is more robust, because the first
+          is a property of today's models that you would have to re-verify every time one changes.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Budget">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">40 lines</span>
+      </div>
+      <div>
+        <h2>A fixed budget, because growth is the default</h2>
+        <p class="thesis">
+          Nothing in the ordinary operation of a team ever removes a charter rule. Without a hard
+          constraint the document grows monotonically until it stops working, and nobody can point at
+          the day it did.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>rule</b> adding requires removing</span>
+          <span class="chip kind-config"><b>cap</b> 40 lines of rules</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The mechanism is one line at the top of the file: <em>adding a rule requires removing or
+        merging one</em>. It is crude, it is occasionally annoying, and it is the only thing that
+        reliably works, because it converts every addition into a comparison. Not "is this rule good"
+        but "is this rule better than the weakest rule currently in here", which is a question with an
+        answer.
+      </p>
+
+      <h3 class="sub">Three ways to make room</h3>
+      <ul>
+        <li><strong>Merge.</strong> Two rules about money handling become one rule about money handling. Usually possible and usually an improvement in clarity.</li>
+        <li><strong>Promote.</strong> Move the rule out of the prose and into a gate, then delete the prose. The constraint gets stronger and the document gets shorter, which is the best available trade.</li>
+        <li><strong>Delete.</strong> The rule has not fired in a year, see §7.</li>
+      </ul>
+
+      <div class="takeaway">
+        <span class="label">Promotion is the move to reach for first</span>
+        <p>
+          A rule that becomes a check or a gate stops needing to be prose at all. The agent does not
+          have to remember it, the document gets a line shorter, and the constraint gets stronger.
+          <a href="/harness/">Promotion to the harness</a> is the same idea worked through five
+          different mount points.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Deletion">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Annually</span>
+      </div>
+      <div>
+        <h2>Deletion day</h2>
+        <p class="thesis">
+          One afternoon a year, with the audit trail open. The question for each rule is not "is this
+          still a good idea" but "when did this last do anything".
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        This is why <a href="/audit-trail/">the trail records passes as well as blocks</a>. A rule that
+        has never blocked anything is either perfectly internalised or completely dead, and those look
+        identical from the outside until you have the numbers.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>the annual review, one row per rule</caption>
+          <thead>
+            <tr><th>Rule</th><th>Fired</th><th>Blocked</th><th>Last block</th><th>Verdict</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>money.integer-cents</td><td class="num">1,204</td><td class="num">31</td><td>6 days ago</td><td>keep · load-bearing</td></tr>
+            <tr><td>payments.no-retry</td><td class="num">890</td><td class="num">4</td><td>3 months ago</td><td>keep · rare and catastrophic</td></tr>
+            <tr><td>scope.allowed-paths</td><td class="num">1,204</td><td class="num">147</td><td>today</td><td>keep · but 147 is a smell, investigate</td></tr>
+            <tr class="flag"><td>test.must-fail-when-reverted</td><td class="num">1,204</td><td class="num">0</td><td>never</td><td>demote to check-only, revisit next year</td></tr>
+            <tr class="total"><td>logging.structured-only</td><td class="num">1,204</td><td class="num">0</td><td>never</td><td>delete · superseded by the linter in March</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Two judgement calls in that table are worth naming. A rule with four blocks in a year stays,
+        because the metric is not frequency but expected damage, and a double-charge event dwarfs a
+        hundred scope warnings. And a rule with a hundred and forty-seven blocks is not a success
+        story: something is systematically producing changes that violate it, and the rule is
+        absorbing a problem rather than solving it.
+      </p>
+
+      <div class="callout">
+        <span class="label">The deletion has to be someone's job</span>
+        <p>
+          Additions happen naturally, because adding a rule is how a team demonstrates it took an
+          incident seriously. Deletion has no such motivation behind it and will not happen
+          spontaneously. Put a name and a date on it, or accept that the charter grows forever.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Start">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Day one</span>
+      </div>
+      <div>
+        <h2>Writing your first one: start empty</h2>
+        <p class="thesis">
+          Genuinely empty, apart from the header that says how the file works.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>CHARTER.md, day one</span><span class="tag pass">the whole file</span></figcaption>
+<pre><code><span class="c-dim"># Charter</span>
+<span class="c-dim">#</span>
+<span class="c-dim"># Every rule names the incident that caused it. No incident, no rule.</span>
+<span class="c-dim"># Adding one requires removing or merging one. Reviewed each January.</span>
+<span class="c-dim">#</span>
+<span class="c-dim"># Format:</span>
+<span class="c-dim">#   the rule, in behavioural terms</span>
+<span class="c-dim">#     altitude: gate | check | human | none</span>
+<span class="c-dim">#     date · link · what it cost</span>
+
+<span class="c-dim">(no rules yet)</span></code></pre>
+      </figure>
+
+      <p>
+        It will not stay empty for long, and every line that arrives will have earned its place. Two
+        exceptions are reasonable on day one: a comprehension bar, because that one is a policy
+        decision rather than a lesson, and anything you are carrying over from a previous team with the
+        original incident still attached.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Where to start with an existing charter</span>
+        <p>
+          Do not rewrite it. Go through it once and put a date and a cause on every line you can. The
+          lines where you cannot are your answer: some of them are load-bearing and merely
+          undocumented, and the rest are the ones to delete first. That exercise takes an hour and is
+          usually the most informative hour anyone has spent on the document.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Anatomy of a Charter</strong>, a reference. CC BY 4.0.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/harness/">Promotion to the Harness</a> (altitudes) ·
+      <a href="/guardrails/">Five Guardrails</a> ·
+      <a href="/audit-trail/">The Audit Trail</a> (the deletion evidence) ·
+      <a href="/eval-loop/">The Eval Loop</a> (does the edit help)</div>
+    <div>The unenforceable rules are trained, not gated ·
+      <a href="/reverse-review/">Reverse-review</a> ·
+      <a href="/comprehension-standard/">The Comprehension Standard</a></div>
+    <div>Colour encodes annotation:
+      <span style="color:var(--brick)">the incident</span> ·
+      <span style="color:var(--gold)">the altitude</span> ·
+      <span style="color:var(--forest)">the expiry</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
