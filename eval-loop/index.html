@@ -1,0 +1,1253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Eval Loop · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Measuring whether a charter edit helped: a frozen task set, deterministic assertions before model judges, blind order-swapped pairwise comparison, and an honest account of what sixty runs can detect. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/eval-loop/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Eval Loop">
+<meta property="og:description" content="You changed the charter. Did it get better? A frozen set, assertions before judges, and the arithmetic nobody prints.">
+<meta property="og:url" content="https://www.tacoda.dev/eval-loop/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Eval Loop">
+<meta name="twitter:description" content="You changed the charter. Did it get better? A frozen set, assertions before judges, and the arithmetic nobody prints.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>The Eval Loop</span>
+      <span class="sep">/</span>
+      <span>worked example</span>
+    </div>
+    <h1>You changed the charter. <em>Did it get better?</em></h1>
+    <p class="standfirst">
+      Guardrails decide what the agent is refused. A factory decides what it produces. Neither one
+      tells you whether last Tuesday's rule change helped, hurt, or did nothing, and in the absence of
+      an instrument every charter edit is an act of faith performed by the person with the strongest
+      opinion. This is the smallest thing that answers the question: a frozen set, assertions before
+      judges, blind pairwise comparison, and an honest account of what sixty runs can actually detect.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · anyone maintaining a charter, a rules file, or a harness they keep editing<br>
+      what you need · twenty tasks, pytest, and deliberately no eval framework<br>
+      pairs with · <a href="/guardrails/">Five Guardrails</a> (what to enforce) · <a href="/factory/">The Factory</a> (what runs it)<br>
+      the honest limit · §5. Read it before you report a number to anyone
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Deterministic</dt>
+          <dd>Exit codes, greps, file checks. Free, instant, and incapable of drifting. Most of what you want lives here.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Judged</dt>
+          <dd>A model reading output. Necessary for some properties, noisy for all of them, and it needs validating like any other instrument.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Below the noise</dt>
+          <dd>Differences your sample size cannot see. The discipline is naming these rather than reporting them.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Build sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> The unmeasured edit</a></li>
+      <li><a href="#s-1"><span class="n">1</span> Freeze the inputs</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Assert first</a></li>
+      <li><a href="#s-3"><span class="n">3</span> The judge</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Pairwise</a></li>
+      <li><a href="#s-5"><span class="n">5</span> What 60 runs see</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Close the loop</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Cost and rot</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The gap</span>
+      </div>
+      <div>
+        <h2>The one file nobody tests</h2>
+        <p class="thesis">
+          Your code has tests. Your infrastructure has a plan. The document that shapes every line the
+          agent writes gets edited on a hunch and merged on a nod.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A charter accumulates. Somebody adds a paragraph after an incident, somebody else adds three
+        rules about naming, a fourth person pastes in a style guide. Each addition is individually
+        defensible and nobody ever measures the total. Two failure modes follow, and both are silent.
+        Rules contradict each other, so the agent picks one at random per session. Or the document gets
+        long enough that the instructions at the bottom stop being followed, and nobody notices which
+        third stopped working.
+      </p>
+      <p>
+        The reason this persists is not laziness. It is that measuring a non-deterministic system feels
+        like it requires apparatus nobody has time to build. It does not. The version below is roughly
+        a hundred and fifty lines of Python and it will catch the two failure modes above within a
+        week.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>what gets tested, and what does not</span><span class="tag warn">the asymmetry</span></figcaption>
+<pre><code>src/billing.py        <span class="c-pass">unit tests, types, review, CI</span>
+infra/main.tf         <span class="c-pass">plan, policy check, review</span>
+.github/workflows/    <span class="c-pass">runs on every PR, fails loudly</span>
+
+CLAUDE.md             <span class="c-block">merged on a nod</span>
+.claude/rules/*.md    <span class="c-block">merged on a nod</span>
+prompts/*.txt         <span class="c-block">merged on a nod</span>
+
+<span class="c-dim">The bottom three decide the shape of everything in the top three.</span></code></pre>
+      </figure>
+
+      <div class="takeaway">
+        <span class="label">The claim this page defends</span>
+        <p>
+          A charter change should arrive with evidence, in the same way a code change arrives with a
+          test. Not a benchmark, not a leaderboard. Evidence: on twenty frozen tasks, this edit made
+          things better, worse, or nothing we can distinguish.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Step one">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Freeze</span>
+      </div>
+      <div>
+        <h2>Twenty tasks, checked in, never edited casually</h2>
+        <p class="thesis">
+          There is no evaluation without fixed inputs. Everything else on this page is downstream of
+          having a set you refuse to change on a whim.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>size</b> 20 tasks</span>
+          <span class="chip kind-gate"><b>rule</b> changing the set resets history</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>evals/tasks/007_refund_rounding.py</span><span class="tag pass">one task, one file</span></figcaption>
+<pre><code>FIXTURE = "fixtures/billing"          <span class="c-dim"># copied to a temp dir per run</span>
+
+PROMPT = """
+Refunds for cancelled orders are being rejected when the order
+included a percentage discount. Fix it so a cancelled discounted
+order can be refunded in full.
+"""
+
+<span class="c-dim"># What "done well" means here, in this repo, for this team.</span>
+CHECKS = [
+    "compiles", "tests_added", "money_is_integer",
+    "no_unrelated_files", "policy_cited",
+]</code></pre>
+      </figure>
+
+      <h3 class="sub">Choosing twenty</h3>
+      <ul>
+        <li><strong>Real tickets, past tense.</strong> Take work already done. You get a known-good outcome for free and the task is genuinely shaped like your work, which a synthetic task never is.</li>
+        <li><strong>Spread across the failure modes you care about.</strong> If half your charter is about money handling, several tasks should touch money. The set is a statement about what you are worried about.</li>
+        <li><strong>Include three you expect to fail.</strong> A set everything passes cannot show improvement, only regression. Headroom is a design requirement.</li>
+        <li><strong>Two that need a refusal.</strong> Tasks where the correct behaviour is to stop and ask. Charters that are pure encouragement score suspiciously well until you add these.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The rule that makes the numbers mean anything</span>
+        <p>
+          Editing the task set invalidates every prior result. Treat it like changing the units on a
+          chart: allowed, occasionally necessary, and it resets the history. Version the set
+          (<code>v1</code>, <code>v2</code>) and record which version produced each number, or within
+          two months you will be comparing measurements taken with different rulers and concluding
+          things about your charter.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step two">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Assert</span>
+      </div>
+      <div>
+        <h2>Most of what you want is a grep or an exit code</h2>
+        <p class="thesis">
+          The instinct is to reach for a model judge immediately. Resist it for one afternoon and you
+          will find that four fifths of your rules are mechanically checkable.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>evals/checks.py</span><span class="tag pass">free, instant, cannot drift</span></figcaption>
+<pre><code>def compiles(w, r):
+    return run(w, "make build").returncode == 0
+
+def tests_added(w, r):
+    return any(p.name.startswith("test_") for p in r.files_changed)
+
+def money_is_integer(w, r):
+    <span class="c-dim"># the charter says money is integer cents, everywhere</span>
+    return not re.search(r"float\(|/ 100\b", r.diff)
+
+def no_unrelated_files(w, r):
+    <span class="c-dim"># scope creep, class 5 in the review taxonomy</span>
+    return set(r.files_changed) &lt;= set(TASK.allowed_paths)
+
+def policy_cited(w, r):
+    return "CHARTER" in r.summary or "policy" in r.summary.lower()</code></pre>
+      </figure>
+
+      <p>
+        Each of these is a rule from the charter, compiled into a sensor. That is the same move as
+        <a href="/guardrails/">turning a rule into a hook</a>, pointed at measurement instead of
+        enforcement, and it has the same payoff: a property that is checked mechanically stops being a
+        matter of opinion.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>which properties need which instrument</caption>
+          <thead>
+            <tr><th>Property</th><th>Instrument</th><th>Why</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Did it build, do tests pass</td><td>exit code</td><td>Already exists. Use it.</td></tr>
+            <tr><td>Money as integer cents</td><td>regex on the diff</td><td>Crude, catches the real cases, zero cost.</td></tr>
+            <tr><td>Touched only allowed paths</td><td>set comparison</td><td>Scope creep is the easiest defect to detect and the most common.</td></tr>
+            <tr><td>Test actually fails when reverted</td><td>run it twice</td><td>Deterministic and catches the test-that-cannot-fail class.</td></tr>
+            <tr class="flag"><td>Is the approach reasonable</td><td>model judge</td><td>Genuinely requires reading. §3.</td></tr>
+            <tr class="flag"><td>Would a reviewer be annoyed</td><td>model judge</td><td>Same, and lower reliability. Use sparingly.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The "test actually fails" check is the best one here</span>
+        <p>
+          Revert the implementation, keep the new test, run the suite. If it stays green the agent
+          wrote a decoration. Two lines of shell, catches a defect class that survives every review,
+          and no judge required.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step three">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Judge</span>
+      </div>
+      <div>
+        <h2>A judge is an instrument, so calibrate it</h2>
+        <p class="thesis">
+          Nobody would trust a thermometer they had never compared against a known temperature. Model
+          judges get deployed on the strength of the prompt sounding sensible.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>pin</b> the model version</span>
+          <span class="chip kind-rule"><b>one</b> property per call</span>
+          <span class="chip kind-hook"><b>validate</b> against 20 human labels</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>evals/judge.py</span><span class="tag warn">binary, anchored, pinned</span></figcaption>
+<pre><code>JUDGE_MODEL = "claude-sonnet-5"   <span class="c-block"># pinned. changing it resets history.</span>
+
+RUBRIC = """
+Answer YES or NO, then one sentence.
+
+Question: does this change handle the cancelled-order case by
+consulting the order state, rather than by catching an exception?
+
+YES example: reads order.status before computing the refund.
+NO example:  wraps the refund call in try/except and returns 0.
+
+Answer NO if you are unsure.
+"""</code></pre>
+      </figure>
+
+      <h3 class="sub">Four rules that do the work</h3>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Binary</span>
+          <span class="what">Yes or no, never one-to-five. Numeric scales from a model are not interval scales, and averaging them produces a number with no meaning that everyone will nonetheless put in a slide.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Anchored</span>
+          <span class="what">A concrete example of each verdict, from your own codebase. Anchors move judges more than any amount of instruction prose.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">One property</span>
+          <span class="what">One question per call. A judge asked to assess six things at once produces a summary judgment about vibes and then rationalises it into six sub-scores.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Pinned</span>
+          <span class="what">Record the exact judge model with every result. When the judge changes, historical comparisons are void, exactly as if you had swapped out the task set.</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Validate it before you believe it</span>
+        <p>
+          Label twenty outputs by hand, then run the judge on the same twenty. If it agrees with you
+          on fewer than about sixteen, the judge is measuring something other than what you asked, and
+          the usual cause is a rubric that is clear to a person who already knows the codebase. Fix
+          the anchors and try again. This costs an hour, once, and is the difference between an
+          instrument and a random number generator with good manners.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step four">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Pairwise</span>
+      </div>
+      <div>
+        <h2>Compare two outputs, never score one</h2>
+        <p class="thesis">
+          Absolute scores drift with everything: the weather in the prompt, the model version, the
+          judge's mood. Relative comparisons on the same task are stable, and relative is all you ever
+          needed.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The question is never "is this output good". It is "is the charter on this branch better than
+        the one on main". So run both, on the same task, and ask the judge which it prefers, with the
+        two labels hidden and the order swapped.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>evals/pairwise.py</span><span class="tag pass">blind, and both orders</span></figcaption>
+<pre><code>def compare(task, charter_a, charter_b, k=3):
+    wins_a = wins_b = ties = 0
+    for _ in range(k):
+        a = run_agent(task, charter_a)
+        b = run_agent(task, charter_b)
+
+        <span class="c-dim"># ask twice, swapping which one is shown first</span>
+        first  = judge_prefers(task, a, b)   <span class="c-dim"># -&gt; "first" | "second"</span>
+        second = judge_prefers(task, b, a)
+
+        <span class="c-warn"># position bias: if the judge picks the same SLOT both</span>
+        <span class="c-warn"># times, it is not reading. Discard the sample.</span>
+        if first == second:
+            ties += 1
+        elif first == "first":
+            wins_a += 1
+        else:
+            wins_b += 1
+    return wins_a, wins_b, ties</code></pre>
+      </figure>
+
+      <p>
+        The discard is the important line. A judge that prefers whichever output it was shown first is
+        a well-documented and entirely ordinary failure, and running only one order lets it pass
+        silently into your results. Running both orders converts the bias from an invisible skew into
+        a visible tie, which is honest and costs one extra call.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Watch the tie rate</span>
+        <p>
+          Ties above roughly a third mean the judge is not distinguishing the two charters at all. That
+          is a real finding and usually the correct one: most charter edits change nothing measurable,
+          and a loop that reports that plainly is worth more than one that always finds a winner.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Step five">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The arithmetic</span>
+      </div>
+      <div>
+        <h2>What sixty runs can and cannot detect</h2>
+        <p class="thesis">
+          This is the section that gets left out, and leaving it out is how a team spends a quarter
+          tuning a charter against noise.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Twenty tasks run three times is sixty samples per arm, which sounds like plenty and is not. For
+        a pass rate somewhere around seventy percent, the rough sample sizes needed to detect a change
+        with any confidence look like this.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>approximate samples per arm, two-proportion comparison, 80% power at the 5% level</caption>
+          <thead>
+            <tr><th>Change you want to detect</th><th>Samples per arm</th><th>With 20 tasks, that is</th></tr>
+          </thead>
+          <tbody>
+            <tr class="flag"><td>70% → 75% (small win)</td><td class="num">~1,250</td><td>60+ runs per task. Not happening.</td></tr>
+            <tr><td>70% → 80%</td><td class="num">~300</td><td>15 runs per task. Expensive but possible.</td></tr>
+            <tr><td>70% → 85%</td><td class="num">~120</td><td>6 runs per task. Feasible.</td></tr>
+            <tr class="total"><td>70% → 50% (a regression)</td><td class="num">~95</td><td>5 runs per task. Comfortably detectable.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Read the table the right way round. A twenty-task set with a few runs each is a <em>regression
+        detector</em>. It will tell you loudly when a charter edit broke something, which is the
+        failure that actually costs you money. It will not tell you which of two reasonable phrasings
+        is five percent better, and any loop that appears to answer that question is reporting noise
+        with a confident face.
+      </p>
+
+      <div class="callout">
+        <span class="label">Report it the way it deserves</span>
+        <p>
+          Three outcomes, and the third is a legitimate result rather than a failure to get one:
+          <strong>regression</strong> (worse on multiple tasks, beyond the tie rate),
+          <strong>improvement</strong> (better on multiple tasks, and large), and
+          <strong>indistinguishable</strong>. Most edits land in the third bucket. A team that can say
+          "indistinguishable" out loud is a team whose other two verdicts mean something.
+        </p>
+      </div>
+
+      <p>
+        Two cheap ways to buy sensitivity without buying runs: use paired comparison, which the design
+        in §4 already does and which is substantially more sensitive than comparing two independent
+        pass rates, and make the deterministic checks in §2 carry as much of the load as possible,
+        because they have no judge noise on top of the agent's own variance.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Step six">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The loop</span>
+      </div>
+      <div>
+        <h2>A charter change is a pull request with evidence</h2>
+        <p class="thesis">
+          The loop only closes when the result lands where the decision is made, which is the pull
+          request, not a dashboard nobody opens.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>.github/workflows/charter-eval.yml</span><span class="tag pass">runs only when the charter moves</span></figcaption>
+<pre><code>on:
+  pull_request:
+    paths:
+      - "CLAUDE.md"
+      - ".claude/rules/**"
+      - "prompts/**"
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - run: python -m evals.pairwise --base origin/main --head HEAD --k 3
+      - run: gh pr comment "$PR" --body-file evals/out/report.md</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption><span>what lands on the pull request</span><span class="tag warn">the whole output</span></figcaption>
+<pre><code>Charter eval · task set v3 · judge claude-sonnet-5 · k=3
+
+  deterministic checks     <span class="c-pass">main 84/100</span>   <span class="c-pass">pr 91/100</span>
+    money_is_integer       <span class="c-pass">16/20 → 20/20</span>  <span class="c-dim">(the rule you added)</span>
+    no_unrelated_files     <span class="c-block">19/20 → 15/20</span>  <span class="c-block">← regression</span>
+
+  pairwise (judged)        <span class="c-dim">pr wins 6 · main wins 4 · ties 10</span>
+
+  VERDICT  <span class="c-block">REGRESSION on scope creep.</span> The new section appears to
+           license refactoring while nearby. Judged difference is
+           <span class="c-dim">indistinguishable (tie rate 50%).</span></code></pre>
+      </figure>
+
+      <p>
+        That report is the point of the whole exercise. It is specific about the thing that got better,
+        specific about the thing that got worse, and explicitly agnostic about the part it cannot
+        resolve. A reviewer can act on all three statements.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The norm this creates</span>
+        <p>
+          A charter pull request with no eval result becomes as odd as a code pull request with no
+          tests. That norm is worth more than any individual number the loop produces, because it is
+          what stops the document growing by accumulation.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Step seven">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Upkeep</span>
+      </div>
+      <div>
+        <h2>Cost, cadence, and the way this rots</h2>
+        <p class="thesis">
+          Three practical facts, and one failure mode that will get you eventually.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Cost</h3>
+      <p>
+        A full pairwise run is <code>tasks × k × 2</code> agent invocations plus <code>tasks × k ×
+        2</code> judge calls. Twenty tasks at k=3 is 120 agent runs and 120 judge calls. Price that
+        against your own provider once, put the figure in the README, and revisit it when the number
+        changes. It is usually small next to one senior engineer spending a day arguing about a
+        paragraph.
+      </p>
+
+      <h3 class="sub">Cadence</h3>
+      <ul>
+        <li><strong>On charter pull requests</strong>, always. This is the whole point.</li>
+        <li><strong>Weekly on main</strong>, unchanged charter. This catches drift from underneath you: a model update, a dependency change, a fixture that rotted.</li>
+        <li><strong>Never continuously.</strong> A loop that runs hourly generates numbers faster than anyone can interpret them, and people start ignoring it by the second week.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The failure mode: overfitting to twenty tasks</span>
+        <p>
+          Tune long enough and the charter gets very good at these twenty tasks and no better at the
+          job. The symptom is a rising score with no corresponding change in what people complain
+          about. The countermeasure is a held-out set: five tasks you run once a quarter and never
+          tune against. If the twenty improve and the five do not, you have been optimising the
+          instrument.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">Where to start</span>
+        <p>
+          Five tasks, the deterministic checks from §2, and no judge at all. That is an afternoon, it
+          has no ongoing cost, and it will catch the next charter edit that quietly licenses scope
+          creep. Everything above §2 is what you add once the cheap version has proved it earns its
+          keep.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The Eval Loop</strong>, a worked example.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/guardrails/">Five Guardrails</a> ·
+      <a href="/factory/">The Factory</a> ·
+      <a href="/harness/">Promotion to the Harness</a></div>
+    <div>Related · <a href="/comprehension-standard/">The Comprehension Standard</a> ·
+      <a href="/reverse-review/">Reverse-review</a> (the defect taxonomy the checks encode)</div>
+    <div>Colour encodes instrument:
+      <span style="color:var(--forest)">deterministic</span> ·
+      <span style="color:var(--gold)">judged</span> ·
+      <span style="color:var(--brick)">below the noise</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
