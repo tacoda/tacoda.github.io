@@ -1,0 +1,1324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Bisect Drill · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A 30-minute monthly exercise: one regression, two hundred commits, no agent. The procedure, the prediction card, five ways a bisect lies, and a four-point rubric. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/bisect-drill/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Bisect Drill">
+<meta property="og:description" content="Two hundred commits, one regression, thirty minutes, no agent. Trains the skill agent-heavy codebases erode fastest.">
+<meta property="og:url" content="https://www.tacoda.dev/bisect-drill/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Bisect Drill">
+<meta name="twitter:description" content="Two hundred commits, one regression, thirty minutes, no agent. Trains the skill agent-heavy codebases erode fastest.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>The Bisect Drill</span>
+      <span class="sep">/</span>
+      <span>30 minutes, monthly</span>
+    </div>
+    <h1>Two hundred commits. <em>One of them did it.</em></h1>
+    <p class="standfirst">
+      Reading a diff and hunting a regression are different skills, and only one of them has a weekly
+      exercise. Hunting is the one agents are worst at, because it is a search over observed states
+      rather than a text problem, and it is also the one that decays fastest in a codebase where most
+      of the history was written by something that is not on the team. Thirty minutes, one real
+      regression, a known answer, and the agent closed.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · anyone who has never driven a bisect under time pressure, which is most people until the night it matters<br>
+      what you need · a repo with real history, one regression whose fix you can already point at, a timer<br>
+      cadence · monthly, thirty minutes. <a href="/reverse-review/">Reverse-review</a> trains reading; this trains hunting<br>
+      the agent · closed for the drill, open for real incidents. §9 says why that is not a contradiction
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>The bound</dt>
+          <dd>A verified good commit and a verified bad one. Everything downstream is worthless without both.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>The search</dt>
+          <dd>Mechanical, logarithmic, and boring on purpose. A thousand commits is ten tests.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>The lie</dt>
+          <dd>Where bisect returns a confident, precise, wrong answer. Five of these, and they are the point of the drill.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Drill sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> Why this decays</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The thirty minutes</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Setting the hunt</a></li>
+      <li><a href="#s-3"><span class="n">3</span> The card</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Bounding</a></li>
+      <li><a href="#s-5"><span class="n">5</span> Running it</a></li>
+      <li><a href="#s-6"><span class="n">6</span> No clean test</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Five lies</a></li>
+      <li><a href="#s-8"><span class="n">8</span> The rubric</a></li>
+      <li><a href="#s-9"><span class="n">9</span> The agent, after</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The premise</span>
+      </div>
+      <div>
+        <h2>The skill that gets rarer as it gets more necessary</h2>
+        <p class="thesis">
+          Three things happened at once, and they all push the same direction.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        First, history got faster and less familiar. A team shipping agent-assisted changes produces
+        more commits, and a larger share of them were never typed by anyone who remembers them. The
+        old fallback for a regression, asking the person who wrote it, has a lower hit rate every
+        quarter.
+      </p>
+      <p>
+        Second, debugging is the task language models are worst at, and the reason is structural
+        rather than temporary. Writing code is generation. Finding a regression is a search over states
+        you have to actually observe: run it, look, narrow, run it again. A model asked where the bug
+        is will produce a confident, well-argued, plausible location, which is exactly the failure mode
+        it has everywhere else, except here you can burn an afternoon on it.
+      </p>
+      <p>
+        Third, and worst, the skill only gets practised during incidents. Nobody bisects for fun. So
+        the reps arrive at the least convenient possible moment, under time pressure, in front of an
+        audience, which is a poor classroom.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">What the drill is for</span>
+        <p>
+          Moving the reps off the incident. Thirty minutes a month, a real regression with a known
+          answer, no stakes. The night it matters, the procedure is already boring.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The loop">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The loop</span>
+      </div>
+      <div>
+        <h2>Thirty minutes, five phases</h2>
+        <p class="thesis">
+          The timeboxes matter. Most failed hunts fail by spending twenty-five minutes on the first
+          phase and calling it thinking.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>roles</b> dealer, hunter</span>
+          <span class="chip kind-gate"><b>closed</b> the agent</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">Before</span>
+          <span class="what">The dealer hands over one sentence of symptom and nothing else. Not the subsystem, not the suspected area, not how long it has been broken.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">0:00 → 0:08</span>
+          <span class="what"><strong>Reproduce.</strong> Get a command that fails reliably. This is the phase people skip and the one that decides whether the rest is real.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">0:08 → 0:13</span>
+          <span class="what"><strong>Bound.</strong> Find one commit where it is broken and one where it is not. Verify both by hand. Write the card (§3) before searching.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">0:13 → 0:22</span>
+          <span class="what"><strong>Search.</strong> Drive the bisect. This should be mechanical and slightly dull. If it is exciting, something has gone wrong.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">0:22 → 0:27</span>
+          <span class="what"><strong>Confirm and classify.</strong> Test the found commit's parent explicitly. Then answer the question that carries the drill: did this commit <em>introduce</em> the defect or merely <em>reveal</em> it?</span>
+        </li>
+        <li data-signal="none">
+          <span class="when">0:27 → 0:30</span>
+          <span class="what"><strong>Debrief.</strong> Compare against the card. Which prediction was wrong, and score it (§8).</span>
+        </li>
+      </ol>
+
+      <div class="callout">
+        <span class="label">Eight minutes on the reproducer is a floor, not a budget</span>
+        <p>
+          If there is no reliable reproducer at 0:08, stop the drill and spend the remaining time
+          building one. A hunt that begins with an unreliable reproducer will converge on a random
+          commit and report it with total confidence, which is a worse outcome than not finishing.
+          Learning to abort at this point is itself a result worth having.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="The dealer">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The dealer</span>
+      </div>
+      <div>
+        <h2>Where the hunts come from</h2>
+        <p class="thesis">
+          Two methods. The first costs nothing and is better material; use the second only when you
+          have to.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Method one · your own fixed regressions</h3>
+      <p>
+        Find a commit in your history that fixed a real regression. Call it <code>F</code>. The hunt is
+        the range ending at <code>F^</code>, the commit just before the fix, and the answer is already
+        recorded in <code>F</code>'s message or its linked issue. Setup cost is close to zero, the
+        defect is genuinely shaped like your codebase's defects, and the debrief comes with a story
+        about what it actually cost the company.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>dealing a hunt from a real fix</span><span class="tag pass">preferred</span></figcaption>
+<pre><code><span class="c-dim"># F is the commit that fixed it. Hand the hunter a clone at F^</span>
+git clone . /tmp/hunt-2026-08
+git -C /tmp/hunt-2026-08 checkout -B main F^
+
+<span class="c-dim"># the hunter gets exactly this and nothing else:</span>
+<span class="c-warn">"Discount codes stopped applying to orders over $100.</span>
+<span class="c-warn"> Worked in the 2.3 release. Find the commit."</span></code></pre>
+      </figure>
+
+      <h3 class="sub">Method two · plant one in the past</h3>
+      <p>
+        When you have no suitable history, insert a defect behind two hundred commits of real work.
+        Branch at an old commit, add the defect, then replay everything since onto it.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>planting a regression 200 commits back</span><span class="tag warn">fallback</span></figcaption>
+<pre><code>OLD=$(git rev-parse main~200)
+
+git checkout -b drill $OLD
+<span class="c-dim"># edit one file, one behavior, no new tests</span>
+git commit -am "Adjust threshold handling"
+
+<span class="c-dim"># replay OLD..main on top of the planted commit</span>
+git rebase --onto drill $OLD main</code></pre>
+      </figure>
+
+      <p>
+        Pick a file that later commits rarely touch, or the rebase will fight you. The seeding rules
+        from <a href="/mentors-playbook/">the mentor's playbook</a> apply unchanged: one defect, it must
+        survive the suite, and the correct version should be a line or two away from the wrong one.
+      </p>
+
+      <div class="callout">
+        <span class="label">One dealer rule above all</span>
+        <p>
+          Never say how far back it goes. The moment the hunter knows the range is two hundred commits
+          rather than two thousand, they start reasoning about which commits look suspicious, and
+          bisect exists precisely so that nobody has to do that.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="The card">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Before you search</span>
+      </div>
+      <div>
+        <h2>The prediction card</h2>
+        <p class="thesis">
+          Written at 0:13, before the first bisect step. Its whole value is that it can be wrong in
+          public.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>bisect drill card</span><span class="tag warn">fill before searching</span></figcaption>
+<pre><code>REPRODUCER   exact command, expected output, actual output
+             verified: <span class="c-pass">5/5 fail on bad</span> · <span class="c-pass">0/5 fail on good</span>
+
+BOUNDS       bad  ________  (verified by hand)
+             good ________  (verified by hand)
+             range ______ commits  →  <span class="c-warn">predicted steps: ⌈log₂ n⌉ = ____</span>
+
+GUESS        subsystem: ______________
+             because: ________________
+
+TRIPWIRES    if the answer is a merge commit, I will ______
+             if the answer is a lockfile bump, I will ______
+             if the answer is a formatting commit, I will ______</code></pre>
+      </figure>
+
+      <p>
+        The verified line at the top is the one that does the work. Five runs on the bad commit and
+        five on the good one, before anything else, because a reproducer that fails four times out of
+        five will still produce an answer and there is no way to tell that answer from a real one
+        afterwards.
+      </p>
+      <p>
+        The tripwires exist because all three of those results mean "your bound or your reproducer is
+        wrong", and in the moment every one of them gets rationalised instead. Writing down the
+        response in advance is what makes it survive contact with a plausible story.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The step count is the honest bit</span>
+        <p>
+          Two hundred commits is eight tests. A thousand is ten. Writing the number down before you
+          start converts the search from a feeling about progress into an arithmetic fact, and it is
+          the fastest way to notice that you have stopped bisecting and started guessing.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Bounding">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The bound</span>
+      </div>
+      <div>
+        <h2>Both ends verified, by hand, first</h2>
+        <p class="thesis">
+          The most common way a bisect wastes an hour is starting from a good commit that was never
+          good.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The bad end is usually easy: it is broken now, that is why you are here. The good end is where
+        people guess. "It worked in the 2.3 release" is a memory, and memories about software behavior
+        from three months ago are not evidence. Check out the tag, run the reproducer, watch it pass.
+        Then it is a bound.
+      </p>
+      <p>
+        If the reproducer fails at the supposed good end too, that is not a setback, it is the most
+        informative thing that has happened all session: the defect is older than you thought, and
+        every theory anyone has offered so far was about the wrong window. Widen and re-verify.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>establishing and starting</span><span class="tag pass">five commands</span></figcaption>
+<pre><code>git bisect start
+git bisect bad  HEAD          <span class="c-dim"># verified: reproducer fails</span>
+git bisect good v2.3.0        <span class="c-dim"># verified: reproducer passes</span>
+
+<span class="c-dim"># git now checks out a midpoint and tells you the step count</span>
+<span class="c-dim"># Bisecting: 99 revisions left to test after this (roughly 7 steps)</span>
+
+git bisect reset              <span class="c-dim"># when done, always</span></code></pre>
+      </figure>
+
+      <p>
+        Two commands worth knowing before you need them. <code>git bisect log</code> prints the
+        session so far, and <code>git bisect replay &lt;file&gt;</code> re-runs a logged session. Together
+        they mean a misclassified step at position four is a thirty-second recovery rather than a
+        restart: dump the log, edit out the bad line, replay.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Running">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Automate it</span>
+      </div>
+      <div>
+        <h2>Let the machine do the boring part</h2>
+        <p class="thesis">
+          <code>git bisect run</code> turns eight manual checkouts into one command, and its exit codes
+          are the whole interface.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>/tmp/check.sh · kept outside the repo on purpose</span><span class="tag pass">the test script</span></figcaption>
+<pre><code>#!/bin/sh
+<span class="c-dim"># Build. If this revision can't even build, it is UNTESTABLE, not bad.</span>
+make build &gt;/dev/null 2&gt;&amp;1 || exit 125
+
+out=$(./bin/app price --qty 3 --code SAVE20 2&gt;/dev/null)
+[ "$out" = "23.97" ] &amp;&amp; exit 0      <span class="c-pass"># good</span>
+exit 1                              <span class="c-block"># bad</span></code></pre>
+      </figure>
+
+      <div class="tablewrap">
+        <table>
+          <caption>what git bisect run reads from your exit code</caption>
+          <thead>
+            <tr><th>Exit</th><th>Means</th><th>Use it when</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>0</td><td>good</td><td>The reproducer passes at this revision.</td></tr>
+            <tr><td>1 – 127, not 125</td><td>bad</td><td>The reproducer fails at this revision.</td></tr>
+            <tr class="flag"><td>125</td><td>skip</td><td>Cannot be tested here: won't build, missing dependency, unrelated breakage.</td></tr>
+            <tr><td>128 and up</td><td>abort</td><td>Something is wrong with the harness itself. Stop the bisect.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Keeping the script outside the working tree is not fussiness. Bisect checks out old revisions,
+        and a script living in the repo will be replaced or deleted underneath you the moment you cross
+        the commit that introduced it. Every bisect that mysteriously dies halfway has usually
+        rediscovered this.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the whole search, one line</span><span class="tag pass">run it</span></figcaption>
+<pre><code>git bisect start &amp;&amp; git bisect bad HEAD &amp;&amp; git bisect good v2.3.0
+git bisect run /tmp/check.sh</code></pre>
+      </figure>
+
+      <div class="callout">
+        <span class="label">The 125 discipline</span>
+        <p>
+          Marking an unbuildable revision as bad is the single most effective way to get a wrong
+          answer that looks right. The commit that fails to compile has nothing to do with your
+          regression, and calling it bad tells git the transition happened before it. Skip is not a
+          weaker answer than bad. It is the true one.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Manual">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">By hand</span>
+      </div>
+      <div>
+        <h2>When there is no clean test</h2>
+        <p class="thesis">
+          Plenty of real regressions are judgment calls: a layout looks wrong, a report is off by an
+          amount nobody can specify, something got slow. Bisect still works. The predicate just lives
+          in your head.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Run it manually, marking each checkout <code>git bisect good</code> or <code>git bisect
+        bad</code> yourself. The risk shifts from automation to consistency: you must apply the same
+        judgment at step seven, twenty minutes in, that you applied at step one. Write the criterion
+        down before starting, in one sentence, and reread it at every step. "Total on the summary row
+        differs from the sum of the line items" is a criterion. "Looks wrong" is not, and it will drift
+        without you noticing.
+      </p>
+
+      <h3 class="sub">Three practical adjustments</h3>
+      <ul>
+        <li>
+          <strong>Rename the terms.</strong> When the thing you are hunting is not a bug (when did this
+          get slow, when did this start passing) the good and bad vocabulary actively confuses.
+          <code>git bisect start --term-old=fast --term-new=slow</code> lets you mark revisions in
+          words that match the question.
+        </li>
+        <li>
+          <strong>Threshold before you look.</strong> For performance, pick the number first. "Over 400ms
+          is slow" decided in advance beats a judgment made while watching, which will quietly track
+          your expectation of where the answer is.
+        </li>
+        <li>
+          <strong>Consider first-parent.</strong> In a merge-heavy history,
+          <code>git bisect start --first-parent</code> searches only the mainline, which lands you on a
+          merge commit rather than a commit inside a branch. Coarser and often faster, and you can
+          bisect inside the guilty merge afterwards.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Five lies">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The lies</span>
+      </div>
+      <div>
+        <h2>Five ways a bisect returns a confident wrong answer</h2>
+        <p class="thesis">
+          Bisect is a proof procedure with preconditions. When they do not hold it does not fail
+          loudly, it hands you a specific commit hash and a plausible story.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Flaky</span>
+          <span class="what">The reproducer is intermittent. Bisect converges on whichever commit happened to sit where the coin landed, and the result is indistinguishable from a real one. <strong>Counter:</strong> the 5/5 and 0/5 check on the card, before step one.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Reveals ≠ introduces</span>
+          <span class="what">The defect sat latent for a year; the commit bisect names is the one that started calling it. The answer is <em>correct</em> and points at an innocent change. <strong>Counter:</strong> read the found commit and ask whether it created the wrong behavior or exposed it. This is the drill's central question, and §8 scores it.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Poisoned by skip</span>
+          <span class="what">Unbuildable or unrelated-broken revisions marked bad instead of skipped. The search is then bounded by a lie and converges early. <strong>Counter:</strong> exit 125, always, no exceptions for "it's probably fine".</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Non-monotone</span>
+          <span class="what">The bug was introduced, fixed, then reintroduced. Bisect assumes exactly one transition and will return <em>a</em> transition, not the one you want. <strong>Counter:</strong> after converging, test the found commit's parent explicitly, and be suspicious when the found commit looks unrelated to the symptom.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Environment drift</span>
+          <span class="what">Old revisions fail for reasons that have nothing to do with the code: an expired fixture, a dependency yanked from the registry, a lockfile your toolchain no longer accepts. <strong>Counter:</strong> notice that the failure mode at old revisions differs from the symptom you are hunting. Different failure, different cause, skip it.</span>
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">The one to internalise</span>
+        <p>
+          Bisect answers "where did the behavior change", which is not the same question as "where is
+          the defect". Most of the time they coincide. The times they do not are the times the hunt is
+          worth doing well, and a hunter who cannot tell the two apart will fix the wrong file with
+          great confidence.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="The rubric">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Four points</span>
+      </div>
+      <div>
+        <h2>Score the hunt, not the answer</h2>
+        <p class="thesis">
+          Deliberately the same shape as the reverse-review rubric, so a team running both is not
+          learning two grading systems.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>bisect drill rubric, 4 points</caption>
+          <thead>
+            <tr><th>Point</th><th>Earned when</th><th>Lost when</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bounded</td>
+              <td>Both ends verified by hand, reproducer checked 5/5 and 0/5, before searching.</td>
+              <td>The good end was assumed. Costs the whole hunt roughly half the time.</td>
+            </tr>
+            <tr>
+              <td>Converged</td>
+              <td>Reached the transition in about ⌈log₂ n⌉ steps, using the bisect throughout.</td>
+              <td>Abandoned the search partway to check a commit that "looked suspicious".</td>
+            </tr>
+            <tr>
+              <td>Distinguished</td>
+              <td>Said whether the commit introduced the defect or revealed it, and gave the reason.</td>
+              <td>Stopped at "this commit is the bug".</td>
+            </tr>
+            <tr class="total">
+              <td>Explained</td>
+              <td>Named the mechanism: which line, what behavior changed, and why the suite stayed green.</td>
+              <td>Named a commit but not a mechanism. The commit is the location; the mechanism is the finding.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        As with reverse-review, the total is not the interesting number. Losing <em>bounded</em>
+        repeatedly is a discipline problem with an easy fix. Losing <em>distinguished</em> repeatedly
+        is a much deeper thing: it means the hunter is treating a search result as a diagnosis, and
+        that habit survives into every incident they will ever run.
+      </p>
+
+      <div class="callout">
+        <span class="label">Finding it fast is not the goal</span>
+        <p>
+          A hunter who converges in six minutes by guessing correctly scores worse than one who takes
+          twenty-five and can say why every step was where it was. Guessing works often enough to be
+          reinforced and it does not scale to the hunt that actually matters.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="The agent">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Afterwards</span>
+      </div>
+      <div>
+        <h2>Why the drill bans the agent and the incident should not</h2>
+        <p class="thesis">
+          The ban is a training decision, not a position on tooling. Stating that plainly matters,
+          because the dogmatic version of this page would be wrong.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        You do arithmetic without a calculator while learning arithmetic, and with one for the rest of
+        your life. The drill closes the agent for thirty minutes a month because an agent will happily
+        run the whole search and hand back an answer, and a rep you did not perform is not a rep. In a
+        real incident, use everything you have.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>in a real hunt, the honest division of labour</caption>
+          <thead>
+            <tr><th>Hand to the agent</th><th>Keep</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Writing the test script and its exit codes</td><td>Deciding what "bad" means</td></tr>
+            <tr><td>Summarising what an unfamiliar commit was trying to do</td><td>Judging whether it introduced or revealed</td></tr>
+            <tr><td>Explaining a subsystem you have never opened</td><td>Knowing whether the reproducer is trustworthy</td></tr>
+            <tr class="total"><td>Drafting the postmortem once you know the mechanism</td><td>The mechanism</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Every item in the right-hand column is a judgment about evidence you have personally observed,
+        and every one of them is what the drill trains. That is the actual argument for the exercise:
+        not that agents are bad at hunting, though they are, but that the parts you will still be
+        supplying are the parts nobody practises.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Cadence, and where to start</span>
+        <p>
+          Monthly is right. Good hunts are scarce, and unlike a diff you cannot generate more of them
+          cheaply. Start by converting your last three postmortems into three dealt hunts. That is a
+          year of drills from work you have already paid for.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The Bisect Drill</strong>, a 30-minute monthly exercise.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/reverse-review/">Reverse-review</a> (reading) ·
+      <a href="/mentors-playbook/">The Mentor's Playbook</a> (seeding and scoring)</div>
+    <div>Related · <a href="/first-ninety-days/">The First Ninety Days</a> ·
+      <a href="/seniority-ladder/">The Seniority Ladder</a></div>
+    <div>Colour encodes phase:
+      <span style="color:var(--forest)">the bound</span> ·
+      <span style="color:var(--gold)">the search</span> ·
+      <span style="color:var(--brick)">the lie</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
