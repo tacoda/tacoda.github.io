@@ -695,6 +695,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <li><a href="#s-6"><span class="n">6</span> What they showed</a></li>
       <li><a href="#s-7"><span class="n">7</span> Bugs in my own instrument</a></li>
       <li><a href="#s-8"><span class="n">8</span> Threats, and next</a></li>
+      <li><a href="#s-9"><span class="n">9</span> Conjecture</a></li>
     </ol>
   </nav>
 
@@ -1386,6 +1387,242 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
           rule, and count which rung actually catches things — but build the comparison so it can come out
           against you, because the first version of mine could not, and the version that could found a
           hole I would never have argued my way to.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="Conjecture">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Conjecture</span>
+      </div>
+      <div>
+        <h2>What I now believe about rule design, offered as opinion rather than result</h2>
+        <p class="thesis">
+          Everything below this line is conjecture. It is what twelve runs and a few years of building
+          these harnesses have left me <em>believing</em>, which is a different thing from what they have
+          shown. None of it is a measurement. Read it as a set of priors worth testing, not findings
+          worth citing.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="callout">
+        <span class="label">Read this before the rest of the section</span>
+        <p>
+          There is no statistical significance anywhere in this project and no claim here should be
+          quoted as though there were. Twelve runs, one model, one seed, one rule family, one author who
+          designed the rules to make the effect visible. Several of the conclusions below rest on a
+          single run. Some rest on nothing but pattern-matching against harnesses I have built before,
+          which is anecdote with a confident voice. Establishing any of this as fact would take a real
+          experiment: many runs per cell, multiple models, multiple codebases, rules chosen by someone
+          with no stake in the answer, and a pre-registered prediction so the analysis cannot drift
+          toward whatever came out. I have not run that experiment. Until someone does, treat what
+          follows as heuristics — useful for deciding what to build next, useless as evidence that the
+          decision was right.
+        </p>
+      </div>
+
+      <h3 class="sub">Where the belief comes from, and how thin it is</h3>
+      <div class="tablewrap">
+        <table>
+          <caption>my confidence, and what it actually rests on</caption>
+          <thead>
+            <tr><th>The belief</th><th>Rests on</th><th>My confidence</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A gate holds only the decidable shadow of a rule</td>
+              <td>An argument about predicates, illustrated once</td>
+              <td>High — it is closer to a definition than a result</td>
+            </tr>
+            <tr>
+              <td>Prose matters most where the code disagrees with it</td>
+              <td>Two rules, a handful of runs, deliberately chosen</td>
+              <td>Moderate, and the design was built to show it</td>
+            </tr>
+            <tr>
+              <td>An enforcer inside the blast radius is not an enforcer</td>
+              <td>One test rewrite; zero hook deletions observed</td>
+              <td>Structural worry, not an observed failure rate</td>
+            </tr>
+            <tr class="flag">
+              <td>In-turn feedback converges, post-loop feedback does not</td>
+              <td>n=1 for the failure</td>
+              <td>Low. A mechanism I would test, nothing more</td>
+            </tr>
+            <tr>
+              <td>Catch counts misrank rungs when one shadows another</td>
+              <td>Two arms, plus one bug in my own report</td>
+              <td>Moderate on the logic, unmeasured on the magnitude</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">1 · Choose the level by what the rule <em>is</em>, not by how badly you want it kept</h3>
+      <p>
+        The instinct when a rule matters is to push it as low and as hard as possible. I think that is the
+        wrong axis. A rule has a decidable part and an undecidable part, and the levels differ in which
+        part they can carry — not in how much they care. "Every amount carries its own currency, and
+        never a default" survived as prose and evaporated as a predicate, because the predicate could only
+        ask about a key set. Pushing that rule down a rung would not have strengthened it; it would have
+        replaced it with a weaker rule wearing its name.
+      </p>
+      <p>
+        So the split I would design to, tentatively: <strong>prose carries the whole rule, including the
+        judgement</strong>; <strong>mechanical rungs carry the part a machine can settle, and are honest
+        about being a subset</strong>. A promotion that silently narrows the rule is a loss disguised as a
+        win, and nothing in a catch-count report will show it to you.
+      </p>
+
+      <h3 class="sub">2 · Prose is worth roughly its distance from the surrounding code</h3>
+      <p>
+        The confound in section 4 is the most useful thing this project taught me, and it is a lesson about
+        writing rules rather than enforcing them. A charter line that restates what the neighbouring files
+        already demonstrate is close to free — and close to worthless, because the code was going to carry
+        it anyway. The same line becomes load-bearing exactly when the surrounding code would lead the
+        agent somewhere else.
+      </p>
+      <p>
+        Practically, that suggests auditing a charter against the codebase rather than against your
+        intentions: for each line, ask what the agent would do with that line deleted. If the answer is
+        "the same thing, by imitation", the line is documentation, not constraint. If the answer is
+        "something else", that is a line earning its tokens — and a candidate for a mechanical rung if it
+        also happens to be decidable. I would not push this further than a heuristic; one seed with a
+        forty-line package is a very quiet imitation surface, and a large legacy repo may drown prose
+        entirely.
+      </p>
+
+      <h3 class="sub">3 · Put the check where the agent can still act on it</h3>
+      <p>
+        This is the belief I hold most strongly and can defend least. Same rule, same violation, same
+        model: checked inside the turn, the agent fixed it and finished; checked after the loop closed, it
+        burned both repair passes and ended <code>blocked</code>. My guess at the mechanism is that a
+        refusal is feedback attached to the action that caused it, while a post-hoc finding is a report
+        about a file the agent believes it already wrote correctly.
+      </p>
+      <p>
+        If that mechanism is real, the design implication is that a rung's job is not only to catch. Early
+        rungs teach within the turn; late rungs adjudicate. A harness with only late rungs may be correct
+        and still fail to converge, spending its repair budget re-deriving what an in-turn refusal would
+        have said immediately. But this rests on a single failed run. It could be one bad sample.
+      </p>
+
+      <h3 class="sub">4 · Never let the level that enforces a rule sit inside the level being enforced</h3>
+      <p>
+        Two holes in this project have the same shape. The hook lives in the charter, so the agent can
+        delete its own guard. The tests are the verifier, and the agent can rewrite them. In both cases
+        the enforcing artifact is inside the blast radius of the thing it enforces against, and in both
+        cases nothing in the pipeline noticed.
+      </p>
+      <p>
+        The four-for-four hook survival is worth stating plainly as non-evidence: the agent had write
+        access to its own guard and fixed the code instead, and did not appear to notice the alternative.
+        Four runs on a task with no incentive to fight is not a safety property. What I take from it is
+        only that the exposure exists and is cheap to close: hold at least one rung the agent has no path
+        to, and treat a change to the verifier as a finding rather than a fix.
+      </p>
+
+      <h3 class="sub">5 · Keep one rung outside the process that produced the work</h3>
+      <p>
+        The E5 arm is the closest this project comes to an unambiguous result, and it is really just an
+        argument about who is allowed to grade the exam. The pipeline reported <code>done</code> with an
+        empty findings list over a tree holding two violations. The rung that found them was the one that
+        did not run inside the pipeline.
+      </p>
+      <p>
+        I would generalise that cautiously: a self-report from the system that did the work is a
+        hypothesis, and the only thing that converts it into a fact is a check with independent access to
+        the artifact. CI is the boring version. It is also the one that was right.
+      </p>
+
+      <h3 class="sub">6 · Do not rank levels by how often they fire</h3>
+      <p>
+        Rung 3 recorded zero catches while rung 2 was installed, because the hook is earlier in the path.
+        Rung 1 records zero catches permanently and by construction — and it is the rung that surfaced the
+        deadlock. A report sorted by catch count would have recommended deleting both.
+      </p>
+      <p>
+        So the number I would actually want, and did not collect: <em>what would reach the tree if this
+        rung were absent</em>. That is an ablation, not a counter, which is uncomfortable — it means the
+        cheap metric is the misleading one and the informative metric costs a full experimental arm per
+        rung. I do not have a way around that. Worth naming rather than pretending the counters are fine.
+      </p>
+
+      <h3 class="sub">7 · Leave a sanctioned exception, and read it as a signal</h3>
+      <p>
+        Unchanged from before the experiment, and unmeasured by it: every refusal should name its escape
+        hatch, and the markers should be counted. The one run that annotated the conflict instead of
+        resolving it silently produced a far better artifact than the one that rewrote the test — same
+        rule, same rungs, different behaviour, n=1 each. I believe the escape hatch is what made the good
+        outcome available. I cannot show it.
+      </p>
+
+      <h3 class="sub">Practical advice, in the order I would actually do it</h3>
+      <ol class="plain">
+        <li>
+          <strong>Write the rule as prose first, in full, including the part no machine can check.</strong>
+          If you cannot state it clearly in a sentence, no rung below will save it.
+        </li>
+        <li>
+          <strong>Ask what the codebase already teaches.</strong> If the surrounding code demonstrates the
+          rule, the prose is documentation. If the code contradicts it, the prose is doing real work — and
+          you should expect to need a mechanical rung too.
+        </li>
+        <li>
+          <strong>Apply the three tests before promoting anything:</strong> consequential, recurrent,
+          decidable. Recurrence is the one people skip, and it is the one that stops you building a gate
+          for something that happened once.
+        </li>
+        <li>
+          <strong>Write the predicate once, as a pure function of its inputs, with no imports from your
+          repo.</strong> Then mount it at every rung that needs it. Two implementations of one rule will
+          disagree, and the agent will find the seam before you do.
+        </li>
+        <li>
+          <strong>Put the first mechanical check inside the turn</strong> — a refusal at the tool boundary,
+          not a report afterward — so the agent learns while it can still act.
+        </li>
+        <li>
+          <strong>Put the last one outside the pipeline entirely.</strong> Independent access to the
+          artifact is what makes <code>done</code> mean anything.
+        </li>
+        <li>
+          <strong>Audit for enforcers inside the blast radius.</strong> Hook configs, test files, lint
+          configs, the gate's own thresholds. Anything the agent can edit is not a constraint on the agent.
+        </li>
+        <li>
+          <strong>Name the escape hatch in every refusal, and count its use.</strong> A spike in markers is
+          the rule asking to be changed.
+        </li>
+        <li>
+          <strong>Do not trust catch counts.</strong> Ablate instead, and assume any rung reading zero is
+          either shadowed or structural until you have turned the rung above it off.
+        </li>
+        <li>
+          <strong>Instrument the instrument.</strong> Both measurement bugs here flattered the thesis. If
+          your harness report has never told you something inconvenient, that is information about the
+          report.
+        </li>
+      </ol>
+
+      <div class="takeaway">
+        <span class="label">The honest summary</span>
+        <p>
+          The ladder is a decent way to think about where a rule lives, and I would build the next harness
+          this way. That is a preference formed by experience, not a conclusion licensed by data. Twelve
+          runs can show you a mechanism exists; they cannot tell you how often it matters, and the two
+          get confused constantly in writing about agents — including, twice, in my own report on this
+          project. If you take one thing from the section, take the shape of the argument rather than any
+          of its numbers, and build your comparison so it is capable of coming out against you.
         </p>
       </div>
     </div>
