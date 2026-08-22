@@ -1463,6 +1463,16 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
               <td>Two arms, plus one bug in my own report</td>
               <td>Moderate on the logic, unmeasured on the magnitude</td>
             </tr>
+            <tr class="flag">
+              <td>One rung per trust boundary, not per rung you can imagine</td>
+              <td>An argument, plus rungs 2 and 3 performing identically</td>
+              <td>Low. This is a preference, not a measurement</td>
+            </tr>
+            <tr class="flag">
+              <td>When to promote, and when to take a rung back out</td>
+              <td>Nothing in this experiment. Prior harnesses only</td>
+              <td>Lowest here. Anecdote, offered because the gap is worse</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -1566,6 +1576,133 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         outcome available. I cannot show it.
       </p>
 
+      <h3 class="sub">8 · When to promote — the three tests say <em>eligible</em>, not <em>yet</em></h3>
+      <p>
+        This experiment has nothing to say about timing, so what follows is drawn from harnesses I have
+        built rather than from any run here. Flagging that hard, because it is the section most likely to
+        be read as a rule and least entitled to be.
+      </p>
+      <p>
+        Consequential, recurrent and decidable are a filter, not a trigger. They tell you a rule
+        <em>could</em> live at a mechanical rung. The question of whether to move it today is separate, and
+        I think it turns on a single asymmetry: a predicate costs you maintenance forever, while a rule left
+        in prose costs you a violation now and then. Promote when the violation is worse than the upkeep.
+        Most rules never get there, which is the outcome the promotion test is supposed to produce.
+      </p>
+      <p>
+        The signals I actually act on, in rough order of how much I trust them:
+      </p>
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Violations are silent</span>
+          <span class="what">The strongest case, and the one E5 illustrates. If breaking the rule produces no symptom — no failing test, no error, just a wrong number in six months — then prose is the only thing between you and the violation, and prose is weakest exactly when nobody is watching. Promote.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">You have restated it</span>
+          <span class="what">A rule you have written into a review comment, or a follow-up prompt, after already stating it in the charter, is a rule the prose is not carrying. That is recurrence with an observable signal rather than recurrence you are asserting. Two or three restatements is my threshold; I cannot defend the number.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">The rule survives a change of author</span>
+          <span class="what">If the rule only matters because of how one person likes to work, a predicate turns a preference into an obligation for everyone who touches the repo. Cheap to write, expensive to live with.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a trigger: it just bit you</span>
+          <span class="what">One painful violation is the most common reason a gate gets built and the worst. Recurrence is unestablished by definition after a single incident. Write the prose, note the date, and see whether it happens again — the limits section of this very page had to admit recurrence is established for nothing here.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a trigger: it would be easy</span>
+          <span class="what">Decidability is a precondition, not a reason. "This is a two-line AST check" tells you the promotion is cheap, not that it is warranted, and a harness accumulating cheap gates is how you arrive at a pipeline nobody can explain.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">9 · When to demote, which I think is the more neglected direction</h3>
+      <p>
+        Harnesses ratchet. Rungs get added after incidents and essentially never removed, because removing
+        one requires arguing that a check is unnecessary, and nobody wants that argument attached to their
+        name when something later breaks. I have no data on this at all. I am fairly confident it is real
+        anyway, and that the ratchet is how a harness becomes something people route around.
+      </p>
+      <p>
+        The signals I would treat as demotion candidates:
+      </p>
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Escape markers are climbing</span>
+          <span class="what">Already the position in section 3, stated there as watching the door. The action when the count spikes is demotion or rewriting, not tightening. Every marker is a case where a human decided the rule was wrong about their situation, and they took the sanctioned route to say so.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">The shadow has drifted from the rule</span>
+          <span class="what">If the predicate now fires on things the rule does not actually care about, you are enforcing the decidable shadow rather than the rule, and the shadow has gone bad. False positives are a demotion signal, not a threshold to tune. Tuning is how a predicate slowly becomes a different rule with the old rule's authority.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">The rung is a proxy for a rule nobody holds anymore</span>
+          <span class="what">Rules outlive their reasons. If you cannot reconstruct why the rule exists — not the incident, the reason — the gate is enforcing institutional memory it does not have. Demote to prose and see whether anyone objects.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a signal: zero catches</span>
+          <span class="what">Point 6, restated because it is the demotion argument people reach for first. Zero can mean shadowed by a rung above it, or structural like rung 1, or genuinely load-bearing prevention. Those look identical in a report and only one is a case for removal.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Not a signal: "we never violate this anymore"</span>
+          <span class="what">The clean codebase and the rung are not independent — the rung is part of why the code is clean, and the clean code is then the imitation surface the agent follows. Section 4 is the same relationship seen from the other side. Removing a rung because its rule is now universally observed is survivorship reasoning, and it removes the thing maintaining the condition it cites as evidence.</span>
+        </li>
+      </ol>
+      <p>
+        The move I would reach for first is not deletion but <strong>demotion by one rung</strong>. Drop the
+        predicate, keep the prose. The intent survives, the maintenance stops, and the failure mode if you
+        were wrong is a violation that shows up in review rather than a rule that vanished from the
+        repository's memory. That also makes the decision reversible, which is the only reason I am
+        comfortable recommending it on this little evidence.
+      </p>
+
+      <h3 class="sub">10 · One layer or several — count trust boundaries, not rungs</h3>
+      <p>
+        The default should be one. Six existed here because the experiment needed six; I would not build
+        six for a real rule, and I do not think this page has earned the reading that more rungs is better.
+      </p>
+      <p>
+        The relevant observation is that rungs 2 and 3 performed identically — both refused in-turn, both
+        converged in zero repairs — and having both bought no measurable enforcement while costing real
+        clarity: the shadowing that made rung 3 look deletable, and a report that invented three deletion
+        incidents partly because two rungs occupied the same moment in the path. Two rungs that differ only
+        in strictness are redundancy. Two rungs that differ in <em>what they are exposed to</em> are not.
+      </p>
+      <p>
+        So the question I would ask is not how many layers, but how many distinct things I am declining to
+        trust. Rung 2 and rung 3 look redundant and are not, because the hook sits in the charter the agent
+        can edit and the tool gate does not. Rung 3 and rung 5 look redundant and are not, because one runs
+        inside the pipeline that produced the work and one does not. Each of those is a boundary. Adding a
+        rung that shares a boundary with an existing one adds cost and no coverage.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the smallest set I would actually build</span><span class="tag warn">a preference, not a result</span></figcaption>
+<pre><code><span class="c-dim">BOUNDARY                      RUNG              WHY IT IS NOT THE OTHERS</span>
+the undecidable part          <span class="c-warn">0  prose</span>         no predicate can hold it
+inside the turn              <span class="c-block">3  tool gate</span>     teaches while the agent can act
+outside the pipeline         <span class="c-block">5  CI</span>            independent access to the tree
+
+<span class="c-dim">add only for a boundary you can name:</span>
+the agent's own config       <span class="c-warn">2  hook</span>          cheap, but agent-deletable
+capability, not conduct      <span class="c-pass">1  tool grant</span>    the call never exists</code></pre>
+      </figure>
+
+      <p>
+        Three, then: the prose, one in-turn refusal, one check outside the pipeline. Rung 0 is not really a
+        redundant layer at all — it carries the part of the rule the predicates cannot, which is why
+        section 1 argues a promoted rule is a narrowed rule. The in-turn refusal is there for convergence
+        as much as for enforcement, on the strength of a single failed run. The outside check is there
+        because a pipeline reported <code>done</code> over a dirty tree, which is the one thing here I
+        would defend without hedging.
+      </p>
+      <p>
+        Cases where I would still go to one rung only: a rule whose violation is loud and immediate needs
+        prose and nothing else, since the failure teaches faster than a gate would. And a rule that cannot
+        be stated as a predicate at all has exactly one available rung whether you like it or not. The
+        error I see most often is not too few layers. It is four rungs on the one rule somebody once got
+        burned by, and prose alone on the twenty rules nobody has been burned by yet.
+      </p>
+
       <h3 class="sub">Practical advice, in the order I would actually do it</h3>
       <ol class="plain">
         <li>
@@ -1581,6 +1718,18 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
           <strong>Apply the three tests before promoting anything:</strong> consequential, recurrent,
           decidable. Recurrence is the one people skip, and it is the one that stops you building a gate
           for something that happened once.
+        </li>
+        <li>
+          <strong>Then wait for a trigger.</strong> Eligible is not the same as due. Promote when
+          violations are silent, or when you have caught yourself restating the rule after already writing
+          it down. Do not promote because it just bit you once, and do not promote because the check would
+          be easy to write.
+        </li>
+        <li>
+          <strong>Count the boundaries you are declining to trust, and build one rung per boundary.</strong>
+          For most rules that is prose, one in-turn refusal, and one check outside the pipeline. Two rungs
+          that differ only in strictness are redundancy that will also wreck your ability to tell which one
+          is working.
         </li>
         <li>
           <strong>Write the predicate once, as a pure function of its inputs, with no imports from your
@@ -1602,6 +1751,12 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         <li>
           <strong>Name the escape hatch in every refusal, and count its use.</strong> A spike in markers is
           the rule asking to be changed.
+        </li>
+        <li>
+          <strong>Review for demotion on a schedule, because it will never happen on demand.</strong>
+          Rising escape markers, false positives, or a rule whose reason nobody can reconstruct are all
+          candidates. Demote by one rung — drop the predicate, keep the prose — rather than deleting the
+          rule outright, so being wrong costs you a review comment instead of a forgotten constraint.
         </li>
         <li>
           <strong>Do not trust catch counts.</strong> Switch rungs off instead, and assume any rung reading zero is
