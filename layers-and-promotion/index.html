@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Layers and Promotion · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
-<meta name="description" content="An experiment: one rule enforced at six rungs of a coding-agent pipeline, with an ablation for each. Twelve runs, two findings about the rungs, three about experimental design, and one harness bug. Built on iii. By Ian Johnson.">
+<meta name="description" content="An experiment: one rule enforced at six rungs of a coding-agent pipeline, with a switch for each. Twelve runs, two findings about the rungs, three about experimental design, and one harness bug. Built on iii. By Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://www.tacoda.dev/layers-and-promotion/">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="tacoda.dev">
 <meta property="og:title" content="Layers and Promotion">
-<meta property="og:description" content="One rule, six rungs, one ablation each. Where should a constraint live — and how would you know you put it in the wrong place?">
+<meta property="og:description" content="One rule, six rungs, one switch each. Where should a constraint live — and how would you know you put it in the wrong place?">
 <meta property="og:url" content="https://www.tacoda.dev/layers-and-promotion/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Layers and Promotion">
-<meta name="twitter:description" content="One rule, six rungs, one ablation each. Where should a constraint live, and how would you know you were wrong?">
+<meta name="twitter:description" content="One rule, six rungs, one switch each. Where should a constraint live, and how would you know you were wrong?">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -636,7 +636,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <span class="sep">/</span>
       <span>experiment</span>
     </div>
-    <h1>Six places to put one rule, and <em>an ablation for each</em>.</h1>
+    <h1>Six places to put one rule, and <em>a switch for each</em>.</h1>
     <p class="standfirst">
       Every discussion of agent constraints ends in a shrug: put it in the charter, and hope. So here
       is a coding agent where one rule is enforced at six rungs, each rung is a separate process, and
@@ -840,12 +840,12 @@ POST /result {job_id}        make gate                   <span class="c-block">r
         <span class="meter-label">The runtime</span>
       </div>
       <div>
-        <h2>Ablating a rung is not starting a process</h2>
+        <h2>Switching a rung off is not starting a process</h2>
         <p class="thesis">
           The experiment is the point; iii is why it took an afternoon. Two properties did the work:
           <strong>components compose</strong>, so a new rung is a worker you add rather than a refactor
           you survive — and <strong>the architecture isolates</strong>, so removing one rung provably
-          cannot disturb the other five. Those are exactly the two things an ablation study needs.
+          cannot disturb the other five. Those are exactly the two things a controlled switch-off needs.
         </p>
         <div class="chips">
           <span class="chip kind-cmd"><b>cli</b> iii · iii console · iii trigger</span>
@@ -875,7 +875,7 @@ POST /result {job_id}        make gate                   <span class="c-block">r
         <code>HOOKS=off</code> is not a feature flag threaded through a codebase. It is one of six
         processes that does not get launched. The independent variable is a process boundary, and the
         other five rungs keep running untouched, unaware anything changed — no branch, no build, no
-        redeploy, and no risk the ablation quietly moved something else.
+        redeploy, and no risk the switch-off quietly moved something else.
       </p>
 
       <figure class="code">
@@ -904,7 +904,7 @@ STAGE_GATE=off   rung 4   the stage gate stops enforcing the predicate</code></p
         </li>
         <li data-signal="pass">
           <span class="when">Isolation is structural, not disciplined</span>
-          <span class="what">Rung 3 cannot be weakened by a change to rung 2, because they do not share a process, a language runtime, or an import graph. The blast radius of an edit is a worker. That is what makes six ablations trustworthy rather than six chances to break something quietly.</span>
+          <span class="what">Rung 3 cannot be weakened by a change to rung 2, because they do not share a process, a language runtime, or an import graph. The blast radius of an edit is a worker. That is what makes six switch-offs trustworthy rather than six chances to break something quietly.</span>
         </li>
         <li data-signal="warn">
           <span class="when">The honest counterweight</span>
@@ -1261,7 +1261,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
     </div>
 
     <div class="rung-body">
-      <h3 class="sub">The ablation pooled rules</h3>
+      <h3 class="sub">The report pooled rules</h3>
       <p>
         The first report averaged money-rule runs together with rounding-rule runs — averaging away the
         only variable under study, which is how much the surrounding code already demonstrates the rule.
@@ -1287,7 +1287,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
       <div class="takeaway">
         <span class="label">Why this one is worth the space</span>
         <p>
-          The instrument produced the finding the experiment most wanted to be true. If the ablation
+          The instrument produced the finding the experiment most wanted to be true. If the rung
           switches had not made "no hook installed" a routine, expected state, I would have had no reason
           to look twice at a number that confirmed my thesis.
         </p>
@@ -1552,7 +1552,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
       </p>
       <p>
         So the number I would actually want, and did not collect: <em>what would reach the tree if this
-        rung were absent</em>. That is an ablation, not a counter, which is uncomfortable — it means the
+        rung were absent</em>. That is a switch-off, not a counter, which is uncomfortable — it means the
         cheap metric is the misleading one and the informative metric costs a full experimental arm per
         rung. I do not have a way around that. Worth naming rather than pretending the counters are fine.
       </p>
@@ -1604,7 +1604,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
           the rule asking to be changed.
         </li>
         <li>
-          <strong>Do not trust catch counts.</strong> Ablate instead, and assume any rung reading zero is
+          <strong>Do not trust catch counts.</strong> Switch rungs off instead, and assume any rung reading zero is
           either shadowed or structural until you have turned the rung above it off.
         </li>
         <li>
