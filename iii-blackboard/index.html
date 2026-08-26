@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Blackboard Architecture for Agents · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A 1975 architecture that fits agents better than pipelines do. Built twice — once as iii configuration, once from scratch — with the activation condition as the load-bearing idea. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/iii-blackboard/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Blackboard Architecture for Agents">
+<meta property="og:description" content="No fixed control flow. Specialists contribute when they see something they can act on — which is how agents actually decide.">
+<meta property="og:url" content="https://www.tacoda.dev/iii-blackboard/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Blackboard Architecture for Agents">
+<meta name="twitter:description" content="A 1975 architecture that fits agents better than pipelines do. Built twice.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>One workflow, three architectures</span>
+      <span class="sep">/</span>
+      <span>2 of 3 · Blackboard</span>
+    </div>
+    <h1>The oldest multi-agent architecture is the <em>least used</em></h1>
+    <p class="standfirst">
+      Hearsay-II solved speech understanding in 1975 with a shape almost nobody reaches for now:
+      a shared knowledge space, a set of specialists that each declare when they are worth waking,
+      and no control flow at all. Nothing calls anything. That last property is why it fits agents
+      better than the pipeline you probably drew instead — a pipeline commits to the order of
+      operations at design time, and an agent's whole value is deciding at runtime.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      companion repo · <a href="https://github.com/tacoda/iii-blackboard"><code>github.com/tacoda/iii-blackboard</code></a><br>
+      built twice · once as <a href="https://iii.dev">iii</a> configuration, once from scratch in stdlib Python<br>
+      the workload · the same incident analysis all three repos run — extract claims, propose an explanation, score it, accept<br>
+      verification · every iii command shown was executed against a live engine (0.22.0) before it was written down<br>
+      tests · <code>6 passed</code>, offline and deterministic
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Blackboard</dt>
+          <dd>The shared knowledge space, partitioned into levels. Every contribution lands here and nowhere else.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Activation condition</dt>
+          <dd>A predicate over the blackboard deciding whether a specialist is worth waking. The load-bearing part.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Control</dt>
+          <dd>Which eligible specialist runs next. An optimization with plain code; cost control with a model in the loop.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Contents">
+    <ol>
+      <li><a href="#rung-0"><span class="n">0</span> The shape</a></li>
+      <li><a href="#rung-1"><span class="n">1</span> On iii</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> The mapping</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> From scratch</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> What it taught</a></li>
+      <li><a href="#takeaway"><span class="n">5</span> Takeaway</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 0 ============ -->
+  <section class="rung" id="rung-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The shape">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The shape</span>
+      </div>
+      <div>
+        <h2>Nothing calls anything</h2>
+        <p class="thesis">
+          A pipeline is a graph you draw. A blackboard is a space you post into. The difference
+          shows up the moment the work stops matching the graph.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The blackboard is a shared, structured store partitioned into <em>levels</em> — raw input,
+        derived evidence, candidate hypotheses, the solution. Independent <strong>knowledge
+        sources</strong> watch it. Each declares an <strong>activation condition</strong>: a
+        predicate over the blackboard's contents that says when this specialist has something to
+        contribute. When a condition matches, that KS becomes eligible; a control component picks
+        which eligible KS runs; it posts its contribution, which may make others eligible.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the loop</span><span class="tag warn">no arrows between specialists</span></figcaption>
+<pre><code>       ┌──────────────── <span class="c-warn">blackboard</span> ────────────────┐
+       │  raw   evidence   hypotheses   solution   │
+       └───┬───────┬────────────┬───────────┬──────┘
+           │       │            │           │
+      <span class="c-block">condition?</span>  <span class="c-block">condition?</span>   <span class="c-block">condition?</span>  <span class="c-block">condition?</span>
+           │       │            │           │
+        extract  propose      score      accept        <span class="c-dim">← knowledge sources</span>
+           └───────┴──────┬─────┴───────────┘
+                      <span class="c-pass">control</span>: run the highest-priority eligible one
+</code></pre>
+      </figure>
+
+      <div class="tablewrap">
+        <table>
+          <caption>where each shape puts the decision</caption>
+          <thead>
+            <tr><th>&nbsp;</th><th>Pipeline / DAG</th><th>Blackboard</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Order of operations</td><td>Decided when you draw it</td><td>Decided per step, from current state</td></tr>
+            <tr><td>Adding a capability</td><td>Rewire the graph</td><td>Add a KS; nothing else changes</td></tr>
+            <tr><td>A stage with nothing to do</td><td>Runs anyway, or you branch</td><td>Its condition doesn't match. It doesn't run</td></tr>
+            <tr><td>Partial results</td><td>Usually a failed run</td><td><strong>Quiescence — an honest outcome</strong></td></tr>
+            <tr class="flag"><td>Predictability</td><td><strong>You know what will happen</strong></td><td>You know what <em>can</em> happen, not what will</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">The honest case against</span>
+        <p>
+          That last row is the price, and it is a real one. A blackboard run is harder to reason
+          about before it happens and harder to test exhaustively. If your stages are genuinely
+          fixed — intake, validate, transform, emit — a pipeline is clearer, cheaper, and easier to
+          debug, and you should build that instead. Reach for a blackboard when the
+          <em>set</em> of applicable steps varies per input, which is exactly the case a fixed graph
+          handles worst.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Step 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">On iii</span>
+      </div>
+      <div>
+        <h2>The activation condition is already a config field</h2>
+        <p class="thesis">
+          The part you would expect to write as code — the predicate deciding whether a specialist
+          wakes — turns out to be a declarative slot on a trigger binding.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Levels are <code>state</code> scopes; nothing needs creating, they exist on first write.
+        Knowledge sources are functions bound to a <code>state</code> trigger. The interesting
+        piece is <code>conditions</code> — an array on the binding, where <code>fp::condition</code>
+        expresses the precondition as data:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>a knowledge source</span><span class="tag block">the precondition, as config</span></figcaption>
+<pre><code>iii trigger engine::register_trigger \
+  trigger_type=state function_id=promote-hypothesis \
+  config='{"scope":"bb:hypotheses"}' \
+  conditions='[{
+    "function_id": "fp::condition",
+    "config": { <span class="c-block">"path": "/new_value/confidence"</span>,
+                <span class="c-block">"op": "&gt;"</span>, <span class="c-block">"to": 0.8</span> }
+  }]'</code></pre>
+      </figure>
+
+      <p>
+        Operators are <code>==</code> <code>!=</code> <code>&gt;</code> <code>&gt;=</code>
+        <code>&lt;</code> <code>&lt;=</code> <code>exists</code> <code>not_empty</code>, plus
+        <code>negate</code>. And the predicate returns more than a boolean:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>evaluated</span><span class="tag pass">a decision and a reason</span></figcaption>
+<pre><code>$ iii trigger fp::condition \
+    event='{"new_value":{"confidence":0.9}}' \
+    condition_config='{"path":"/new_value/confidence","op":"&gt;","to":0.8}'
+<span class="c-pass">{"decision": "allow", "reason": "`/new_value/confidence` is 0.9, expected &gt; 0.8"}</span>
+
+$ <span class="c-dim"># same condition, weaker hypothesis</span>
+<span class="c-warn">{"decision": "skip",  "reason": "`/new_value/confidence` is 0.5, expected &gt; 0.8"}</span></code></pre>
+      </figure>
+
+      <p>
+        That reason string is the detail worth stealing. Opportunistic control is the hardest kind
+        to debug precisely because there is no call stack to read — "why didn't anything happen?"
+        is the characteristic failure. Here every scheduling decision explains itself, and you did
+        not have to instrument anything to get it. Classic blackboard implementations built that
+        by hand.
+      </p>
+
+      <div class="callout">
+        <span class="label">One typo builds a blackboard where nothing ever fires</span>
+        <p>
+          Paths are <strong>JSON pointer</strong> — <code>/new_value/confidence</code>, not
+          <code>new_value.confidence</code>. A dotted path is not an error: it resolves to
+          "nothing", the condition evaluates to <code>skip</code>, and the knowledge source simply
+          never wakes. No exception, no warning, no failed binding — just a system that quietly
+          does nothing. This cost me a confused ten minutes and it will cost you the same.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The mapping</span>
+      </div>
+      <div>
+        <h2>Hearsay-II to iii, verified</h2>
+        <p class="thesis">
+          Most of it is a rename. Two rows are not, and they are the ones to plan around.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>the blackboard architecture, mapped</caption>
+          <thead>
+            <tr><th>Hearsay-II</th><th>iii</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Blackboard, in levels</td><td><code>state</code> scopes</td><td>config</td></tr>
+            <tr><td>Knowledge source</td><td>any registered function</td><td>config</td></tr>
+            <tr><td><strong>Activation condition</strong></td><td><code>fp::condition</code> in <code>conditions[]</code></td><td>config</td></tr>
+            <tr><td>Opportunistic triggering</td><td><code>state</code> trigger, scope/key filters</td><td>config</td></tr>
+            <tr><td>Competing writes to a slot</td><td><code>state::compare-and-set</code></td><td>config</td></tr>
+            <tr><td>Change notification</td><td><code>state:created</code> / <code>updated</code> / <code>deleted</code></td><td>config</td></tr>
+            <tr><td>Explaining a decision</td><td>the condition's <code>reason</code> string</td><td><strong>free</strong></td></tr>
+            <tr class="flag"><td>Agenda / priority scheduling</td><td><code>priority_field</code> — RabbitMQ adapter only</td><td><strong>gap</strong></td></tr>
+            <tr class="flag"><td>Quiescence detection</td><td>—</td><td><strong>gap</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The agenda gap is a deployment detail with real consequences: the builtin and redis queue
+        adapters ignore message priority entirely, so a single-node blackboard has an
+        <em>unordered</em> agenda. Every eligible KS still runs; you just lose control over which
+        one runs first, which — see the next rung — is the difference between an optimization and
+        a bill.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">From scratch</span>
+      </div>
+      <div>
+        <h2>Two hundred lines, and most of it isn't the blackboard</h2>
+        <p class="thesis">
+          Building it with nothing underneath is the only way to see which parts iii was quietly
+          handling.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The store, the knowledge sources and the control loop are small. What takes the space is
+        everything around them — content-hash compare-and-set, a change log so the loop can tell
+        progress from stalling, and the termination logic.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>scratch/blackboard.py</span><span class="tag pass">the control loop</span></figcaption>
+<pre><code>def run(self) -&gt; str:
+    for step in range(self.max_steps):
+        if not self.bb.empty("solution"):
+            return <span class="c-pass">"solved"</span>
+
+        eligible = [ks for ks in self.sources if ks.eligible(self.bb)]
+        if not eligible:
+            return <span class="c-warn">"quiescent"</span>        <span class="c-dim"># nothing applies. a real answer.</span>
+
+        ks = max(eligible, key=lambda k: k.priority)
+        before = len(self.bb.log)
+        ks.action(self.bb)
+        if len(self.bb.log) == before:
+            return <span class="c-block">"stalled"</span>          <span class="c-dim"># eligible but contributed nothing</span>
+
+    return "exhausted"</code></pre>
+      </figure>
+
+      <p>
+        Four outcomes, and only one of them is "solved". That is the honest shape of opportunistic
+        control, and writing it out is what makes the earlier gap concrete: <strong>nothing calls
+        anything, so nothing naturally ends.</strong> Termination is a thing you build. It looks
+        free in the diagram.
+      </p>
+
+      <p>
+        <code>stalled</code> is the one I did not anticipate. A knowledge source whose condition
+        stays true but which contributes nothing will be selected forever — the single way this
+        loop livelocks. The check is three lines and it is not optional.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the same run, both implementations</span><span class="tag warn">stub model, offline</span></figcaption>
+<pre><code>[0] extract-evidence   (priority 10)
+[1] propose-hypothesis (priority 20)
+[2] score-hypothesis   (priority 30)
+[3] accept-hypothesis  (priority 40)
+[4] solution present — done
+
+outcome: <span class="c-pass">solved</span>
+answer:  The backlog is a throughput limit, not a failure: one consumer, flat errors.
+conf:    0.86</code></pre>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">What it taught</span>
+      </div>
+      <div>
+        <h2>Four things that only showed up because we built it twice</h2>
+        <p class="thesis">
+          Each of these was invisible from one side or the other.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ul>
+        <li>
+          <strong>The activation condition is the whole architecture.</strong> Everything else is
+          bookkeeping. Get the predicates wrong and a blackboard is a hash map with extra steps —
+          and because a wrong predicate fails <em>silently</em> (nothing fires), it is the failure
+          you should build your tests around.
+        </li>
+        <li>
+          <strong>Opportunism needs a termination story, and it is yours.</strong> Both
+          implementations needed an explicit quiescence check. iii's <code>state::barrier</code>
+          answers "wait for N contributions", not "nothing is eligible anymore" — a different
+          question, and the one that actually ends a run.
+        </li>
+        <li>
+          <strong>Agent knowledge sources make the priority function load-bearing.</strong> With
+          deterministic specialists, running them in a poor order costs microseconds. With
+          model-backed ones it costs a model call, in dollars and seconds. The agenda stops being
+          an optimization and becomes the cost control — which is what makes iii's priority gap
+          matter more than it first appears.
+        </li>
+        <li>
+          <strong>Partial results are a first-class outcome.</strong> A pipeline that can't finish
+          has failed. A blackboard that reaches quiescence has told you something true: given what
+          is known, no specialist can contribute further. For agent systems — which routinely hit
+          the edge of what they can determine — that is a far more useful thing to return than an
+          exception.
+        </li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The reframe worth keeping</span>
+        <p>
+          Agents are usually wired as pipelines because that is what the tooling suggests, not
+          because the work is pipeline-shaped. If you have ever added a conditional branch to skip
+          a stage that had nothing to do, you have started hand-rolling activation conditions. The
+          blackboard is what that becomes if you take it seriously.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAKEAWAY ============ -->
+  <section class="rung" id="takeaway">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Takeaway">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Takeaway</span>
+      </div>
+      <div>
+        <h2>Fifty-year-old architecture, unusually good fit</h2>
+        <p class="thesis">
+          Not because it is clever, but because it declines to decide the thing agents need to
+          decide at runtime.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="takeaway">
+        <p>
+          <strong>Use a blackboard when the set of applicable steps varies per input.</strong> Not
+          when the content varies — a pipeline handles that fine — but when you genuinely cannot
+          say in advance which specialists apply. That is the case a fixed graph handles worst and
+          the case agent systems hit constantly.
+        </p>
+        <p>
+          <strong>On iii, most of it is configuration.</strong> Levels are state scopes, knowledge
+          sources are bound functions, activation conditions are <code>fp::condition</code>
+          entries, and contention is <code>compare-and-set</code>. You get self-explaining
+          scheduling decisions for free. You do not get an ordered agenda without RabbitMQ, and you
+          do not get quiescence detection at all.
+        </p>
+        <p>
+          <strong>Build the termination logic first.</strong> It is the part that looks free in the
+          diagram, is absent from both substrates, and determines whether your system stops or
+          spins. Everything else is genuinely as easy as it looks.
+        </p>
+      </div>
+
+      <p>
+        The companion repo has both implementations side by side, plus a demo that walks the
+        activation conditions flipping between <code>allow</code> and <code>skip</code> against a
+        live engine. Six tests, offline and deterministic; the one worth reading first is
+        <code>test_quiescence_when_nothing_eligible</code>, because that outcome is the whole
+        architecture in one assertion.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The Blackboard Architecture for Agents</strong>, opportunistic control.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Companion repo ·
+      <a href="https://github.com/tacoda/iii-blackboard"><code>github.com/tacoda/iii-blackboard</code></a></div>
+    <div>One workflow, three architectures ·
+      <a href="/iii-for-otp-practitioners/">Actors &amp; supervision</a> ·
+      <strong>Blackboard</strong> ·
+      <a href="/iii-event-sourcing/">Event sourcing</a></div>
+    <div>Colour encodes the part:
+      <span style="color:var(--gold)">blackboard</span> ·
+      <span style="color:var(--brick)">activation condition</span> ·
+      <span style="color:var(--forest)">control</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>

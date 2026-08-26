@@ -3,20 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>iii for OTP Practitioners · Harness Engineering · Ian Johnson</title>
+<title>Actors and Supervision for Agents · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
-<meta name="description" content="OTP can be pseudo-implemented on iii with no code at all — queue definitions, state ops, and trigger bindings. Half of OTP does not port; it dissolves. A different perspective on the distributed queue. By Ian Johnson.">
+<meta name="description" content="OTP built twice — as iii configuration and from scratch. Half of it ports as pure config, half dissolves, and the part you actually lose is the mailbox. By Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://www.tacoda.dev/iii-for-otp-practitioners/">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="tacoda.dev">
-<meta property="og:title" content="iii for OTP Practitioners">
-<meta property="og:description" content="A GenServer with no source file. Half of OTP does not port to a durable queue — it dissolves.">
+<meta property="og:title" content="Actors and Supervision for Agents">
+<meta property="og:description" content="A GenServer with no source file, and a supervisor that works perfectly while the work never finishes.">
 <meta property="og:url" content="https://www.tacoda.dev/iii-for-otp-practitioners/">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iii for OTP Practitioners">
-<meta name="twitter:description" content="A GenServer with no source file. Half of OTP does not port — it dissolves.">
+<meta name="twitter:title" content="Actors and Supervision for Agents">
+<meta name="twitter:description" content="Half of OTP does not port. It dissolves. Built twice to find out which half.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -639,18 +639,18 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="eyebrow">
       <span>Harness Engineering</span>
       <span class="sep">/</span>
-      <span>iii for OTP practitioners</span>
+      <span>One workflow, three architectures</span>
       <span class="sep">/</span>
-      <span>A GenServer with no source file</span>
+      <span>1 of 3 · Actors &amp; supervision</span>
     </div>
     <h1>Half of OTP does not port. It <em>dissolves</em>.</h1>
     <p class="standfirst">
       If you have written Elixir, you carry a mental model of distributed systems shaped like a
       supervision tree: processes that hold state, die, and get restarted. Durable-queue systems
-      like iii model the same territory differently — state outlives the thing computing it, and
-      failure is a property of a message rather than a process. Most of OTP survives that
-      translation as pure configuration. The parts that do not survive are more interesting than
-      the parts that do, because they were answers to a question the other architecture never asks.
+      model the same territory differently — state outlives the thing computing it, and failure is
+      a property of a message rather than a process. Most of OTP survives that translation as pure
+      configuration. The parts that don't survive are more interesting than the parts that do,
+      because they were answers to a question the other architecture never asks.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -660,10 +660,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="provenance">
       companion repo · <a href="https://github.com/tacoda/iii-otp"><code>github.com/tacoda/iii-otp</code></a><br>
-      substrate · <a href="https://iii.dev">iii</a> 0.22.0 · workers <code>queue</code>, <code>state</code>, <code>pubsub</code>, <code>fp</code>, <code>cron</code><br>
-      the claim · a working GenServer built from queue definitions, state ops, and trigger bindings — no worker source<br>
-      not the claim · that iii is Erlang, or that this scales to a million actors<br>
-      verification · every command shown was run against a live engine before it was written down
+      built twice · once as <a href="https://iii.dev">iii</a> configuration, once from scratch in stdlib Python<br>
+      the workload · the same incident analysis all three repos run — extract claims, propose an explanation, score it, accept<br>
+      verification · every iii command shown was executed against a live engine (0.22.0) before it was written down<br>
+      tests · <code>10 passed</code>, offline and deterministic
     </div>
 
     <dl class="signals">
@@ -694,11 +694,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
   <nav class="railnav" aria-label="Contents">
     <ol>
       <li><a href="#rung-0"><span class="n">0</span> Two lenses</a></li>
-      <li><a href="#rung-1"><span class="n">1</span> A GenServer</a></li>
+      <li><a href="#rung-1"><span class="n">1</span> On iii</a></li>
       <li><a href="#rung-2"><span class="n">2</span> The translation</a></li>
-      <li><a href="#rung-3"><span class="n">3</span> What dissolves</a></li>
-      <li><a href="#rung-4"><span class="n">4</span> What doesn't</a></li>
-      <li><a href="#rung-5"><span class="n">5</span> Other shapes</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> From scratch</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> What dissolves</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> What doesn't</a></li>
       <li><a href="#takeaway"><span class="n">6</span> Takeaway</a></li>
     </ol>
   </nav>
@@ -771,10 +771,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-head">
       <div class="rung-index">
         <span class="num">1</span>
-        <div class="meter" role="img" aria-label="Step 1 of 5">
+        <div class="meter" role="img" aria-label="Step 1 of 6">
           <i class="on"></i><i></i><i></i><i></i><i></i>
         </div>
-        <span class="meter-label">A GenServer</span>
+        <span class="meter-label">On iii</span>
       </div>
       <div>
         <h2>Three declarations, no source file</h2>
@@ -806,26 +806,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        Now the callback. <code>state::update</code> takes an ordered list of atomic operations —
-        <code>set</code>, <code>merge</code>, <code>increment</code>, <code>decrement</code>,
-        <code>append</code>, <code>remove</code> — applies them to a <code>(scope, key)</code>, and
-        returns both the old and new value. That is <code>handle_call/3</code>: a state
-        transition and a reply, expressed as data rather than a function body.
-      </p>
-
-      <figure class="code">
-        <figcaption><span>the callback</span><span class="tag warn">handle_call, as data</span></figcaption>
-<pre><code>iii trigger state::update scope=otp:counter key=c1 \
-  ops='[{"type":"increment","path":"n","by":5}]'
-
-<span class="c-dim">{ "old_value": { "n": 1 }, "new_value": { "n": 6 } }</span></code></pre>
-      </figure>
-
-      <p>
-        Join them and you have a cast. Enqueue onto the actor's lane, targeting
-        <code>state::update</code>. The message carries its own destination, so nothing needs to be
-        registered as a consumer; <code>messageReceiptId</code> is the idempotency key that makes a
-        redelivery a no-op.
+        Now the callback. <code>state::update</code> takes an ordered list of atomic operations,
+        applies them to a <code>(scope, key)</code>, and returns both the old and new value. That
+        is <code>handle_call/3</code>: a state transition and a reply, expressed as data rather
+        than a function body.
       </p>
 
       <figure class="code">
@@ -842,12 +826,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        That is a durable, per-actor-serialized, retry-backed, idempotency-keyed message send into a
-        persistent state machine, and there is no source file anywhere in it. The supervisor is a
-        <code>worker-compose.yaml</code> dependency graph. Monitors are trigger bindings —
-        <code>engine::register_trigger trigger_type=state function_id=publish</code> fans every
-        mutation in a scope out to a topic. Restart intensity is <code>max_retries</code> and a
-        dead-letter queue.
+        That is a durable, per-actor-serialized, retry-backed, idempotency-keyed message send into
+        a persistent state machine, and there is no source file anywhere in it. The supervisor is a
+        <code>worker-compose.yaml</code> dependency graph. Monitors are trigger bindings. Restart
+        intensity is <code>max_retries</code> and a dead-letter queue.
       </p>
 
       <div class="callout">
@@ -871,7 +853,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-head">
       <div class="rung-index">
         <span class="num">2</span>
-        <div class="meter" role="img" aria-label="Step 2 of 5">
+        <div class="meter" role="img" aria-label="Step 2 of 6">
           <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
         </div>
         <span class="meter-label">The translation</span>
@@ -903,7 +885,6 @@ footer strong { color: var(--ink-2); font-weight: 600; }
             <tr><td>Supervisor tree</td><td><code>worker-compose.yaml</code> <code>depends_on</code></td><td>config</td></tr>
             <tr><td><code>init/1</code> → <code>{:ok, _}</code></td><td>Readiness = registration on the engine</td><td>config</td></tr>
             <tr><td><code>rest_for_one</code></td><td>Cascading stop, reverse dependency order</td><td>config</td></tr>
-            <tr><td>Shutdown → brutal kill</td><td>SIGTERM to group → grace → SIGKILL</td><td>config</td></tr>
             <tr><td><code>max_restarts</code></td><td><code>max_retries</code> + backoff → DLQ</td><td>config</td></tr>
             <tr><td><code>send_interval</code></td><td><code>cron</code> binding</td><td>config</td></tr>
             <tr><td><code>monitor</code></td><td><code>state</code> trigger on the scope</td><td>config</td></tr>
@@ -923,10 +904,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        Note the row that says <em>free</em>. Hot code upgrade is the thing OTP is famous for making
-        possible and notorious for making painful — <code>code_change/3</code>, appups, relups. Here
-        the callback is a list of operations in a config entry, and config hot-reloads. You get the
-        capability by accident, because you gave up expressing the callback as code.
+        Note the row that says <em>free</em>. Hot code upgrade is the thing OTP is famous for
+        making possible and notorious for making painful — <code>code_change/3</code>, appups,
+        relups. Here the callback is a list of operations in a config entry, and config
+        hot-reloads. You get the capability by accident, because you gave up expressing the
+        callback as code.
       </p>
     </div>
   </section>
@@ -936,8 +918,89 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-head">
       <div class="rung-index">
         <span class="num">3</span>
-        <div class="meter" role="img" aria-label="Step 3 of 5">
+        <div class="meter" role="img" aria-label="Step 3 of 6">
           <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">From scratch</span>
+      </div>
+      <div>
+        <h2>The supervisor works perfectly and the work never finishes</h2>
+        <p class="thesis">
+          Writing OTP by hand is what makes the "dissolves" column legible — and it surfaces the
+          one property the translation genuinely costs you.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The from-scratch half is a <code>Mailbox</code> (strict FIFO), a <code>GenServer</code>
+        (state plus a serialized loop), and a <code>Supervisor</code> with
+        <code>one_for_one</code> / <code>rest_for_one</code> and a real restart-intensity window.
+        Restart intensity — the thing everyone forgets, and without which a crash loop is
+        indistinguishable from a busy system — is about fifteen lines.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>scratch/otp.py</span><span class="tag pass">why "restart" dissolves on iii</span></figcaption>
+<pre><code>def restart(self) -&gt; None:
+    self.state = self._init()   <span class="c-pass"># state is gone; this is the cost</span>
+    self.mailbox = Mailbox()    <span class="c-block"># so is anything still queued</span>
+    self.starts += 1</code></pre>
+      </figure>
+
+      <p>
+        Once you have written <em>that</em> line, the mapping table stops being a claim and starts
+        being obvious. On iii there is no such line to write, because the state was never in the
+        process. There is nothing to rebuild.
+      </p>
+
+      <p>
+        The demo runs the shared workflow with one injected provider failure. The supervisor does
+        its job flawlessly:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>one transient model failure</span><span class="tag block">everything healthy, nothing delivered</span></figcaption>
+<pre><code>supervisor log:
+  <span class="c-warn">score crashed: provider error</span>
+  score restarted (start #2)
+  accept restarted (start #2)          <span class="c-dim">← rest_for_one cascade</span>
+
+final state per child:
+  extract   starts=1  {"claims": [...]}
+  propose   starts=1  {"hypothesis": "..."}
+  score     starts=2  {}
+  accept    starts=2  <span class="c-block">{"accepted": null}</span>          <span class="c-block">← the work never completed</span></code></pre>
+      </figure>
+
+      <p>
+        Every process is healthy. The cascade was correct. And the run produced nothing, because
+        the restart cleared <code>score</code>'s mailbox and the message that caused the crash is
+        gone. <strong>Supervision restores the process, never the message.</strong>
+      </p>
+
+      <div class="callout">
+        <span class="label">This is not a bug in the implementation. It is OTP.</span>
+        <p>
+          In BEAM the answer is that the sender retries — and the sender is usually another
+          supervised process a microsecond away, so nobody notices the cost. With an agentic stage,
+          the sender is a model call you already paid for. Losing the in-flight message on restart
+          is a very different proposition when replaying it costs a few cents and several seconds.
+          That is the strongest practical argument for moving the unit of failure from the process
+          to the message — which is exactly what the durable-queue translation does.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step 4 of 6">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
         </div>
         <span class="meter-label">What dissolves</span>
       </div>
@@ -952,14 +1015,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        The fact is this: <strong>state lives in volatile memory inside something that can die.</strong>
-        Supervision exists to restart that thing. Restart intensity exists to stop supervision from
-        looping forever. Links exist to stop collaborators from acting on state that died with its
-        owner. The registry exists because pids are ephemeral and unroutable, so names need
-        indirection.
-      </p>
-      <p>
-        Move the state out and each of those loses its subject.
+        The fact is this: <strong>state lives in volatile memory inside something that can
+        die.</strong> Supervision exists to restart that thing. Restart intensity exists to stop
+        supervision from looping forever. Links exist to stop collaborators from acting on state
+        that died with its owner. The registry exists because pids are ephemeral and unroutable.
       </p>
 
       <figure class="code">
@@ -983,56 +1042,46 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           already handled by retries.
         </li>
         <li>
-          <strong>Restart intensity.</strong> <code>max_restarts</code> within
-          <code>max_seconds</code> exists to stop a crash-restart loop. The queue's answer is three
-          retries with exponential backoff, then dead-letter. It is the same job done better: the
-          poison message is <em>preserved</em>, inspectable, and replayable with
-          <code>iii::queue::redrive</code> once you fix the cause. OTP escalates and the message is
-          gone.
+          <strong>Restart intensity.</strong> Three retries with exponential backoff, then
+          dead-letter. Same job done better: the poison message is <em>preserved</em>, inspectable,
+          and replayable with <code>iii::queue::redrive</code> once you fix the cause. OTP
+          escalates and the message is gone.
         </li>
         <li>
           <strong>Registry.</strong> A registry maps a stable name onto an unstable pid. Here the
-          address <em>is</em> the name. <code>(scope, key)</code> never goes stale, so there is no
-          lookup-versus-death race to lose.
+          address <em>is</em> the name. <code>(scope, key)</code> never goes stale.
         </li>
         <li>
           <strong>Links and EXIT.</strong> Links protect collaborators from acting on state that
           died. There is no stale memory to protect against. What survives is cascade for genuine
-          <em>data</em> dependencies, which the compose daemon already does — a queue worker
-          pushing into a dead database corrupts work invisibly, and that edge is worth keeping.
+          <em>data</em> dependencies, which the compose daemon already does.
         </li>
       </ul>
-
-      <p>
-        Monitors survive, but inverted. You no longer watch for liveness; you subscribe to
-        transitions. A <code>state</code> trigger binding delivers the scope, the key, the old value
-        and the new one. You learn what changed rather than merely that something stopped.
-      </p>
 
       <div class="callout">
         <span class="label">The reframe worth keeping</span>
         <p>
           It is tempting to score this as "iii is missing supervision." That reading is backwards.
           Supervision is a solution, and solutions only look like requirements until you change the
-          problem. The right question for any distributed substrate is not <em>does it have a
-          supervisor</em> but <em>what does it do with state, and what follows from that</em>.
+          problem. The right question for any substrate is not <em>does it have a supervisor</em>
+          but <em>what does it do with state, and what follows from that</em>.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ============ RUNG 4 ============ -->
-  <section class="rung" id="rung-4">
+  <!-- ============ RUNG 5 ============ -->
+  <section class="rung" id="rung-5">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">4</span>
-        <div class="meter" role="img" aria-label="Step 4 of 5">
-          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Step 5 of 6">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
         <span class="meter-label">What doesn't</span>
       </div>
       <div>
-        <h2>Two things OTP has that you will actually miss</h2>
+        <h2>Two things you will actually miss</h2>
         <p class="thesis">
           One is inherent to the architecture. The other is a missing feature wearing an
           actor-model costume.
@@ -1046,14 +1095,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         ordered: two messages sent from A to B arrive in send order, always. The queue worker
         documents its own divergence — a failed FIFO message is re-queued via <code>nack</code>
         rather than blocking the poller, so a message enqueued <em>after</em> the failure can be
-        delivered before the retried one catches up. Session events carry a parallel warning:
-        at-least-once and unordered, reconcile by revision, never by arrival.
-      </p>
-      <p>
-        No configuration closes this. Handlers have to be order-independent, or carry sequence
-        numbers and park what arrives early. If your domain has genuine causal chains — a
-        <code>deposit</code> that must land before a <code>withdraw</code> — this is the constraint
-        that shapes your design, and it is the strongest argument for staying on BEAM.
+        delivered before the retried one catches up.
       </p>
 
       <figure class="code">
@@ -1067,18 +1109,18 @@ queue: A then B, unless A stumbles.</span></code></pre>
       </figure>
 
       <p>
+        No configuration closes this. Handlers have to be order-independent, or carry sequence
+        numbers and park what arrives early. If your domain has genuine causal chains, this is the
+        constraint that shapes your design, and it is the strongest argument for staying on BEAM.
+      </p>
+
+      <p>
         <strong>Delayed delivery.</strong> There is no <code>Process.send_after</code>. The queue
         accepts <code>delaySeconds</code> and <code>visibilityTimeout</code> "for parity" and
-        ignores both. <code>cron</code> is recurring-expression only, UTC only, and skips missed
-        runs with no catch-up.
-      </p>
-      <p>
-        But look at what <code>send_after</code> is actually used for. Call timeouts —
-        <code>timeout_ms</code> covers that. Periodic work — <code>cron</code>. Retry backoff — the
-        queue does it natively and exponentially. Only the fourth use, business-time scheduling
-        ("expire this cart in thirty minutes"), is uncovered. That is a scheduling feature, not a
-        hole in the actor model, and the idiomatic workaround is a sweeper: a cron tick that scans
-        state for due items.
+        ignores both. But look at what <code>send_after</code> is actually used for: call timeouts
+        (<code>timeout_ms</code> covers it), periodic work (<code>cron</code>), retry backoff (the
+        queue does it natively), and business-time scheduling. Only the fourth is uncovered — a
+        scheduling feature, not a hole in the actor model.
       </p>
 
       <div class="callout">
@@ -1091,91 +1133,6 @@ queue: A then B, unless A stumbles.</span></code></pre>
           does; it refuses to start if its queue cannot be ensured.
         </p>
       </div>
-    </div>
-  </section>
-
-  <!-- ============ RUNG 5 ============ -->
-  <section class="rung" id="rung-5">
-    <div class="rung-head">
-      <div class="rung-index">
-        <span class="num">5</span>
-        <div class="meter" role="img" aria-label="Step 5 of 5">
-          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
-        </div>
-        <span class="meter-label">Other shapes</span>
-      </div>
-      <div>
-        <h2>If not actors, and not pipelines, then what</h2>
-        <p class="thesis">
-          Two lenses is a start, not an inventory. The distributed-systems literature has several
-          more models, and some of them fit agents considerably better than either.
-        </p>
-      </div>
-    </div>
-
-    <div class="rung-body">
-      <p>
-        Here is the sharp version, and it is a problem for the whole exercise above:
-        <strong>supervision assumes failure is crash-stop and detectable.</strong> Agent failure is
-        neither. A confident wrong answer raises no exception, exits zero, and returns a
-        well-formed payload. Restarting does not fix a bad plan. OTP offers superb machinery for the
-        failure mode agents mostly do not have, which is worth knowing before you spend a quarter
-        porting it.
-      </p>
-
-      <div class="tablewrap">
-        <table>
-          <caption>other models, and what they would buy an agent system</caption>
-          <thead>
-            <tr><th>Model</th><th>Shape</th><th>Why it fits agents</th></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Blackboard</strong></td>
-              <td>Shared knowledge space; specialists contribute opportunistically when they see something they can act on</td>
-              <td>No fixed control flow, which is how agents actually decide. <code>state</code> plus change triggers is already one</td>
-            </tr>
-            <tr>
-              <td><strong>Tuple space</strong></td>
-              <td>Associative <code>in</code>/<code>out</code>/<code>rd</code>; coordination decoupled in space and time</td>
-              <td>Same family, more formal. Agents pull work matching their capability rather than being addressed</td>
-            </tr>
-            <tr>
-              <td><strong>Event sourcing</strong></td>
-              <td>Append-only log; state is a fold over history</td>
-              <td>A transcript already <em>is</em> an event log. "Why did it do that" becomes a query instead of forensics</td>
-            </tr>
-            <tr>
-              <td><strong>Dataflow</strong></td>
-              <td>Operators, windows, back-pressure</td>
-              <td>Generations are expensive and rate-limited. Back-pressure is exactly what BEAM lacks</td>
-            </tr>
-            <tr>
-              <td><strong>CRDTs</strong></td>
-              <td>Convergent replicated types; merge instead of coordinate</td>
-              <td>The principled answer to concurrent writers. Parallel agents editing one plan, without a lock</td>
-            </tr>
-            <tr>
-              <td><strong>BSP</strong></td>
-              <td>Fan out, barrier, aggregate, repeat</td>
-              <td>Spawn-and-synthesize is literally a superstep. <code>state::barrier</code> is the join</td>
-            </tr>
-            <tr class="flag">
-              <td><strong>Sagas</strong></td>
-              <td>Compensating transactions for steps that cannot roll back</td>
-              <td>Agents send email and move money. Undo matters more here than in ordinary services, and is barely explored</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p>
-        Blackboard is the one to sit with. It comes from Hearsay-II in the 1970s, it was designed
-        for exactly this — multiple specialists with partial knowledge, no predetermined order of
-        contribution — and almost nobody reaches for it now. A <code>state</code> scope plus trigger
-        bindings gives you one this afternoon, with none of the addressing decisions an actor system
-        forces you to make up front.
-      </p>
     </div>
   </section>
 
@@ -1205,41 +1162,43 @@ queue: A then B, unless A stumbles.</span></code></pre>
           A GenServer falls out of three declarations. A supervision tree falls out of a
           <code>depends_on</code> graph. Monitors, timers, process groups, ETS and barriers are all
           trigger bindings or state scopes. Restart, restart intensity, the registry and links have
-          no referent at all, because they were answers to a question this architecture does not
-          ask. Ordering under retry and delayed delivery are the two places you give something up.
+          no referent at all. Ordering under retry and delayed delivery are the two places you give
+          something up.
         </p>
         <p>
-          <strong>Do not port OTP wholesale.</strong> Porting a solution is how you inherit the
-          shape of a problem you no longer have. Take the mailbox, take supervision-as-dependency-
-          graph, take the dead-letter queue, and let the rest dissolve.
+          <strong>The mailbox is what you actually lose.</strong> Going in, the interesting gap
+          looked like supervision — and supervision dissolves. The property worth mourning is
+          strict FIFO between two endpoints, and the durable-queue translation cannot give it back,
+          because its retry mechanism is what breaks the order.
         </p>
         <p>
-          <strong>Then ask whether actors were the right lens at all.</strong> If you are building
-          agents, your failures are semantic and silent, your writers are concurrent, your history
-          matters more than your liveness, and your control flow is decided at runtime by a model.
-          Blackboard, event sourcing and CRDTs answer those pressures directly. The actor model
-          answers a different set of pressures beautifully — just check they are yours.
+          <strong>Then ask whether actors were the right lens at all.</strong> Supervision assumes
+          failure is crash-stop and detectable. A confident wrong answer exits zero and returns a
+          well-formed payload — nothing in the from-scratch implementation would notice, and
+          nothing in the iii translation would either. OTP offers superb machinery for the failure
+          mode agents mostly do not have.
         </p>
       </div>
 
       <p>
-        Everything above was executed against iii 0.22.0 before it was written down; the companion
-        repo has the config files, the bootstrap script, and a counter actor that runs from first
-        cast to dead-letter. Fair warning that three of the functions it depends on appear in no
-        documentation and one published README actively contradicts the running system. Enumerate
-        the engine, not the docs.
+        That last point is why this is a series rather than an essay. The same incident-analysis
+        workflow runs over a <a href="/iii-blackboard/">blackboard</a>, where control is
+        opportunistic and partial results are a legitimate outcome, and over an
+        <a href="/iii-event-sourcing/">event log</a>, where history is the system and replay is the
+        debugging surface. Both answer pressures that agent systems actually have. Read them next.
       </p>
     </div>
   </section>
 
   <footer>
-    <div><strong>iii for OTP Practitioners</strong>, a GenServer with no source file.
+    <div><strong>Actors and Supervision for Agents</strong>, a GenServer with no source file.
       <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
     <div>Companion repo ·
       <a href="https://github.com/tacoda/iii-otp"><code>github.com/tacoda/iii-otp</code></a></div>
-    <div>Related · <a href="/iii-harness/">Building a harness with iii</a> ·
-      <a href="/pi-harness/">Building a harness with pi</a> ·
-      <a href="/factory/">The factory</a></div>
+    <div>One workflow, three architectures ·
+      <strong>Actors &amp; supervision</strong> ·
+      <a href="/iii-blackboard/">Blackboard</a> ·
+      <a href="/iii-event-sourcing/">Event sourcing</a></div>
     <div>Colour encodes the verdict:
       <span style="color:var(--gold)">ports as config</span> ·
       <span style="color:var(--forest)">dissolves</span> ·

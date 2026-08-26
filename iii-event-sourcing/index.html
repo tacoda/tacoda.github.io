@@ -1,0 +1,1078 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event Sourcing for Agents · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="An agent transcript already is an append-only event log. Built twice — as iii configuration and from scratch — including the silent concurrency hazard that cost two writers their events. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/iii-event-sourcing/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Event Sourcing for Agents">
+<meta property="og:description" content="The log being ordered does not make your projections ordered. A silent corruption, found by building it twice.">
+<meta property="og:url" content="https://www.tacoda.dev/iii-event-sourcing/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Event Sourcing for Agents">
+<meta name="twitter:description" content="The log is ordered. The notifications are not. That gap is where wrong dashboards come from.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>One workflow, three architectures</span>
+      <span class="sep">/</span>
+      <span>3 of 3 · Event sourcing</span>
+    </div>
+    <h1>Your agent transcript is <em>already</em> an event log</h1>
+    <p class="standfirst">
+      Event sourcing says state is not stored, it is derived: the authoritative record is an
+      append-only log of what happened, and every read model is a fold over it. Agent systems
+      produce that log whether or not they take it seriously — which means the choice is not
+      whether to have one, but whether to get replay, projections and audit out of it, or keep
+      treating it as a chat history you occasionally grep.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      companion repo · <a href="https://github.com/tacoda/iii-event-sourcing"><code>github.com/tacoda/iii-event-sourcing</code></a><br>
+      built twice · once as <a href="https://iii.dev">iii</a> configuration, once from scratch in stdlib Python<br>
+      the workload · the same incident analysis all three repos run — extract claims, propose an explanation, score it, accept<br>
+      verification · every iii command shown was executed against a live engine (0.22.0) before it was written down<br>
+      tests · <code>8 passed</code>, offline and deterministic
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>The log</dt>
+          <dd>Append-only, ordered by an explicit parent chain. The only authoritative record.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Projection</dt>
+          <dd>A read model: a pure fold over the log. Disposable, rebuildable, never authoritative.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Notification</dt>
+          <dd>At-least-once and unordered. A doorbell, not data — and the source of the hazard below.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Contents">
+    <ol>
+      <li><a href="#rung-0"><span class="n">0</span> The shape</a></li>
+      <li><a href="#rung-1"><span class="n">1</span> On iii</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> The hazard</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> From scratch</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> What it taught</a></li>
+      <li><a href="#takeaway"><span class="n">5</span> Takeaway</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 0 ============ -->
+  <section class="rung" id="rung-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The shape">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The shape</span>
+      </div>
+      <div>
+        <h2>State as a fold, not a cell</h2>
+        <p class="thesis">
+          "What is the state" and "how did it get that way" stop being two questions with two
+          different levels of support.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Nothing is updated in place. A write appends <code>HypothesisScored{confidence: 0.86}</code>
+        to a stream; the current confidence is whatever you get by folding the stream. Read models
+        are derived, disposable, and rebuildable — if a projection has a bug you fix the fold and
+        replay, rather than migrating corrupted rows.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>what changes when the log is authoritative</caption>
+          <thead>
+            <tr><th>&nbsp;</th><th>State-in-place</th><th>Event-sourced</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Current value</td><td>Read a row</td><td>Fold a stream (or read a projection)</td></tr>
+            <tr><td>History</td><td>Whatever you remembered to log</td><td><strong>The system itself</strong></td></tr>
+            <tr><td>Fixing a bad read model</td><td>Data migration</td><td>Fix the fold, replay</td></tr>
+            <tr><td>"Why is it like this?"</td><td>Forensics</td><td><strong>A query</strong></td></tr>
+            <tr><td>Storage</td><td>Bounded by state size</td><td>Grows forever</td></tr>
+            <tr class="flag"><td>Cost of a schema change</td><td>One migration</td><td>Old events are immutable — the fold carries every version, forever</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">Why this suits agents specifically</span>
+        <p>
+          With deterministic code, replay is a debugging convenience — you could always just run it
+          again. With a model in the loop you <em>cannot</em>: re-running gives you a different run.
+          The log is the only record of what the agent actually saw and decided. That moves replay
+          from convenience to the only reliable debugging surface you have, and it is why the
+          unbounded-growth row above is a price worth paying here when it often isn't elsewhere.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Step 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">On iii</span>
+      </div>
+      <div>
+        <h2>An event store wearing a chat-shaped label</h2>
+        <p class="thesis">
+          <code>session-manager</code> is documented as a conversation store. It is also, without
+          modification, a correct event log.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A stream is a session. An event is a <code>custom</code> entry whose
+        <code>custom_type</code> is the event type — a real discriminator slot, not something you
+        smuggle into the payload. Ordering is an explicit <code>parent_id</code> chain returned on
+        every append, so the log is a linked list rather than a timestamp-sorted bag.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>appending a domain event</span><span class="tag warn">custom_type is the event type</span></figcaption>
+<pre><code>iii trigger session::append session_id=$SID \
+  message='{"role":"custom",
+            <span class="c-warn">"custom_type":"ClaimRecorded"</span>,
+            "content":[{"type":"text","text":"{\"claim\":\"one consumer attached\"}"}],
+            "timestamp":1717800000000}'
+
+<span class="c-dim">{ "entry_id": "e_45d958d6…", "parent_id": "e_5e3d1086…", "timestamp": … }</span></code></pre>
+      </figure>
+
+      <div class="tablewrap">
+        <table>
+          <caption>event sourcing, mapped and verified</caption>
+          <thead>
+            <tr><th>Concept</th><th>iii</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Stream</td><td>a session; aggregate identity in <code>metadata</code></td><td>config</td></tr>
+            <tr><td>Event type</td><td><code>custom_type</code> on the entry</td><td>config</td></tr>
+            <tr><td>Ordering</td><td>explicit <code>parent_id</code> chain</td><td>config</td></tr>
+            <tr><td>Read the log</td><td><code>session::messages</code>, already in chain order</td><td>config</td></tr>
+            <tr><td>Projection</td><td><code>session::message-added</code> binding → <code>state</code> scope</td><td>config</td></tr>
+            <tr><td>Per-aggregate filter</td><td><code>metadata</code> subset match on the binding</td><td>config</td></tr>
+            <tr><td>Fork / what-if replay</td><td><code>session::fork</code></td><td>config</td></tr>
+            <tr><td>Aggregate version guard</td><td><code>state::compare-and-set</code> — <em>not</em> in the log</td><td>config</td></tr>
+            <tr class="flag"><td>Optimistic concurrency on append</td><td>—</td><td><strong>absent</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The hazard</span>
+      </div>
+      <div>
+        <h2>Two writers, two success responses, one surviving event</h2>
+        <p class="thesis">
+          The dangerous kind of missing feature is not the one that errors. It is the one with a
+          convincing near-miss.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <code>session::append</code> has no conditional write. Pass <code>expected_revision</code>
+        and it is accepted, ignored, and the append succeeds anyway — no error tells you your
+        concurrency control does nothing:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the near-miss</span><span class="tag block">accepted. ignored.</span></figcaption>
+<pre><code>$ iii trigger session::append session_id=$SID <span class="c-block">expected_revision=3</span> message=…
+<span class="c-dim">{"entry_id": "e_399c8b87…", "parent_id": "e_20ec1d48…"}</span>   <span class="c-block">← appended regardless</span></code></pre>
+      </figure>
+
+      <p>
+        <code>parent_id</code>, meanwhile, <em>is</em> real and <em>is</em> validated — an unknown
+        parent returns <code>session/parent_not_found</code>. So it looks exactly like the
+        conditional-append primitive. It isn't. Two writers appending at the same parent both
+        succeed:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the corruption</span><span class="tag block">both writers got a 200</span></figcaption>
+<pre><code>writer A -&gt; e_fd3ce7e1ffe6   (parent e_9da6…)   <span class="c-pass">ok</span>
+writer B -&gt; e_cad909ed44b3   (parent e_9da6…)   <span class="c-pass">ok</span>
+
+$ iii trigger session::messages session_id=$SID
+  … e_9da67bbfd6c1  {"confidence":0.86}
+  … <span class="c-warn">e_cad909ed44b3  {"claim":"writer B"}</span>
+                                       <span class="c-block">← A is not here</span>
+
+$ iii trigger session::get-message entry_id=e_fd3ce7e1ffe6
+  <span class="c-dim">{"id":"e_fd3ce7e1ffe6", "message":{…"writer A"…}, "revision": 0}</span></code></pre>
+      </figure>
+
+      <p>
+        A's event is durable — you can fetch it by id — but it sits on a sibling branch that
+        <code>session::messages</code> does not walk. Any projection reading the ordinary way will
+        never see it. A's writer received a success response. Nothing, anywhere, reports a problem.
+      </p>
+
+      <div class="callout">
+        <span class="label">The operational consequence</span>
+        <p>
+          The version guard has to live in <code>state</code>, and the ordering is not negotiable:
+          <strong>compare-and-set first, append second.</strong> Append first and you have written
+          an event you cannot un-append — the log is append-only, which is the point, and which
+          means a concurrency mistake is permanent. There is also no branch enumeration
+          (<code>session::leaves</code> does not exist; <code>include_branches</code> is not
+          honored), so recovering an orphaned entry requires already knowing its
+          <code>entry_id</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">From scratch</span>
+      </div>
+      <div>
+        <h2>Four lines that upstream doesn't have</h2>
+        <p class="thesis">
+          Writing the missing feature by hand is the fastest way to judge how missing it really is.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>scratch/eventstore.py</span><span class="tag pass">real optimistic concurrency</span></figcaption>
+<pre><code>def append(self, stream, type, payload, *, expected_version=None) -&gt; Event:
+    log = self._streams.setdefault(stream, [])
+    <span class="c-pass">if expected_version is not None and expected_version != len(log):</span>
+        <span class="c-pass">raise Conflict(f"{stream}: expected {expected_version}, found {len(log)}")</span>
+    event = Event(seq=len(log) + 1, type=type, payload=payload, stream=stream)
+    log.append(event)
+    self._notify(event)
+    return event</code></pre>
+      </figure>
+
+      <p>
+        Four lines. Which is what makes the absence notable — this is not a hard feature, and its
+        convincing near-miss is what makes it dangerous rather than merely missing.
+      </p>
+
+      <p>
+        The more valuable half of the from-scratch build is the <code>UnreliableBus</code>: a
+        notification channel that is at-least-once and unordered <em>on purpose</em>, because that
+        is the contract <code>session-manager</code> documents for itself. It exists so a test can
+        prove the following, which is the single most transferable finding in this series:
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the headline test</span><span class="tag block">same events, same fold, different answers</span></figcaption>
+<pre><code>_seed(store)                       <span class="c-dim"># 4 events, appended in order</span>
+bus.drain(lambda e: (naive_handler(e), doorbell_handler(e)))
+
+truth = Projection("truth", incident_fold).rebuild(store.read(STREAM))
+
+assert <span class="c-pass">doorbell.state == truth</span>    <span class="c-dim"># re-reads the ordered log. correct.</span>
+assert <span class="c-block">naive.state    != truth</span>    <span class="c-dim"># folds in arrival order. corrupted.</span>
+assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
+      </figure>
+
+      <p>
+        Identical events. Identical fold function. One projection is right and one is silently
+        wrong, and the only difference is whether it trusted the delivery order. No exception is
+        raised in either case — the wrong one just reports a wrong number.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">What it taught</span>
+      </div>
+      <div>
+        <h2>Four findings, one of which applies everywhere</h2>
+        <p class="thesis">
+          The ordering one is not about iii. It is about every event-sourced system with an
+          asynchronous notification channel.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ul>
+        <li>
+          <strong>The log being ordered does not make your projections ordered.</strong> iii's log
+          is ordered by parent chain. Its notifications are explicitly "at-least-once and
+          unordered". Those two facts live in different documents, and the gap between them is
+          where wrong dashboards come from. Check this in whatever you are using — the two
+          guarantees are almost never stated in the same place.
+        </li>
+        <li>
+          <strong>Treat the notification as a doorbell, not as data.</strong> Re-read the ordered
+          log on every notification and you are immune to reordering, duplication and gaps, for the
+          cost of one read per event. Fold the delivered event directly and you are fast and wrong.
+          Both implementations arrived at this independently.
+        </li>
+        <li>
+          <strong>A near-miss is worse than an absence.</strong> A missing feature makes you build
+          something. A feature that accepts your parameter and ignores it, next to a similar
+          parameter that validates convincingly, makes you believe you are protected. Test that
+          your concurrency control actually rejects something.
+        </li>
+        <li>
+          <strong>Replay is worth more with a model in the loop.</strong> Forking a stream just
+          before a model call and replaying it with a different prompt is a genuinely better
+          debugging loop than re-running and hoping — because re-running does not reproduce the run.
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ TAKEAWAY ============ -->
+  <section class="rung" id="takeaway">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Takeaway">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Takeaway</span>
+      </div>
+      <div>
+        <h2>You already have the log. Decide whether it counts.</h2>
+        <p class="thesis">
+          The work is not producing events. It is committing to the log being authoritative, and
+          getting the ordering discipline right.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="takeaway">
+        <p>
+          <strong>Agent systems are event-sourced whether or not they mean to be.</strong> The
+          transcript is an append-only record of what happened. Event sourcing is the decision to
+          treat it as the source of truth rather than as a log file, and to derive read models from
+          it instead of maintaining them alongside.
+        </p>
+        <p>
+          <strong>On iii, the store is already there and the concurrency control is not.</strong>
+          <code>session-manager</code> gives you streams, typed events, chain ordering, projections
+          via trigger bindings, and fork-for-replay. It does not give you conditional append, it
+          accepts <code>expected_revision</code> and ignores it, and concurrent appends branch
+          silently. Put the version in <code>state</code>, CAS before you append, and never the
+          other way round.
+        </p>
+        <p>
+          <strong>Write the ordering test before you write the projection.</strong> A projection
+          that folds in arrival order is correct in development, correct under light load, and
+          wrong the first time anything retries. It never raises. The only way you find out is by
+          deliberately delivering events out of order and asserting that it still matches the log.
+        </p>
+      </div>
+
+      <p>
+        That is the end of the series: the same incident-analysis workflow implemented over
+        <a href="/iii-for-otp-practitioners/">actors and supervision</a>, a
+        <a href="/iii-blackboard/">blackboard</a>, and an event log. Three architectures, one task,
+        two implementations each. The pattern across all three is that iii supplies more of each
+        model than expected, and the parts it doesn't supply are consistently the ones that fail
+        quietly rather than loudly.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Event Sourcing for Agents</strong>, the log is the system.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Companion repo ·
+      <a href="https://github.com/tacoda/iii-event-sourcing"><code>github.com/tacoda/iii-event-sourcing</code></a></div>
+    <div>One workflow, three architectures ·
+      <a href="/iii-for-otp-practitioners/">Actors &amp; supervision</a> ·
+      <a href="/iii-blackboard/">Blackboard</a> ·
+      <strong>Event sourcing</strong></div>
+    <div>Colour encodes the part:
+      <span style="color:var(--gold)">the log</span> ·
+      <span style="color:var(--forest)">projection</span> ·
+      <span style="color:var(--brick)">notification</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
