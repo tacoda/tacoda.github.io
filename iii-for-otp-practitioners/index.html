@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iii for OTP Practitioners · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="OTP can be pseudo-implemented on iii with no code at all — queue definitions, state ops, and trigger bindings. Half of OTP does not port; it dissolves. A different perspective on the distributed queue. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/iii-for-otp-practitioners/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="iii for OTP Practitioners">
+<meta property="og:description" content="A GenServer with no source file. Half of OTP does not port to a durable queue — it dissolves.">
+<meta property="og:url" content="https://www.tacoda.dev/iii-for-otp-practitioners/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iii for OTP Practitioners">
+<meta name="twitter:description" content="A GenServer with no source file. Half of OTP does not port — it dissolves.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>iii for OTP practitioners</span>
+      <span class="sep">/</span>
+      <span>A GenServer with no source file</span>
+    </div>
+    <h1>Half of OTP does not port. It <em>dissolves</em>.</h1>
+    <p class="standfirst">
+      If you have written Elixir, you carry a mental model of distributed systems shaped like a
+      supervision tree: processes that hold state, die, and get restarted. Durable-queue systems
+      like iii model the same territory differently — state outlives the thing computing it, and
+      failure is a property of a message rather than a process. Most of OTP survives that
+      translation as pure configuration. The parts that do not survive are more interesting than
+      the parts that do, because they were answers to a question the other architecture never asks.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      companion repo · <a href="https://github.com/tacoda/iii-otp"><code>github.com/tacoda/iii-otp</code></a><br>
+      substrate · <a href="https://iii.dev">iii</a> 0.22.0 · workers <code>queue</code>, <code>state</code>, <code>pubsub</code>, <code>fp</code>, <code>cron</code><br>
+      the claim · a working GenServer built from queue definitions, state ops, and trigger bindings — no worker source<br>
+      not the claim · that iii is Erlang, or that this scales to a million actors<br>
+      verification · every command shown was run against a live engine before it was written down
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Ports as config</dt>
+          <dd>The OTP concept has a direct iii equivalent, reachable with a YAML entry or a trigger binding.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Dissolves</dt>
+          <dd>The concept has no referent here. Not a missing feature — the problem it solved does not arise.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Genuine gap</dt>
+          <dd>OTP gives you something real that this architecture does not, and no configuration closes it.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Contents">
+    <ol>
+      <li><a href="#rung-0"><span class="n">0</span> Two lenses</a></li>
+      <li><a href="#rung-1"><span class="n">1</span> A GenServer</a></li>
+      <li><a href="#rung-2"><span class="n">2</span> The translation</a></li>
+      <li><a href="#rung-3"><span class="n">3</span> What dissolves</a></li>
+      <li><a href="#rung-4"><span class="n">4</span> What doesn't</a></li>
+      <li><a href="#rung-5"><span class="n">5</span> Other shapes</a></li>
+      <li><a href="#takeaway"><span class="n">6</span> Takeaway</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ RUNG 0 ============ -->
+  <section class="rung" id="rung-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="Two lenses">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Two lenses</span>
+      </div>
+      <div>
+        <h2>Who owns this state, versus what happened to it</h2>
+        <p class="thesis">
+          Actors and durable queues are two answers to the same question. They diverge on one
+          decision, and everything else follows from it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The actor model puts state inside a process. The process is the unit of identity, the unit
+        of concurrency, and the unit of failure, all at once. That bundling is what makes OTP
+        elegant: because the three coincide, one mechanism — supervision — handles all three.
+      </p>
+      <p>
+        A durable-queue system unbundles them. Identity is a key. Concurrency is a queue lane.
+        Failure is a message delivery. Because they no longer coincide, no single mechanism covers
+        all three — but each one gets a mechanism better suited to it than a supervision tree was.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>the same system, asked two different questions</caption>
+          <thead>
+            <tr><th>&nbsp;</th><th>Actor lens</th><th>Durable-queue lens</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Primary question</td><td>Who owns this state and who restarts it?</td><td>What happened, and can I replay it?</td></tr>
+            <tr><td>Identity</td><td>A pid, ephemeral</td><td>A key, permanent</td></tr>
+            <tr><td>State lives</td><td>In RAM, inside the process</td><td>In a store, outside anything</td></tr>
+            <tr><td>Unit of failure</td><td>The process</td><td>The message</td></tr>
+            <tr><td>Recovery</td><td>Restart and rebuild</td><td>Retry; the state never left</td></tr>
+            <tr><td>Ordering</td><td><strong>Guaranteed between two processes</strong></td><td>Best effort; breaks under retry</td></tr>
+            <tr><td>Delivery</td><td>At-most-once, never duplicated</td><td>At-least-once; be idempotent</td></tr>
+            <tr><td>Back-pressure</td><td>None — mailboxes grow until the node dies</td><td><strong>Queue depth, concurrency caps, DLQ</strong></td></tr>
+            <tr class="flag"><td>Audit trail</td><td>Whatever you logged</td><td>The log <em>is</em> the system</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">Read the last three rows together</span>
+        <p>
+          This is not a scoreboard where one column wins. BEAM gives you ordering and exactly-once
+          local delivery, and those are real guarantees you will miss. The queue gives you
+          back-pressure and durable history, and OTP practitioners have hand-rolled both more than
+          once. The trade is legible, which is the most you can ask of an architectural choice.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 1 ============ -->
+  <section class="rung" id="rung-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Step 1 of 5">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">A GenServer</span>
+      </div>
+      <div>
+        <h2>Three declarations, no source file</h2>
+        <p class="thesis">
+          The interesting part is not that this is possible. It is that the callback module —
+          the thing you would assume has to be code — turns out to be data.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Start with the mailbox. A named FIFO queue whose <code>message_group_field</code> is the
+        actor id: messages sharing a group value run in order, different groups run concurrently.
+        That one field is the difference between a mailbox and a work pool.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the mailbox</span><span class="tag warn">ports as config</span></figcaption>
+<pre><code>iii trigger queue::define queue=otp-genserver config='{
+  <span class="c-warn">"type": "fifo"</span>,
+  <span class="c-warn">"message_group_field": "actor_id"</span>,
+  "concurrency": 10,
+  "max_retries": 3,
+  "backoff_ms": 1000
+}'
+
+<span class="c-dim">{ "changed": true, "queue": "otp-genserver" }</span></code></pre>
+      </figure>
+
+      <p>
+        Now the callback. <code>state::update</code> takes an ordered list of atomic operations —
+        <code>set</code>, <code>merge</code>, <code>increment</code>, <code>decrement</code>,
+        <code>append</code>, <code>remove</code> — applies them to a <code>(scope, key)</code>, and
+        returns both the old and new value. That is <code>handle_call/3</code>: a state
+        transition and a reply, expressed as data rather than a function body.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the callback</span><span class="tag warn">handle_call, as data</span></figcaption>
+<pre><code>iii trigger state::update scope=otp:counter key=c1 \
+  ops='[{"type":"increment","path":"n","by":5}]'
+
+<span class="c-dim">{ "old_value": { "n": 1 }, "new_value": { "n": 6 } }</span></code></pre>
+      </figure>
+
+      <p>
+        Join them and you have a cast. Enqueue onto the actor's lane, targeting
+        <code>state::update</code>. The message carries its own destination, so nothing needs to be
+        registered as a consumer; <code>messageReceiptId</code> is the idempotency key that makes a
+        redelivery a no-op.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>GenServer.cast/2</span><span class="tag block">durable · serialized · retried</span></figcaption>
+<pre><code>iii trigger engine::queue::enqueue \
+  queue=otp-genserver function_id=state::update \
+  messageReceiptId=msg-001 \
+  data='{ <span class="c-warn">"actor_id": "c1"</span>,
+          "scope": "otp:counter", "key": "c1",
+          "ops": [{"type":"increment","path":"n","by":100}] }'
+
+<span class="c-dim">$ iii trigger state::get scope=otp:counter key=c1
+{ "n": 106 }</span></code></pre>
+      </figure>
+
+      <p>
+        That is a durable, per-actor-serialized, retry-backed, idempotency-keyed message send into a
+        persistent state machine, and there is no source file anywhere in it. The supervisor is a
+        <code>worker-compose.yaml</code> dependency graph. Monitors are trigger bindings —
+        <code>engine::register_trigger trigger_type=state function_id=publish</code> fans every
+        mutation in a scope out to a topic. Restart intensity is <code>max_retries</code> and a
+        dead-letter queue.
+      </p>
+
+      <div class="callout">
+        <span class="label">Three functions that are in no README</span>
+        <p>
+          <code>state::compare-and-set</code> exists and works, returning
+          <code>{"swapped": false, "current": …}</code> on conflict. This matters because the
+          <code>workflow</code> worker's own documentation states there is no CAS and instructs you
+          to file an engine feature request — that guidance is out of date as of state 0.22.2.
+          <code>state::barrier</code> (a fan-in condition for trigger bindings) and
+          <code>state::claim-namespace</code> (singleton election over a function prefix) are
+          likewise undocumented. Enumerate <code>engine::functions::list</code> before believing any
+          prose about what is missing, including this page.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 2 ============ -->
+  <section class="rung" id="rung-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Step 2 of 5">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The translation</span>
+      </div>
+      <div>
+        <h2>The whole mapping, with the honest column</h2>
+        <p class="thesis">
+          Most rows are unremarkable. Read the last six.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table>
+          <caption>OTP to iii, and what the translation costs</caption>
+          <thead>
+            <tr><th>OTP</th><th>iii</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>GenServer process</td><td><code>(scope, key)</code> in <code>state</code></td><td>config</td></tr>
+            <tr><td>Process state</td><td>The value at that key</td><td>config</td></tr>
+            <tr><td><code>handle_cast</code></td><td><code>state::update</code> op-list</td><td>config</td></tr>
+            <tr><td><code>handle_call</code> reply</td><td><code>{old_value, new_value}</code></td><td>config</td></tr>
+            <tr><td>Mailbox</td><td>FIFO queue, <code>message_group_field</code></td><td>config</td></tr>
+            <tr><td><code>GenServer.cast</code></td><td><code>engine::queue::enqueue</code></td><td>config</td></tr>
+            <tr><td><code>call</code> timeout</td><td><code>timeout_ms</code>, default 30 min</td><td>config</td></tr>
+            <tr><td>Optimistic concurrency</td><td><code>state::compare-and-set</code></td><td>config</td></tr>
+            <tr><td>Supervisor tree</td><td><code>worker-compose.yaml</code> <code>depends_on</code></td><td>config</td></tr>
+            <tr><td><code>init/1</code> → <code>{:ok, _}</code></td><td>Readiness = registration on the engine</td><td>config</td></tr>
+            <tr><td><code>rest_for_one</code></td><td>Cascading stop, reverse dependency order</td><td>config</td></tr>
+            <tr><td>Shutdown → brutal kill</td><td>SIGTERM to group → grace → SIGKILL</td><td>config</td></tr>
+            <tr><td><code>max_restarts</code></td><td><code>max_retries</code> + backoff → DLQ</td><td>config</td></tr>
+            <tr><td><code>send_interval</code></td><td><code>cron</code> binding</td><td>config</td></tr>
+            <tr><td><code>monitor</code></td><td><code>state</code> trigger on the scope</td><td>config</td></tr>
+            <tr><td><code>pg</code> groups</td><td><code>pubsub</code> topics</td><td>config</td></tr>
+            <tr><td>ETS</td><td><code>state</code> scopes</td><td>config</td></tr>
+            <tr><td><code>which_children</code></td><td><code>state::list_keys</code></td><td>config</td></tr>
+            <tr><td>Barrier / join</td><td><code>state::barrier</code> as a condition</td><td>config</td></tr>
+            <tr><td>Hot code upgrade</td><td>Callbacks are config; config hot-reloads</td><td><strong>free</strong></td></tr>
+            <tr class="flag"><td>Restarting a crashed actor</td><td>—</td><td><strong>dissolves</strong></td></tr>
+            <tr class="flag"><td>Restart intensity windows</td><td>—</td><td><strong>dissolves</strong></td></tr>
+            <tr class="flag"><td>Process registry (name → pid)</td><td>—</td><td><strong>dissolves</strong></td></tr>
+            <tr class="flag"><td>Links / EXIT propagation</td><td>—</td><td><strong>dissolves</strong></td></tr>
+            <tr class="flag"><td>Mailbox ordering under retry</td><td>—</td><td><strong>gap</strong></td></tr>
+            <tr class="flag"><td>Delayed / one-shot send</td><td>—</td><td><strong>gap</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Note the row that says <em>free</em>. Hot code upgrade is the thing OTP is famous for making
+        possible and notorious for making painful — <code>code_change/3</code>, appups, relups. Here
+        the callback is a list of operations in a config entry, and config hot-reloads. You get the
+        capability by accident, because you gave up expressing the callback as code.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 3 ============ -->
+  <section class="rung" id="rung-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Step 3 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">What dissolves</span>
+      </div>
+      <div>
+        <h2>Four features that were answers to one question</h2>
+        <p class="thesis">
+          OTP's machinery cascades from a single fact. Remove the fact and the cascade has nothing
+          to hold onto.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The fact is this: <strong>state lives in volatile memory inside something that can die.</strong>
+        Supervision exists to restart that thing. Restart intensity exists to stop supervision from
+        looping forever. Links exist to stop collaborators from acting on state that died with its
+        owner. The registry exists because pids are ephemeral and unroutable, so names need
+        indirection.
+      </p>
+      <p>
+        Move the state out and each of those loses its subject.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the cascade, and where it stops</span><span class="tag pass">dissolves</span></figcaption>
+<pre><code>state in volatile RAM
+  └─► process can die with state
+        └─► <span class="c-pass">supervision</span> to restart it
+              └─► <span class="c-pass">restart intensity</span> to bound the loop
+        └─► <span class="c-pass">links</span> so peers don't read stale state
+  └─► pid is ephemeral
+        └─► <span class="c-pass">registry</span> for stable names
+
+<span class="c-dim">state in a durable store
+  └─► nothing above has a subject</span></code></pre>
+      </figure>
+
+      <ul>
+        <li>
+          <strong>Restart.</strong> No process owns the state, so there is nothing to restart — the
+          state is already there. The unit of failure moved to the message, and message failure is
+          already handled by retries.
+        </li>
+        <li>
+          <strong>Restart intensity.</strong> <code>max_restarts</code> within
+          <code>max_seconds</code> exists to stop a crash-restart loop. The queue's answer is three
+          retries with exponential backoff, then dead-letter. It is the same job done better: the
+          poison message is <em>preserved</em>, inspectable, and replayable with
+          <code>iii::queue::redrive</code> once you fix the cause. OTP escalates and the message is
+          gone.
+        </li>
+        <li>
+          <strong>Registry.</strong> A registry maps a stable name onto an unstable pid. Here the
+          address <em>is</em> the name. <code>(scope, key)</code> never goes stale, so there is no
+          lookup-versus-death race to lose.
+        </li>
+        <li>
+          <strong>Links and EXIT.</strong> Links protect collaborators from acting on state that
+          died. There is no stale memory to protect against. What survives is cascade for genuine
+          <em>data</em> dependencies, which the compose daemon already does — a queue worker
+          pushing into a dead database corrupts work invisibly, and that edge is worth keeping.
+        </li>
+      </ul>
+
+      <p>
+        Monitors survive, but inverted. You no longer watch for liveness; you subscribe to
+        transitions. A <code>state</code> trigger binding delivers the scope, the key, the old value
+        and the new one. You learn what changed rather than merely that something stopped.
+      </p>
+
+      <div class="callout">
+        <span class="label">The reframe worth keeping</span>
+        <p>
+          It is tempting to score this as "iii is missing supervision." That reading is backwards.
+          Supervision is a solution, and solutions only look like requirements until you change the
+          problem. The right question for any distributed substrate is not <em>does it have a
+          supervisor</em> but <em>what does it do with state, and what follows from that</em>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 4 ============ -->
+  <section class="rung" id="rung-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Step 4 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">What doesn't</span>
+      </div>
+      <div>
+        <h2>Two things OTP has that you will actually miss</h2>
+        <p class="thesis">
+          One is inherent to the architecture. The other is a missing feature wearing an
+          actor-model costume.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <strong>Ordering under retry.</strong> A BEAM mailbox is a mailbox precisely because it is
+        ordered: two messages sent from A to B arrive in send order, always. The queue worker
+        documents its own divergence — a failed FIFO message is re-queued via <code>nack</code>
+        rather than blocking the poller, so a message enqueued <em>after</em> the failure can be
+        delivered before the retried one catches up. Session events carry a parallel warning:
+        at-least-once and unordered, reconcile by revision, never by arrival.
+      </p>
+      <p>
+        No configuration closes this. Handlers have to be order-independent, or carry sequence
+        numbers and park what arrives early. If your domain has genuine causal chains — a
+        <code>deposit</code> that must land before a <code>withdraw</code> — this is the constraint
+        that shapes your design, and it is the strongest argument for staying on BEAM.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the reordering window</span><span class="tag block">genuine gap</span></figcaption>
+<pre><code>enqueue A ──► deliver A ──► <span class="c-warn">A fails</span> ──► nack, backoff 1000ms
+enqueue B ─────────────────► deliver B  <span class="c-block">◄── B lands first</span>
+                             retry A ──► deliver A
+
+<span class="c-dim">BEAM: A then B, always.
+queue: A then B, unless A stumbles.</span></code></pre>
+      </figure>
+
+      <p>
+        <strong>Delayed delivery.</strong> There is no <code>Process.send_after</code>. The queue
+        accepts <code>delaySeconds</code> and <code>visibilityTimeout</code> "for parity" and
+        ignores both. <code>cron</code> is recurring-expression only, UTC only, and skips missed
+        runs with no catch-up.
+      </p>
+      <p>
+        But look at what <code>send_after</code> is actually used for. Call timeouts —
+        <code>timeout_ms</code> covers that. Periodic work — <code>cron</code>. Retry backoff — the
+        queue does it natively and exponentially. Only the fourth use, business-time scheduling
+        ("expire this cart in thirty minutes"), is uncovered. That is a scheduling feature, not a
+        hole in the actor model, and the idiomatic workaround is a sweeper: a cron tick that scans
+        state for due items.
+      </p>
+
+      <div class="callout">
+        <span class="label">One landmine that is neither</span>
+        <p>
+          Grouped FIFO only applies to <em>named</em> queues created through
+          <code>queue::define</code>. A plain <code>durable:subscriber</code> binding stays globally
+          serial — one actor at a time across the entire system. Same code, same config file,
+          silently 1x instead of 10x. Assert your engine version at boot the way the harness worker
+          does; it refuses to start if its queue cannot be ensured.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RUNG 5 ============ -->
+  <section class="rung" id="rung-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Step 5 of 5">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Other shapes</span>
+      </div>
+      <div>
+        <h2>If not actors, and not pipelines, then what</h2>
+        <p class="thesis">
+          Two lenses is a start, not an inventory. The distributed-systems literature has several
+          more models, and some of them fit agents considerably better than either.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Here is the sharp version, and it is a problem for the whole exercise above:
+        <strong>supervision assumes failure is crash-stop and detectable.</strong> Agent failure is
+        neither. A confident wrong answer raises no exception, exits zero, and returns a
+        well-formed payload. Restarting does not fix a bad plan. OTP offers superb machinery for the
+        failure mode agents mostly do not have, which is worth knowing before you spend a quarter
+        porting it.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <caption>other models, and what they would buy an agent system</caption>
+          <thead>
+            <tr><th>Model</th><th>Shape</th><th>Why it fits agents</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Blackboard</strong></td>
+              <td>Shared knowledge space; specialists contribute opportunistically when they see something they can act on</td>
+              <td>No fixed control flow, which is how agents actually decide. <code>state</code> plus change triggers is already one</td>
+            </tr>
+            <tr>
+              <td><strong>Tuple space</strong></td>
+              <td>Associative <code>in</code>/<code>out</code>/<code>rd</code>; coordination decoupled in space and time</td>
+              <td>Same family, more formal. Agents pull work matching their capability rather than being addressed</td>
+            </tr>
+            <tr>
+              <td><strong>Event sourcing</strong></td>
+              <td>Append-only log; state is a fold over history</td>
+              <td>A transcript already <em>is</em> an event log. "Why did it do that" becomes a query instead of forensics</td>
+            </tr>
+            <tr>
+              <td><strong>Dataflow</strong></td>
+              <td>Operators, windows, back-pressure</td>
+              <td>Generations are expensive and rate-limited. Back-pressure is exactly what BEAM lacks</td>
+            </tr>
+            <tr>
+              <td><strong>CRDTs</strong></td>
+              <td>Convergent replicated types; merge instead of coordinate</td>
+              <td>The principled answer to concurrent writers. Parallel agents editing one plan, without a lock</td>
+            </tr>
+            <tr>
+              <td><strong>BSP</strong></td>
+              <td>Fan out, barrier, aggregate, repeat</td>
+              <td>Spawn-and-synthesize is literally a superstep. <code>state::barrier</code> is the join</td>
+            </tr>
+            <tr class="flag">
+              <td><strong>Sagas</strong></td>
+              <td>Compensating transactions for steps that cannot roll back</td>
+              <td>Agents send email and move money. Undo matters more here than in ordinary services, and is barely explored</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Blackboard is the one to sit with. It comes from Hearsay-II in the 1970s, it was designed
+        for exactly this — multiple specialists with partial knowledge, no predetermined order of
+        contribution — and almost nobody reaches for it now. A <code>state</code> scope plus trigger
+        bindings gives you one this afternoon, with none of the addressing decisions an actor system
+        forces you to make up front.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ TAKEAWAY ============ -->
+  <section class="rung" id="takeaway">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Takeaway">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Takeaway</span>
+      </div>
+      <div>
+        <h2>Pseudo-OTP is the point, not the consolation prize</h2>
+        <p class="thesis">
+          You can build most of OTP out of queue definitions and state operations. You should
+          probably build less of it than you can.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="takeaway">
+        <p>
+          <strong>The translation is real but partial, and the partiality is informative.</strong>
+          A GenServer falls out of three declarations. A supervision tree falls out of a
+          <code>depends_on</code> graph. Monitors, timers, process groups, ETS and barriers are all
+          trigger bindings or state scopes. Restart, restart intensity, the registry and links have
+          no referent at all, because they were answers to a question this architecture does not
+          ask. Ordering under retry and delayed delivery are the two places you give something up.
+        </p>
+        <p>
+          <strong>Do not port OTP wholesale.</strong> Porting a solution is how you inherit the
+          shape of a problem you no longer have. Take the mailbox, take supervision-as-dependency-
+          graph, take the dead-letter queue, and let the rest dissolve.
+        </p>
+        <p>
+          <strong>Then ask whether actors were the right lens at all.</strong> If you are building
+          agents, your failures are semantic and silent, your writers are concurrent, your history
+          matters more than your liveness, and your control flow is decided at runtime by a model.
+          Blackboard, event sourcing and CRDTs answer those pressures directly. The actor model
+          answers a different set of pressures beautifully — just check they are yours.
+        </p>
+      </div>
+
+      <p>
+        Everything above was executed against iii 0.22.0 before it was written down; the companion
+        repo has the config files, the bootstrap script, and a counter actor that runs from first
+        cast to dead-letter. Fair warning that three of the functions it depends on appear in no
+        documentation and one published README actively contradicts the running system. Enumerate
+        the engine, not the docs.
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>iii for OTP Practitioners</strong>, a GenServer with no source file.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Companion repo ·
+      <a href="https://github.com/tacoda/iii-otp"><code>github.com/tacoda/iii-otp</code></a></div>
+    <div>Related · <a href="/iii-harness/">Building a harness with iii</a> ·
+      <a href="/pi-harness/">Building a harness with pi</a> ·
+      <a href="/factory/">The factory</a></div>
+    <div>Colour encodes the verdict:
+      <span style="color:var(--gold)">ports as config</span> ·
+      <span style="color:var(--forest)">dissolves</span> ·
+      <span style="color:var(--brick)">genuine gap</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
