@@ -527,6 +527,27 @@ pre code { background: none; padding: 0; font-size: inherit; }
 .c-pass   { color: var(--forest); }
 .c-dim    { color: var(--ink-3); }
 
+/* ---------- diagrams ---------- */
+/* Mermaid source lives in the page and renders in the browser. The figure
+   body is transparent so the paper shows through the diagram; until the
+   script runs, the source is visible as text. */
+.code.diagram { background: none; }
+.code.diagram .mermaid {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink-3);
+  text-align: center;
+}
+.code.diagram .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
 /* ---------- callouts ---------- */
 .callout {
   border: 1px solid var(--rule);
@@ -1022,18 +1043,20 @@ final state per child:
         and unroutable.
       </p>
 
-      <figure class="code">
+      <figure class="code diagram">
         <figcaption><span>the cascade, and where it stops</span><span class="tag pass">dissolves</span></figcaption>
-<pre><code>state in volatile RAM
-  └─► process can die with state
-        └─► <span class="c-pass">supervision</span> to restart it
-              └─► <span class="c-pass">restart intensity</span> to bound the loop
-        └─► <span class="c-pass">links</span> so peers don't read stale state
-  └─► pid is ephemeral
-        └─► <span class="c-pass">registry</span> for stable names
-
-<span class="c-dim">state in a durable store
-  └─► nothing above has a subject</span></code></pre>
+<pre class="mermaid">
+flowchart LR
+  ram["state in volatile RAM"] --> die["process can die with state"]
+  ram --> pid["pid is ephemeral"]
+  die --> sup["supervision to restart it"]
+  sup --> intensity["restart intensity to bound the loop"]
+  die --> links["links so peers don't read stale state"]
+  pid --> registry["registry for stable names"]
+  durable["state in a durable store"] --> subject["nothing above has a subject"]
+  class sup,intensity,links,registry pass
+  class durable,subject dim
+</pre>
       </figure>
 
       <ul>
@@ -1098,14 +1121,25 @@ final state per child:
         running, so a message enqueued <em>after</em> the failure can arrive before the retried one.
       </p>
 
-      <figure class="code">
+      <figure class="code diagram">
         <figcaption><span>the reordering window</span><span class="tag block">genuine gap</span></figcaption>
-<pre><code>enqueue A ──► deliver A ──► <span class="c-warn">A fails</span> ──► nack, backoff 1000ms
-enqueue B ─────────────────► deliver B  <span class="c-block">◄── B lands first</span>
-                             retry A ──► deliver A
-
-<span class="c-dim">BEAM: A then B, always.
-queue: A then B, unless A stumbles.</span></code></pre>
+<pre class="mermaid">
+sequenceDiagram
+  participant P as producer
+  participant Q as queue
+  participant W as worker
+  P->>Q: enqueue A
+  Q->>W: deliver A
+  W--xW: A fails
+  W->>Q: nack, backoff 1000ms
+  P->>Q: enqueue B
+  Q->>W: deliver B
+  Note over W: B lands first
+  Q-->>Q: retry A
+  Q->>W: deliver A
+  Note over P,W: BEAM: A then B, always.
+  Note over P,W: queue: A then B, unless A stumbles.
+</pre>
       </figure>
 
       <p>
@@ -1206,5 +1240,73 @@ queue: A then B, unless A stumbles.</span></code></pre>
   </footer>
 
 </div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+  const nodes = [...document.querySelectorAll("pre.mermaid")];
+  const source = new Map(nodes.map(el => [el, el.textContent]));
+  const token = name => getComputedStyle(document.documentElement)
+    .getPropertyValue(name).trim();
+
+  /* The palette is read from the page's own tokens, so one definition serves
+     light and dark, prefers-color-scheme and the explicit toggle. Every
+     background stays transparent so the paper shows through. */
+  const themeVariables = () => ({
+    background: "transparent",
+    mainBkg: token("--surface-2"),
+    primaryColor: token("--surface-2"),
+    primaryTextColor: token("--ink"),
+    primaryBorderColor: token("--rule"),
+    nodeBorder: token("--rule"),
+    lineColor: token("--ink-3"),
+    textColor: token("--ink-2"),
+    clusterBkg: "transparent",
+    clusterBorder: token("--rule"),
+    edgeLabelBackground: token("--ground"),
+    /* sequence notes default to mermaid's lemon, which is a second palette */
+    noteBkgColor: token("--surface-2"),
+    noteTextColor: token("--ink"),
+    noteBorderColor: token("--rule"),
+    fontFamily: token("--mono"),
+    fontSize: "13px"
+  });
+
+  /* Same four signal colours the prose uses: brick blocks, gold warns,
+     forest passes, and dim is structure rather than a step. */
+  const signals = () => [
+    `classDef block fill:${token("--brick-wash")},stroke:${token("--brick")},color:${token("--ink")}`,
+    `classDef warn fill:${token("--gold-wash")},stroke:${token("--gold")},color:${token("--ink")}`,
+    `classDef pass fill:${token("--forest-wash")},stroke:${token("--forest")},color:${token("--ink")}`,
+    `classDef dim fill:transparent,stroke:${token("--rule")},color:${token("--ink-3")}`
+  ].join("\n");
+
+  async function render() {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: themeVariables(),
+      flowchart: { htmlLabels: false, curve: "linear", rankSpacing: 38,
+                   nodeSpacing: 28, padding: 8, useMaxWidth: true,
+                   wrappingWidth: 240 },
+      sequence: { useMaxWidth: true, mirrorActors: false }
+    });
+    for (const el of nodes) {
+      el.removeAttribute("data-processed");
+      /* classDef is flowchart grammar; a sequenceDiagram fails to parse with
+         the signal block appended, so it renders without one. */
+      const src = source.get(el);
+      el.textContent = /^\s*(flowchart|graph)\b/m.test(src)
+        ? `${src}\n${signals()}` : src;
+    }
+    await mermaid.run({ nodes });
+  }
+
+  render();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-theme"] });
+</script>
 </body>
 </html>

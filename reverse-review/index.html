@@ -526,6 +526,27 @@ pre code { background: none; padding: 0; font-size: inherit; }
 .c-pass   { color: var(--forest); }
 .c-dim    { color: var(--ink-3); }
 
+/* ---------- diagrams ---------- */
+/* Mermaid source lives in the page and renders in the browser. The figure
+   body is transparent so the paper shows through the diagram; until the
+   script runs, the source is visible as text. */
+.code.diagram { background: none; }
+.code.diagram .mermaid {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink-3);
+  text-align: center;
+}
+.code.diagram .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
 /* ---------- callouts ---------- */
 .callout {
   border: 1px solid var(--rule);
@@ -718,16 +739,28 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
 
     <div class="rung-body">
-      <figure class="code">
+      <figure class="code diagram">
         <figcaption><span>where the senior's attention goes</span><span class="tag warn">the whole idea</span></figcaption>
-<pre><code><span class="c-dim">NORMAL REVIEW</span>
-  junior writes  ──▶  <span class="c-warn">senior reviews the code</span>
-                      <span class="c-dim">~1 hour, spent on one diff, mostly on defects</span>
-
-<span class="c-dim">REVERSE-REVIEW</span>
-  agent writes   ──▶  junior reviews the code
-                 ──▶  <span class="c-block">senior reviews the review</span>
-                      <span class="c-dim">~15 min, spent on judgment, which is the part that transfers</span></code></pre>
+<pre class="mermaid">
+flowchart LR
+%% declared bottom-up: the layout engine stacks the later subgraph first,
+%% so REVERSE-REVIEW is written first and renders under NORMAL REVIEW
+  subgraph reverse["REVERSE-REVIEW"]
+    direction LR
+    aw["agent writes"] --> jr["junior reviews the code"]
+    aw --> sr["senior reviews the review"]
+    sr ~~~ rcost["~15 min, spent on judgment, which is the part that transfers"]
+  end
+  subgraph normal["NORMAL REVIEW"]
+    direction LR
+    jw["junior writes"] --> sc["senior reviews the code"]
+    sc ~~~ ncost["~1 hour, spent on one diff, mostly on defects"]
+  end
+  class sc warn
+  class ncost warn
+  class jr,sr pass
+  class rcost dim
+</pre>
       </figure>
 
       <p>
@@ -1289,5 +1322,73 @@ git apply -R ../../fulcorum-reverse-review/diffs/03-test-that-cannot-fail.diff</
   </footer>
 
 </div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+  const nodes = [...document.querySelectorAll("pre.mermaid")];
+  const source = new Map(nodes.map(el => [el, el.textContent]));
+  const token = name => getComputedStyle(document.documentElement)
+    .getPropertyValue(name).trim();
+
+  /* The palette is read from the page's own tokens, so one definition serves
+     light and dark, prefers-color-scheme and the explicit toggle. Every
+     background stays transparent so the paper shows through. */
+  const themeVariables = () => ({
+    background: "transparent",
+    mainBkg: token("--surface-2"),
+    primaryColor: token("--surface-2"),
+    primaryTextColor: token("--ink"),
+    primaryBorderColor: token("--rule"),
+    nodeBorder: token("--rule"),
+    lineColor: token("--ink-3"),
+    textColor: token("--ink-2"),
+    clusterBkg: "transparent",
+    clusterBorder: token("--rule"),
+    edgeLabelBackground: token("--ground"),
+    /* sequence notes default to mermaid's lemon, which is a second palette */
+    noteBkgColor: token("--surface-2"),
+    noteTextColor: token("--ink"),
+    noteBorderColor: token("--rule"),
+    fontFamily: token("--mono"),
+    fontSize: "13px"
+  });
+
+  /* Same four signal colours the prose uses: brick blocks, gold warns,
+     forest passes, and dim is structure rather than a step. */
+  const signals = () => [
+    `classDef block fill:${token("--brick-wash")},stroke:${token("--brick")},color:${token("--ink")}`,
+    `classDef warn fill:${token("--gold-wash")},stroke:${token("--gold")},color:${token("--ink")}`,
+    `classDef pass fill:${token("--forest-wash")},stroke:${token("--forest")},color:${token("--ink")}`,
+    `classDef dim fill:transparent,stroke:${token("--rule")},color:${token("--ink-3")}`
+  ].join("\n");
+
+  async function render() {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: themeVariables(),
+      flowchart: { htmlLabels: false, curve: "linear", rankSpacing: 38,
+                   nodeSpacing: 28, padding: 8, useMaxWidth: true,
+                   wrappingWidth: 240 },
+      sequence: { useMaxWidth: true, mirrorActors: false }
+    });
+    for (const el of nodes) {
+      el.removeAttribute("data-processed");
+      /* classDef is flowchart grammar; a sequenceDiagram fails to parse with
+         the signal block appended, so it renders without one. */
+      const src = source.get(el);
+      el.textContent = /^\s*(flowchart|graph)\b/m.test(src)
+        ? `${src}\n${signals()}` : src;
+    }
+    await mermaid.run({ nodes });
+  }
+
+  render();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-theme"] });
+</script>
 </body>
 </html>

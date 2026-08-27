@@ -528,6 +528,27 @@ pre code { background: none; padding: 0; font-size: inherit; }
 .c-pass   { color: var(--forest); }
 .c-dim    { color: var(--ink-3); }
 
+/* ---------- diagrams ---------- */
+/* Mermaid source lives in the page and renders in the browser. The figure
+   body is transparent so the paper shows through the diagram; until the
+   script runs, the source is visible as text. */
+.code.diagram { background: none; }
+.code.diagram .mermaid {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink-3);
+  text-align: center;
+}
+.code.diagram .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
 /* ---------- callouts ---------- */
 .callout {
   border: 1px solid var(--rule);
@@ -735,15 +756,26 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         no model formed, so the second week starts where the first did.
       </p>
 
-      <figure class="code">
+      <figure class="code diagram">
         <figcaption><span>the sequence that stopped being mandatory</span><span class="tag warn">what to restore on purpose</span></figcaption>
-<pre><code><span class="c-dim">BEFORE</span>
-  need to change X  ──▶  find X  ──▶  read around X  ──▶  <span class="c-pass">model forms</span>  ──▶  change X
-                         <span class="c-dim">comprehension was the toll, and it was compulsory</span>
-
-<span class="c-dim">NOW</span>
-  need to change X  ──▶  <span class="c-warn">change X</span>
-                         <span class="c-block">model never forms, and nothing reports its absence</span></code></pre>
+<pre class="mermaid">
+flowchart TB
+  subgraph before["BEFORE"]
+    direction LR
+    b1["need to change X"] --> b2["find X"] --> b3["read around X"] --> b4["model forms"] --> b5["change X"]
+    bnote["comprehension was the toll, and it was compulsory"]
+  end
+  subgraph now["NOW"]
+    direction LR
+    n1["need to change X"] --> n2["change X"]
+    nnote["model never forms, and nothing reports its absence"]
+  end
+  before ~~~ now
+  class b4 pass
+  class n2 warn
+  class bnote dim
+  class nnote block
+</pre>
       </figure>
 
       <p>
@@ -1291,5 +1323,73 @@ footer strong { color: var(--ink-2); font-weight: 600; }
   </footer>
 
 </div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+  const nodes = [...document.querySelectorAll("pre.mermaid")];
+  const source = new Map(nodes.map(el => [el, el.textContent]));
+  const token = name => getComputedStyle(document.documentElement)
+    .getPropertyValue(name).trim();
+
+  /* The palette is read from the page's own tokens, so one definition serves
+     light and dark, prefers-color-scheme and the explicit toggle. Every
+     background stays transparent so the paper shows through. */
+  const themeVariables = () => ({
+    background: "transparent",
+    mainBkg: token("--surface-2"),
+    primaryColor: token("--surface-2"),
+    primaryTextColor: token("--ink"),
+    primaryBorderColor: token("--rule"),
+    nodeBorder: token("--rule"),
+    lineColor: token("--ink-3"),
+    textColor: token("--ink-2"),
+    clusterBkg: "transparent",
+    clusterBorder: token("--rule"),
+    edgeLabelBackground: token("--ground"),
+    /* sequence notes default to mermaid's lemon, which is a second palette */
+    noteBkgColor: token("--surface-2"),
+    noteTextColor: token("--ink"),
+    noteBorderColor: token("--rule"),
+    fontFamily: token("--mono"),
+    fontSize: "13px"
+  });
+
+  /* Same four signal colours the prose uses: brick blocks, gold warns,
+     forest passes, and dim is structure rather than a step. */
+  const signals = () => [
+    `classDef block fill:${token("--brick-wash")},stroke:${token("--brick")},color:${token("--ink")}`,
+    `classDef warn fill:${token("--gold-wash")},stroke:${token("--gold")},color:${token("--ink")}`,
+    `classDef pass fill:${token("--forest-wash")},stroke:${token("--forest")},color:${token("--ink")}`,
+    `classDef dim fill:transparent,stroke:${token("--rule")},color:${token("--ink-3")}`
+  ].join("\n");
+
+  async function render() {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: themeVariables(),
+      flowchart: { htmlLabels: false, curve: "linear", rankSpacing: 38,
+                   nodeSpacing: 28, padding: 8, useMaxWidth: true,
+                   wrappingWidth: 240 },
+      sequence: { useMaxWidth: true, mirrorActors: false }
+    });
+    for (const el of nodes) {
+      el.removeAttribute("data-processed");
+      /* classDef is flowchart grammar; a sequenceDiagram fails to parse with
+         the signal block appended, so it renders without one. */
+      const src = source.get(el);
+      el.textContent = /^\s*(flowchart|graph)\b/m.test(src)
+        ? `${src}\n${signals()}` : src;
+    }
+    await mermaid.run({ nodes });
+  }
+
+  render();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-theme"] });
+</script>
 </body>
 </html>
