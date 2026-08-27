@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: reviewed 2026-08-27, kept impersonal by author decision">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Eval Loop · Harness Engineering · Ian Johnson</title>
@@ -642,11 +643,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>You changed the charter. <em>Did it get better?</em></h1>
     <p class="standfirst">
-      Guardrails decide what the agent is refused. A factory decides what it produces. Neither one
-      tells you whether last Tuesday's rule change helped, hurt, or did nothing, and in the absence of
-      an instrument every charter edit is an act of faith performed by the person with the strongest
+      Guardrails decide what the agent may not do. A factory decides what it produces. Neither one
+      tells you whether last Tuesday's rule change helped, hurt, or did nothing. So without an
+      instrument, every charter edit is an act of faith performed by the person with the strongest
       opinion. This is the smallest thing that answers the question: a frozen set, assertions before
-      judges, blind pairwise comparison, and an honest account of what sixty runs can actually detect.
+      judges, blind pairwise comparison, and an honest account of what sixty runs can detect.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -681,7 +682,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch block"></span>
         <div>
           <dt>Below the noise</dt>
-          <dd>Differences your sample size cannot see. The discipline is naming these rather than reporting them.</dd>
+          <dd>Differences your sample size cannot see. The discipline is naming these differences rather than reporting them.</dd>
         </div>
       </div>
     </dl>
@@ -721,18 +722,17 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        A charter accumulates. Somebody adds a paragraph after an incident, somebody else adds three
-        rules about naming, a fourth person pastes in a style guide. Each addition is individually
-        defensible and nobody ever measures the total. Two failure modes follow, and both are silent.
+        A charter accumulates. Somebody adds a paragraph after an incident. Somebody else adds three
+        rules about naming, and a fourth person pastes in a style guide. Each addition is defensible on
+        its own, and nobody measures the total. Two failure modes follow, and both are silent.
         Rules contradict each other, so the agent picks one at random per session. Or the document gets
-        long enough that the instructions at the bottom stop being followed, and nobody notices which
+        long enough that the agent stops following the instructions at the bottom. Nobody notices which
         third stopped working.
       </p>
       <p>
-        The reason this persists is not laziness, but that measuring a non-deterministic system feels
-        like it requires apparatus nobody has time to build. It does not. The version below is roughly
-        a hundred and fifty lines of Python and it will catch the two failure modes above within a
-        week.
+        The reason is not laziness: measuring a non-deterministic system looks like it needs apparatus
+        nobody has time to build. It does not. The version below is roughly a hundred and fifty lines
+        of Python, and catches both failure modes within a week.
       </p>
 
       <figure class="code">
@@ -802,20 +802,20 @@ CHECKS = [
 
       <h3 class="sub">Choosing twenty</h3>
       <ul>
-        <li><strong>Real tickets, past tense.</strong> Take work already done. You get a known-good outcome for free and the task is genuinely shaped like your work, which a synthetic task never is.</li>
-        <li><strong>Spread across the failure modes you care about.</strong> If half your charter is about money handling, several tasks should touch money. The set is a statement about what you are worried about.</li>
+        <li><strong>Real tickets, past tense.</strong> Take work already done: you get a known-good outcome for free, and a task shaped like your real work. No synthetic task has that shape.</li>
+        <li><strong>Spread across the failure modes you care about.</strong> If half your charter is about money handling, several tasks should touch money. The set states what you worry about.</li>
         <li><strong>Include three you expect to fail.</strong> A set everything passes cannot show improvement, only regression, so headroom is a design requirement.</li>
-        <li><strong>Two that need a refusal.</strong> Tasks where the correct behaviour is to stop and ask. Without them, charters that are pure encouragement score suspiciously well until you add these.</li>
+        <li><strong>Two that need a refusal.</strong> Tasks where the correct behaviour is to stop and ask. Without them, charters that are pure encouragement score too well.</li>
       </ul>
 
       <div class="callout">
         <span class="label">The rule that makes the numbers mean anything</span>
         <p>
           Editing the task set invalidates every prior result. Treat it like changing the units on a
-          chart: allowed, occasionally necessary, and it resets the history. Version the set
-          (<code>v1</code>, <code>v2</code>) and record which version produced each number, or within
-          two months you will be comparing measurements taken with different rulers and concluding
-          things about your charter.
+          chart: allowed, sometimes necessary, and it resets the history. Version the set
+          (<code>v1</code>, <code>v2</code>), and record which version produced each number. Without
+          that record, within two months you will compare measurements taken with different rulers and
+          conclude things about your charter.
         </p>
       </div>
     </div>
@@ -834,7 +834,7 @@ CHECKS = [
       <div>
         <h2>Most of what you want is a grep or an exit code</h2>
         <p class="thesis">
-          The instinct is to reach for a model judge immediately. Resist it for one afternoon and you
+          The first instinct is to reach for a model judge. Resist it for one afternoon and you
           will find that four fifths of your rules are mechanically checkable.
         </p>
       </div>
@@ -862,9 +862,9 @@ def policy_cited(w, r):
       </figure>
 
       <p>
-        Each of these is a rule from the charter, compiled into a sensor, which is the same move as
-        <a href="/guardrails/">turning a rule into a hook</a>, pointed at measurement instead of
-        enforcement, and it has the same payoff: a property that is checked mechanically stops being a
+        Each check above turns one charter rule into a measurement. Compiling the same rule into
+        <a href="/guardrails/">a hook</a> is the other half of the move, aimed at enforcement instead
+        of measurement. The payoff is the same either way: a property a script can check stops being a
         matter of opinion.
       </p>
 
@@ -878,15 +878,15 @@ def policy_cited(w, r):
             <tr><td>Did it build, do tests pass</td><td>exit code</td><td>Already exists. Use it.</td></tr>
             <tr><td>Money as integer cents</td><td>regex on the diff</td><td>Crude, catches the real cases, zero cost.</td></tr>
             <tr><td>Touched only allowed paths</td><td>set comparison</td><td>Scope creep is the easiest defect to detect and the most common.</td></tr>
-            <tr><td>Test actually fails when reverted</td><td>run it twice</td><td>Deterministic and catches the test-that-cannot-fail class.</td></tr>
-            <tr class="flag"><td>Is the approach reasonable</td><td>model judge</td><td>Genuinely requires reading. §3.</td></tr>
-            <tr class="flag"><td>Would a reviewer be annoyed</td><td>model judge</td><td>Same, and lower reliability. Use sparingly.</td></tr>
+            <tr><td>Test fails when reverted</td><td>run it twice</td><td>Deterministic and catches the test-that-cannot-fail class.</td></tr>
+            <tr class="flag"><td>Is the approach reasonable</td><td>model judge</td><td>Requires reading. §3.</td></tr>
+            <tr class="flag"><td>Would a reviewer be annoyed</td><td>model judge</td><td>Same, and lower reliability. Use with care.</td></tr>
           </tbody>
         </table>
       </div>
 
       <div class="takeaway">
-        <span class="label">The "test actually fails" check is the best one here</span>
+        <span class="label">The "test fails when reverted" check is the best one here</span>
         <p>
           Revert the implementation, keep the new test, run the suite. If it stays green the agent
           wrote a decoration. Two lines of shell, catches a defect class that survives every review,
@@ -942,7 +942,7 @@ Answer NO if you are unsure.
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Binary</span>
-          <span class="what">Yes or no, never one-to-five. Numeric scales from a model are not interval scales, and averaging them produces a number with no meaning that everyone will nonetheless put in a slide.</span>
+          <span class="what">Yes or no, never one-to-five. Numeric scales from a model are not interval scales. Averaging them produces a number with no meaning, and everyone puts that number in a slide anyway.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Anchored</span>
@@ -950,7 +950,7 @@ Answer NO if you are unsure.
         </li>
         <li data-signal="pass">
           <span class="when">One property</span>
-          <span class="what">One question per call. A judge asked to assess six things at once produces a summary judgment about vibes and then rationalises it into six sub-scores.</span>
+          <span class="what">One question per call. Ask a judge to assess six things at once and it produces a summary judgment about vibes. Then it rationalises that judgment into six sub-scores.</span>
         </li>
         <li data-signal="block">
           <span class="when">Pinned</span>
@@ -962,8 +962,8 @@ Answer NO if you are unsure.
         <span class="label">Validate it before you believe it</span>
         <p>
           Label twenty outputs by hand, then run the judge on the same twenty. If it agrees with you
-          on fewer than about sixteen, the judge is measuring something other than what you asked, and
-          the usual cause is a rubric that is clear to a person who already knows the codebase. Fix
+          on fewer than about sixteen, the judge is measuring something other than what you asked. The
+          usual cause is a rubric that is clear only to someone who already knows the codebase. Fix
           the anchors and try again. This costs an hour, once, and is the difference between an
           instrument and a random number generator with good manners.
         </p>
@@ -993,9 +993,9 @@ Answer NO if you are unsure.
 
     <div class="rung-body">
       <p>
-        The question is never "is this output good", but "is the charter on this branch better than
-        the one on main". So run both, on the same task, and ask the judge which it prefers, with the
-        two labels hidden and the order swapped.
+        Never ask "is this output good". Ask "is the charter on this branch better than the one on
+        main". So run both charters on the same task, and ask the judge which it prefers. Hide the two
+        labels, and swap the order.
       </p>
 
       <figure class="code">
@@ -1022,18 +1022,18 @@ Answer NO if you are unsure.
       </figure>
 
       <p>
-        The discard is the important line. A judge that prefers whichever output it was shown first is
-        a well-documented and entirely ordinary failure, and running only one order lets it pass
-        silently into your results. Running both orders converts the bias from an invisible skew into
-        a visible tie, which is honest and costs one extra call.
+        The discard is the important line. Position bias is well-documented and ordinary: a judge can
+        prefer whichever output it sees first. Run one order and that bias passes into your results
+        undetected. Run both orders and the bias becomes a visible tie, which is honest and costs one
+        extra call.
       </p>
 
       <div class="takeaway">
         <span class="label">Watch the tie rate</span>
         <p>
           Ties above roughly a third mean the judge is not distinguishing the two charters at all. That
-          is a real finding and usually the correct one: most charter edits change nothing measurable,
-          and a loop that reports that plainly is worth more than one that always finds a winner.
+          is a real finding, and usually the correct one: most charter edits change nothing measurable.
+          A loop that reports the tie is worth more than one that always finds a winner.
         </p>
       </div>
     </div>
@@ -1052,17 +1052,17 @@ Answer NO if you are unsure.
       <div>
         <h2>What sixty runs can and cannot detect</h2>
         <p class="thesis">
-          This is the section that gets left out, and leaving it out is how a team spends a quarter
-          tuning a charter against noise.
+          Write-ups leave this section out, and that omission costs a team a quarter spent tuning a
+          charter against noise.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        Twenty tasks run three times is sixty samples per arm, which sounds like plenty and is not. For
-        a pass rate somewhere around seventy percent, the rough sample sizes needed to detect a change
-        with any confidence look like this.
+        Twenty tasks run three times is sixty samples per arm, which sounds like plenty and is not.
+        Take a pass rate somewhere around seventy percent. Then the rough sample sizes needed to detect
+        a change with any confidence look like this.
       </p>
 
       <div class="tablewrap">
@@ -1082,28 +1082,27 @@ Answer NO if you are unsure.
 
       <p>
         Read the table the right way round. A twenty-task set with a few runs each is a <em>regression
-        detector</em>. It will tell you loudly when a charter edit broke something, which is the
-        failure that actually costs you money. It will not tell you which of two reasonable phrasings
-        is five percent better, and any loop that appears to answer that question is reporting noise
-        with a confident face.
+        detector</em>. It will tell you when a charter edit broke something, which is the failure that
+        costs you money. It will not tell you which of two reasonable phrasings is five percent better.
+        A loop that appears to answer that question is reporting noise with a confident face.
       </p>
 
       <div class="callout">
         <span class="label">Report it the way it deserves</span>
         <p>
-          Three outcomes, and the third is a legitimate result rather than a failure to get one:
-          <strong>regression</strong> (worse on multiple tasks, beyond the tie rate),
-          <strong>improvement</strong> (better on multiple tasks, and large), and
-          <strong>indistinguishable</strong>. Most edits land in the third bucket. A team that can say
+          Report three outcomes: <strong>regression</strong>, <strong>improvement</strong>, and
+          <strong>indistinguishable</strong>. Regression means worse on multiple tasks, beyond the tie
+          rate. Improvement means better on multiple tasks, and large. The third is a legitimate result
+          rather than a failure to get one, and most edits land there. A team that can say
           "indistinguishable" out loud is a team whose other two verdicts mean something.
         </p>
       </div>
 
       <p>
-        Two cheap ways to buy sensitivity without buying runs: use paired comparison, which the design
-        in §4 already does and which is substantially more sensitive than comparing two independent
-        pass rates, and make the deterministic checks in §2 carry as much of the load as possible,
-        because they have no judge noise on top of the agent's own variance.
+        Two cheap changes raise sensitivity without buying runs. Use paired comparison, which the design in
+        §4 already does: pairing is more sensitive than comparing two independent pass rates. Then make
+        the deterministic checks in §2 carry as much of the load as they can. Those checks add no judge
+        noise on top of the agent's own variance.
       </p>
     </div>
   </section>
@@ -1121,8 +1120,8 @@ Answer NO if you are unsure.
       <div>
         <h2>A charter change is a pull request with evidence</h2>
         <p class="thesis">
-          The loop only closes when the result lands where the decision is made, which is the pull
-          request, not a dashboard nobody opens.
+          The loop closes only when the result lands where the reviewer decides: the pull request, not
+          a dashboard nobody opens.
         </p>
       </div>
     </div>
@@ -1163,17 +1162,17 @@ jobs:
       </figure>
 
       <p>
-        That report is the point of the whole exercise, specific about the thing that got better,
-        specific about the thing that got worse, and explicitly agnostic about the part it cannot
-        resolve. A reviewer can act on all three statements.
+        That report is the point of the whole exercise. It names what got better, names what got worse,
+        and stays agnostic about the part it cannot resolve. A reviewer can act on all three
+        statements.
       </p>
 
       <div class="takeaway">
         <span class="label">The norm this creates</span>
         <p>
           A charter pull request with no eval result becomes as odd as a code pull request with no
-          tests. That norm is worth more than any individual number the loop produces, because it is
-          what stops the document growing by accumulation.
+          tests. That norm is worth more than any number the loop produces, because it stops the
+          document growing by accumulation.
         </p>
       </div>
     </div>
@@ -1192,7 +1191,7 @@ jobs:
       <div>
         <h2>Cost, cadence, and the way this rots</h2>
         <p class="thesis">
-          Three practical facts, and one failure mode that will get you eventually.
+          Three practical facts, and one failure mode that will get you.
         </p>
       </div>
     </div>
@@ -1203,7 +1202,7 @@ jobs:
         A full pairwise run is <code>tasks × k × 2</code> agent invocations plus <code>tasks × k ×
         2</code> judge calls. Twenty tasks at k=3 is 120 agent runs and 120 judge calls. Price that
         against your own provider once, put the figure in the README, and revisit it when the number
-        changes. It is usually small next to one senior engineer spending a day arguing about a
+        changes. That bill is usually small next to one senior engineer spending a day arguing about a
         paragraph.
       </p>
 
@@ -1211,7 +1210,7 @@ jobs:
       <ul>
         <li><strong>On charter pull requests</strong>, always. This is the whole point.</li>
         <li><strong>Weekly on main</strong>, unchanged charter. This catches drift from underneath you: a model update, a dependency change, a fixture that rotted.</li>
-        <li><strong>Never continuously.</strong> A loop that runs hourly generates numbers faster than anyone can interpret them, and people start ignoring it by the second week.</li>
+        <li><strong>Never continuously.</strong> A loop that runs hourly generates numbers faster than anyone can read them. Then people start ignoring it by the second week.</li>
       </ul>
 
       <div class="callout">
@@ -1228,10 +1227,9 @@ jobs:
       <div class="takeaway">
         <span class="label">Where to start</span>
         <p>
-          Five tasks, the deterministic checks from §2, and no judge at all. That is an afternoon, it
-          has no ongoing cost, and it will catch the next charter edit that quietly licenses scope
-          creep. Everything above §2 is what you add once the cheap version has proved it earns its
-          keep.
+          Five tasks, the deterministic checks from §2, and no judge at all. That takes an afternoon,
+          costs nothing to keep, and catches the next charter edit that licenses scope creep.
+          Everything above §2 is what you add once the cheap version has proved it earns its keep.
         </p>
       </div>
     </div>

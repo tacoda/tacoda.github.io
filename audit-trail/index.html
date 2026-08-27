@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: reviewed 2026-08-27, kept impersonal by author decision">
   <meta name="voice-subject" content="third-party">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -311,14 +312,14 @@ footer b { color: var(--fg); font-weight: 600; }
   <div class="note">
     <span class="lbl">What this page is</span>
     <p>
-      An audit trail exists to answer one question, asked by someone who was not there:
+      An audit trail answers one question from a stranger:
       <b>why does this line exist?</b> Below is a single agent run, recorded end to end, including
-      the moment a gate refused its first attempt. Click any step to see what was written down at
-      that point, and why that field is in the schema.
+      the moment a gate refused its first attempt. Click any step to see the record it produced,
+      and why each field is in the schema.
     </p>
     <p>
-      Everything here is fabricated to be representative. The schema in the right-hand column is the
-      part to steal.
+      Nothing here comes from a real run: every name, hash, and timestamp is a stand-in. The schema
+      in the right-hand column is the part to steal.
     </p>
   </div>
 
@@ -366,10 +367,9 @@ footer b { color: var(--fg); font-weight: 600; }
         <div class="note warn">
           <span class="lbl">The field everyone forgets</span>
           <p>
-            <b>charter_sha.</b> Without it you cannot answer "which rules were in force when this ran",
-            and a year from now the charter will have moved thirty times. It also makes every run
-            joinable against the eval history, so a regression in output quality can be traced to the
-            exact rule edit that preceded it.
+            <b>charter_sha.</b> Without it, nobody can say which rules were in force, because the
+            charter moves thirty times a year. It also joins every run to the eval history. Trace a
+            quality regression back to the exact rule edit that preceded it.
           </p>
         </div>
       </div>
@@ -391,9 +391,9 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <div class="note">
           <span class="lbl">Record references, not contents</span>
           <p>
-            Store path plus content hash plus the repo sha. Never the file body. Bodies make the trail
-            enormous, duplicate your source of truth, and turn a log store into somewhere secrets go to
-            live forever. The hash is enough to prove what was read, and the repo already has the text.
+            Store path plus content hash plus the repo sha. Never the file body. Bodies bloat the trail,
+            duplicate your source of truth, and turn a log store into a place secrets live forever. The
+            hash proves what the agent read, and the repo already has the text.
           </p>
         </div>
       </div>
@@ -412,11 +412,10 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <div class="note ok">
           <span class="lbl">Log the road not taken</span>
           <p>
-            The rejected alternative is the highest-value row in the whole trail and the one almost no
-            system records. It is what makes a review possible six months later, and it is the same
-            artifact an engineer needs for
-            <a href="/evidence-of-judgment/">evidence of judgment</a>. Capture it here and it is
-            produced automatically instead of remembered.
+            The rejected alternative is the highest-value row in the trail, and almost no system
+            records it. That row is what makes review possible six months later, and an engineer needs
+            it as <a href="/evidence-of-judgment/">evidence of judgment</a>. Capture it at plan time,
+            and the run produces that evidence instead of an engineer remembering it.
           </p>
         </div>
       </div>
@@ -434,8 +433,8 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
           <span class="lbl">Pre and post, always both</span>
           <p>
             Recording only the result makes concurrent edits unresolvable. With the pre-image hash you
-            can prove the agent edited the file it thought it was editing, which is the failure that
-            appears the moment two runs touch one repo.
+            can prove the agent edited the file it thought it was editing. That failure appears the
+            moment two runs touch one repo.
           </p>
         </div>
       </div>
@@ -458,16 +457,16 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
   <span class="dim">"money is integer cents everywhere; percentages resolve</span>
   <span class="dim">via Decimal, then round half-up to cents."</span></code></pre>
         <div class="note bad">
-          <span class="lbl">This is the row the whole trail exists for</span>
+          <span class="lbl">The row the trail exists for</span>
           <p>
-            A gate that blocks and is never recorded looks, from the outside, exactly like a gate that
-            never fired. Six months later nobody can tell whether the rule is load-bearing or dead
-            weight, and dead rules are what
-            <a href="/seniority-ladder/">R4</a> is supposed to delete.
+            A gate that blocks without a record looks, from the outside, exactly like a gate that
+            never fired. Six months later nobody can tell whether that rule is load-bearing or dead
+            weight. Deleting dead rules is
+            <a href="/seniority-ladder/">R4</a>'s job, and the record of every firing is how R4 finds them.
           </p>
           <p>
-            <b>Record every firing, including the ones that pass.</b> The pass count is what tells you a
-            rule still earns its place; the block count is what tells you it is doing work today.
+            <b>Record every firing, including the ones that pass.</b> The pass count tells you a rule
+            still earns its place. Its block count tells you the rule is doing work today.
           </p>
         </div>
       </div>
@@ -487,9 +486,9 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <div class="note warn">
           <span class="lbl">Bound the retries, and record the bound</span>
           <p>
-            An unbounded correction loop burns budget and eventually talks itself into satisfying the
-            gate rather than solving the problem. Two attempts, then a human. The budget belongs in
-            the trail so that "why did this escalate" has an answer that is not somebody's memory.
+            Two attempts, then a human. An unbounded correction loop burns budget and talks itself
+            into satisfying the gate, not the problem. Record the budget in the trail, so "why did
+            this escalate" has an answer that is not somebody's memory.
           </p>
         </div>
       </div>
@@ -505,8 +504,8 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <div class="note ok">
           <span class="lbl">Passes are data too</span>
           <p>
-            Four rules ran, four are written down. A trail that records only failures cannot answer the
-            most useful maintenance question there is: which of our rules has not blocked anything in
+            Four rules ran, and the trail records all four. A trail that records only failures cannot
+            answer the most useful maintenance question. Which of our rules has not blocked anything in
             twelve months?
           </p>
         </div>
@@ -543,8 +542,8 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
           <span class="lbl">Put the trail link in the pull request</span>
           <p>
             A trail nobody can find is a trail nobody uses. One line in the PR body, pointing at this
-            view, is what converts the store from compliance furniture into the thing a reviewer opens
-            when a diff looks odd.
+            view, is enough. That link turns the store from compliance furniture into something a
+            reviewer opens when a diff looks odd.
           </p>
         </div>
       </div>
@@ -568,7 +567,7 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
             <tr><td class="k">context_refs</td><td>path + content hash. Never bodies.</td></tr>
             <tr><td class="k">tool_calls[]</td><td>name, args (redacted), result hash, ms.</td></tr>
             <tr class="req"><td class="k">gates[]</td><td>rule_id, verdict, matched location. Passes included.</td></tr>
-            <tr class="req"><td class="k">alternatives[]</td><td>What was rejected and why. The rarest, most valuable.</td></tr>
+            <tr class="req"><td class="k">alternatives[]</td><td>Which option the agent rejected, and why. The rarest, most valuable.</td></tr>
             <tr><td class="k">retry_index</td><td>With the budget, so escalations explain themselves.</td></tr>
             <tr><td class="k">pre_sha / post_sha</td><td>Both. One of them is useless alone.</td></tr>
             <tr><td class="k">outcome</td><td>pr number, merge sha, or the reason it stopped.</td></tr>
@@ -579,8 +578,8 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
       <div class="note warn">
         <span class="lbl">Never write these</span>
         <p>
-          Raw prompts containing customer data, tool arguments carrying credentials or personal
-          information, whole file bodies, and full model outputs. Hash or redact at the point of
+          Raw prompts with customer data, and tool arguments carrying credentials or personal data.
+          Never whole file bodies, and never full model outputs. Hash or redact at the point of
           capture, not in a cleanup job later. An audit store is append-only by design, which means a
           mistake in it is permanent by design.
         </p>
@@ -646,9 +645,9 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <span class="lbl">One question, run quarterly</span>
         <p>
           Pick a merged change from three months ago at random. Using only the trail, answer:
-          <b>why does this line look like this?</b> If you can name the alternative that was rejected,
-          the rule that constrained it, and the human who is accountable, you have an audit trail. If
-          you can only see what happened and in what order, you have logs.
+          <b>why does this line look like this?</b> If you name the rejected alternative, the rule
+          that constrained it, and the accountable human, you have an audit trail. If you can only see
+          what happened and in what order, you have logs.
         </p>
       </div>
       <div class="finding high">
@@ -678,9 +677,9 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
       <div class="note warn" style="margin-top:12px">
         <span class="lbl">The trap</span>
         <p>
-          Teams build the dashboard first and the schema second, and end up with a beautiful view over
-          data that cannot answer the only question that matters. The schema is the product. This page
-          is just a way of looking at it.
+          Teams build the dashboard first and the schema second. The view is beautiful, and the data
+          under it cannot answer the only question that matters. The schema is the product, and this
+          page is only a way of looking at it.
         </p>
       </div>
     </div>
@@ -694,7 +693,7 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
       <a href="/eval-loop/">The Eval Loop</a> (joins on charter_sha)</div>
     <div>Related · <a href="/evidence-of-judgment/">Evidence of Judgment</a> ·
       <a href="/seniority-ladder/">The Seniority Ladder</a></div>
-    <div>State is carried by border colour:
+    <div>Border colour carries state:
       <span class="ok">passed</span> ·
       <span class="lit">in progress</span> ·
       <span class="bad">blocked</span>.</div>

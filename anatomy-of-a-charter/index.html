@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: reviewed 2026-08-27, kept impersonal by author decision">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Anatomy of a Charter · Harness Engineering · Ian Johnson</title>
@@ -642,11 +643,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Every line in a charter is <em>a scar</em>.</h1>
     <p class="standfirst">
-      Most teams write their charter on day one, from best practices, in one sitting. That document is
-      a list of guesses, and it will be argued away the first time it is inconvenient, because nobody
-      can say what it cost to learn. Good charters are not authored. They accrete, one incident at a
-      time, and every rule carries the date and the damage that put it there. Here is one, in full,
-      annotated line by line.
+      Most teams write their charter on day one, from best practices, in one sitting. That charter is
+      a list of guesses: nobody can say what a line cost, so someone argues it away the first time it
+      is inconvenient. Nobody authors a good charter. Charters accrete, one incident at a time, and
+      every rule carries the date and the damage that put it there. Here is one, in full, annotated
+      line by line.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -673,14 +674,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch warn"></span>
         <div>
           <dt>The altitude</dt>
-          <dd>Sentence, check, or gate. Stated explicitly, and always the cheapest one that actually holds.</dd>
+          <dd>Sentence, check, or gate. The charter names it, and names the cheapest one that holds.</dd>
         </div>
       </div>
       <div class="signal">
         <span class="swatch pass"></span>
         <div>
           <dt>The expiry</dt>
-          <dd>When this gets reviewed for deletion. A rule that cannot expire is a rule nobody will ever remove.</dd>
+          <dd>When the team reviews this rule for deletion. A rule that cannot expire is a rule nobody will ever remove.</dd>
         </div>
       </div>
     </dl>
@@ -722,20 +723,20 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         Watch what happens to a day-one charter. It says "write clean, maintainable code" and "follow
-        existing patterns" and "add tests". Every line is true, none of it changes any behaviour,
-        because the model was already doing roughly that. Then a real problem arrives, somebody adds a
-        paragraph about it, and now the document is nine tenths ornament and one tenth load-bearing,
-        with no way to tell which is which from the inside.
+        existing patterns" and "add tests". Every line is true, and none of it changes any behaviour,
+        because the model was already close to that. Then a real problem arrives and somebody adds a
+        paragraph about it. Now the charter is nine tenths ornament and one tenth load-bearing, and
+        nobody inside can tell which is which.
       </p>
       <p>
         The alternative is uncomfortable and works: start with nothing, and add a rule only after
-        something has gone wrong. The resulting document is shorter, every line has a story, and when
-        someone proposes dropping one under deadline pressure there is an answer that is not an
+        something has gone wrong. The resulting charter is shorter, and every line has a story. Then
+        someone proposes dropping a rule under deadline pressure, and the answer is a cost, not an
         opinion.
       </p>
 
       <figure class="code">
-        <figcaption><span>two documents of the same length</span><span class="tag warn">only one survives a crunch</span></figcaption>
+        <figcaption><span>two charters of the same length</span><span class="tag warn">only one survives a crunch</span></figcaption>
 <pre><code><span class="c-dim">AUTHORED</span>
   "Prefer clear names."           <span class="c-block">← already true. costs nothing, does nothing</span>
   "Handle errors appropriately."  <span class="c-block">← unfalsifiable</span>
@@ -771,8 +772,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The whole charter, forty lines</h2>
         <p class="thesis">
-          A billing team, three years in, after roughly a dozen incidents. This is what is left after
-          the deletions.
+          A billing team, three years in, after roughly a dozen incidents. The deletions took
+          everything else.
         </p>
       </div>
     </div>
@@ -827,9 +828,9 @@ and ask. Do not pick the one that is easier to implement.
       </figure>
 
       <p>
-        Seven sections, six of them traceable to a specific bad day. Notice how much is absent: nothing
-        about style, nothing about naming, nothing about architecture, no instructions to be careful or
-        thorough. §5 is about why.
+        Seven sections, six of them traceable to a specific bad day. Notice how much is absent:
+        nothing about style, nothing about naming, nothing about architecture. No instruction to be
+        careful or thorough either. §5 is about why.
       </p>
     </div>
   </section>
@@ -876,15 +877,15 @@ then round half-up to cents. Never float on a money path.
         </li>
         <li data-signal="warn">
           <span class="when">The altitude</span>
-          <span class="what">One of <code>gate</code>, <code>check</code>, <code>human</code>, or <code>none</code>. Writing it down forces the question "is this actually enforced anywhere", which is uncomfortable roughly a third of the time.</span>
+          <span class="what">One of <code>gate</code>, <code>check</code>, <code>human</code>, or <code>none</code>. Writing it down forces the question "does anything enforce this rule", which is uncomfortable roughly a third of the time.</span>
         </li>
         <li data-signal="pass">
           <span class="when">The date and link</span>
-          <span class="what">Makes the rule auditable and makes §7 possible. Also tells a reader instantly whether this rule is from a world that still exists.</span>
+          <span class="what">Makes the rule auditable and makes §7 possible. Also tells a reader whether this rule is from a world that still exists.</span>
         </li>
         <li data-signal="block">
           <span class="when">The damage</span>
-          <span class="what">In money, customers, or hours. That cost is what wins the argument in a crunch, and it is the part that always gets dropped when people are in a hurry to write the rule.</span>
+          <span class="what">In money, customers, or hours. That cost wins the argument in a crunch. People always drop the cost when they are in a hurry to write the rule.</span>
         </li>
       </ol>
 
@@ -892,9 +893,9 @@ then round half-up to cents. Never float on a money path.
         <span class="label">Why "~$40/day" and not "a bug"</span>
         <p>
           Six months from now somebody will propose relaxing this rule because it is inconvenient in
-          one place. "It caused a bug" loses that argument. "It quietly cost forty dollars a day for
-          three weeks before anyone noticed" wins it, and more importantly it lets you lose the
-          argument correctly on the occasions when forty dollars a day is genuinely the right price.
+          one place. "It caused a bug" loses that argument. "It cost forty dollars a day for three
+          weeks before anyone noticed" wins it. That number also lets you lose the argument on the
+          occasions when forty dollars a day is genuinely the right price.
         </p>
       </div>
     </div>
@@ -913,8 +914,8 @@ then round half-up to cents. Never float on a money path.
       <div>
         <h2>Why these three are at three different altitudes</h2>
         <p class="thesis">
-          Same document, three enforcement strengths, and the choice is not about how much the team
-          cares. It is about what the failure is shaped like.
+          Same charter, three enforcement strengths, and the choice is not about how much the team
+          cares. The shape of the failure decides it.
         </p>
       </div>
     </div>
@@ -922,7 +923,7 @@ then round half-up to cents. Never float on a money path.
     <div class="rung-body">
       <div class="tablewrap">
         <table>
-          <caption>picking the cheapest altitude that actually holds</caption>
+          <caption>picking the cheapest altitude that holds</caption>
           <thead>
             <tr><th>Rule</th><th>Altitude</th><th>Why not lower</th><th>Why not higher</th></tr>
           </thead>
@@ -936,14 +937,14 @@ then round half-up to cents. Never float on a money path.
             <tr>
               <td>Only paths in the ticket</td>
               <td>check</td>
-              <td>Happens constantly; prose alone was ignored under deadline.</td>
-              <td>Legitimate exceptions exist, so a hard refusal would be routinely overridden, and a gate everyone overrides is worse than a check.</td>
+              <td>Happens constantly, and the team ignored prose alone under deadline.</td>
+              <td>Legitimate exceptions exist, so people would override a hard refusal. A gate everyone overrides is worse than a check.</td>
             </tr>
             <tr class="total">
               <td>Stop and ask when the ticket is wrong</td>
               <td>none</td>
               <td>Nothing lower than prose.</td>
-              <td>Not mechanically detectable. A gate here would be a lie. §4.</td>
+              <td>Nothing mechanical can detect it. A gate here would be a lie. §4.</td>
             </tr>
           </tbody>
         </table>
@@ -952,15 +953,15 @@ then round half-up to cents. Never float on a money path.
       <h3 class="sub">The rule for choosing</h3>
       <ul>
         <li><strong>Start at prose.</strong> Most rules never need to leave. Promotion costs engineering time and adds friction to every future change.</li>
-        <li><strong>Promote on evidence, not on fear.</strong> A rule earns a check when prose demonstrably failed, and a gate when the failure reached production. Both of those are facts you can point at, not predictions.</li>
-        <li><strong>Do not gate what has legitimate exceptions.</strong> A refusal that gets overridden weekly teaches everyone that refusals are negotiable, and it damages the gates that are not.</li>
+        <li><strong>Promote on evidence, not on fear.</strong> A rule earns a check after prose fails, and a gate after the failure reaches production. Both are facts you can point at, not predictions.</li>
+        <li><strong>Do not gate what has legitimate exceptions.</strong> A refusal that people override weekly teaches everyone that refusals are negotiable, and it damages the gates that are not.</li>
       </ul>
 
       <div class="takeaway">
         <span class="label">Demotion is a move too</span>
         <p>
-          A gate whose rule has become second nature can go back down to a check, or out entirely.
-          Almost nobody does this, which is why charters only grow. See
+          A gate whose rule has become second nature can go back down to a check, or out of the
+          charter. Almost nobody demotes a rule, which is why charters only grow. See
           <a href="/harness/">the demotion section</a> for the version of this argument that applies
           to harness code.
         </p>
@@ -982,44 +983,45 @@ then round half-up to cents. Never float on a money path.
         <h2>The most valuable rule is the one you cannot enforce</h2>
         <p class="thesis">
           "When the ticket and the code disagree about the rule, stop and ask." No gate can detect
-          this. It stays anyway, and it is the line that has prevented the most expensive failures.
+          that disagreement. It stays anyway, and it is the line that has prevented the most
+          expensive failures.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        INC-94 is worth telling in full because it is the failure mode that survives every mechanical
-        control on this page. A ticket asked for discount codes to apply to shipping. The code had a
-        rule, three years old and undocumented, that shipping is never discounted because of how the
-        carrier contract settles. The agent implemented the ticket. Every test passed, every gate
-        passed, review approved it, and the company spent five weeks under-billing carriers before
-        anyone connected the two.
+        INC-94 is worth telling in full, because it is the failure mode that survives every mechanical
+        control on this page. A ticket asked for discount codes to apply to shipping. But the code had
+        a three-year-old undocumented rule: the system never discounts shipping, because of how the
+        carrier contract settles. The agent implemented the ticket anyway. Every test passed, every
+        gate passed, and review approved it. Then the company spent five weeks under-billing carriers
+        before anyone connected the ticket and the rule.
       </p>
       <p>
-        No gate catches this. The change was correct with respect to the ticket, correct with respect
-        to the tests, and consistent with the codebase style. The only thing that catches it is
-        somebody noticing that two sources of truth disagree and stopping to ask which one is wrong.
-        That is the whole skill, and the exercises in this catalog exist to build it.
+        No gate catches that failure. The change matched the ticket, matched the tests, and matched the
+        codebase style. Only a person catches it, by noticing that two sources of truth disagree and
+        asking which one is wrong. That is the whole skill, and the exercises in this catalog exist to
+        build it.
       </p>
 
       <div class="callout">
         <span class="label">Do not delete the rules you cannot enforce</span>
         <p>
-          There is a tidy-minded instinct to strip a charter down to only the mechanically enforced
-          rules, on the grounds that the rest is decoration. Resist it. The unenforceable lines are
-          where the expensive failures live, precisely because they are the ones no gate is watching.
-          Marking them <code>none</code> is honest. Removing them is not.
+          A tidy-minded instinct says to cut every rule no gate enforces, because those lines look
+          like decoration. Resist that instinct anyway. The unenforceable lines are where the
+          expensive failures live, because no gate is watching them. So marking them
+          <code>none</code> is honest, and removing them is not.
         </p>
       </div>
 
       <div class="takeaway">
         <span class="label">What to do instead of enforcing it</span>
         <p>
-          Train for it. A rule marked <code>none</code> is a standing instruction to the humans, and
-          the way it gets installed is <a href="/reverse-review/">reverse-review</a> and
-          <a href="/junior-to-senior/">the workshop</a>, not a hook. Charter rules at the
-          <code>none</code> altitude should each point at how the team practises them.
+          Train for it. A rule marked <code>none</code> is a standing instruction to the humans. So
+          you install it with <a href="/reverse-review/">reverse-review</a> and
+          <a href="/junior-to-senior/">the workshop</a>, not with a hook. Every charter rule at the
+          <code>none</code> altitude should point at how the team practises it.
         </p>
       </div>
     </div>
@@ -1036,10 +1038,10 @@ then round half-up to cents. Never float on a money path.
         <span class="meter-label">Absent</span>
       </div>
       <div>
-        <h2>Six things deliberately not in there</h2>
+        <h2>Six things left out on purpose</h2>
         <p class="thesis">
-          A charter is defined by its omissions. Every line you add dilutes the ones that matter, so
-          the omissions have to be argued for as carefully as the inclusions.
+          The omissions define a charter. Every line you add dilutes the ones that matter, so argue
+          the omissions as hard as the inclusions.
         </p>
       </div>
     </div>
@@ -1048,36 +1050,37 @@ then round half-up to cents. Never float on a money path.
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Style</span>
-          <span class="what">Line length, quote style, import order. The formatter already does this deterministically and for free, so a charter rule here spends attention to duplicate a solved problem.</span>
+          <span class="what">Line length, quote style, import order. The formatter already fixes all three, the same way every time, for free. So a charter rule here spends attention on a solved problem.</span>
         </li>
         <li data-signal="block">
           <span class="when">Type-enforced facts</span>
-          <span class="what">"Always return a Result type." If the compiler enforces it, saying it again buys nothing and dates badly when the types change.</span>
+          <span class="what">"Always return a Result type." If the compiler enforces it, the charter line buys nothing. It also goes stale when the types change.</span>
         </li>
         <li data-signal="block">
           <span class="when">Generic virtue</span>
-          <span class="what">"Write clean, maintainable, well-documented code." Unfalsifiable, universally agreed, and changes no output. The most common filler in the genre.</span>
+          <span class="what">"Write clean, maintainable, well-documented code." Unfalsifiable, agreed by everyone, and changes no output. The most common filler in the genre.</span>
         </li>
         <li data-signal="block">
           <span class="when">Things done well already</span>
-          <span class="what">Instructions the model follows at a high rate unprompted. Measure before adding: if it is already at 95%, the rule is buying the last five points at the cost of diluting everything else.</span>
+          <span class="what">Instructions the model follows at a high rate unprompted. Measure it before adding. If the model is already at 95%, the rule buys the last five points and dilutes everything else.</span>
         </li>
         <li data-signal="block">
           <span class="when">Architecture essays</span>
-          <span class="what">Three paragraphs on the service topology. That is documentation, it belongs in the repo, and the agent can read it when the task calls for it. A charter is rules, not context.</span>
+          <span class="what">Three paragraphs on the service topology. Documentation belongs in the repo, and the agent can read it when the task calls for it. A charter is rules, not context.</span>
         </li>
         <li data-signal="block">
           <span class="when">Anything about tone</span>
-          <span class="what">How the agent should phrase things. Occasionally worth having, almost never worth the space it takes at the top of a document whose lower half is already weakly followed.</span>
+          <span class="what">How the agent should phrase things. Worth having now and then. Still, almost never worth space at the top of a charter whose lower half already gets weak compliance.</span>
         </li>
       </ol>
 
       <div class="callout">
         <span class="label">Ordering is a real effect, and a reason to stay short</span>
         <p>
-          Instructions near the top of a long document are followed more reliably than instructions near
-          the bottom. You can respond to that by carefully ordering a long charter, or by keeping it
-          short enough that ordering does not matter much. The second holds up better, because the first is a property of today's models that you would have to re-verify every time one changes.
+          The model follows instructions near the top of a long document better than instructions near
+          the bottom. You have two responses. So order a long charter with care, or keep it short
+          enough that order does not matter. The second holds up better, because the first depends on
+          today's models. Then you would have to re-verify it every time a model changes.
         </p>
       </div>
     </div>
@@ -1097,8 +1100,7 @@ then round half-up to cents. Never float on a money path.
         <h2>A fixed budget, because growth is the default</h2>
         <p class="thesis">
           Nothing in the ordinary operation of a team ever removes a charter rule. Without a hard
-          constraint the document grows monotonically until it stops working, and nobody can point at
-          the day it did.
+          constraint the charter only grows, until it stops working on a day nobody can name.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>rule</b> adding requires removing</span>
@@ -1110,15 +1112,16 @@ then round half-up to cents. Never float on a money path.
     <div class="rung-body">
       <p>
         The mechanism is one line at the top of the file: <em>adding a rule requires removing or
-        merging one</em>. It is crude, it is occasionally annoying, and nothing else reliably works, because it converts every addition into a comparison. Not "is this rule good"
-        but "is this rule better than the weakest rule currently in here", which is a question with an
+        merging one</em>. It is crude and annoying, and nothing else reliably works, because it turns
+        every addition into a comparison. The question stops being "is this rule good". It becomes
+        "is this rule better than the weakest rule in the charter", which is a question with an
         answer.
       </p>
 
       <h3 class="sub">Three ways to make room</h3>
       <ul>
-        <li><strong>Merge.</strong> Two rules about money handling become one rule about money handling. Usually possible and usually an improvement in clarity.</li>
-        <li><strong>Promote.</strong> Move the rule out of the prose and into a gate, then delete the prose. The constraint gets stronger and the document gets shorter, which is the best available trade.</li>
+        <li><strong>Merge.</strong> Two rules about money handling become one rule about money handling. Often possible, and often clearer.</li>
+        <li><strong>Promote.</strong> Move the rule out of the prose and into a gate, then delete the prose. The constraint gets stronger and the charter gets shorter, which is the best available trade.</li>
         <li><strong>Delete.</strong> The rule has not fired in a year, see §7.</li>
       </ul>
 
@@ -1126,7 +1129,7 @@ then round half-up to cents. Never float on a money path.
         <span class="label">Promotion is the move to reach for first</span>
         <p>
           A rule that becomes a check or a gate stops needing to be prose at all. The agent does not
-          have to remember it, the document gets a line shorter, and the constraint gets stronger.
+          have to remember it, the charter gets a line shorter, and the constraint gets stronger.
           <a href="/harness/">Promotion to the harness</a> is the same idea worked through five
           different mount points.
         </p>
@@ -1142,22 +1145,22 @@ then round half-up to cents. Never float on a money path.
         <div class="meter" role="img" aria-label="Deletion">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
-        <span class="meter-label">Annually</span>
+        <span class="meter-label">Once a year</span>
       </div>
       <div>
         <h2>Deletion day</h2>
         <p class="thesis">
-          One afternoon a year, with the audit trail open. The question for each rule is not "is this
-          still a good idea" but "when did this last do anything".
+          One afternoon a year, with the audit trail open. For each rule, the question is not "is this
+          still a good idea" but "when did it last do anything".
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        This is why <a href="/audit-trail/">the trail records passes as well as blocks</a>. A rule that
-        has never blocked anything is either perfectly internalised or completely dead, and those look
-        identical from the outside until you have the numbers.
+        Deletion day is why <a href="/audit-trail/">the trail records passes as well as blocks</a>. A
+        rule that has never blocked anything is either second nature or dead. Both look identical from
+        the outside until you have the numbers.
       </p>
 
       <div class="tablewrap">
@@ -1178,18 +1181,18 @@ then round half-up to cents. Never float on a money path.
 
       <p>
         Two judgement calls in that table are worth naming. A rule with four blocks in a year stays,
-        because the metric is not frequency but expected damage, and a double-charge event dwarfs a
-        hundred scope warnings. And a rule with a hundred and forty-seven blocks is not a success
-        story: something is systematically producing changes that violate it, and the rule is
-        absorbing a problem rather than solving it.
+        because the metric is expected damage, not frequency. So one double-charge event dwarfs a
+        hundred scope warnings. A rule with a hundred and forty-seven blocks is not a success story.
+        Something upstream keeps producing changes that violate it, so the rule absorbs a problem
+        instead of solving it.
       </p>
 
       <div class="callout">
         <span class="label">The deletion has to be someone's job</span>
         <p>
-          Additions happen naturally, because adding a rule is how a team demonstrates it took an
-          incident seriously. Deletion has no such motivation behind it and will not happen
-          spontaneously. Put a name and a date on it, or accept that the charter grows forever.
+          Additions happen on their own, because adding a rule is how a team shows the incident
+          mattered. Deletion has no such motivation behind it, so it never happens on its own. Put a
+          name and a date on it, or accept that the charter grows forever.
         </p>
       </div>
     </div>
@@ -1208,7 +1211,7 @@ then round half-up to cents. Never float on a money path.
       <div>
         <h2>Writing your first one: start empty</h2>
         <p class="thesis">
-          Genuinely empty, apart from the header that says how the file works.
+          Nothing but the header that says how the file works.
         </p>
       </div>
     </div>
@@ -1231,18 +1234,18 @@ then round half-up to cents. Never float on a money path.
 
       <p>
         It will not stay empty for long, and every line that arrives will have earned its place. Two
-        exceptions are reasonable on day one: a comprehension bar, because that one is a policy
-        decision rather than a lesson, and anything you are carrying over from a previous team with the
-        original incident still attached.
+        exceptions are reasonable on day one. A comprehension bar counts, because that rule is a
+        policy decision rather than a lesson. So does anything you carry over from a previous team,
+        with the original incident still attached.
       </p>
 
       <div class="takeaway">
         <span class="label">Where to start with an existing charter</span>
         <p>
-          Do not rewrite it. Go through it once and put a date and a cause on every line you can. The
-          lines where you cannot are your answer: some of them are load-bearing and merely
-          undocumented, and the rest are the ones to delete first. That exercise takes an hour and is
-          usually the most informative hour anyone has spent on the document.
+          Do not rewrite it. Instead, go through it once and put a date and a cause on every line you
+          can. The lines where you cannot are your answer. Some are load-bearing and undocumented, and
+          the rest are the ones to delete first. That exercise takes an hour, and it is often the most
+          informative hour anyone has spent on the charter.
         </p>
       </div>
     </div>

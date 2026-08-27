@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: reviewed 2026-08-27, kept impersonal by author decision">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cold Codebase · Ian Johnson</title>
@@ -666,14 +667,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>Where questions</dt>
-          <dd>"Where is discount logic handled?" The agent is genuinely excellent at these. Spend freely.</dd>
+          <dd>"Where is discount logic handled?" The agent is excellent at these. Spend most of the budget here.</dd>
         </div>
       </div>
       <div class="signal">
         <span class="swatch warn"></span>
         <div>
           <dt>What questions</dt>
-          <dd>"What does this function do?" Usually right, occasionally confidently wrong. Verify by reading after.</dd>
+          <dd>"What does this function do?" Right most of the time, and confident when wrong. Verify by reading after.</dd>
         </div>
       </div>
       <div class="signal">
@@ -722,20 +723,20 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        The old sequence was enforced by physics. To change a function you had to find it, and to find
-        it you had to learn the layout. To make the change compile you had to learn the types. To make
+        Physics enforced the old sequence. To change a function you had to find it, and to find it you
+        had to learn the layout. To make the change compile you had to learn the types. To make
         it pass you had to learn what the tests believed. None of that was a curriculum. It was the
         toll you paid on the way to your first merged change, and everybody paid it.
       </p>
       <p>
         The toll is now optional. An agent will locate the function, match the surrounding style,
-        satisfy the types, and get the suite green, in a system the person driving it could not draw on
-        a napkin. The change is often fine. The problem is what did not happen: no model got built, and
-        the second week starts from the same place as the first.
+        satisfy the types, and get the suite green. It does all of that work in a system the person
+        driving it could not draw on a napkin. The change often works, and the problem is what did not happen:
+        no model formed, so the second week starts where the first did.
       </p>
 
       <figure class="code">
-        <figcaption><span>the sequence that stopped being mandatory</span><span class="tag warn">what to restore deliberately</span></figcaption>
+        <figcaption><span>the sequence that stopped being mandatory</span><span class="tag warn">what to restore on purpose</span></figcaption>
 <pre><code><span class="c-dim">BEFORE</span>
   need to change X  ──▶  find X  ──▶  read around X  ──▶  <span class="c-pass">model forms</span>  ──▶  change X
                          <span class="c-dim">comprehension was the toll, and it was compulsory</span>
@@ -746,17 +747,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        This is not an argument for working without the agent. It is an argument that one specific
-        thing which used to be free now has to be bought on purpose, and that a week is a fair price
-        for a system you will work in for two years.
+        This is not an argument for working without the agent. The argument is narrower: comprehension
+        used to be free, and now you have to buy it on purpose. A week is a fair price for a system you
+        will work in for two years.
       </p>
 
       <div class="takeaway">
         <span class="label">The inversion this exercise runs on</span>
         <p>
-          For one week the agent is a comprehension instrument, not a production instrument. You are
-          allowed to ask it anything and not allowed to ship anything. That constraint is the entire
-          design.
+          For one week the agent is a comprehension instrument, not a production instrument. You may
+          ask it anything, and you may not ship anything. That constraint is the entire design.
         </p>
       </div>
     </div>
@@ -775,7 +775,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Three deliverables, one budget</h2>
         <p class="thesis">
-          Roughly ninety minutes a day. The rest of the week is whatever onboarding you already do.
+          About ninety minutes a day. The rest of the week is whatever onboarding you already do.
         </p>
         <div class="chips">
           <span class="chip kind-make"><b>deliver</b> one map</span>
@@ -813,10 +813,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">The one prohibition</span>
         <p>
-          No production changes this week. Not a typo fix, not a dependency bump, not the small ticket
-          somebody offers you on Wednesday to make you feel useful. The offer will come, it will be
-          kindly meant, and accepting it converts the week back into ordinary onboarding, where the
-          model does not get built.
+          No production changes this week. Not a typo fix, not a dependency bump, not the small
+          Wednesday ticket that makes you feel useful. The offer will come, and whoever makes it means
+          well, but if you accept it the week becomes ordinary onboarding and no model forms.
         </p>
       </div>
     </div>
@@ -835,22 +834,22 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Seams first, then exactly one trace</h2>
         <p class="thesis">
-          The instinct is to read the source tree. The source tree is organised for the people who
-          already have the model.
+          The instinct is to read the source tree. That tree serves the people who already have the
+          model.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        A system's shape is defined at its boundaries, not in its middle. Before opening any business
-        logic, answer two questions: where does data get in, and where does it get out. Everything
+        The boundaries define a system's shape, not the middle. Before opening any business logic,
+        answer two questions: where does data get in, and where does it get out. Everything
         between those is detail you can acquire later, and most of it you never will, correctly.
       </p>
 
       <h3 class="sub">The seams, in about twenty minutes</h3>
       <ul>
-        <li><strong>In:</strong> HTTP routes, queue consumers, scheduled jobs, CLI entry points, webhooks. Find the file where these are registered, because every system has one and it is the most informative file in the repo.</li>
+        <li><strong>In:</strong> HTTP routes, queue consumers, scheduled jobs, CLI entry points, webhooks. Find the file that registers them: every system has one, and it is the most informative file in the repo.</li>
         <li><strong>Out:</strong> the database client, the outbound HTTP client, the queue publisher, anything that sends mail or money. Grep for the client, not for the concept.</li>
         <li><strong>State:</strong> the schema, or the migrations directory. Table names are the closest thing most systems have to an honest domain glossary.</li>
       </ul>
@@ -858,16 +857,17 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="takeaway">
         <span class="label">Then: one trace, all the way down</span>
         <p>
-          Pick one real request or job with the host. Follow it from the entry point to the last write
-          it causes, reading every layer it passes through. One vertical slice beats a horizontal
-          survey of any single layer, because nothing else shows you how the layers actually relate rather than what the directory names claim.
+          Pick one real request or job with the host. Then follow it from the entry point to the last
+          write it causes, reading every layer it passes through. Following one trace beats a
+          horizontal survey of any single layer. Only the trace shows how the layers relate, rather
+          than what the directory names claim.
         </p>
       </div>
 
       <p>
         Choose the trace for centrality, not simplicity. The health check endpoint is easy and teaches
-        nothing. The thing the business would notice within ten minutes if it stopped is the right
-        pick, and the host should be choosing it on that basis in their fifteen minutes on Monday.
+        nothing. Instead, pick the thing the business would notice within ten minutes if it stopped.
+        The host chooses on that basis during their fifteen minutes on Monday.
       </p>
     </div>
   </section>
@@ -885,8 +885,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Draw it by hand, and draw it badly</h2>
         <p class="thesis">
-          A generated diagram lists everything. A model is mostly a decision about what to leave out,
-          and the leaving out is the part you have to do yourself.
+          A generated diagram lists everything. A model is a decision about what to leave out, and
+          that decision is yours to make.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>rule</b> one page, by hand</span>
@@ -915,7 +915,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="pass">
           <span class="when">Arrows</span>
-          <span class="what">Label every arrow with <em>what flows</em>, not with "uses". "order id" and "signed token" are labels. An unlabeled arrow, by contrast, means you have not actually followed it.</span>
+          <span class="what">Label every arrow with <em>what flows</em>, not with "uses". "order id" and "signed token" are labels. An unlabeled arrow, by contrast, means you have not followed it.</span>
         </li>
         <li data-signal="block">
           <span class="when">Question marks</span>
@@ -925,8 +925,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         Do not tidy it. A map with three crossings out and a question mark in the corner is doing its
-        job; a clean one drawn on the second attempt has usually had its uncertainty edited out, which
-        is the only information it contained that nobody else already had.
+        job. A clean second draft, by contrast, has often had its uncertainty edited out. That
+        uncertainty was the only thing on the page nobody else already had.
       </p>
     </div>
   </section>
@@ -953,8 +953,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         Twenty is arbitrary and the arbitrariness is fine; scarcity is the mechanism, not the number.
-        What matters far more is that the three kinds of question have wildly different reliability,
-        and treating them as one kind is how people end the week confidently misinformed.
+        The three kinds of question matter more than the count, because their reliability differs.
+        Treat them as one kind, and you end the week misinformed and confident about it.
       </p>
 
       <div class="tablewrap">
@@ -989,18 +989,18 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">Why the why questions are poison here</span>
         <p>
-          The agent will answer them, fluently, in the same register as the other two. But the reason a
-          particular thing is written a particular way is local and historical: an incident in March, a
-          contract clause, a database that used to be somewhere else. That information is in commit
-          messages, issues, and people. When the model supplies a plausible reason instead, you have
-          acquired a false belief that will feel like knowledge for months.
+          The agent will answer them, fluently, in the same register as the other two. But the reason
+          for a particular design is local and historical: an incident in March, a contract clause, a
+          database that moved. That information is in commit messages, issues, and people. When the
+          model supplies a plausible reason, you have acquired a false belief that will feel like
+          knowledge for months.
         </p>
       </div>
 
       <p>
         Spend the budget on the question marks from Tuesday, mostly on <em>where</em>. Then redraw the
-        map. The second map is the one you keep, and comparing it to the first is a useful thing to
-        show the host on Friday: it shows what you thought the system was on Tuesday.
+        map. Keep the second map. Show the host both maps on Friday: the first one records what you
+        thought the system was on Tuesday.
       </p>
     </div>
   </section>
@@ -1026,8 +1026,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        Write down one prediction about behavior, specific enough to be falsified, before running
-        anything. Then run it.
+        Before you run anything, write down one prediction about behavior, specific enough that the run
+        can prove it wrong. Then run it.
       </p>
 
       <figure class="code">
@@ -1052,18 +1052,18 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        Mark the line you are least sure about before running. That is the honest part of the exercise
-        and it is what makes the result informative either way: being right about the thing you flagged
-        as shaky is worth something, and being wrong about a line you were confident in is worth a
-        great deal more.
+        Mark the line you are least sure about before running. That mark is the honest part of the
+        exercise, and it makes the result informative either way. Being right about a line you flagged
+        as shaky is worth something. Being wrong about a line you were confident in is worth a great
+        deal more.
       </p>
 
       <div class="takeaway">
         <span class="label">Wrong is the good outcome</span>
         <p>
-          A claim that comes back entirely correct usually means it was too safe. The purpose is to
-          find the edge of the model on a Thursday in week one, in a scratch environment, rather than
-          in March in production.
+          A claim that comes back correct on every line was most likely too safe. The purpose is to
+          find the edge of the model on a Thursday in week one, in a scratch environment. The
+          alternative is March, in production.
         </p>
       </div>
     </div>
@@ -1091,33 +1091,33 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <h3 class="sub">Twenty minutes on the map</h3>
       <p>
-        Walk the host through it, then let them ask. The useful questions are all of one shape: point
-        at an arrow and ask what flows across it, point at a box and ask what happens when it fails.
-        Anything answered with "I think" gets circled, and circles are a fine result. The map is being
-        graded on whether it is honest, not on whether it is complete.
+        Walk the host through it, then let them ask. Their useful questions are all of one shape. Point
+        at an arrow and ask what flows across it. Point at a box and ask what happens when it fails.
+        Anything answered with "I think" gets circled, and circles are a fine result: the host grades
+        the map on honesty, not on completeness.
       </p>
 
       <h3 class="sub">Ten minutes on the gaps</h3>
       <p>
         Hand over the list of every question the codebase could not answer. Every "why is this like
-        this" with no answer in a comment, a commit message, an issue, or a charter rule.
+        this" with no answer in a comment, commit message, issue, or charter rule.
       </p>
 
       <div class="callout">
         <span class="label">This list is a depreciating asset</span>
         <p>
-          A new person is the only one who can see what is undocumented, and the ability lasts about
-          three weeks. After that the gaps become invisible, not because they were filled but because
-          the person stopped noticing them. Every engineer who joins and does not write this list down
-          is an audit of the codebase that was performed and then thrown away.
+          Only a new person can see what the documentation leaves out, and that ability lasts about
+          three weeks. After that the gaps become invisible, not because anybody filled them but
+          because the person stopped noticing. Every engineer who joins and does not write this list
+          down has audited the codebase and then thrown the audit away.
         </p>
       </div>
 
       <p>
         The host owes an answer or an admission on each item, that day. "Nobody knows, it predates all
-        of us" is a legitimate answer and should be written into the repo as exactly that, because the
-        next person will otherwise spend the same afternoon on it. This is where the exercise pays rent
-        back to the codebase rather than only consuming senior time.
+        of us" is a legitimate answer. Write it into the repo in exactly those words, or the next
+        person spends the same afternoon on it. This is where the exercise pays rent back to the
+        codebase rather than only consuming senior time.
       </p>
     </div>
   </section>
@@ -1147,9 +1147,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </p>
       <p>
         What survives the redraw is your model. What does not survive was a diagram you made, which is
-        a different thing that feels identical while you are holding it. Most people lose about a third
-        on the first attempt, and the third they lose is informative: it is usually the part they
-        copied from the agent rather than the part they traced by hand.
+        a different thing that feels identical while you hold it. Most people lose about a third on the
+        first attempt, and the lost third is informative. In most cases they copied it from the agent
+        instead of tracing it by hand.
       </p>
 
       <div class="takeaway">
@@ -1196,10 +1196,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">Why not the tour</span>
         <p>
-          The two-hour whiteboard walkthrough is the default, it feels generous, and almost none of it
-          is retained, because it arrives before there are any hooks to hang it on. The same two hours
-          spent on Friday, answering questions the person actually generated, lands completely
-          differently. Same information, same senior, opposite retention.
+          The two-hour whiteboard walkthrough is the default, and it feels generous. The listener keeps
+          almost none of it, because it arrives before there are any hooks to hang it on. The same two
+          hours on Friday, answering questions the person generated, stick. Same information, same
+          senior, opposite retention.
         </p>
       </div>
 
@@ -1208,12 +1208,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <li>
           <strong>No host.</strong> Use an open source repo and let the issue tracker be the oracle.
           Pick a closed bug, predict from your map which files the fix touched, then open the pull
-          request and see. It is a weaker exercise on gaps and a surprisingly good one on claims.
+          request and see. It is a weaker exercise on gaps and a strong one on claims.
         </li>
         <li>
           <strong>Two people, one system.</strong> Two new engineers, same trace, separate maps, no
-          comparing until Friday. Two honest maps of one system look substantially different, and
-          discovering that in week one is a durable lesson about what a map is.
+          comparing until Friday. Two honest maps of one system differ a lot, and discovering that
+          difference in week one is a durable lesson about what a map is.
         </li>
       </ul>
     </div>
@@ -1245,7 +1245,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">The tour</span>
-          <span class="what">A generous senior explains the architecture on Monday morning. Nothing sticks, and worse, the person now has borrowed vocabulary that hides which parts they cannot actually name.</span>
+          <span class="what">A generous senior explains the architecture on Monday morning. Nothing sticks, and worse, the person now has borrowed vocabulary that hides which parts they cannot name.</span>
         </li>
         <li data-signal="block">
           <span class="when">Breadth-first</span>
@@ -1261,16 +1261,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">The gap list nobody reads</span>
-          <span class="what">Collected on Friday, filed nowhere. Do this twice and people correctly stop writing it, and you have lost the only audit of your documentation you were ever going to get for free.</span>
+          <span class="what">Collected on Friday, filed nowhere. Ignore the list twice and people stop writing it, which is the correct response. You have lost the only free audit of your documentation.</span>
         </li>
       </ol>
 
       <div class="takeaway">
         <span class="label">Where to start</span>
         <p>
-          If you adopt one piece of this, adopt Monday: one trace, entry point to last write, followed
-          by hand. It is ninety minutes, it needs no host beyond picking the trace, and it produces
-          more usable model than the rest of the week combined.
+          If you adopt one piece of the week, adopt Monday: one trace, entry point to last write,
+          followed by hand. Monday takes ninety minutes and needs no host beyond picking the trace, yet
+          it produces more usable model than the rest of the week combined.
         </p>
       </div>
     </div>

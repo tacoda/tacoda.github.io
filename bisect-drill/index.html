@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: reviewed 2026-08-27, kept impersonal by author decision">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Bisect Drill · Ian Johnson</title>
@@ -643,10 +644,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>Two hundred commits. <em>One of them did it.</em></h1>
     <p class="standfirst">
       Reading a diff and hunting a regression are different skills, and only one of them has a weekly
-      exercise. Hunting is the one agents are worst at, because it is a search over observed states
-      rather than a text problem, and it is also the one that decays fastest in a codebase where most
-      of the history was written by something that is not on the team. Thirty minutes, one real
-      regression, a known answer, and the agent closed.
+      exercise. Agents are worst at hunting, because a hunt searches over states you must observe,
+      not over text. The skill also decays fastest in a codebase where nobody on the team typed most
+      of the history. Thirty minutes, one real regression, a known answer, and the agent closed.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -674,14 +674,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch warn"></span>
         <div>
           <dt>The search</dt>
-          <dd>Mechanical, logarithmic, and boring on purpose. A thousand commits is ten tests.</dd>
+          <dd>Mechanical, logarithmic, and boring on purpose. A thousand commits is just ten tests.</dd>
         </div>
       </div>
       <div class="signal">
         <span class="swatch block"></span>
         <div>
           <dt>The lie</dt>
-          <dd>Where bisect returns a confident, precise, wrong answer. Five of these, and they are the point of the drill.</dd>
+          <dd>Where bisect returns a confident, precise, wrong answer. Five of these lies, and they are the point of the drill.</dd>
         </div>
       </div>
     </dl>
@@ -723,21 +723,21 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         First, history got faster and less familiar. A team shipping agent-assisted changes produces
-        more commits, and a larger share of them were never typed by anyone who remembers them. The
-        old fallback for a regression, asking the person who wrote it, has a lower hit rate every
+        more commits. Fewer of those commits came from a person who still remembers writing them. So
+        the old fallback for a regression, asking whoever wrote it, has a lower hit rate every
         quarter.
       </p>
       <p>
         Second, debugging is the task language models are worst at, and the reason is structural
         rather than temporary. Writing code is generation. Finding a regression is a search over states
-        you have to actually observe: run it, look, narrow, run it again. A model asked where the bug
-        is will produce a confident, well-argued, plausible location, which is exactly the failure mode
-        it has everywhere else, except here you can burn an afternoon on it.
+        you have to observe: run it, look, narrow, run it again. Ask a model where the defect is, and
+        it produces a confident, well-argued, plausible location. That location is exactly the failure
+        mode it has everywhere else, but here it can cost you an afternoon.
       </p>
       <p>
         Third, and worst, the skill only gets practised during incidents. Nobody bisects for fun. So
-        the reps arrive at the least convenient possible moment, under time pressure, in front of an
-        audience, which is a poor classroom.
+        the reps arrive at the least convenient moment: under time pressure, in front of an audience.
+        An incident is a poor classroom.
       </p>
 
       <div class="takeaway">
@@ -777,23 +777,23 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="none">
           <span class="when">Before</span>
-          <span class="what">The dealer hands over one sentence of symptom and nothing else. Not the subsystem, not the suspected area, not how long it has been broken.</span>
+          <span class="what">The dealer hands over one sentence of symptom and nothing else. Not the subsystem, not the suspected area, not the age of the defect.</span>
         </li>
         <li data-signal="pass">
           <span class="when">0:00 → 0:08</span>
-          <span class="what"><strong>Reproduce.</strong> Get a command that fails reliably. This is the phase people skip and the one that decides whether the rest is real.</span>
+          <span class="what"><strong>Reproduce.</strong> Get a command that fails reliably. People skip this phase, and it decides whether the rest is real.</span>
         </li>
         <li data-signal="pass">
           <span class="when">0:08 → 0:13</span>
-          <span class="what"><strong>Bound.</strong> Find one commit where it is broken and one where it is not. Verify both by hand. Write the card (§3) before searching.</span>
+          <span class="what"><strong>Bound.</strong> Find one commit that fails and one that passes. Verify both ends by hand, then write the card (§3) before you search.</span>
         </li>
         <li data-signal="warn">
           <span class="when">0:13 → 0:22</span>
-          <span class="what"><strong>Search.</strong> Drive the bisect. This should be mechanical and slightly dull. If it is exciting, something has gone wrong.</span>
+          <span class="what"><strong>Search.</strong> Drive the bisect. The search should be mechanical and dull. If it is exciting, something has gone wrong.</span>
         </li>
         <li data-signal="block">
           <span class="when">0:22 → 0:27</span>
-          <span class="what"><strong>Confirm and classify.</strong> Test the found commit's parent explicitly. Then answer the question that carries the drill: did this commit <em>introduce</em> the defect or merely <em>reveal</em> it?</span>
+          <span class="what"><strong>Confirm and classify.</strong> Test the found commit's parent explicitly. Then answer the question the drill exists for: did this commit <em>introduce</em> the defect or only <em>reveal</em> it?</span>
         </li>
         <li data-signal="none">
           <span class="when">0:27 → 0:30</span>
@@ -804,10 +804,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">Eight minutes on the reproducer is a floor, not a budget</span>
         <p>
-          If there is no reliable reproducer at 0:08, stop the drill and spend the remaining time
-          building one. A hunt that begins with an unreliable reproducer will converge on a random
-          commit and report it with total confidence, which is a worse outcome than not finishing.
-          Learning to abort at this point is itself a result worth having.
+          If there is no reliable reproducer at 0:08, stop the drill and build one with the time
+          left. A hunt that starts from an unreliable reproducer converges on a random commit and
+          reports it with total confidence. That outcome is worse than not finishing, so learning to
+          abort at this point is itself a result worth having.
         </p>
       </div>
     </div>
@@ -835,11 +835,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <h3 class="sub">Method one · your own fixed regressions</h3>
       <p>
-        Find a commit in your history that fixed a real regression. Call it <code>F</code>. The hunt is
-        the range ending at <code>F^</code>, the commit just before the fix, and the answer is already
-        recorded in <code>F</code>'s message or its linked issue. Setup cost is close to zero, the
-        defect is genuinely shaped like your codebase's defects, and the debrief comes with a story
-        about what it actually cost the company.
+        Find a commit in your history that fixed a real regression. Call it <code>F</code>. Then the hunt
+        is the range ending at <code>F^</code>, the commit just before the fix. <code>F</code>'s own
+        message, or its linked issue, already records the answer. Setup cost is close to zero, and the defect has
+        the shape of your codebase's own defects. The debrief also comes with a story about what the
+        defect cost the company.
       </p>
 
       <figure class="code">
@@ -856,7 +856,7 @@ git -C /tmp/hunt-2026-08 checkout -B main F^
       <h3 class="sub">Method two · plant one in the past</h3>
       <p>
         When you have no suitable history, insert a defect behind two hundred commits of real work.
-        Branch at an old commit, add the defect, then replay everything since onto it.
+        Branch at an old commit, add the defect, then replay every later commit onto that branch.
       </p>
 
       <figure class="code">
@@ -872,17 +872,18 @@ git rebase --onto drill $OLD main</code></pre>
       </figure>
 
       <p>
-        Pick a file that later commits rarely touch, or the rebase will fight you. The seeding rules
-        from <a href="/mentors-playbook/">the mentor's playbook</a> apply unchanged: one defect, it must
-        survive the suite, and the correct version should be a line or two away from the wrong one.
+        Pick a file that later commits almost never touch, or the rebase will fight you. The seeding
+        rules from <a href="/mentors-playbook/">the mentor's playbook</a> apply unchanged: one defect,
+        and it must survive the suite. The correct version should also sit a line or two away from the
+        wrong one.
       </p>
 
       <div class="callout">
         <span class="label">One dealer rule above all</span>
         <p>
-          Never say how far back it goes. The moment the hunter knows the range is two hundred commits
-          rather than two thousand, they start reasoning about which commits look suspicious, and
-          bisect exists precisely so that nobody has to do that.
+          Never say how far back it goes. A hunter who knows the range is two hundred commits, not two
+          thousand, starts reasoning about which commits look suspicious. Bisect exists precisely so
+          that nobody has to do that reasoning.
         </p>
       </div>
     </div>
@@ -926,22 +927,22 @@ TRIPWIRES    if the answer is a merge commit, I will ______
       </figure>
 
       <p>
-        The verified line at the top is the one that does the work. Five runs on the bad commit and
-        five on the good one, before anything else, because a reproducer that fails four times out of
-        five will still produce an answer and there is no way to tell that answer from a real one
-        afterwards.
+        The verified line at the top is the one that does the work. Do five runs on the bad commit and
+        five on the good one, before anything else. A reproducer that fails four times out of five
+        still produces an answer, and nothing afterwards tells that answer apart from a real one.
       </p>
       <p>
-        The tripwires exist because all three of those results mean "your bound or your reproducer is
-        wrong", and in the moment every one of them gets rationalised instead. Writing down the
-        response in advance is what makes it survive contact with a plausible story.
+        The tripwires exist because all three of those results mean one thing: your bound or your
+        reproducer is wrong. In the moment, a hunter rationalises every one of them instead. Writing
+        down the response in advance is what makes it survive contact with a plausible story.
       </p>
 
       <div class="takeaway">
         <span class="label">The step count is the honest bit</span>
         <p>
-          Two hundred commits is eight tests. A thousand is ten. Writing the number down before you
-          start converts the search from a feeling about progress into an arithmetic fact, and it is what tells you soonest that you have stopped bisecting and started guessing.
+          Two hundred commits is eight tests. A thousand is just ten. Write the number down before you
+          start, and the search becomes an arithmetic fact instead of a feeling about progress. That
+          fact is also the earliest warning that you have stopped bisecting and started guessing.
         </p>
       </div>
     </div>
@@ -968,15 +969,16 @@ TRIPWIRES    if the answer is a merge commit, I will ______
 
     <div class="rung-body">
       <p>
-        The bad end is usually easy: it is broken now, that is why you are here. The good end is where
-        people guess. "It worked in the 2.3 release" is a memory, and memories about software behavior
-        from three months ago are not evidence. Check out the tag, run the reproducer, watch it pass.
-        Then it is a bound.
+        The bad end is usually easy: the code fails now, and that failure is why you are here. The good end is
+        where people guess. "It worked in the 2.3 release" is a memory, and a memory about software
+        behavior from three months ago is not evidence. Check out the tag, run the reproducer, watch it
+        pass. Then it is a bound.
       </p>
       <p>
-        If the reproducer fails at the supposed good end too, that is not a setback, it is the most
-        informative thing that has happened all session: the defect is older than you thought, and
-        every theory anyone has offered so far was about the wrong window. Widen and re-verify.
+        If the reproducer fails at the supposed good end too, that failure is not a setback. Instead,
+        it is the most informative result of the session: the defect is older than you thought. Every
+        theory anyone has offered so far was about the wrong window, so widen the bound and verify it
+        again.
       </p>
 
       <figure class="code">
@@ -994,8 +996,8 @@ git bisect reset              <span class="c-dim"># when done, always</span></co
       <p>
         Two commands worth knowing before you need them. <code>git bisect log</code> prints the
         session so far, and <code>git bisect replay &lt;file&gt;</code> re-runs a logged session. Together
-        they mean a misclassified step at position four is a thirty-second recovery rather than a
-        restart: dump the log, edit out the bad line, replay.
+        they turn a misclassified step at position four into a thirty-second recovery rather than a
+        restart. Dump the log, edit out the bad line, then replay it.
       </p>
     </div>
   </section>
@@ -1038,19 +1040,19 @@ exit 1                              <span class="c-block"># bad</span></code></p
             <tr><th>Exit</th><th>Means</th><th>Use it when</th></tr>
           </thead>
           <tbody>
-            <tr><td>0</td><td>good</td><td>The reproducer passes at this revision.</td></tr>
-            <tr><td>1 – 127, not 125</td><td>bad</td><td>The reproducer fails at this revision.</td></tr>
-            <tr class="flag"><td>125</td><td>skip</td><td>Cannot be tested here: won't build, missing dependency, unrelated breakage.</td></tr>
+            <tr><td>0</td><td>good</td><td>The reproducer passes at this commit.</td></tr>
+            <tr><td>1 – 127, not 125</td><td>bad</td><td>The reproducer fails at this commit.</td></tr>
+            <tr class="flag"><td>125</td><td>skip</td><td>Bisect cannot test this commit: no build, missing dependency, unrelated breakage.</td></tr>
             <tr><td>128 and up</td><td>abort</td><td>Something is wrong with the harness itself. Stop the bisect.</td></tr>
           </tbody>
         </table>
       </div>
 
       <p>
-        Keeping the script outside the working tree is not fussiness. Bisect checks out old revisions,
-        and a script living in the repo will be replaced or deleted underneath you the moment you cross
-        the commit that introduced it. Every bisect that mysteriously dies halfway has usually
-        rediscovered this.
+        Keeping the script outside the working tree is not fussiness. Bisect checks out old commits, so
+        it replaces or deletes any script that lives in the repo. That script disappears the moment you
+        cross the commit that introduced it. A bisect that dies halfway for no clear reason has often
+        rediscovered that fact.
       </p>
 
       <figure class="code">
@@ -1062,10 +1064,11 @@ git bisect run /tmp/check.sh</code></pre>
       <div class="callout">
         <span class="label">The 125 discipline</span>
         <p>
-          Marking an unbuildable revision as bad is the single most effective way to get a wrong
-          answer that looks right. The commit that fails to compile has nothing to do with your
-          regression, and calling it bad tells git the transition happened before it. Skip is not a
-          weaker answer than bad. It is the true one.
+          Marking an unbuildable commit as bad produces a wrong answer that looks right. No other
+          mistake in a bisect does it so often. The commit that fails to compile has nothing to do with
+          your regression. Calling it
+          bad tells git the transition happened before that commit, so skip is not a weaker answer than
+          bad, but the true one.
         </p>
       </div>
     </div>
@@ -1093,9 +1096,9 @@ git bisect run /tmp/check.sh</code></pre>
 
     <div class="rung-body">
       <p>
-        Run it manually, marking each checkout <code>git bisect good</code> or <code>git bisect
-        bad</code> yourself. The risk shifts from automation to consistency: you must apply the same
-        judgment at step seven, twenty minutes in, that you applied at step one. Write the criterion
+        Run the bisect by hand, and mark each checkout <code>git bisect good</code> or <code>git bisect
+        bad</code> yourself. The risk shifts from automation to consistency, because step seven, twenty
+        minutes in, needs the same judgment as step one. Write the criterion
         down before starting, in one sentence, and reread it at every step. "Total on the summary row
         differs from the sum of the line items" is a criterion. "Looks wrong" is not, and it will drift
         without you noticing.
@@ -1104,21 +1107,21 @@ git bisect run /tmp/check.sh</code></pre>
       <h3 class="sub">Three practical adjustments</h3>
       <ul>
         <li>
-          <strong>Rename the terms.</strong> When the thing you are hunting is not a bug (when did this
-          get slow, when did this start passing) the good and bad vocabulary actively confuses.
-          <code>git bisect start --term-old=fast --term-new=slow</code> lets you mark revisions in
-          words that match the question.
+          <strong>Rename the terms.</strong> When you hunt something that is not a defect, the good and
+          bad vocabulary confuses you. Ask when did this get slow, or when did this start passing, and
+          neither word fits. <code>git bisect start --term-old=fast --term-new=slow</code> lets you mark
+          commits in words that match the question.
         </li>
         <li>
           <strong>Threshold before you look.</strong> For performance, pick the number first. "Over 400ms
-          is slow" decided in advance beats a judgment made while watching, which will quietly track
+          is slow", decided in advance, beats a judgment you make while watching. That judgment tracks
           your expectation of where the answer is.
         </li>
         <li>
           <strong>Consider first-parent.</strong> In a merge-heavy history,
-          <code>git bisect start --first-parent</code> searches only the mainline, which lands you on a
-          merge commit rather than a commit inside a branch. Coarser and often faster, and you can
-          bisect inside the guilty merge afterwards.
+          <code>git bisect start --first-parent</code> searches only the mainline. You land on a merge
+          commit rather than on a commit inside a branch. Coarser and often faster, and you can
+          bisect inside that merge afterwards.
         </li>
       </ul>
     </div>
@@ -1137,8 +1140,8 @@ git bisect run /tmp/check.sh</code></pre>
       <div>
         <h2>Five ways a bisect returns a confident wrong answer</h2>
         <p class="thesis">
-          Bisect is a proof procedure with preconditions. When they do not hold it does not fail
-          loudly, it hands you a specific commit hash and a plausible story.
+          Bisect is a proof procedure with preconditions. When those preconditions do not hold, bisect
+          does not fail. It hands you a specific commit hash and a plausible story.
         </p>
       </div>
     </div>
@@ -1147,23 +1150,23 @@ git bisect run /tmp/check.sh</code></pre>
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Flaky</span>
-          <span class="what">The reproducer is intermittent. Bisect converges on whichever commit happened to sit where the coin landed, and the result is indistinguishable from a real one. <strong>Counter:</strong> the 5/5 and 0/5 check on the card, before step one.</span>
+          <span class="what">The reproducer is intermittent. Bisect converges on whichever commit the flaky run happened to fail at. That result looks exactly like a real one. <strong>Counter:</strong> the 5/5 and 0/5 check on the card, before step one.</span>
         </li>
         <li data-signal="block">
           <span class="when">Reveals ≠ introduces</span>
-          <span class="what">The defect sat latent for a year; the commit bisect names is the one that started calling it. The answer is <em>correct</em> and points at an innocent change. <strong>Counter:</strong> read the found commit and ask whether it created the wrong behavior or exposed it. This is the drill's central question, and §8 scores it.</span>
+          <span class="what">The defect sat latent for a year; the commit bisect names is the one that started calling it. The answer is <em>correct</em> and points at an innocent change. <strong>Counter:</strong> read the found commit and ask whether it created the wrong behavior or exposed it. That question is the centre of the drill, and §8 scores it.</span>
         </li>
         <li data-signal="block">
           <span class="when">Poisoned by skip</span>
-          <span class="what">Unbuildable or unrelated-broken revisions marked bad instead of skipped. The search is then bounded by a lie and converges early. <strong>Counter:</strong> exit 125, always, no exceptions for "it's probably fine".</span>
+          <span class="what">Unbuildable or unrelated-broken commits marked bad instead of skipped. A lie then bounds the search, and it converges early. <strong>Counter:</strong> exit 125, always, no exceptions for "it's probably fine".</span>
         </li>
         <li data-signal="block">
           <span class="when">Non-monotone</span>
-          <span class="what">The bug was introduced, fixed, then reintroduced. Bisect assumes exactly one transition and will return <em>a</em> transition, not the one you want. <strong>Counter:</strong> after converging, test the found commit's parent explicitly, and be suspicious when the found commit looks unrelated to the symptom.</span>
+          <span class="what">Someone introduced the defect, fixed it, then reintroduced it. Bisect assumes exactly one transition and will return <em>a</em> transition, not the one you want. <strong>Counter:</strong> after converging, test the found commit's parent explicitly, and be suspicious when the found commit looks unrelated to the symptom.</span>
         </li>
         <li data-signal="block">
           <span class="when">Environment drift</span>
-          <span class="what">Old revisions fail for reasons that have nothing to do with the code: an expired fixture, a dependency yanked from the registry, a lockfile your toolchain no longer accepts. <strong>Counter:</strong> notice that the failure mode at old revisions differs from the symptom you are hunting. Different failure, different cause, skip it.</span>
+          <span class="what">Old commits fail for reasons that have nothing to do with the code. Three examples: an expired fixture, a dependency yanked from the registry, a lockfile your toolchain no longer accepts. <strong>Counter:</strong> notice that the failure mode at old commits differs from the symptom you are hunting. Different failure, different cause, skip it.</span>
         </li>
       </ol>
 
@@ -1171,9 +1174,9 @@ git bisect run /tmp/check.sh</code></pre>
         <span class="label">The one to internalise</span>
         <p>
           Bisect answers "where did the behavior change", which is not the same question as "where is
-          the defect". Most of the time they coincide. The times they do not are the times the hunt is
-          worth doing well, and a hunter who cannot tell the two apart will fix the wrong file with
-          great confidence.
+          the defect". Most of the time they coincide. But the times they do not coincide are the times
+          the hunt is worth doing well. A hunter who cannot tell the two questions apart will fix the
+          wrong file with great confidence.
         </p>
       </div>
     </div>
@@ -1192,7 +1195,7 @@ git bisect run /tmp/check.sh</code></pre>
       <div>
         <h2>Score the hunt, not the answer</h2>
         <p class="thesis">
-          Deliberately the same shape as the reverse-review rubric, so a team running both is not
+          The same shape as the reverse-review rubric, on purpose, so a team running both is not
           learning two grading systems.
         </p>
       </div>
@@ -1209,7 +1212,7 @@ git bisect run /tmp/check.sh</code></pre>
             <tr>
               <td>Bounded</td>
               <td>Both ends verified by hand, reproducer checked 5/5 and 0/5, before searching.</td>
-              <td>The good end was assumed. Costs the whole hunt roughly half the time.</td>
+              <td>The hunter assumed the good end. Costs the whole hunt roughly half the time.</td>
             </tr>
             <tr>
               <td>Converged</td>
@@ -1219,7 +1222,7 @@ git bisect run /tmp/check.sh</code></pre>
             <tr>
               <td>Distinguished</td>
               <td>Said whether the commit introduced the defect or revealed it, and gave the reason.</td>
-              <td>Stopped at "this commit is the bug".</td>
+              <td>Stopped at "this commit is the defect".</td>
             </tr>
             <tr class="total">
               <td>Explained</td>
@@ -1233,16 +1236,16 @@ git bisect run /tmp/check.sh</code></pre>
       <p>
         As with reverse-review, the total is not the interesting number. Losing <em>bounded</em>
         repeatedly is a discipline problem with an easy fix. Losing <em>distinguished</em> repeatedly
-        is a much deeper thing: it means the hunter is treating a search result as a diagnosis, and
-        that habit survives into every incident they will ever run.
+        is a much deeper thing, because the hunter is treating a search result as a diagnosis. That
+        habit survives into every incident they will ever run.
       </p>
 
       <div class="callout">
         <span class="label">Finding it fast is not the goal</span>
         <p>
-          A hunter who converges in six minutes by guessing correctly scores worse than one who takes
-          twenty-five and can say why every step was where it was. Guessing works often enough to be
-          reinforced and it does not scale to the hunt that actually matters.
+          A hunter who guesses right and converges in six minutes scores worse than one who takes
+          twenty-five. The slower hunter can say why every step was where it was. Guessing works often
+          enough to reinforce itself, and it does not scale to the hunt that matters.
         </p>
       </div>
     </div>
@@ -1261,8 +1264,8 @@ git bisect run /tmp/check.sh</code></pre>
       <div>
         <h2>Why the drill bans the agent and the incident should not</h2>
         <p class="thesis">
-          The ban is a training decision, not a position on tooling. Stating that plainly matters,
-          because the dogmatic version of this page would be wrong.
+          The ban is a training decision, not a position on tooling. Saying so matters, because the
+          dogmatic version of this page would be wrong.
         </p>
       </div>
     </div>
@@ -1270,9 +1273,9 @@ git bisect run /tmp/check.sh</code></pre>
     <div class="rung-body">
       <p>
         You do arithmetic without a calculator while learning arithmetic, and with one for the rest of
-        your life. The drill closes the agent for thirty minutes a month because an agent will happily
-        run the whole search and hand back an answer, and a rep you did not perform is not a rep. In a
-        real incident, use everything you have.
+        your life. The drill closes the agent for thirty minutes a month, because an agent will run the
+        whole search and hand back an answer. A rep you did not perform is not a rep. In a real
+        incident, use everything you have.
       </p>
 
       <div class="tablewrap">
@@ -1291,10 +1294,10 @@ git bisect run /tmp/check.sh</code></pre>
       </div>
 
       <p>
-        Every item in the right-hand column is a judgment about evidence you have personally observed,
-        and every one of them is what the drill trains. That is the actual argument for the exercise:
-        not that agents are bad at hunting, though they are, but that the parts you will still be
-        supplying are the parts nobody practises.
+        Every item in the right-hand column is a judgment about evidence you observed yourself, and the
+        drill trains every one of them. The argument for the exercise is not that agents are bad at
+        hunting, though they are. The real point is that the parts you still supply are the parts
+        nobody practises.
       </p>
 
       <div class="takeaway">

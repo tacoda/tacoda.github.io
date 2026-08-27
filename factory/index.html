@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: reviewed 2026-08-27, kept impersonal by author decision">
   <meta name="voice-subject" content="third-party">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -668,17 +669,17 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>A harness by definition, a factory by operation, <em>a queue by design</em></h1>
     <p class="standfirst">
-      A <em>lights-on factory</em>: it takes a tracker card and returns a merged pull request, and
-      the lights are on in two distinct senses. Governance gates raise a decision to a human
-      <em>before</em> an action is taken, and observability and provenance record what happened
+      A <em>lights-on factory</em>: it takes a tracker card and returns a merged pull request. The
+      lights are on in two distinct senses. Gates raise a decision to a human
+      <em>before</em> the factory acts. Then observability and provenance record what happened
       <em>after</em> it. Autonomy is a separate dial. It is about 5,300 lines of Python:
       three runtime dependencies, one model dependency, sixteen job handlers, seven seams, 193 tests.
       Nothing in it knows what the code it delivers is <em>for</em>. No product vocabulary, no
       business rules, no domain types. That absence is a design property, not an omission: the
-      factory is the machinery, and everything domain-specific lives in the target repo's charter,
-      where it can be authored and changed without touching the engine. The five rungs below ascend
-      the way the system was actually built: one dependency, one pure function, one durable queue,
-      one writer per card, one lit loop.
+      factory is the machinery. Everything domain-specific lives in the target repo's charter,
+      where its owners change it. The five rungs below
+      ascend in build order: one dependency, one pure function, one durable queue, one writer per
+      card, one lit loop.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -705,7 +706,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch block"></span>
         <div>
           <dt>Model turn</dt>
-          <dd>The expensive, non-deterministic move. Spent only where inference is required.</dd>
+          <dd>The expensive, non-deterministic move. Spent only where the work needs inference.</dd>
         </div>
       </div>
       <div class="signal">
@@ -741,8 +742,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The smallest model dependency that does the job</h2>
         <p class="thesis">
-          This harness reaches for exactly one library to run an agent: the Claude Agent SDK. Not because frameworks are bad, but because the SDK <em>is</em> Claude Code, and Claude Code is
-          already the harness this shop prefers. Point it at a directory and the target repo's
+          This harness reaches for exactly one library to run an agent: the Claude Agent SDK. Not because frameworks are bad, but because the SDK <em>is</em> Claude Code, the harness
+          this shop already prefers. Point it at a directory and the target repo's
           charter, hooks, skills and MCP servers load natively. Everything a framework would add on
           top is either already there or not needed yet.
         </p>
@@ -779,11 +780,14 @@ agent = [<span class="c-pass">"claude-agent-sdk&gt;=0.1"</span>, "anthropic&gt;=
       </figure>
 
       <p>
-        The reason one dependency is enough is that the SDK is not a thin HTTP client. It runs Claude Code in-process. Pointed at <code>cwd=&lt;the task's worktree&gt;</code>, it loads
+        One dependency is enough because the SDK is not a thin HTTP client: it runs Claude Code
+        in-process. Point it at <code>cwd=&lt;the task's worktree&gt;</code> and it loads
         that repo's <code>CLAUDE.md</code>, its glob-scoped <code>.claude/rules</code>, its skills,
-        its <code>.mcp.json</code> servers and its <code>settings.json</code> hooks, natively, with no reproduction on the harness side. A framework-based harness has to rebuild all of that:
-        context assembly, tool definitions, permission modes, hook dispatch. Here the harness
-        injects only the one layer Claude cannot know about (cross-repo governance policy) and gets the rest for free.
+        its <code>.mcp.json</code> servers and its <code>settings.json</code> hooks. It loads them
+        natively, so the harness reproduces none of it. A framework-based harness has to rebuild all
+        of that: context assembly, tool definitions, permission modes, hook dispatch. This harness
+        injects only the one layer Claude cannot know about, cross-repo governance policy, and gets
+        the rest free.
       </p>
 
       <figure class="code">
@@ -809,10 +813,11 @@ class ModelProvider(ABC):
 
       <h3 class="sub">Subscription auth, and why it decides the architecture</h3>
       <p>
-        One provider covers both auth modes, and the default is the interesting one. If an API key
-        is configured it is passed through to the SDK; if it is not, the SDK falls back to the
-        <code>claude</code> CLI's own ambient authentication: the subscription already being paid for. No token to mint, rotate, scope or leak, and no per-token invoice for a factory whose
-        normal state is four long agent turns running at once.
+        One provider covers both auth modes, and the default is the interesting one. Configure an
+        API key and the provider passes it through to the SDK. Leave it unset and the SDK falls back
+        to ambient <code>claude</code> CLI authentication: the subscription this shop
+        already pays for. That removes the token to mint, rotate, scope or leak. It also removes the
+        per-token invoice for a factory whose normal state is four long agent turns at once.
       </p>
 
       <figure class="code">
@@ -836,10 +841,10 @@ return ClaudeAgentOptions(system_prompt={"type": "preset", "preset": "claude_cod
       </figure>
 
       <p>
-        Cost is still measured. The SDK's terminal <code>ResultMessage</code> carries
+        The harness still measures cost. The SDK's terminal <code>ResultMessage</code> carries
         <code>total_cost_usd</code> and a token count, so every job records what the turn would have
-        cost whether or not anything was metered, which is what makes the per-card price in rung 5
-        possible without an invoice.
+        cost. That record holds whether or not the vendor metered anything. So rung 5 can price a
+        card without an invoice.
       </p>
 
       <aside class="aside">
@@ -847,7 +852,7 @@ return ClaudeAgentOptions(system_prompt={"type": "preset", "preset": "claude_cod
         <p>
           "Drive a stock coding-agent harness from code, on the subscription you already pay for" is
           not a single-vendor trick. Two other vendors ship the same shape: an official SDK that
-          spawns and drives their own CLI, reusing the login that CLI already stored. Two more get
+          drives their own CLI, reusing the login it already stored. Two more get
           part of the way. The differences are worth knowing before you pick, because they are
           differences in <em>credential</em>, not in capability.
         </p>
@@ -895,19 +900,19 @@ return ClaudeAgentOptions(system_prompt={"type": "preset", "preset": "claude_cod
 
         <p>
           Two caveats matter more than the comparison. Vendor terms differ and they move, so read the
-          current ones for whichever you pick instead of inheriting an assumption from a blog post.
-          And the frameworks do none of this: LangChain, LangGraph, deepagents and Pydantic AI all
-          authenticate with a provider API key, and every subscription-shaped adapter for them is
-          community glue. Subscription auth is a property of the vendor's own CLI-driving SDK, which is a second, independent reason the seam here wraps one of those.
+          current ones for whichever you pick. Do not inherit an assumption from a blog post.
+          And the frameworks do none of this. LangChain, LangGraph, deepagents and Pydantic AI all
+          authenticate with a provider API key. So every subscription-shaped adapter for them is
+          community glue. Subscription auth is a property of the vendor's own CLI-driving SDK. That property is a second, independent reason the seam here wraps one of those.
         </p>
 
         <h3 class="sub">The suggestion: make the harness a port, not a choice</h3>
         <p>
-          If several stock harnesses can be embedded, then "which coding agent runs the turn" is
-          exactly the kind of decision that belongs behind a port. The factory already has the port: <code>ModelProvider</code>, thirty lines, written before there was a second implementation
-          to justify it. An adapter per harness is the natural next move, and each adapter's job is
-          narrow: run one turn in a working directory, stream progress lines, come back with text,
-          tokens, cost and optional structured data.
+          Several stock harnesses accept embedding, so "which coding agent runs the turn" belongs
+          behind a port. The factory already has the port: <code>ModelProvider</code>, thirty lines, written before there was a second implementation
+          to justify it. An adapter per harness is the natural next move. Each adapter's job is
+          narrow. It runs one turn in a working directory, streams progress lines, and returns
+          text, tokens, cost and optional structured data.
         </p>
 
         <figure class="code">
@@ -922,29 +927,31 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
         </figure>
 
         <p>
-          What each adapter absorbs is the part that is genuinely vendor-shaped: the stream event
-          types, how structured output is coaxed out and validated, how tool policy is expressed, and
-          which auth mode is in play. What none of them touch is the queue, the reconciler, the pure
-          derive function, the worktree isolation or the oversight dial, none of which have any opinion about which agent did the work. That is the payoff of putting the seam in early:
-          the factory becomes harness-agnostic without a rewrite, and adding a vendor is one class
-          plus its mock, not a migration.
+          Each adapter absorbs the genuinely vendor-shaped part: the stream event types, plus how it
+          coaxes out and validates structured output. It also absorbs how that harness
+          expresses tool policy and which auth mode is in play. None of them touch the queue, the
+          reconciler, the pure derive function, the worktree isolation or the oversight dial. None of
+          those five holds any opinion about which agent did the work. That is the payoff of putting
+          the seam in early. The factory becomes harness-agnostic without a rewrite, and adding a
+          vendor is one class plus its mock, not a migration.
         </p>
 
         <p>
           It is also the honest way to hedge a fast-moving decision. Vendors change their auth
-          posture, their pricing and their SDK surface on their own schedule; a port converts each of
-          those from an incident into an adapter edit. And a second adapter buys something
-          immediately, before any vendor changes anything. The same interface, implemented as a stub,
-          is what lets this system's whole delivery loop run in 193 tests with no model, no network
-          and no spend.
+          posture, their pricing and their SDK surface on their own schedule. A port converts each of
+          those changes from an incident into an adapter edit. And a second adapter buys something
+          immediately, before any vendor changes anything. Implement it as a stub and the whole
+          delivery loop runs in 193 tests: no model, no network, no spend.
         </p>
       </aside>
 
       <h3 class="sub">When to reach past the SDK</h3>
       <p>
         This is a threshold, not a preference. The SDK is the right tool while the flow you need is
-        the flow a stock harness already runs. The moment you need something a stock harness cannot give you, a genuinely custom control flow or the ability to swap the model underneath, that is when a framework earns its place, and Pydantic AI, LangChain, LangGraph and
-        deepagents are the right answers to that question.
+        the flow a stock harness already runs. A framework earns its place the moment you need
+        something a stock harness cannot give you. Two cases qualify: a genuinely custom control
+        flow, or the ability to swap the model underneath. Pydantic AI, LangChain, LangGraph and
+        deepagents are the right answers to that need.
       </p>
 
       <ol class="sequence">
@@ -958,7 +965,7 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
         </li>
         <li data-signal="warn">
           <span class="when">Custom flow</span>
-          <span class="what">A control flow no stock harness will run for you: a graph with joins and conditional fan-in, per-node memory policies, a human-approval node mid-graph, cross-process resumption of a partial graph. <strong>Reach for the framework.</strong></span>
+          <span class="what">A control flow no stock harness will run for you. Four shapes qualify: a graph with joins and conditional fan-in, per-node memory policies, a human-approval node mid-graph, cross-process resumption of a partial graph. <strong>Reach for the framework.</strong></span>
         </li>
         <li data-signal="warn">
           <span class="when">Model choice</span>
@@ -966,7 +973,7 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
         </li>
         <li data-signal="block">
           <span class="when">Not yet</span>
-          <span class="what">Neither threshold has been hit here, so neither dependency exists here. If one arrives, the change is one class behind <code>ModelProvider</code>, which is the whole reason the seam was written before it was needed.</span>
+          <span class="what">Neither threshold has arrived here, so neither dependency exists here. If one arrives, the change is one class behind <code>ModelProvider</code>: the whole reason the seam went in early.</span>
         </li>
       </ol>
 
@@ -974,11 +981,11 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
         <span class="label">Without it</span>
         <p>
           Start with a framework and you pay twice. Once in reproduction: the framework's runtime
-          re-implements charter loading, tool policy, hook dispatch and permission modes that Claude
-          Code already does, and your versions drift from the ones your engineers use interactively.
-          And once at the meter: framework paths authenticate with a provider API key, so an
+          re-implements charter loading, tool policy, hook dispatch and permission modes Claude
+          Code already does. Your versions then drift from the ones your engineers use interactively.
+          And once at the meter: framework paths authenticate with a provider API key. So an
           unattended factory bills per token from the first run, before you know whether the flow is
-          even right.
+          right at all.
         </p>
       </div>
 
@@ -987,10 +994,10 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
         <p>
           Take the highest rung of the ladder that holds. If your preferred harness is Claude Code,
           its SDK <em>is</em> your agent framework. Reaching past it buys custom flow and model
-          portability, and until you need those two things it buys only surface area. The discipline
-          that makes this safe is not the choice, it is the <strong>seam</strong>: thirty lines of
-          abstract class means the decision stays reversible, and a stub implementation of the same
-          interface is what lets the whole factory run in tests with no model at all.
+          portability. Until you need those two, it buys only surface area. The discipline
+          that makes this safe is not the choice, it is the <strong>seam</strong>. Thirty lines of
+          abstract class keep the decision reversible. And a stub implementation of the same
+          interface runs the whole factory in tests with no model at all.
         </p>
       </div>
     </div>
@@ -1010,9 +1017,10 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
         <h2>Derive, don't remember</h2>
         <p class="thesis">
           The daemon holds no opinion about where a card is. Every tick it reads current external
-          state, hands a snapshot to a pure function, and gets back at most one action to enqueue.
-          The controller model, not the event model: if the daemon dies mid-run, external state is
-          untouched and the next tick resumes from it.
+          state and hands a snapshot to a pure function. That function returns at most one action
+          to enqueue.
+          The controller model, not the event model: if the daemon dies mid-run, external state
+          stays as it was and the next tick resumes from it.
         </p>
         <div class="chips">
           <span class="chip kind-rule"><b>pure</b> harness/derive.py · derive_action</span>
@@ -1028,9 +1036,10 @@ provider = ADAPTERS[cfg.harness](model=cfg.model, api_key=cfg.api_key, posture=p
     <div class="rung-body">
       <p>
         <code>derive.py</code> has no imports that touch the network, the disk or the clock. It maps
-        one issue snapshot to one decision, and the pipeline it encodes is a table anyone can read:
+        one issue snapshot to one decision, and the pipeline it encodes is a table anyone can read.
         Backlog → Needs&nbsp;Details → To&nbsp;Do → In&nbsp;Progress → In&nbsp;Review →
-        In&nbsp;Staging → Done, over four phases (Discover → Define → Dispatch → Verify).
+        In&nbsp;Staging → Done. Those seven states span four phases: Discover → Define → Dispatch →
+        Verify.
       </p>
 
       <figure class="code">
@@ -1057,8 +1066,8 @@ def derive_action(issue: Issue) -&gt; Decision:
 
       <p>
         Note what <em>isn't</em> here. No model call decides where a card goes next. Routing feedback
-        is the same story. Whether a comment means "revise the open PR" or "file a follow-up card"
-        is decided by the card's status, in one line, for free:
+        is the same story. The card's status decides whether a comment means "revise the open PR" or
+        "file a follow-up card", in one line, for free:
       </p>
 
       <figure class="code">
@@ -1099,11 +1108,11 @@ def _retire_poison(self, key, action):
 
       <h3 class="sub">The tracker and the code host are ports too</h3>
       <p>
-        The reconciler reads two systems it does not own: the ticketing system the cards live in and
-        the code host the branches and pull requests live on. Neither belongs in
+        The reconciler reads two systems it does not own. The cards live in the tracker, and the
+        branches and pull requests live on the code host. Neither belongs in
         <code>derive_action</code>. The same discipline that put <code>ModelProvider</code> in front
-        of the agent puts a port in front of each of these: the pure function sees an
-        <code>Issue</code> snapshot and returns a decision, and the vendor's REST shapes, field ids,
+        of the agent puts a port in front of each. The pure function sees an <code>Issue</code>
+        snapshot and returns a decision. Meanwhile the vendor's REST shapes, field ids,
         status names and rate limits stay on the far side of an adapter.
       </p>
 
@@ -1125,13 +1134,13 @@ CODE_HOSTS = {"github": GitHubHost, "gitlab": GitLabHost}
       </figure>
 
       <p>
-        What each adapter absorbs is the vendor-shaped part: how a status is named and transitioned,
-        whether a merge is a squash or a rebase, which webhook or poll tells you a check went red,
-        and how the credential is scoped. What none of them touch is the pipeline. Swapping Jira for
-        Linear, or GitHub for GitLab, is a class and its fake. The state machine, the guards and
-        the queue do not know a substitution happened. It is also what makes
-        <em>tracker and code host = whatever you already run</em> a claim rather than a hope, and
-        what lets the whole delivery loop run in tests against in-memory doubles: a controller that
+        Each adapter absorbs the vendor-shaped part: how the vendor names and transitions a status,
+        and whether a merge is a squash or a rebase. The same adapter owns which webhook or poll
+        tells you a check went red, and how the vendor scopes the credential. None of them touch the
+        pipeline. Swapping Jira for Linear, or GitHub for GitLab, is a class and its fake. The state
+        machine, the guards and the queue do not know a substitution happened. That seam also makes
+        <em>tracker and code host = whatever you already run</em> a claim rather than a hope.
+        It lets the whole delivery loop run in tests against in-memory doubles. A controller that
         derives from external state is only as testable as the seam it reads that state through.
       </p>
 
@@ -1139,23 +1148,23 @@ CODE_HOSTS = {"github": GitHubHost, "gitlab": GitLabHost}
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Crash safety</span>
-          <span class="what">The daemon can be killed at any instant. Nothing is lost because nothing was held: state lives in the tracker, the code host, git and the queue's files. The next tick reads the world as it is and continues.</span>
+          <span class="what">Kill the daemon at any instant and it loses nothing, because it held nothing. State lives in the tracker, the code host, git and the queue's files. The next tick reads the world as it is and continues.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Testability</span>
-          <span class="what">The interesting logic is a pure function over a dataclass, so the entire pipeline, every transition and every route, is covered by fast tests with no daemon, no network and no model.</span>
+          <span class="what">The interesting logic is a pure function over a dataclass. Fast tests cover the entire pipeline, every transition and every route, with no daemon, no network and no model.</span>
         </li>
         <li data-signal="warn">
           <span class="when">Cost</span>
-          <span class="what">Routing decisions cost nothing. Inference is spent on drafting a contract, implementing a change and reviewing a diff: the three places judgment is actually required.</span>
+          <span class="what">Routing decisions cost nothing. The factory spends inference on drafting a contract, implementing a change and reviewing a diff: the three places needing judgment.</span>
         </li>
         <li data-signal="block">
           <span class="when">Idle discipline</span>
-          <span class="what">A card mid-approval derives <code>NOTHING</code> rather than re-rendering. <code>_needs_refine</code> re-drafts only when new feedback arrives after the last render, so a waiting card is not silently re-spent every tick.</span>
+          <span class="what">A card mid-approval derives <code>NOTHING</code> rather than re-rendering. <code>_needs_refine</code> re-drafts only when new feedback arrives after the last render, so a waiting card is not re-spent every tick.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Free observability</span>
-          <span class="what">The same pass writes <code>pipeline.json</code>: cards grouped by stage, each with its next action, which is the board's entire data source. The projection is a by-product of deciding.</span>
+          <span class="what">The same pass writes <code>pipeline.json</code>: cards grouped by stage, each with its next action. That file is the board's entire data source, and the projection is a by-product of deciding.</span>
         </li>
       </ol>
 
@@ -1163,18 +1172,18 @@ CODE_HOSTS = {"github": GitHubHost, "gitlab": GitLabHost}
         <span class="label">Without it</span>
         <p>
           Go event-driven with state in the process and two failure modes arrive together. A missed
-          or duplicated webhook wedges a card in a state nobody can name, and a deploy mid-run loses
+          or duplicated webhook wedges a card in a state nobody can name. And a deploy mid-run loses
           the only copy of "where were we". Then, because in-process state is unreliable, the natural
-          fix is to ask the model where the card is, which is expensive, non-deterministic, and
-          untestable, three properties you do not want in a routing decision.
+          fix is to ask the model where the card is. That fix is expensive, non-deterministic and
+          untestable: three properties you do not want in a routing decision.
         </p>
       </div>
 
       <div class="takeaway">
         <span class="label">For the book</span>
         <p>
-          Deterministic decisions stay in the harness; a model turn is spent only where inference is
-          required. The test for a rule is whether you can write it as a pure function over external state. If you can, it does not belong in a prompt. <strong>Derive, don't
+          Deterministic decisions stay in the harness, and a model turn goes only where the work
+          needs inference. The test for a rule is whether you can write it as a pure function over external state. If you can, it does not belong in a prompt. <strong>Derive, don't
           remember</strong> is the same discipline at the system level that "read the file, don't
           recall it" is at the agent level.
         </p>
@@ -1214,8 +1223,8 @@ CODE_HOSTS = {"github": GitHubHost, "gitlab": GitLabHost}
 
     <div class="rung-body">
       <p>
-        The unit of work is a job, and the job record is the whole contract between the loop and the
-        world. Everything the factory later wants to know (what ran, how many times, what it cost, what it had gotten through before it died) is a field here.
+        The unit of work is a job, and the job record is the whole contract between loop and
+        world. Every later question is a field on that record: what ran, how many times, what it cost, what it had gotten through before it died.
       </p>
 
       <figure class="code">
@@ -1261,8 +1270,8 @@ class Job:
 
       <p>
         <code>superseded</code> is the state worth stealing. Without it, a dead-lettered job is
-        permanent poison: the reconciler refuses to re-enqueue that <code>(card, action)</code> pair,
-        so a card that failed once can never be retried, and the operator's button does nothing. With
+        permanent poison. The reconciler refuses to re-enqueue that <code>(card, action)</code> pair,
+        so nothing can retry a card that failed once. The operator's button does nothing. With
         it, newer human feedback retires the corpse and a fresh job runs, history intact, no zombie
         revived.
       </p>
@@ -1271,7 +1280,7 @@ class Job:
       <p>
         The store keeps an in-memory cache for speed and a file per job for truth. Every mutation
         updates the cache and immediately flushes JSON to disk; startup rehydrates the cache from the
-        files. There is no migration, no schema and nothing to back up beyond a directory, and the contents are readable with <code>cat</code> at three in the morning, which is a feature.
+        files. There is no migration, no schema and nothing to back up beyond a directory. You can read the contents with <code>cat</code> at three in the morning, which is a feature.
       </p>
 
       <figure class="code">
@@ -1299,9 +1308,9 @@ def _flush(self, job):
       <h3 class="sub">Leasing: crash recovery without a heartbeat</h3>
       <p>
         <code>lease()</code> is where four mechanisms meet in twenty lines. It hands out one ready
-        job, reclaims leases that expired because a worker died, increments the attempt counter, and
-        dead-letters anything that has burned its budget. Nothing else in the system needs to know
-        that a worker crashed.
+        job and reclaims leases that expired because a worker died. It also increments the attempt
+        counter and dead-letters anything that has burned its budget. Nothing else in the system
+        needs to know that a worker crashed.
       </p>
 
       <figure class="code">
@@ -1327,9 +1336,9 @@ def _flush(self, job):
       </figure>
 
       <p>
-        A one-hour visibility timeout is right for agent work and wrong for a restart, so startup has
-        its own recovery: at that moment no worker holds a lease, therefore every leased job is
-        orphaned and can be requeued immediately instead of waiting the timeout out.
+        A one-hour visibility timeout fits agent work and not a restart, so startup has
+        its own recovery. At that moment no worker holds a lease, so every leased job is an orphan.
+        Startup requeues those orphans at once instead of waiting the timeout out.
       </p>
 
       <figure class="code">
@@ -1409,11 +1418,11 @@ except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every fai
         </li>
         <li data-signal="block">
           <span class="when">Dead-letter</span>
-          <span class="what">Three attempts and the job leaves the queue instead of retrying forever. Combined with the reconciler's poison guard, a wedged card stops spending, visibly, in a state a human can see and act on.</span>
+          <span class="what">Three attempts and the job leaves the queue instead of retrying forever. With the reconciler's poison guard, a wedged card stops spending in a state a human can see and act on.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Checkpoint</span>
-          <span class="what">Resume rather than restart: the branch, the worktree path and the "stack is already up" flag survive a crash, so attempt two continues instead of re-paying.</span>
+          <span class="what">Resume rather than restart. The branch, worktree path and "stack is already up" flag survive a crash, so attempt two continues instead of re-paying.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Append-only trace</span>
@@ -1424,7 +1433,7 @@ except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every fai
       <div class="callout">
         <span class="label">Without it</span>
         <p>
-          Run the same loop with in-process state and a <code>for</code> loop over cards, and the
+          Run the same loop with in-process state and a <code>for</code> loop over cards. The
           failure is not that it breaks. It is that it breaks <em>invisibly and expensively</em>. A
           retry re-runs a handler whose first attempt already opened a pull request. A restart loses
           the fact that a container stack is up, and the next attempt collides with it. A card that
@@ -1436,12 +1445,13 @@ except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every fai
       <div class="takeaway">
         <span class="label">For the book</span>
         <p>
-          Choose the durable unit first and the rest of the system hangs off it. Because the job
-          record carries cost, attempts, checkpoint and result, the factory gets pricing,
+          Choose the durable unit first and the rest of the system hangs off it. The job
+          record carries cost, attempts, checkpoint and result. That gives the factory pricing,
           observability, operator control and crash recovery without a second mechanism for any of
-          them. <strong>Agentic orchestration is a queue problem wearing a new hat</strong>, and the boring, decades-old answers (idempotency keys, visibility timeouts, dead-letters, capped
-          backoff) are the ones that hold when the worker is a non-deterministic agent that runs for
-          twenty minutes.
+          them. <strong>Agentic orchestration is a queue problem wearing a new hat.</strong> The
+          boring, decades-old answers are idempotency keys, visibility timeouts, dead-letters and
+          capped backoff. Those four hold even when the worker is a non-deterministic agent that
+          runs for twenty minutes.
         </p>
       </div>
     </div>
@@ -1460,8 +1470,8 @@ except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every fai
       <div>
         <h2>One writer per card, parallel everywhere else</h2>
         <p class="thesis">
-          Four agents run at once here, and none of them can collide, because the serialization point
-          is in the leasing function rather than in anyone's prompt. Per-card single-writer in the
+          Four agents run at once here, and none of them can collide. That is because the
+          serialization point is in the leasing function, not in anyone's prompt. Per-card single-writer in the
           queue, a git worktree per card, a container namespace per card, and a bounded pool that
           <em>is</em> the backpressure. The operator's controls arrive as files, because the board and
           the daemon are different processes.
@@ -1479,9 +1489,10 @@ except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every fai
 
     <div class="rung-body">
       <p>
-        The single-writer guarantee is eight lines inside the function that picks the next job. A job
-        carrying an <code>issue_key</code> is skipped while another job for that same key holds a
-        live lease. Two agents therefore never write one worktree, not because they were told not to, but because the second one is never handed the work.
+        The single-writer guarantee is eight lines inside the function that picks the next job. That
+        function skips a job carrying an <code>issue_key</code> while another job for that same key
+        holds a live lease. Two agents therefore never write one worktree, and not because a prompt
+        told them not to: the queue never hands the second one the work.
       </p>
 
       <figure class="code">
@@ -1506,10 +1517,10 @@ except Exception as exc:  <span class="c-dim"># noqa: BLE001 — route every fai
       </figure>
 
       <p>
-        Serializing per card is only half of it; the other half is making sure two <em>different</em>
-        cards cannot collide either. Each card gets its own git worktree off the source repo. It shares <code>.git</code>, so it is fast and there is no full clone per card, and it gets its own container
-        project namespace, so <code>make up</code> and <code>make down</code> refer to the same stack
-        and to nobody else's.
+        Serializing per card is only half of it. The other half stops two <em>different</em>
+        cards from colliding. Each card gets its own git worktree off the source repo. It shares <code>.git</code>, so it is fast and there is no full clone per card. Each card also gets
+        its own container project namespace. So <code>make up</code> and <code>make down</code> refer
+        to the same stack and to nobody else's.
       </p>
 
       <figure class="code">
@@ -1537,10 +1548,11 @@ def _compose_env(issue_key: str) -&gt; dict:
       </figure>
 
       <p>
-        Backpressure needs no separate mechanism: the pool is bounded, so the number of agents in
-        flight is the number of workers, and the default (four) is set by the ceiling the target repo
-        can actually run. Stopping needs no protocol either: a file on disk, checked by every worker
-        between jobs, external to the loop's own logic so it works even when the loop is confused.
+        Backpressure needs no separate mechanism. A bounded pool means the number of agents in
+        flight is the number of workers. The ceiling the target repo can run sets the default, which
+        is four. Stopping needs no protocol either: a file on disk, which every worker checks
+        between jobs. That file sits outside the loop's own logic, so it works even when the loop has
+        lost track.
       </p>
 
       <figure class="code">
@@ -1597,7 +1609,7 @@ elif action == CANCEL and job.status == LEASED:
         </li>
         <li data-signal="pass">
           <span class="when">Two stacks, one name</span>
-          <span class="what">Prevented by a per-card compose project name. The known ceiling is stated in the code: fixed host ports still need the target repo's compose to be per-project.</span>
+          <span class="what">Prevented by a per-card compose project name. The code states the known ceiling: fixed host ports still need the target repo's compose to be per-project.</span>
         </li>
         <li data-signal="warn">
           <span class="when">Too many agents</span>
@@ -1605,17 +1617,17 @@ elif action == CANCEL and job.status == LEASED:
         </li>
         <li data-signal="block">
           <span class="when">Cancel mid-run</span>
-          <span class="what">A leased job cannot be preempted, so the cancel is traced and left pending; when it lands, a <code>reset</code> job stops the stack and hard-resets the worktree to base, leaving the card cleanly restartable.</span>
+          <span class="what">Nothing can preempt a leased job, so the queue traces the cancel and leaves it pending. When the cancel lands, a <code>reset</code> job stops the stack and hard-resets the worktree to base. The card is then cleanly restartable.</span>
         </li>
       </ol>
 
       <div class="callout">
         <span class="label">Without it</span>
         <p>
-          Two agents in one worktree produce interleaved edits that no review can untangle and no test can localise, because the diff is a merge of two intentions. Two container stacks under one
+          Two agents in one worktree produce interleaved edits: no review can untangle them and no test can localise them. The diff is a merge of two intentions. Two container stacks under one
           project name mean one card's <code>make down</code> silently kills another card's database.
-          And an unbounded pool discovers its own limit the expensive way: rate limits, a saturated
-          laptop, and a set of half-finished branches whose runs died together.
+          And an unbounded pool finds its own limit the expensive way: rate limits, a saturated
+          laptop, dead half-finished branches.
         </p>
       </div>
 
@@ -1623,11 +1635,11 @@ elif action == CANCEL and job.status == LEASED:
         <span class="label">For the book</span>
         <p>
           Serialize where writes land; parallelize everything else. The important part is
-          <em>where</em> the serialization lives: in the queue, as a property of leasing, not as an
-          instruction in a prompt an agent may reason its way around. <strong>A concurrency rule an
-          agent has to remember is not a concurrency rule</strong>, and the corollary is that giving
-          each unit of work its own ground (its own tree, its own stack, its own namespace) removes
-          more coordination than any amount of locking adds.
+          <em>where</em> the serialization lives. It lives in the queue, as a property of leasing, not
+          as a prompt instruction an agent may reason around. <strong>A concurrency
+          rule an agent has to remember is not a concurrency rule.</strong> The corollary: give each
+          unit of work its own ground, meaning its own tree, its own stack, its own namespace. That
+          isolation removes more coordination than any amount of locking adds.
         </p>
       </div>
     </div>
@@ -1647,9 +1659,10 @@ elif action == CANCEL and job.status == LEASED:
         <h2>Lights on: gates before the action, the record after it</h2>
         <p class="thesis">
           Lights-on is not "nobody is watching". It is the opposite, and it has two halves.
-          <em>Before</em> an action: governance gates raise the decision to a human: an approval touchpoint, an interrupt on ambiguity, a merge gate that refuses a red pull request.
-          <em>After</em> it: observability and provenance: a trace line per completed step, a
-          persisted artifact per step, a cost per card, every decision mirrored where the work lives.
+          <em>Before</em> an action, gates raise the decision to a human: an approval touchpoint, an interrupt on ambiguity, a gate that refuses a red pull request.
+          <em>After</em> it, observability and provenance record what happened: a trace line per
+          completed step, a persisted artifact per step, a cost per card. And each decision gets
+          mirrored where the work lives.
           Autonomy is a separate dial, and it moves without disturbing either half.
         </p>
         <div class="chips">
@@ -1669,56 +1682,58 @@ elif action == CANCEL and job.status == LEASED:
         <li data-signal="block">
           <span class="when">Draft</span>
           <span class="what">
-            A model turn drafts the intent contract (outcome, acceptance, scope in and out, open questions) against a JSON schema, so the next step gets fields rather than prose. The
-            rendered contract is written back to the card and the card moves to await approval.
+            A model turn drafts the intent contract against a JSON schema, so the next step gets
+            fields, not prose. The contract carries outcome, acceptance, scope in and out, and
+            open questions. The harness writes the rendered contract back to the card, and the card
+            moves to await approval.
           </span>
         </li>
         <li data-signal="pass">
           <span class="when">Dispatch</span>
           <span class="what">
             No model. Prepare the worktree, checkpoint the branch and path, bring the stack up once,
-            assign the card, move it to In&nbsp;Progress. Every one of those is durable, so a crash
+            assign the card, move to In&nbsp;Progress. Every one of those is durable, so a crash
             here costs seconds.
           </span>
         </li>
         <li data-signal="block">
           <span class="when">Execute</span>
           <span class="what">
-            The agent runs inside the worktree with the contract inlined. The card is the source of truth, so the executor is handed it rather than left to fetch it. Then commit, count
+            The agent runs inside the worktree with the contract inlined. The card is the source of truth, so the harness hands it to the executor rather than leaving it to fetch. Then commit, count
             added lines, and verify.
           </span>
         </li>
         <li data-signal="warn">
           <span class="when">Verify</span>
           <span class="what">
-            The harness dispatches the <em>target repo's own</em> Stop hooks, its authored <code>make pre-commit</code> and test commands, and falls back to a configured test
-            command only if the repo has none. Commands belong to the charter; dispatch belongs to
+            The harness dispatches the <em>target repo's own</em> Stop hooks, plus its authored <code>make pre-commit</code> and test commands. If the repo has none, the harness falls back
+            to a configured test command. Commands belong to the charter; dispatch belongs to
             the harness.
           </span>
         </li>
         <li data-signal="pass">
           <span class="when">Review</span>
           <span class="what">
-            Push, open the pull request, move to In&nbsp;Review, and chain an automated review job
-            that returns structured findings and a suggested verdict, recorded as an artifact and
+            Push, open the pull request, and move to In&nbsp;Review. Then chain an automated review
+            job. It returns structured findings and a suggested verdict, recorded as an artifact and
             mirrored as a comment.
           </span>
         </li>
         <li data-signal="warn">
           <span class="when">Merge</span>
           <span class="what">
-            <code>merge_ready</code> is a hard precondition even on a human accept: a red or closed
-            pull request cannot be squashed. Merge, move to staging, then tear down: stop the stack,
+            <code>merge_ready</code> is a hard precondition even on a human accept: nothing squashes
+            a red or closed pull request. Merge, move to staging, then tear down: stop the stack,
             remove the worktree.
           </span>
         </li>
       </ol>
 
       <p>
-        Two things make that sequence auditable rather than merely automatic. Every step ends with a hard, persisted artifact, which is exactly what lets the queue resume it and an auditor
-        replay it. And the audit log is the queue's own append-only <code>traces.jsonl</code>: the
+        Two things make that sequence auditable rather than merely automatic. Every step ends with a hard, persisted artifact: exactly what lets the queue resume it and an auditor
+        replay it. And the audit log is the queue's own append-only <code>traces.jsonl</code>. The
         dashboard's sqlite database is a <em>projection</em> of that file, rebuildable at will, never
-        the source of truth. Files are the store; the tracker and the pull request are mirrors, kept
+        the source of truth. Files are the store. The tracker and the pull request are mirrors, kept
         current so decisions are visible where the work lives.
       </p>
 
@@ -1736,7 +1751,7 @@ elif action == CANCEL and job.status == LEASED:
           <span class="when">Before · gate</span>
           <span class="what">
             <strong>Interrupts.</strong> The executor that hits a real decision raises a question
-            instead of choosing. The card blocks, and no further action is taken on it, until a human
+            instead of choosing. The card blocks, and nothing else happens on it, until a human
             answers on the board.
           </span>
         </li>
@@ -1744,42 +1759,43 @@ elif action == CANCEL and job.status == LEASED:
           <span class="when">Before · gate</span>
           <span class="what">
             <strong>Deterministic preconditions.</strong> <code>merge_ready</code> refuses a red or
-            closed pull request even when a human has already said accept, and at lights-out
-            settings a blocking review finding holds the card instead of auto-accepting it.
+            closed pull request even when a human has already said accept. And at lights-out
+            settings, a blocking review finding holds the card instead of auto-accepting it.
           </span>
         </li>
         <li data-signal="pass">
           <span class="when">After · record</span>
           <span class="what">
             <strong>Traces.</strong> Every enqueue, lease, checkpoint, model turn, failure and
-            completion appends a line to <code>traces.jsonl</code> once the step has happened, including the agent's own step-by-step output, flushed into the job's log as each turn
-            lands.
+            completion appends a line to <code>traces.jsonl</code> once the step has happened. The
+            trace includes the agent's own step-by-step output, which flushes into the job's log as
+            each turn lands.
           </span>
         </li>
         <li data-signal="pass">
           <span class="when">After · record</span>
           <span class="what">
-            <strong>Artifacts and cost.</strong> Each phase persists its structured result, and each
-            job carries the dollars and tokens it burned, including on the attempts that failed.
+            <strong>Artifacts and cost.</strong> Each phase persists its structured result. Each
+            job carries the dollars and tokens it burned, including on failed attempts.
           </span>
         </li>
         <li data-signal="pass">
           <span class="when">After · record</span>
           <span class="what">
-            <strong>Provenance.</strong> Contracts, interrupt answers, verdicts and review findings
-            are mirrored onto the card and the pull request, so the decision trail sits where the
-            work lives rather than only in the harness's own files.
+            <strong>Provenance.</strong> The harness mirrors contracts, interrupt answers, verdicts
+            and review findings onto the card and the pull request. So the decision trail sits where
+            the work lives, not only in the harness's own files.
           </span>
         </li>
       </ol>
 
       <h3 class="sub">Ambiguity becomes a question, not a guess</h3>
       <p>
-        An agent that hits a real decision point has two bad options, pick something or stop, and one good one. The execute schema carries a <code>needs_input</code> flag; when it comes back
-        set, the harness files an interrupt, the card blocks, and the question appears on the board
-        for a human. The answer is written back, the reconciler enqueues a <code>resume</code>
-        carrying the feedback, and the same answer is mirrored to the card and the pull request so
-        the decision is recorded where the work is.
+        An agent that hits a real decision point has two bad options, pick something or stop, and one good one. The execute schema carries a <code>needs_input</code> flag. When it comes back
+        set, the harness files an interrupt, the card blocks, and the question goes to the board. A
+        human writes the answer back. The reconciler then enqueues a
+        <code>resume</code> carrying the feedback, and mirrors the answer to the card and the
+        pull request. The decision therefore lands where the work is.
       </p>
 
       <figure class="code">
@@ -1802,8 +1818,8 @@ if intr["status"] == RESOLVED:
       <h3 class="sub">The dial</h3>
       <p>
         Autonomy is a setting, not a rewrite. Every level runs the same handlers and writes the same
-        audit trail; they differ only in which transitions need a recorded human approval first.
-        There are exactly two human touchpoints to place on that scale: approving a drafted contract, and merging a reviewed pull request. At the middle setting the default gate is
+        audit trail. They differ only in which transitions need a recorded human approval first.
+        Exactly two human touchpoints sit on that scale: approving a drafted contract, and merging a reviewed pull request. At the middle setting the default gate is
         just the merge.
       </p>
 
@@ -1824,9 +1840,9 @@ if intr["status"] == RESOLVED:
       </div>
 
       <p>
-        Lights-out is not the same as ungated. At the two highest settings a card in review
-        auto-accepts <em>only</em> if the automated review's findings pass a deterministic gate; a
-        blocking finding holds the card and marks it on the board for a human, who can still accept
+        Lights-out is not the same as ungated. At the two highest settings, a card in review
+        auto-accepts <em>only</em> if the automated review's findings pass a deterministic gate. A
+        blocking finding holds the card and marks it on the board. A human can still accept
         it in the app. The dial removes the human's obligation to touch every move, but it does not remove the gates.
       </p>
 
@@ -1834,8 +1850,8 @@ if intr["status"] == RESOLVED:
       <p>
         The factory can mine its own failures, propose a change, validate it, and adopt it. Which
         raises the obvious question: adopt it <em>where</em>? The answer is the governor. A charter
-        change is authored text, cheap to review and trivial to revert, so a validated proposal is
-        applied. A harness change is code, so a proposal is only ever recorded, so it becomes a human-reviewed edit like any other.
+        change is authored text, cheap to review and trivial to revert, so the loop applies a
+        validated proposal. A harness change is code, so the loop only records the proposal, which becomes a human-reviewed edit like any other.
       </p>
 
       <figure class="code">
@@ -1855,20 +1871,21 @@ for p in proposals:
       </figure>
 
       <p>
-        The same split runs through the whole system. Carry that away if nothing else: <em>authored → charter; applied → harness.</em> Behaviour specifications (rules, gates, skills, the commands that verify a change) live in the target repo, where the
-        people who own that code can author them. The machinery that runs specifications (the loop, the queue, dispatch, isolation, the dial) lives in the harness, and knows nothing about what
-        it is delivering. That is why there is no domain vocabulary anywhere in these 5,300 lines,
-        and why the factory can be pointed at a different repo on a Tuesday without a rewrite.
+        The same split runs through the whole system. Carry that away if nothing else: <em>authored → charter; applied → harness.</em> Behaviour specifications live in the target repo: rules, gates, skills, and the commands that verify a change. The
+        people who own that code author them. The machinery that runs specifications (the loop, the queue, dispatch, isolation, the dial) lives in the harness, and knows nothing about what
+        it is delivering. That is why there is no domain vocabulary anywhere in these 5,300 lines.
+        It is also why you can point the factory at a different repo on a Tuesday without a rewrite.
       </p>
 
       <div class="callout">
         <span class="label">Without it</span>
         <p>
-          Skip the dial and autonomy becomes all-or-nothing: a system nobody trusts enough to leave
-          running, or one running unattended before anyone has earned the right to. Skip the asymmetry and it is worse, because a harness that edits its own code from mined failures is a
-          system whose behaviour drifts without a diff anyone reviewed. And skip the persisted
-          artifact at each step and none of the rest is even measurable: a reported success whose
-          write is invisible in external state did not happen.
+          Skip the dial and autonomy becomes all-or-nothing. Instead you get a system nobody trusts
+          enough to leave running, or one running unattended before anyone earned the right.
+          Skip the asymmetry and it is worse, because a harness that edits its own code from mined
+          failures drifts unreviewed. And skip the persisted artifact at each
+          step and nothing else here is measurable. A reported success whose write is invisible in
+          external state did not happen.
         </p>
       </div>
 
@@ -1877,13 +1894,13 @@ for p in proposals:
         <p>
           A harness by definition, a factory by operation, a queue by design, and the three are not
           separate claims. It is a <strong>harness</strong> because it applies a charter it does not
-          author, which is what keeps domain knowledge out of the engine. It is a
+          author. That keeps domain knowledge out of the engine. It is a
           <strong>lights-on factory</strong> because a gate raises the decision to a human before an
-          action and provenance records what happened after it, so autonomy becomes a dial you can
+          action. Provenance records what happened after it. So autonomy becomes a dial you can
           turn rather than a leap you take. And it is a
           <strong>queue</strong> because durability, retry, isolation, cost and audit are all
-          properties of a job record, which is what makes the other two claims survive contact with
-          a crash at 3am.
+          properties of a job record. That record is what makes the other two claims survive contact
+          with a crash at 3am.
         </p>
       </div>
     </div>
@@ -1894,7 +1911,7 @@ for p in proposals:
       dependency to its self-improving loop. <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
     <div>Rungs ascend by composition: 1 dependency → 1 pure function → 1 durable queue → 1 writer per
       card → 1 lit loop. Each rung's mechanisms depend on the ones below it.</div>
-    <div>Excerpts are drawn from a working harness, lightly trimmed for width; structure, thresholds
+    <div>These excerpts come from a working harness, lightly trimmed for width; structure, thresholds
       and control flow are unchanged. Deliberately absent: any business vocabulary, because the engine does not know what it delivers. Colour encodes signal:
       <span style="color:var(--gold)">deterministic</span> ·
       <span style="color:var(--brick)">model turn</span> ·
