@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Junior to Senior in the Age of AI — Workshop · Ian Johnson</title>
+<title>Junior to Senior in the Age of AI · Workshop · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
 <meta name="description" content="A workshop on the structured refusal to skip comprehension: one rule, five questions, five moves, and the two loops a charter is built from. By Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
@@ -649,7 +650,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <p class="byline">
       <span class="by">Words by</span>
       <span class="name">Ian Johnson</span>
-      <span class="role">— author of <em>Harness Engineering</em> · tacoda.dev</span>
+      <span class="role">, author of <em>Harness Engineering</em> · tacoda.dev</span>
     </p>
 
     <div class="provenance">
@@ -724,7 +725,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <figure class="code">
-        <figcaption><span>pre-flight — send it ahead in the calendar invite</span><span class="tag pass">green before we start</span></figcaption>
+        <figcaption><span>pre-flight: send it ahead in the calendar invite</span><span class="tag pass">green before we start</span></figcaption>
 <pre><code>git clone https://github.com/tacoda/fulcorum-junior-to-senior-workshop.git
 cd fulcorum-junior-to-senior-workshop/seed
 pip install pytest &amp;&amp; pytest      <span class="c-pass"># 3 passed — you're ready</span></code></pre>
@@ -775,7 +776,7 @@ pip install pytest &amp;&amp; pytest      <span class="c-pass"># 3 passed — yo
       <figure class="code">
         <figcaption><span>the comprehension card</span><span class="tag warn">print it, keep it</span></figcaption>
 <pre><code><span class="c-warn">THE DAILY RULE</span>
-  Don't merge a change you can't explain — to the agent, out loud, in your own words.
+  Don't merge a change you can't explain: to the agent, out loud, in your own words.
   Green pipeline = permission to proceed. Red = a lesson before a human had to teach it.
 
 <span class="c-warn">FIVE QUESTIONS</span> (comprehension in — ask these of any diff)
@@ -819,7 +820,7 @@ pip install pytest &amp;&amp; pytest      <span class="c-pass"># 3 passed — yo
 
     <div class="rung-body">
       <figure class="code">
-        <figcaption><span>seed/ — the trap in six lines</span><span class="tag block">green, and wrong</span></figcaption>
+        <figcaption><span>seed/: the trap in six lines</span><span class="tag block">green, and wrong</span></figcaption>
 <pre><code>cd seed
 pytest                                       <span class="c-pass"># 3 passed</span>
 python app.py                                <span class="c-pass"># cash total $10.80  ← rounded down, customer's favor</span>
@@ -988,7 +989,7 @@ python app.py                                <span class="c-block"># cash total 
       <h3 class="sub">1 · The rule steers (feedforward)</h3>
       <figure class="code">
         <figcaption><span>ask your agent, verbatim</span><span class="tag warn">shapes the draft</span></figcaption>
-<pre><code>Show me how you'd implement `round_cash(total_cents)` — round a cash total
+<pre><code>Show me how you'd implement `round_cash(total_cents)`: round a cash total
 to a nickel now that pennies are gone.</code></pre>
       </figure>
       <p>
@@ -1005,7 +1006,7 @@ to a nickel now that pennies are gone.</code></pre>
       </figure>
       <p>The moment it saves <code>money.py</code>, the hook fires and blocks it:</p>
       <figure class="code">
-        <figcaption><span>round-gate — the refusal, told to the agent</span><span class="tag block">exit 2</span></figcaption>
+        <figcaption><span>round-gate: the refusal, told to the agent</span><span class="tag block">exit 2</span></figcaption>
 <pre><code><span class="c-block">round-gate (edit): round_cash(1083) = 1085, but the customer's-favor
 amount is 1080 — cash rounded against the customer.</span></code></pre>
       </figure>
@@ -1044,7 +1045,7 @@ amount is 1080 — cash rounded against the customer.</span></code></pre>
     </div>
 
     <div class="rung-body">
-      <h3 class="sub">Feedforward — the rule's specificity</h3>
+      <h3 class="sub">Feedforward: the rule's specificity</h3>
       <p>A rule you cannot fail is a rule that cannot steer.</p>
       <div class="tablewrap">
         <table>
@@ -1067,7 +1068,7 @@ amount is 1080 — cash rounded against the customer.</span></code></pre>
         </table>
       </div>
 
-      <h3 class="sub">Feedback — the gate's position</h3>
+      <h3 class="sub">Feedback: the gate's position</h3>
       <p>Same check, different distance from the mistake. The earlier the loop closes, the cheaper the fix.</p>
       <div class="tablewrap">
         <table>
@@ -1207,7 +1208,7 @@ if got != want:                <span class="c-dim"># block when the code failed 
         </li>
         <li data-signal="block">
           <span class="when">The pattern</span>
-          <span class="what">At scale, the code is what the agent imitates. Leave a round-down implementation in the tree and you've planted the pattern the next change copies. The more of it there is, the louder it gets.</span>
+          <span class="what">At scale, the code is what the agent imitates. Leave a round-down implementation in the tree and you've planted the pattern the next change copies, and the more of it there is, the louder it gets.</span>
         </li>
       </ol>
 
@@ -1322,7 +1323,7 @@ if got != want:                <span class="c-dim"># block when the code failed 
       <ol class="sequence">
         <li data-signal="none">
           <span class="when">The shift</span>
-          <span class="what"><strong>From "does it work?" to "how would I know?"</strong> The junior question is <em>did the tests pass.</em> The senior question is <em>what would have to be true for this to be wrong, and did I check it?</em> Step 2 lived in that gap. Distrust the green until you've named the case it doesn't cover.</span>
+          <span class="what"><strong>From "does it work?" to "how would I know?"</strong> The junior question is <em>did the tests pass.</em> The senior question is <em>what would have to be true for this to be wrong, and did I check it?</em> Step 2 lived in that gap, so distrust the green until you've named the case it doesn't cover.</span>
         </li>
         <li data-signal="none">
           <span class="when">The shift</span>
@@ -1444,7 +1445,7 @@ if got != want:                <span class="c-dim"># block when the code failed 
   </section>
 
   <footer>
-    <div><strong>How to Grow from Junior to Senior in the Age of AI</strong> — a one-hour workshop.
+    <div><strong>How to Grow from Junior to Senior in the Age of AI</strong> , a one-hour workshop.
       <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
     <div>Seed repo and run sheet ·
       <a href="https://github.com/tacoda/fulcorum-junior-to-senior-workshop"><code>github.com/tacoda/fulcorum-junior-to-senior-workshop</code></a></div>

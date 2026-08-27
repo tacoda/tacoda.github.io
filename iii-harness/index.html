@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building a Harness with iii · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -851,7 +852,7 @@ workers:
       <div>
         <h2>Register a function, subscribe to a topic, publish the next one</h2>
         <p class="thesis">
-          A node is not a class hierarchy or a framework subclass. It is a connection, a handler,
+          A node is not a class hierarchy or a framework subclass, but a connection, a handler,
           and a trigger. Five Python nodes and one TypeScript node in this pipeline share the same
           three-line skeleton.
         </p>
@@ -914,8 +915,7 @@ def publish(topic: str, job_id: str) -&gt; None:
         <span class="label">The tradeoff hiding in that decoupling</span>
         <p>
           Nothing checks that <code>expand.research</code> has a subscriber. Publish to a topic
-          nobody listens to and the job simply stops advancing, with no error anywhere. That is the
-          cost of a string-keyed graph, and it is why the <code>stage</code> field on the job object
+          nobody listens to and the job simply stops advancing, with no error anywhere. That is the cost of a string-keyed graph, which is what makes the <code>stage</code> field on the job object
           in rung 3 is not optional bookkeeping.
         </p>
       </div>
@@ -1193,7 +1193,7 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
       <div>
         <h2>When to reach for a graph, and when not to</h2>
         <p class="thesis">
-          This shape is not better than one agent with good tools. It is better at specific things,
+          This shape is not better than one agent with good tools, only better at specific things,
           and worse at others, and the honest version of that list is short.
         </p>
       </div>
@@ -1210,7 +1210,7 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
 
       <h3 class="sub">Do not reach for it when</h3>
       <ul>
-        <li><strong>The structure varies per run.</strong> A fixed graph cannot decide it needs a different shape today. This is the disqualifying condition.</li>
+        <li><strong>The structure varies per run.</strong> A fixed graph cannot decide it needs a different shape today, and that is the disqualifying condition.</li>
         <li><strong>The whole thing takes ten seconds.</strong> The queue, the state store, and six processes are pure overhead against one call that finishes before the infrastructure finishes starting.</li>
         <li><strong>You have not proved the pipeline yet.</strong> Write it as one agent first. Split it when a stage starts deserving its own budget, its own retry, or its own language.</li>
       </ul>

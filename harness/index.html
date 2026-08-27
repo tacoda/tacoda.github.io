@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Promotion to the Harness · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -644,8 +645,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       rule is: not a line of prose you hope the model weighs, but a decision about <em>where in your
       own code</em> the constraint lives. A custom harness has five distinct places to put one, and
       choosing between them is the engineering. This follows a single rule up all five, in
-      LangChain, LangGraph, and deepagents. The predicate never changes. Only its mount point does,
-      and each move buys something the rung below it could not.
+      LangChain, LangGraph, and deepagents. The predicate never changes. Only its mount point does, and every move up trades effort for a guarantee the rung below cannot make.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -830,8 +830,7 @@ def check(source: str, filename: str = "&lt;source&gt;") -&gt; list[str]:
     <div class="rung-body">
       <p>
         The rule itself is one paragraph, and a capable model reading it writes <code>//</code>
-        most of the time. <strong>Most of the time</strong> is the operative phrase, and it is why
-        there are four more rungs. What owning the harness changes is not the sentence, it is that
+        most of the time. <strong>Most of the time</strong> is the operative phrase, which is what the next four rungs are for. What owning the harness changes is not the sentence, it is that
         you get to choose when it is present.
       </p>
 
@@ -862,8 +861,7 @@ def inject_money_rule(request, handler):
         A charter file is unconditional: every rule pays for itself in context on every turn,
         including the turns about CSS. Assembling the prompt in code lets a rule cost nothing until
         it is relevant, which in practice is how you keep a growing rule set from crowding out the
-        task. It is a small win, and it is the only thing rung 1 gains from being in a custom
-        harness.
+        task. It is a small win, and it is all rung 1 gains from being in a custom harness.
       </p>
 
       <h3 class="sub">What rung 1 buys</h3>
@@ -905,9 +903,8 @@ def inject_money_rule(request, handler):
       <div>
         <h2>Make the violation unrepresentable</h2>
         <p class="thesis">
-          The cheapest enforcement in a custom harness is not a gate at all. It is a tool whose
-          schema cannot express the thing you are forbidding. You only get this rung because you own
-          the tool surface, and it is the one most people skip straight past.
+          The cheapest enforcement in a custom harness is not a gate at all: a tool whose
+          schema cannot express the thing you are forbidding. You only get this rung because you own the tool surface, which is also why most people skip straight past it.
         </p>
         <div class="chips">
           <span class="chip kind-agent"><b>surface</b> the tools you define</span>
@@ -953,11 +950,11 @@ def set_price(sku: str, <span class="c-pass">cents: int</span>) -&gt; str:
       <ol class="sequence">
         <li data-signal="warn">
           <span class="when">Coercion</span>
-          <span class="what">A schema is not a proof. <code>cents: int</code> rejects <code>1080.5</code>, but a whole-valued float like <code>1080.0</code> is silently coerced to <code>1080</code> by validation. That is harmless here and would not be in every domain. Check what your validator actually does rather than assuming.</span>
+          <span class="what">A schema is not a proof. <code>cents: int</code> rejects <code>1080.5</code>, but a whole-valued float like <code>1080.0</code> is silently coerced to <code>1080</code> by validation. The coercion is harmless here and would not be in every domain. Check what your validator actually does rather than assuming.</span>
         </li>
         <li data-signal="block">
           <span class="when">Irreducible width</span>
-          <span class="what">Some tools genuinely have to take arbitrary text. A coding agent that edits source cannot be handed a schema that expresses "valid money code". That is precisely the case rung 3 exists for.</span>
+          <span class="what">Some tools genuinely have to take arbitrary text. A coding agent that edits source cannot be handed a schema that expresses "valid money code". which is precisely the case rung 3 exists for.</span>
         </li>
         <li data-signal="block">
           <span class="when">Not retrofittable</span>
@@ -1109,7 +1106,7 @@ agent = create_agent(model="claude-opus-5",    <span class="c-dim"># reads ANTHR
         <p>
           At rung 3 the constraint stops being part of the conversation. Prompt injection cannot
           reach it, a long context cannot crowd it out, and a persuasive intermediate step cannot
-          talk it down, because it is not a claim the model is weighing. It is a branch in your
+          talk it down, because it is not a claim the model is weighing but a branch in your
           code. That is the whole difference between a rule the agent follows and an invariant the
           system has.
         </p>
@@ -1295,8 +1292,7 @@ agent = create_deep_agent(
 
       <h3 class="sub">The ledger, which is the actual point of rung 5</h3>
       <p>
-        Every firing appends one line. It is deliberately boring, and it is the only thing on this
-        page that tells you whether any of the preceding work was worth doing.
+        Every firing appends one line. The ledger is deliberately boring, and nothing else on this page tells you whether any of the preceding work was worth doing.
       </p>
 
       <figure class="code">
@@ -1319,7 +1315,7 @@ agent = create_deep_agent(
         </li>
         <li data-signal="pass">
           <span class="when">allowed</span>
-          <span class="what">Someone took the <code>money-gate: allow</code> escape. This is the most valuable line in the file: a rising allow rate means the rule no longer matches the code, and the rule is what needs fixing.</span>
+          <span class="what">Someone took the <code>money-gate: allow</code> escape, and that line is the most valuable one in the file: a rising allow rate means the rule no longer matches the code, and the rule is what needs fixing.</span>
         </li>
       </ol>
 
@@ -1328,7 +1324,7 @@ agent = create_deep_agent(
         <p>
           Rungs 1 through 4 add constraint. Rung 5 adds the only thing that lets you ever take
           constraint away. Without a ledger, every gate you write is permanent by default, because
-          nobody can argue it is not pulling its weight. That is how a harness silently accretes
+          nobody can argue it is not pulling its weight, which is how a harness silently accretes
           into something nobody wants to touch.
         </p>
       </div>
@@ -1370,8 +1366,8 @@ agent = create_deep_agent(
           <tbody>
             <tr>
               <td>Blocks steady, allows near zero</td>
-              <td>The rule is live and correctly scoped. It is catching real attempts.</td>
-              <td>Leave it. This is a gate earning its keep.</td>
+              <td>The rule is live and correctly scoped, catching real attempts.</td>
+              <td>Leave it. That gate is earning its keep.</td>
             </tr>
             <tr>
               <td>Zero blocks, many passes</td>

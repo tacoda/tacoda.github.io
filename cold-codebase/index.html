@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cold Codebase · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -848,7 +849,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">The seams, in about twenty minutes</h3>
       <ul>
-        <li><strong>In:</strong> HTTP routes, queue consumers, scheduled jobs, CLI entry points, webhooks. Find the file where these are registered. Every system has one and it is the most informative file in the repo.</li>
+        <li><strong>In:</strong> HTTP routes, queue consumers, scheduled jobs, CLI entry points, webhooks. Find the file where these are registered, because every system has one and it is the most informative file in the repo.</li>
         <li><strong>Out:</strong> the database client, the outbound HTTP client, the queue publisher, anything that sends mail or money. Grep for the client, not for the concept.</li>
         <li><strong>State:</strong> the schema, or the migrations directory. Table names are the closest thing most systems have to an honest domain glossary.</li>
       </ul>
@@ -858,8 +859,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           Pick one real request or job with the host. Follow it from the entry point to the last write
           it causes, reading every layer it passes through. One vertical slice beats a horizontal
-          survey of any single layer, because it is the only way to learn how the layers actually
-          relate rather than what the directory names claim.
+          survey of any single layer, because nothing else shows you how the layers actually relate rather than what the directory names claim.
         </p>
       </div>
 
@@ -914,7 +914,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="pass">
           <span class="when">Arrows</span>
-          <span class="what">Label every arrow with <em>what flows</em>, not with "uses". "order id" and "signed token" are labels. An unlabeled arrow means you have not actually followed it.</span>
+          <span class="what">Label every arrow with <em>what flows</em>, not with "uses". "order id" and "signed token" are labels. An unlabeled arrow, by contrast, means you have not actually followed it.</span>
         </li>
         <li data-signal="block">
           <span class="when">Question marks</span>
@@ -1248,7 +1248,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Breadth-first</span>
-          <span class="what">Reading the source tree top to bottom. Produces familiarity with names and no model of behavior. One trace, all the way down, beats it every time.</span>
+          <span class="what">Reading the source tree top to bottom. Produces familiarity with names and no model of behavior, and one trace, all the way down, beats it every time.</span>
         </li>
         <li data-signal="block">
           <span class="when">The generated diagram</span>

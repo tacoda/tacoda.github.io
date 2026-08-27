@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Eval Loop · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -727,7 +728,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         third stopped working.
       </p>
       <p>
-        The reason this persists is not laziness. It is that measuring a non-deterministic system feels
+        The reason this persists is not laziness, but that measuring a non-deterministic system feels
         like it requires apparatus nobody has time to build. It does not. The version below is roughly
         a hundred and fifty lines of Python and it will catch the two failure modes above within a
         week.
@@ -802,8 +803,8 @@ CHECKS = [
       <ul>
         <li><strong>Real tickets, past tense.</strong> Take work already done. You get a known-good outcome for free and the task is genuinely shaped like your work, which a synthetic task never is.</li>
         <li><strong>Spread across the failure modes you care about.</strong> If half your charter is about money handling, several tasks should touch money. The set is a statement about what you are worried about.</li>
-        <li><strong>Include three you expect to fail.</strong> A set everything passes cannot show improvement, only regression. Headroom is a design requirement.</li>
-        <li><strong>Two that need a refusal.</strong> Tasks where the correct behaviour is to stop and ask. Charters that are pure encouragement score suspiciously well until you add these.</li>
+        <li><strong>Include three you expect to fail.</strong> A set everything passes cannot show improvement, only regression, so headroom is a design requirement.</li>
+        <li><strong>Two that need a refusal.</strong> Tasks where the correct behaviour is to stop and ask. Without them, charters that are pure encouragement score suspiciously well until you add these.</li>
       </ul>
 
       <div class="callout">
@@ -860,7 +861,7 @@ def policy_cited(w, r):
       </figure>
 
       <p>
-        Each of these is a rule from the charter, compiled into a sensor. That is the same move as
+        Each of these is a rule from the charter, compiled into a sensor, which is the same move as
         <a href="/guardrails/">turning a rule into a hook</a>, pointed at measurement instead of
         enforcement, and it has the same payoff: a property that is checked mechanically stops being a
         matter of opinion.
@@ -991,7 +992,7 @@ Answer NO if you are unsure.
 
     <div class="rung-body">
       <p>
-        The question is never "is this output good". It is "is the charter on this branch better than
+        The question is never "is this output good", but "is the charter on this branch better than
         the one on main". So run both, on the same task, and ask the judge which it prefers, with the
         two labels hidden and the order swapped.
       </p>
@@ -1161,7 +1162,7 @@ jobs:
       </figure>
 
       <p>
-        That report is the point of the whole exercise. It is specific about the thing that got better,
+        That report is the point of the whole exercise, specific about the thing that got better,
         specific about the thing that got worse, and explicitly agnostic about the part it cannot
         resolve. A reviewer can act on all three statements.
       </p>

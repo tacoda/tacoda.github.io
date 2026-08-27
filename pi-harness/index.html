@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building a Harness with pi · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -931,7 +932,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Belt 1</span>
-          <span class="what"><strong>The connection.</strong> <code>node:sqlite</code> opened with <code>readOnly: true</code>. SQLite rejects every write at the engine level. This is the belt that holds even if the other two have a bug.</span>
+          <span class="what"><strong>The connection.</strong> <code>node:sqlite</code> opened with <code>readOnly: true</code>. SQLite rejects every write at the engine level, which is the belt that holds even if the other two have a bug.</span>
         </li>
         <li data-signal="block">
           <span class="when">Belt 2</span>
@@ -979,7 +980,7 @@ function checkReadOnly(sql: string): { ok: boolean; reason?: string } {
         Without <code>scrub</code>, a legitimate query containing the word "update" inside a string
         literal gets rejected, and a semicolon inside a literal reads as statement stacking. A guard
         that produces false refusals on valid work is a guard the operator eventually removes, so
-        the scrubbing is not a nicety. It is what keeps the belt in place.
+        the scrubbing is not a nicety, but what keeps the belt in place.
       </p>
 
       <h3 class="sub">The guard has a runnable spec</h3>
@@ -1070,8 +1071,7 @@ description: Plain-English-to-SQL answer loop (understand the question →
         <p>
           The playbook's loop includes <em>sanity-check</em> before <em>answer</em>. A query that
           runs is not a query that answers the question asked, and the failure mode of this harness
-          is not a crash: it is a confident sentence containing the wrong number. That step is
-          cheap, and it is the only thing standing between a fluent answer and a wrong one.
+          is not a crash: it is a confident sentence containing the wrong number. That step is cheap, and it is what stands between a fluent answer and a wrong one.
         </p>
       </div>
     </div>

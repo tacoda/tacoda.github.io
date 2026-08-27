@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Five Guardrails — Harness Engineering · Ian Johnson</title>
+<title>Five Guardrails · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
 <meta name="description" content="Five worked examples of agent guardrails, ascending from a single deny-list entry to a self-measuring delivery loop. From Harness Engineering by Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
@@ -11,11 +12,11 @@
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="tacoda.dev">
-<meta property="og:title" content="Five Guardrails — Harness Engineering">
+<meta property="og:title" content="Five Guardrails · Harness Engineering">
 <meta property="og:description" content="Five worked examples of agent guardrails, ascending from a single deny-list entry to a self-measuring delivery loop.">
 <meta property="og:url" content="https://www.tacoda.dev/guardrails/">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Five Guardrails — Harness Engineering">
+<meta name="twitter:title" content="Five Guardrails · Harness Engineering">
 <meta name="twitter:description" content="Five worked examples of agent guardrails, ascending from a single deny-list entry to a self-measuring delivery loop.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -635,19 +636,17 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Five guardrails, from <em>one line of config</em> to a closed loop</h1>
     <p class="standfirst">
-      Every example below is running code in a production charter — a Laravel API with a
+      Every example below is running code in a production charter: a Laravel API with a
       TypeScript/React front end, Docker for local development, Jira and GitHub for state.
       Nothing here depends on that stack. Swap Laravel for Rails or Django, <code>make</code> for
       <code>just</code> or <code>npm run</code>, Jira for Linear: the patterns are about
-      <em>where a constraint is enforced</em>, not what enforces it. They ascend deliberately —
-      rung&nbsp;1 is a rule and a deny-list entry; rung&nbsp;5 is an orchestrator that measures
-      its own cost and writes new rules back into the charter it runs under. Each rung buys
-      something the one below it could not.
+      <em>where a constraint is enforced</em>, not what enforces it. They ascend deliberately:       rung&nbsp;1 is a rule and a deny-list entry; rung&nbsp;5 is an orchestrator that measures
+      its own cost and writes new rules back into the charter it runs under. Each rung closes a gap the one below it leaves open.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
       <span class="name">Ian Johnson</span>
-      <span class="role">— author of <em>Harness Engineering</em> · tacoda.dev</span>
+      <span class="role">, author of <em>Harness Engineering</em> · tacoda.dev</span>
     </p>
 
     <div class="provenance">
@@ -675,7 +674,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>Pass / sanctioned</dt>
-          <dd>The permitted path the guardrail leaves open — a make target, an escape marker.</dd>
+          <dd>The permitted path the guardrail leaves open: a make target, an escape marker.</dd>
         </div>
       </div>
     </dl>
@@ -706,7 +705,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p class="thesis">
           The cheapest guardrail there is: prose that states the intent, a deny list that makes
           it non-negotiable, and a sanctioned path that makes compliance the easy option.
-          No scripts, no hooks — three artifacts pointing the same direction.
+          No scripts, no hooks: three artifacts pointing the same direction.
         </p>
         <div class="chips">
           <span class="chip kind-rule"><b>rule</b> .claude/rules/toolchain.md</span>
@@ -719,7 +718,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         This project runs entirely inside Docker. An agent that types <code>php artisan migrate</code>
-        executes it on the host, where there is no PHP extension set and no database — and then,
+        executes it on the host, where there is no PHP extension set and no database, and then,
         being helpful, invents a workaround. The failure is not that the command was wrong; it is
         that the wrong command was <em>available</em>.
       </p>
@@ -727,7 +726,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <h3 class="sub">The three artifacts</h3>
 
       <figure class="code">
-        <figcaption><span>.claude/rules/toolchain.md — the guide, always-on (<code>paths: **</code>)</span><span class="tag warn">authored</span></figcaption>
+        <figcaption><span>.claude/rules/toolchain.md: the guide, always-on (<code>paths: **</code>)</span><span class="tag warn">authored</span></figcaption>
         <pre><code>**Always use `make` targets.** Never run `npm`, `npx`, `php`, `php artisan`,
 `composer`, `vite`, or similar tools directly — they execute on the host, not
 in the container, and bypass the project's environment.
@@ -740,7 +739,7 @@ in the container, and bypass the project's environment.
       </figure>
 
       <figure class="code">
-        <figcaption><span>.claude/settings.json — the enforcement</span><span class="tag block">refuses at tool-call time</span></figcaption>
+        <figcaption><span>.claude/settings.json: the enforcement</span><span class="tag block">refuses at tool-call time</span></figcaption>
 <pre><code>"permissions": {
   "allow": [
     <span class="c-pass">"Bash(make *)"</span>, "Bash(git *)", "Bash(gh *)", "Bash(jira *)",
@@ -755,7 +754,7 @@ in the container, and bypass the project's environment.
       </figure>
 
       <figure class="code">
-        <figcaption><span>Makefile — the sanctioned path, self-documenting</span><span class="tag pass">permitted</span></figcaption>
+        <figcaption><span>Makefile: the sanctioned path, self-documenting</span><span class="tag pass">permitted</span></figcaption>
 <pre><code>test-parallel:  <span class="c-dim">## Run use-case-tier tests in parallel via paratest (no DB)</span>
 test-adapter:   <span class="c-dim">## Run adapter-tier tests against SQLite :memory: / stubbed HTTP</span>
 pint-fix:       <span class="c-dim">## Fix PHP code style (ARGS= for extra flags)</span>
@@ -766,7 +765,7 @@ migrate:        <span class="c-dim">## Run database migrations (ARGS= for extra 
       <ol class="sequence">
         <li data-signal="none">
           <span class="when">Session start</span>
-          <span class="what"><code>toolchain.md</code> auto-loads — its <code>paths:</code> glob is <code>**</code>, so it is in context every turn.</span>
+          <span class="what"><code>toolchain.md</code> auto-loads: its <code>paths:</code> glob is <code>**</code>, so it is in context every turn.</span>
         </li>
         <li data-signal="block">
           <span class="when">Tool call</span>
@@ -774,7 +773,7 @@ migrate:        <span class="c-dim">## Run database migrations (ARGS= for extra 
         </li>
         <li data-signal="pass">
           <span class="when">Recovery</span>
-          <span class="what">The rule already named the alternative, so the retry is <code>make migrate</code> — not an invented workaround.</span>
+          <span class="what">The rule already named the alternative, so the retry is <code>make migrate</code>, not an invented workaround.</span>
         </li>
       </ol>
 
@@ -782,8 +781,7 @@ migrate:        <span class="c-dim">## Run database migrations (ARGS= for extra 
         <span class="label">Without it</span>
         <p>
           The rule alone is advisory: a sufficiently stuck agent reasons its way past prose
-          ("just this once, to check the version"). The deny list alone is a wall with no door —
-          blocked, no stated alternative, and the agent starts guessing at paths.
+          ("just this once, to check the version"). The deny list alone is a wall with no door: blocked, no stated alternative, and the agent starts guessing at paths you never meant it to try.
         </p>
       </div>
 
@@ -814,7 +812,7 @@ migrate:        <span class="c-dim">## Run database migrations (ARGS= for extra 
         <h2>Compiling a rule into a sensor</h2>
         <p class="thesis">
           A deny list matches command strings. It cannot see inside a file write. To enforce a
-          content rule you need a hook that reads the tool payload — and, crucially, one that
+          content rule you need a hook that reads the tool payload, and, crucially, one that
           inspects only the <em>new</em> content, so the gate judges the change rather than the
           codebase.
         </p>
@@ -829,12 +827,12 @@ migrate:        <span class="c-dim">## Run database migrations (ARGS= for extra 
     <div class="rung-body">
       <p>
         The rule's frontmatter carries the incident that motivated it. That <code>why:</code>
-        field is not documentation courtesy — it is what lets an agent reason about the edge case
+        field is not documentation courtesy, because it is what lets an agent reason about the edge case
         the rule's letter does not cover.
       </p>
 
       <figure class="code">
-        <figcaption><span>.claude/rules/prohibited-patterns.md — frontmatter</span><span class="tag warn">authored</span></figcaption>
+        <figcaption><span>.claude/rules/prohibited-patterns.md: frontmatter</span><span class="tag warn">authored</span></figcaption>
 <pre><code>---
 description: Functions and patterns that must never appear in committed code —
   debug output, raw queries, imperative array functions, lazy-loaded relationships
@@ -852,7 +850,7 @@ why: A `dd()` shipped to production swallowed a KeyboardInterrupt and broke the
       </figure>
 
       <figure class="code">
-        <figcaption><span>scripts/charter/check-banned-tokens.sh — the sensor</span><span class="tag block">exit 2</span></figcaption>
+        <figcaption><span>scripts/charter/check-banned-tokens.sh: the sensor</span><span class="tag block">exit 2</span></figcaption>
 <pre><code><span class="c-dim"># Extract NEW content from tool input — the gate judges the change,
 # not the file it lands in.</span>
 case "$tool" in
@@ -889,15 +887,15 @@ fi</code></pre>
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Fail open</span>
-          <span class="what">No file path, non-code extension, or an allowlisted directory (<code>scripts/</code>, <code>vendor/</code>, <code>database/migrations/</code>) → <code>exit 0</code>. A sensor that blocks on cases it does not understand is a sensor that gets turned off.</span>
+          <span class="what">No file path, non-code extension, or an allowlisted directory (<code>scripts/</code>, <code>vendor/</code>, <code>database/migrations/</code>) → <code>exit 0</code>. A sensor that blocks on cases it does not understand is a sensor you will end up turning off.</span>
         </li>
         <li data-signal="block">
           <span class="when">Exit 2 talks</span>
-          <span class="what">Exit&nbsp;2 returns stderr <em>to the agent</em>, not to a log read after the fact. The block message is therefore written as a prompt: what fired, why, and the specific alternative to use instead.</span>
+          <span class="what">Exit&nbsp;2 returns stderr <em>to the agent</em>, not to a log read after the fact. So write the block message as a prompt: what fired, why, and the specific alternative you want used instead.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Two escape grains</span>
-          <span class="what">Per-line <code>// charter:allow</code> and whole-run <code>CHARTER_BYPASS=1</code>. One legitimate exception should not require disabling the gate globally — that is how gates die.</span>
+          <span class="what">Per-line <code>// charter:allow</code> and whole-run <code>CHARTER_BYPASS=1</code>. One legitimate exception should not require disabling the gate globally, because that is how gates die.</span>
         </li>
         <li data-signal="warn">
           <span class="when">Names its rule</span>
@@ -909,8 +907,7 @@ fi</code></pre>
         <span class="label">Without it</span>
         <p>
           The rule fires only when the file's path happens to match a loaded glob and the agent
-          happens to weight it. A <code>dd()</code> inserted while debugging survives to review —
-          and a one-line debug statement in a large diff is precisely what review skims past.
+          happens to weight it. A <code>dd()</code> inserted while debugging survives to review,           and a one-line debug statement in a large diff is precisely what your review skims past.
         </p>
       </div>
 
@@ -920,7 +917,7 @@ fi</code></pre>
           This is the compilation step: a rule that can be expressed as a regex over new content
           should be <em>both</em> prose and a hook. Prose so the agent generalises; a hook so
           compliance does not depend on generalisation. The test for whether a rule is ready to
-          compile is falsifiability — "no <code>env()</code> outside <code>config/</code>" compiles;
+          compile is falsifiability: "no <code>env()</code> outside <code>config/</code>" compiles;
           "prefer clean code" never will.
         </p>
       </div>
@@ -942,7 +939,7 @@ fi</code></pre>
         <p class="thesis">
           <code>commits.md</code> is one rule file with two iron laws: no AI attribution, and no
           commit with failing checks. It is enforced at four different points in the session
-          lifecycle, because each failure is cheapest to catch at a different moment — and one of
+          lifecycle, because each failure is cheapest to catch at a different moment, and one of
           those sensors exists purely to detect that the others are missing.
         </p>
         <div class="chips">
@@ -962,7 +959,7 @@ fi</code></pre>
         <li data-signal="warn">
           <span class="when">T0 · Session start</span>
           <span class="what">
-            <code>session-start.sh</code> prints branch, last commit, dirty count — then checks
+            <code>session-start.sh</code> prints branch, last commit, dirty count, then checks
             that the git pre-commit hook is actually installed and executable.
             <strong>A missing hook is not an inconvenience; it is the silent absence of
             verification</strong>, so it warns loudly.
@@ -973,7 +970,7 @@ fi</code></pre>
           <span class="what">
             <code>check-commit-msg.sh</code> intercepts <code>git commit -m</code> and tests the
             subject against Conventional Commits with an optional <code>[PROJ-123]</code> prefix.
-            Blocks before the commit object exists — nothing to amend, nothing to force-push.
+            Blocks before the commit object exists: nothing to amend, nothing to force-push.
           </span>
         </li>
         <li data-signal="block">
@@ -993,7 +990,7 @@ fi</code></pre>
       </ol>
 
       <figure class="code">
-        <figcaption><span>scripts/charter/session-start.sh — the sensor that checks the sensors</span><span class="tag warn">stderr, non-blocking</span></figcaption>
+        <figcaption><span>scripts/charter/session-start.sh: the sensor that checks the sensors</span><span class="tag warn">stderr, non-blocking</span></figcaption>
 <pre><code><span class="c-dim"># The git hook is the ONLY gate on the commit path (commits.md) — the agent no
 # longer runs `make pre-commit` explicitly. So a missing hook is not a small
 # inconvenience, it is silent absence of verification. Warn loudly.</span>
@@ -1006,7 +1003,7 @@ fi</code></pre>
       </figure>
 
       <figure class="code">
-        <figcaption><span>scripts/charter/check-commit-msg.sh — fail-open parsing, strict matching</span><span class="tag block">exit 2</span></figcaption>
+        <figcaption><span>scripts/charter/check-commit-msg.sh: fail-open parsing, strict matching</span><span class="tag block">exit 2</span></figcaption>
 <pre><code><span class="c-dim"># Only intercept actual `git commit -m ...` invocations. Other commands
 # (gh pr create, jira comment) may contain the literal string "git commit"
 # in a body/heredoc — those must pass.</span>
@@ -1029,7 +1026,7 @@ fi</code></pre>
       </figure>
 
       <figure class="code">
-        <figcaption><span>scripts/detect-scope.sh — the exception, reasoned rather than convenient</span><span class="tag pass">scopes the gate</span></figcaption>
+        <figcaption><span>scripts/detect-scope.sh: the exception, reasoned rather than convenient</span><span class="tag pass">scopes the gate</span></figcaption>
 <pre><code>case "$f" in
     *.md|*.txt|*.rst|LICENSE|LICENSE.*) ;;
     <span class="c-dim"># Generated by `make charter-index` and read by no checker, so `all`
@@ -1049,8 +1046,7 @@ esac</code></pre>
           Collapse these to a single commit-time gate and you get the expensive failure mode: a
           malformed subject line discovered after a six-minute full-suite run, or worse, a "done"
           declared on a red tree because nothing checked at the moment the claim was made. The
-          <code>SessionStart</code> warning is the easiest of the four to skip building, because
-          it blocks nothing — and it is the one that catches a fresh clone where
+          <code>SessionStart</code> warning is the easiest of the four to skip building, because it blocks nothing, yet it catches a fresh clone where
           <code>make install-hooks</code> never ran and <em>every other sensor on this list is
           silently absent</em>.
         </p>
@@ -1060,7 +1056,7 @@ esac</code></pre>
         <span class="label">For the book</span>
         <p>
           Enforcement moment is a design variable, not an implementation detail. Ask, for each
-          law: <em>when is this failure cheapest to fix?</em> Then place the sensor there — and
+          law: <em>when is this failure cheapest to fix?</em> Then place the sensor there, and
           place one more sensor where you would discover that the first is gone. Note the
           asymmetry in the parsing: <strong>strict about what it rejects, generous about what it
           declines to judge</strong>. Unparseable input exits&nbsp;0. Gates that guess block real
@@ -1083,7 +1079,7 @@ esac</code></pre>
       <div>
         <h2>Pairing a dumb gate with an agent that reads intent</h2>
         <p class="thesis">
-          Every codebase has one module where mistakes are not recoverable — the billing
+          Every codebase has one module where mistakes are not recoverable: the billing
           calculator, the permissions resolver, the migration runner. Protecting it needs two
           kinds of sensor that fail in opposite directions: a script that counts, and an agent
           that understands. The charter deliberately pairs them.
@@ -1101,8 +1097,7 @@ esac</code></pre>
     <div class="rung-body">
       <p>
         The rule's <code>why:</code> and its "recent regression context" section do work no regex
-        can: they tell the agent <em>which kind of caution</em> applies here. Not "be careful" —
-        specifically, pin behaviour before touching it, and never bundle a behaviour change with
+        can: they tell the agent <em>which kind of caution</em> applies here. Not "be careful", but         specifically, pin behaviour before touching it, and never bundle a behaviour change with
         a refactor. Substitute your own module and your own incident; the shape holds.
       </p>
 
@@ -1110,7 +1105,7 @@ esac</code></pre>
         <figcaption><span>.claude/rules/billing-high-risk.md</span><span class="tag warn">authored · locked</span></figcaption>
 <pre><code>---
 description: The billing calculator is mission-critical and recently regressed
-  — changes require regression tests, explicit approval for behavior changes,
+ : changes require regression tests, explicit approval for behavior changes,
   and characterization tests before any refactor
 paths:
   - "app/Services/Billing/**"
@@ -1144,7 +1139,7 @@ combination the suite did not pin. Until the characterization cards land,
         <li data-signal="block">
           <span class="when">Mechanical</span>
           <span class="what">
-            <code>check-regression-test.sh</code> — app code changed, no test file added or
+            <code>check-regression-test.sh</code>: app code changed, no test file added or
             modified → <code>exit 2</code>. It cannot tell a good test from a bad one. It does not
             need to; it catches the case where there is none.
           </span>
@@ -1152,7 +1147,7 @@ combination the suite did not pin. Until the characterization cards land,
         <li data-signal="pass">
           <span class="when">Judgment</span>
           <span class="what">
-            <code>billing-risk.md</code> — a read-only agent with <code>allowed_tools</code>
+            <code>billing-risk.md</code>: a read-only agent with <code>allowed_tools</code>
             restricted to <code>Read</code>, <code>Grep</code>, <code>Glob</code> and three
             <code>git</code> verbs. It reads the diff and asks whether the test actually pins the
             behaviour, and whether the math precision quietly shifted.
@@ -1161,21 +1156,21 @@ combination the suite did not pin. Until the characterization cards land,
         <li data-signal="warn">
           <span class="when">Mechanical</span>
           <span class="what">
-            <code>check-diff-size.sh</code> — warns past 15 files, blocks past 40. Pure counting;
+            <code>check-diff-size.sh</code>: warns past 15 files, blocks past 40. Pure counting;
             no idea what the card asked for.
           </span>
         </li>
         <li data-signal="pass">
           <span class="when">Judgment</span>
           <span class="what">
-            <code>scope-guard.md</code> — reads the Jira card and the diff together, and flags
+            <code>scope-guard.md</code>: reads the Jira card and the diff together, and flags
             drive-by edits that are individually reasonable and collectively out of scope.
           </span>
         </li>
       </ol>
 
       <figure class="code">
-        <figcaption><span>scripts/charter/check-diff-size.sh — a gate that names its own companion</span><span class="tag block">exit 2 past hard ceiling</span></figcaption>
+        <figcaption><span>scripts/charter/check-diff-size.sh: a gate that names its own companion</span><span class="tag block">exit 2 past hard ceiling</span></figcaption>
 <pre><code><span class="c-dim"># Blast-radius gate. A "small fix" that quietly rewrote 40 files is a signal to
 # stop and look. Mechanical backstop to the intent-aware
 # .claude/agents/scope-guard.md.</span>
@@ -1203,7 +1198,7 @@ fi</code></pre>
           Gates alone: a change adds one trivial assertion, passes the regression gate, and ships
           a rounding-mode shift. Agents alone: expensive, non-deterministic, and the first thing
           dropped when a run is under time pressure. The regression that motivated this rule turned
-          on a date-and-rounding edge case — it would have passed a file-count check and a
+          on a date-and-rounding edge case, so it would have passed a file-count check and a
           test-presence check both.
         </p>
       </div>
@@ -1212,8 +1207,8 @@ fi</code></pre>
         <span class="label">For the book</span>
         <p>
           Sensors have a cost/precision curve, and high-risk code needs both ends of it. Scripts
-          are free, deterministic and dumb — run them always. Agents are expensive, probabilistic
-          and can read intent — run them where the blast radius justifies the cost. The
+          are free, deterministic and dumb, so run them always. Agents are expensive, probabilistic
+          and can read intent, so run them where the blast radius justifies the cost. The
           implementation detail that makes the pair work: <strong>each one names the other in its
           output</strong>, so a human who sees the cheap signal knows the expensive check exists.
         </p>
@@ -1232,12 +1227,12 @@ fi</code></pre>
         <span class="meter-label">Closed loop</span>
       </div>
       <div>
-        <h2>The loop that writes its own rules — and the brake that stops it</h2>
+        <h2>The loop that writes its own rules: and the brake that stops it</h2>
         <p class="thesis">
           Everything above composes into one delivery run: an orchestrator derives the next phase
           from external state, dispatches it to a subagent, verifies from the store rather than
           the report, prices the run, and proposes a new charter rule. Then the interesting part
-          — the machinery that stops that flywheel from becoming a ratchet.
+         : the machinery that stops that flywheel from becoming a ratchet.
         </p>
         <div class="chips">
           <span class="chip kind-skill"><b>skill</b> /drive</span>
@@ -1259,7 +1254,7 @@ fi</code></pre>
         <li data-signal="none">
           <span class="when">Drive</span>
           <span class="what">
-            <code>/drive</code> reads Jira, GitHub and git — never conversation memory — and
+            <code>/drive</code> reads Jira, GitHub and git, never conversation memory, and
             derives the next phase from a table. Its iron law is <em>DERIVE, DON'T REMEMBER</em>.
           </span>
         </li>
@@ -1267,7 +1262,7 @@ fi</code></pre>
           <span class="when">Dispatch</span>
           <span class="what">
             One subagent, foreground, one at a time. <code>single-writer.md</code> prohibits
-            concurrent writers outright — <strong>no gate unlocks it, no urgency justifies
+            concurrent writers outright: <strong>no gate unlocks it, no urgency justifies
             it</strong>. The child gets identifiers (Jira key, PR number, worktree path), never a
             briefing; if a phase can only be dispatched by explaining the situation to it, the
             loop has drifted into holding state in conversation and must stop.
@@ -1276,8 +1271,7 @@ fi</code></pre>
         <li data-signal="pass">
           <span class="when">Fan out</span>
           <span class="what">
-            Inside <code>/implement</code>, four review agents run <em>in parallel</em> — legal,
-            because they are read-only sensors returning structured findings against a shared
+            Inside <code>/implement</code>, four review agents run <em>in parallel</em>, which is legal because they are read-only sensors returning structured findings against a shared
             schema. Reconciliation is dedup-and-filter, not a forensic merge. Only the main loop
             applies fixes.
           </span>
@@ -1285,8 +1279,7 @@ fi</code></pre>
         <li data-signal="block">
           <span class="when">Smoke</span>
           <span class="what">
-            Exercise the feature's happy path against a running stack and capture the evidence —
-            a screenshot per meaningful state, or a report. Then re-read Jira, GitHub and git.
+            Exercise the feature's happy path against a running stack and capture the evidence:             a screenshot per meaningful state, or a report. Then re-read Jira, GitHub and git.
             <em>Never trust the subagent's self-report</em>: a reported success whose write is
             invisible in external state did not happen, and a change nobody drove is a change
             nobody proved. Both are failed passes.
@@ -1295,7 +1288,7 @@ fi</code></pre>
         <li data-signal="warn">
           <span class="when">Price</span>
           <span class="what">
-            <code>make drive-metrics KEY=PROJ-482</code> — merged LOC against token cost, priced
+            <code>make drive-metrics KEY=PROJ-482</code>: merged LOC against token cost, priced
             from a rate table. Reported without editorialising, and with its two limits stated:
             list-price arithmetic, not an invoice; LOC flatters a card that wrote a lot.
           </span>
@@ -1310,7 +1303,7 @@ fi</code></pre>
       </ol>
 
       <figure class="code">
-        <figcaption><span>/learn — the bar a lesson must clear</span><span class="tag warn">approval-gated</span></figcaption>
+        <figcaption><span>/learn: the bar a lesson must clear</span><span class="tag warn">approval-gated</span></figcaption>
 <pre><code><span class="c-dim">Derive candidates from what the run *recorded*, never from recall:</span>
 1. A two-strike gate — the same failure twice.
 2. A repeated `auto-resolved:` judgment call across checkpoint lines.
@@ -1360,7 +1353,7 @@ to show for the invocation.</code></pre>
             <tr><td>rule</td><td>env-config</td><td>app/**/*.php</td><td class="num">2,058</td></tr>
             <tr><td>rule</td><td>toolchain</td><td>**</td><td class="num">1,428</td></tr>
             <tr><td>rule</td><td>role-checks</td><td>app/**/*.php</td><td class="num">1,373</td></tr>
-            <tr class="total flag"><td colspan="3">TOTAL — over budget (60,000) across 15 charter files</td><td class="num">75,830</td></tr>
+            <tr class="total flag"><td colspan="3">TOTAL (over budget (60,000) across 15 charter files)</td><td class="num">75,830</td></tr>
           </tbody>
         </table>
       </div>
@@ -1368,7 +1361,7 @@ to show for the invocation.</code></pre>
       <p>
         Read the <em>shape</em> rather than the totals. Three rules load on <code>**</code> and
         are paid on every file in the repo. Five more load on <code>app/**/*.php</code>, which is
-        most of the backend. Only two are actually specific to this module — and they are the two
+        most of the backend. Only two are actually specific to this module, and they are the two
         smallest entries in the table. That distribution is the finding: the budget is consumed
         almost entirely by rules that are not about the file being edited.
       </p>
@@ -1383,7 +1376,7 @@ to show for the invocation.</code></pre>
 
       <p>
         Two read-only scans complete the brake. <code>rule-drift.sh</code> checks every
-        <code>paths:</code> glob against the repo and flags globs matching zero files — a rule
+        <code>paths:</code> glob against the repo and flags globs matching zero files: a rule
         describing code that no longer exists. <code>decorative-rule-check.sh</code> counts each
         rule three ways (commits in 90 days, cross-references from skills and agents, mentions in
         <code>CLAUDE.md</code>/<code>CHARTER.md</code>) and marks the ones scoring zero everywhere
@@ -1397,7 +1390,7 @@ to show for the invocation.</code></pre>
           Run the flywheel for six months without a brake and the charter reaches the state every
           long-lived one does: rules that contradict each other, rules whose globs point at
           deleted directories, and a per-file load so large the agent's attention is spent reading
-          policy instead of code. The failure is invisible from inside — nothing errors. Quality
+          policy instead of code. The failure is invisible from inside: nothing errors. Quality
           just quietly degrades, and the natural response is to write another rule.
         </p>
       </div>
@@ -1409,7 +1402,7 @@ to show for the invocation.</code></pre>
           accumulates, it rots, and it needs a deletion path with the same status as its addition
           path. <code>/learn</code> and <code>/prune</code> are deliberately symmetric, both
           approval-gated, both human-owned. And the load budget makes the abstract cost of
-          "one more rule" into a number attached to a specific file — which is the only form of
+          "one more rule" into a number attached to a specific file, which is the only form of
           cost anyone actually acts on.
         </p>
       </div>
@@ -1417,7 +1410,7 @@ to show for the invocation.</code></pre>
   </section>
 
   <footer>
-    <div><strong>Five guardrails</strong> — worked examples drawn from a single production charter.
+    <div><strong>Five guardrails</strong>: worked examples drawn from a single production charter.
       <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
     <div>Rungs ascend by composition, not by size: 3 artifacts → 3 → 6 → 5 → 9, but each rung's
       artifacts depend on the ones below.</div>

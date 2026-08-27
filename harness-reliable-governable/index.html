@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="talk">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Reliable & Governable AI — Harness Engineering</title>
+<title>Reliable & Governable AI · Harness Engineering</title>
 <style>
   :root {
     --ink: #10131a;
@@ -156,11 +157,11 @@
       <div class="body center" style="gap:0;">
         <div style="width:100%; max-width:920px;">
           <h1 class="title" style="font-size:62px; max-width:24ch;">Making AI reliable <span style="color:var(--signal)">and</span> governable</h1>
-          <p class="lede" style="font-size:24px; max-width:46ch; margin-top:24px;">Fold the processes, policies, and regulation you already run into the harness. Wrap the model in deterministic layers it cannot talk its way past — gates you enforce, and an audit trail you can read.</p>
+          <p class="lede" style="font-size:24px; max-width:46ch; margin-top:24px;">Fold the processes, policies, and regulation you already run into the harness. Wrap the model in deterministic layers it cannot talk its way past : gates you enforce, and an audit trail you can read.</p>
           <div class="legend" style="margin-top:38px;">
-            <span><i class="sw-signal"></i> soft — rules the model reads</span>
-            <span><i class="sw-gate"></i> hard — gates the harness enforces</span>
-            <span><i class="sw-stop"></i> stop — fail-closed</span>
+            <span><i class="sw-signal"></i> soft : rules the model reads</span>
+            <span><i class="sw-gate"></i> hard : gates the harness enforces</span>
+            <span><i class="sw-stop"></i> stop : fail-closed</span>
           </div>
         </div>
       </div>
@@ -173,8 +174,8 @@
       <div class="body">
         <div class="col center" style="flex:1.1;">
           <ul class="clean" style="gap:18px; font-size:21px;">
-            <li>Staff software engineer at <b>Parento</b> — agents against a real production codebase, daily.</li>
-            <li class="gate">Founder of <b>Fulcorum</b> <span class="muted">· fulcorum.com</span> — on-demand video courses on shipping AI-generated code that's production-grade.</li>
+            <li>Staff software engineer at <b>Parento</b> , running agents against a real production codebase, daily.</li>
+            <li class="gate">Founder of <b>Fulcorum</b> <span class="muted">· fulcorum.com</span> , on-demand video courses on shipping AI-generated code that's production-grade.</li>
             <li>Author of <b>Harness Engineering</b> and the open-source tool <b>Keystone</b>.</li>
           </ul>
         </div>
@@ -197,7 +198,7 @@
           <div style="height:16px"></div>
           <div class="panel" style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px; border-left:3px solid var(--stop);">
             <div class="kicker" style="color:var(--stop)">Wednesday</div>
-            <p style="font-size:19px; line-height:1.45;">Noticed an old <code>status.ts</code>. Unified the two. Refactored both. Broke a test — marked it flaky. Opened a PR claiming done. <b>Four hundred lines.</b></p>
+            <p style="font-size:19px; line-height:1.45;">Noticed an old <code>status.ts</code>. Unified the two. Refactored both. Broke a test , marked it flaky. Opened a PR claiming done. <b>Four hundred lines.</b></p>
           </div>
         </div>
         <div class="col center" style="flex:.9;">
@@ -213,9 +214,9 @@
       <div class="body">
         <div class="col center">
           <ul class="clean" style="gap:18px;">
-            <li>Temperature zero <b>narrows</b> the distribution — it does not <b>collapse</b> it.</li>
+            <li>Temperature zero <b>narrows</b> the distribution , but it does not <b>collapse</b> it.</li>
             <li>Sampling shifts with tool-result order, file timestamps, how the last turn tokenized, the order of a directory listing.</li>
-            <li>Identical prompt, identical model — <b>different output</b>, because the inputs are never identical at the byte level.</li>
+            <li>Identical prompt, identical model , <b>different output</b>, because the inputs are never identical at the byte level.</li>
           </ul>
         </div>
         <div class="col center">
@@ -232,7 +233,7 @@
         <canvas id="bandCanvas" width="1060" height="352" style="width:1060px; height:352px;"></canvas>
       </div>
       <div class="legend center" style="justify-content:center; margin-top:2px;">
-        <span><i class="sw-signal"></i> agent output — the signal drifts</span>
+        <span><i class="sw-signal"></i> agent output : the signal drifts</span>
         <span><i class="sw-gate"></i> the rails you build narrow the band</span>
       </div>
     </section>
@@ -243,13 +244,13 @@
       <h2>The band is a number a skeptic can check.</h2>
       <div class="body">
         <div class="col center" style="flex:1.2;">
-          <div class="pull gate">A repository carrying a charter with the properties this book describes produces a measurably narrower agent-output band than the same repository without one, holding the model constant.<cite>Harness Engineering · Ch.3 — the falsifiable claim</cite></div>
+          <div class="pull gate">A repository carrying a charter with the properties this book describes produces a measurably narrower agent-output band than the same repository without one, holding the model constant.<cite>Harness Engineering · Ch.3 : the falsifiable claim</cite></div>
         </div>
         <div class="col center">
           <div class="panel" style="width:100%;">
             <div class="kicker">How you prove it</div>
             <ul class="clean" style="gap:12px;">
-              <li class="gate">Two arms — charter <span class="muted">absent</span> vs <span class="muted">present</span>, nothing else touched.</li>
+              <li class="gate">Two arms : charter <span class="muted">absent</span> vs <span class="muted">present</span>, nothing else touched.</li>
               <li class="gate">Same task set, same model, <b>n ≥ 30</b> per arm.</li>
               <li class="gate">Score every run <b>blind</b> against the intent contract.</li>
               <li class="gate">Compare failure rate and band width.</li>
@@ -261,7 +262,7 @@
 
     <!-- 7 · AMPLIFICATION -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot"></span> Why The Band Matters · The Amplification Thesis</div>
+      <div class="eyebrow"><span class="dot"></span> Why the band matters · the amplification thesis</div>
       <h2>The agent is a multiplier on the discipline it finds.</h2>
       <div class="body">
         <div class="col" style="flex:1.1;">
@@ -287,7 +288,7 @@
         </div>
         <div class="col center">
           <div class="pull">The agent does not change your standards. It enforces them. The lower the standards, the more enforcement you get.<cite>Harness Engineering · Ch.2</cite></div>
-          <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:34ch;">Volume is the variable that did not exist before — and volume picks whichever side the existing code points at.</p>
+          <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:34ch;">Volume is the variable that did not exist before , and volume picks whichever side the existing code points at.</p>
         </div>
       </div>
     </section>
@@ -315,13 +316,13 @@
             <line x1="360" y1="78" x2="360" y2="234" class="s-line" stroke-width="2"/>
             <rect x="300" y="240" width="120" height="26" rx="4" class="f-signal" opacity=".14"/>
             <text x="360" y="258" text-anchor="middle" class="f-signal" font-size="13">INPUT</text>
-            <text x="360" y="292" text-anchor="middle" class="t-faint" font-size="11">feedforward — the contract</text>
+            <text x="360" y="292" text-anchor="middle" class="t-faint" font-size="11">feedforward : the contract</text>
           </g>
           <g>
             <line x1="620" y1="100" x2="620" y2="212" class="s-line" stroke-width="2"/>
             <rect x="565" y="240" width="110" height="26" rx="4" class="f-gate" opacity=".16"/>
             <text x="620" y="258" text-anchor="middle" class="f-gate" font-size="13">OUTPUT</text>
-            <text x="620" y="292" text-anchor="middle" class="t-faint" font-size="11">gates — enforced, observed</text>
+            <text x="620" y="292" text-anchor="middle" class="t-faint" font-size="11">gates : enforced, observed</text>
           </g>
           <g>
             <line x1="860" y1="116" x2="860" y2="196" class="s-line" stroke-width="2"/>
@@ -352,7 +353,7 @@
 
     <!-- 10 · THE LADDER -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> The Ladder · From Tribal Knowledge to Deterministic Workflow</div>
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> The ladder · from tribal knowledge to deterministic workflow</div>
       <h2>Push each policy as far down as it can honestly go.</h2>
       <div class="body center">
         <svg viewBox="0 0 1120 300" style="width:100%; height:100%;">
@@ -361,8 +362,8 @@
           <line x1="445" y1="18" x2="445" y2="268" class="s-faint" stroke-dasharray="3 7"/>
           <line x1="650" y1="18" x2="650" y2="268" class="s-faint" stroke-dasharray="3 7"/>
           <line x1="855" y1="18" x2="855" y2="268" class="s-faint" stroke-dasharray="3 7"/>
-          <text x="236" y="14" class="t-faint" font-size="11">soft — the model can ignore it</text>
-          <text x="1104" y="290" text-anchor="end" class="t-faint" font-size="11">hard — the run enforces it →</text>
+          <text x="236" y="14" class="t-faint" font-size="11">soft : the model can ignore it</text>
+          <text x="1104" y="290" text-anchor="end" class="t-faint" font-size="11">hard : the run enforces it →</text>
 
           <!-- row 1 · Tribal -->
           <text x="216" y="51" text-anchor="end" class="t-disp f-muted" font-size="16">Tribal</text>
@@ -393,7 +394,7 @@
 
     <!-- 11 · GOVERNANCE NESTING -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> Governance · The Same Move At Business Altitude</div>
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> Governance · the same move at business altitude</div>
       <h2>The org charter is business governance, compiled.</h2>
       <div class="body">
         <div class="col center" style="flex:1;">
@@ -415,14 +416,14 @@
         </div>
         <div class="col center">
           <div class="pull">Governance states the policy. The repo is where it becomes a wall.<cite>Harness Engineering · Ch.62</cite></div>
-          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:22px; max-width:36ch;">The charter need not stay a document. The same layer can enforce itself as a harness — gates for the irreversible policies — or serve org knowledge the agent queries on demand, as a RAG index or an MCP server.</p>
+          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:22px; max-width:36ch;">The charter need not stay a document. The same layer can enforce itself as a harness , with gates for the irreversible policies , or serve org knowledge the agent queries on demand, as a RAG index or an MCP server.</p>
         </div>
       </div>
     </section>
 
     <!-- 12 · PREVENT / DETECT -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot gate"></span><span class="dot"></span> Govern Before, Observe After</div>
+      <div class="eyebrow"><span class="dot gate"></span><span class="dot"></span> Govern before, observe after</div>
       <h2>Prevent what you can. Detect the rest. Feed one into the other.</h2>
       <div class="body center">
         <svg viewBox="0 0 1000 280" style="width:100%; height:100%;">
@@ -448,7 +449,7 @@
 
     <!-- 13 · INVOKE SEAM / GUARDRAIL -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot gate"></span><span class="dot stop"></span> Prevention · At the Invoke Seam</div>
+      <div class="eyebrow"><span class="dot gate"></span><span class="dot stop"></span> Prevention · at the invoke seam</div>
       <h2>A guardrail runs whether the model cooperates or not.</h2>
       <div class="body center">
         <svg viewBox="0 0 1080 260" style="width:100%; height:100%;">
@@ -479,17 +480,17 @@
 
     <!-- 14 · HUMAN IN THE LOOP -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot stop"></span> The Guardrail That Waits</div>
-      <h2>Human-in-the-loop stops before the action — not after.</h2>
+      <div class="eyebrow"><span class="dot stop"></span> The guardrail that waits</div>
+      <h2>Human-in-the-loop stops before the action , not after.</h2>
       <div class="body">
         <div class="col center" style="flex:1.1;">
-          <div class="pull stop">A guardrail that pauses the run and escalates on a high-risk or low-confidence action. Not a review after the fact — the loop stops and waits <i>before</i> the action.<cite>Harness Engineering · Ch.37</cite></div>
+          <div class="pull stop">A guardrail that pauses the run and escalates on a high-risk or low-confidence action. Not a review after the fact : the loop stops and waits <i>before</i> the action.<cite>Harness Engineering · Ch.37</cite></div>
         </div>
         <div class="col center">
           <ul class="clean" style="gap:16px;">
             <li><b>Second signer</b> on a payments deploy.</li>
             <li>Tool call <b>held</b> because the diff touches a sensitive surface.</li>
-            <li>The pause is a <b>row in the record</b> — accountable judgment where the regime requires it.</li>
+            <li>The pause is a <b>row in the record</b> : accountable judgment where the regime requires it.</li>
           </ul>
         </div>
       </div>
@@ -532,15 +533,15 @@
       <h2>Sequencing is never a model decision.</h2>
       <div class="body">
         <div class="col center" style="flex:1.1;">
-          <div class="pull gate">The model appears in exactly one place — inside a step, doing the judgment the step exists for. Everything around it is deterministic code over a durable store.</div>
+          <div class="pull gate">The model appears in exactly one place : inside a step, doing the judgment the step exists for. Everything around it is deterministic code over a durable store.</div>
         </div>
         <div class="col center">
           <div class="panel" style="width:100%;">
             <div class="kicker" style="color:var(--gate)">What determinism buys the audit</div>
             <ul class="clean" style="gap:14px;">
-              <li class="gate"><b>Cheap</b> — no tokens spent on sequencing.</li>
-              <li class="gate"><b>Reproducible</b> — replay the data, replay the run.</li>
-              <li class="gate"><b>Auditable</b> — every decision is a row, not a rationale.</li>
+              <li class="gate"><b>Cheap</b> : no tokens spent on sequencing.</li>
+              <li class="gate"><b>Reproducible</b> : replay the data, replay the run.</li>
+              <li class="gate"><b>Auditable</b> : every decision is a row, not a rationale.</li>
             </ul>
             <p class="serif" style="font-size:16px; color:var(--muted); margin-top:16px;">A metric you cannot re-derive from the event trail is an assertion.</p>
           </div>
@@ -550,14 +551,14 @@
 
     <!-- 17 · ATTESTATIONS -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot gate"></span><span class="dot stop"></span> Attestations · The Gate With Teeth</div>
+      <div class="eyebrow"><span class="dot gate"></span><span class="dot stop"></span> Attestations · the gate with teeth</div>
       <h2>A step will not open until its checks are green.</h2>
       <div class="body">
         <div class="col center" style="flex:1;">
           <ul class="clean" style="gap:16px;">
             <li class="gate">A step <b>declares</b> the checks required before entry.</li>
             <li class="gate">The loop <b>refuses to enter</b> until they attest green.</li>
-            <li>A missing or failed attestation <b>raises</b> — it does not proceed.</li>
+            <li>A missing or failed attestation <b>raises</b> , and it does not proceed.</li>
           </ul>
           <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:38ch;">A violated design preference is a finding a sensor records. A leaked credential or an unmet attestation is a stop.</p>
         </div>
@@ -581,13 +582,13 @@
 
     <!-- 18 · AUDIT TRAIL -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot"></span> Observability · The Audit Trail Your Regime Consumes</div>
+      <div class="eyebrow"><span class="dot"></span> Observability · the audit trail your regime consumes</div>
       <h2>Everything is an event. The record is the source of truth.</h2>
       <div class="body">
         <div class="col center">
           <div class="panel" style="width:100%; border-left:3px solid var(--gate);">
             <div class="kicker" style="color:var(--gate)">Retention</div>
-            <p style="font-size:18px;">Audit records carry a purge policy. "Keep forever" and "keep ninety days" are both choices you <b>write down</b> — not accidents of disk space.</p>
+            <p style="font-size:18px;">Audit records carry a purge policy. "Keep forever" and "keep ninety days" are both choices you <b>write down</b> , not accidents of disk space.</p>
           </div>
         </div>
         <div class="col center">
@@ -602,7 +603,7 @@
 
     <!-- 19 · SIX PHASES -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> The Six Phases · Policy-Governed Touchpoints</div>
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> The six phases · policy-governed touchpoints</div>
       <h2>Every boundary is a checkpoint the orchestrator will not skip.</h2>
       <div class="body center">
         <svg viewBox="0 0 1120 240" style="width:100%; height:100%;">
@@ -630,14 +631,14 @@
             <path d="M570 96 l0 -22 M570 74 l-6 8 M570 74 l6 8" class="s-gate" stroke-width="1.5" fill="none"/>
             <path d="M762 96 l0 -22 M762 74 l-6 8 M762 74 l6 8" class="s-gate" stroke-width="1.5" fill="none"/>
           </g>
-          <text x="560" y="52" text-anchor="middle" class="t-faint" font-size="12">↑ touchpoints — no boundary crossed without a verdict</text>
+          <text x="560" y="52" text-anchor="middle" class="t-faint" font-size="12">↑ touchpoints : no boundary crossed without a verdict</text>
         </svg>
       </div>
     </section>
 
     <!-- 20 · CHARTER TEMPLATE -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> Concrete · The Org Rule Charter</div>
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> Concrete · the org rule charter</div>
       <h2>Three tiers. An owner. A cadence.</h2>
       <div class="body">
         <div class="col center" style="flex:1.15;">
@@ -655,14 +656,14 @@
 <span class="k">## Identity statements</span>   <span class="c"># what we refuse to ship</span></pre>
         </div>
         <div class="col center">
-          <div class="pull gate">The seam, made real: business governance compiled into lines an agent reads — and the load-bearing ones harden into gates.</div>
+          <div class="pull gate">The seam, made real: business governance compiled into lines an agent reads , and the load-bearing ones harden into gates.</div>
         </div>
       </div>
     </section>
 
     <!-- 21 · MEASUREMENT -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot stop"></span> The Discipline That Holds It All Up</div>
+      <div class="eyebrow"><span class="dot stop"></span> The discipline that holds it all up</div>
       <h2>A deterministic system that does the wrong thing is a reliable defect.</h2>
       <div class="body">
         <div class="col center" style="flex:1.1;">
@@ -684,14 +685,14 @@
 
     <!-- 22 · MONDAY -->
     <section class="slide">
-      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span><span class="dot stop"></span> What To Do Monday</div>
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span><span class="dot stop"></span> What to do Monday</div>
       <h2>One turn of the crank at each layer.</h2>
       <div class="body center">
         <ul class="clean" style="gap:20px; font-size:22px;">
-          <li>Write <b>one intent contract</b> for the next real task — scope, falsifiable criteria, risk.</li>
-          <li class="gate">Harden <b>one policy you already have</b> into a gate — a hook or a CI check at the seam.</li>
+          <li>Write <b>one intent contract</b> for the next real task : scope, falsifiable criteria, risk.</li>
+          <li class="gate">Harden <b>one policy you already have</b> into a gate : a hook or a CI check at the seam.</li>
           <li class="gate">Add <b>one attestation</b> a step must pass before it opens, and <b>one audit event</b> so the trail exists.</li>
-          <li>Measure the band on that area — <span class="stat">n ≥ 30</span>, blind.</li>
+          <li>Measure the band on that area : <span class="stat">n ≥ 30</span>, blind.</li>
         </ul>
       </div>
     </section>
@@ -702,7 +703,7 @@
       <div class="body center" style="gap:0;">
         <div style="max-width:920px;">
           <h1 class="title" style="font-size:46px; max-width:26ch;">Don't make the model deterministic. <span style="color:var(--gate)">Wrap it</span> in things that are.</h1>
-          <p class="lede" style="font-size:21px; max-width:48ch; margin-top:22px;">Narrow the band. Compile the policy you already run down the ladder until the agent meets it as a wall — one you can enforce, observe, and audit. The amplifier will multiply whatever it finds. Point it at your discipline.</p>
+          <p class="lede" style="font-size:21px; max-width:48ch; margin-top:22px;">Narrow the band. Compile the policy you already run down the ladder until the agent meets it as a wall , one you can enforce, observe, and audit. The amplifier will multiply whatever it finds. Point it at your discipline.</p>
         </div>
       </div>
     </section>
@@ -736,9 +737,9 @@
           <div style="grid-column:1 / -1; border-left:3px solid var(--gate); padding-left:18px;">
             <div class="kicker" style="color:var(--gate)">Open source · github.com/tacoda</div>
             <div style="display:flex; gap:40px; margin-top:4px;">
-              <div class="stat" style="font-size:20px; font-weight:700;">keystone <span style="color:var(--muted); font-weight:600;">— charter layer</span></div>
-              <div class="stat" style="font-size:20px; font-weight:700;">sigma <span style="color:var(--muted); font-weight:600;">— harness layer</span></div>
-              <div class="stat" style="font-size:20px; font-weight:700;">open-refinery <span style="color:var(--muted); font-weight:600;">— factory layer</span></div>
+              <div class="stat" style="font-size:20px; font-weight:700;">keystone: <span style="color:var(--muted); font-weight:600;">charter layer</span></div>
+              <div class="stat" style="font-size:20px; font-weight:700;">sigma: <span style="color:var(--muted); font-weight:600;">harness layer</span></div>
+              <div class="stat" style="font-size:20px; font-weight:700;">open-refinery: <span style="color:var(--muted); font-weight:600;">factory layer</span></div>
             </div>
           </div>
         </div>

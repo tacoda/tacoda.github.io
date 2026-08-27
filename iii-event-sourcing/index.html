@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Event Sourcing for Agents · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
-<meta name="description" content="An agent transcript already is an append-only event log. Built twice — as iii configuration and from scratch — including the silent concurrency hazard that cost two writers their events. By Ian Johnson.">
+<meta name="description" content="An agent transcript already is an append-only event log. Built twice, as iii configuration and from scratch, including the silent concurrency hazard that cost two writers their events. By Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://www.tacoda.dev/iii-event-sourcing/">
 
@@ -647,7 +648,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <p class="standfirst">
       Event sourcing says state is not stored, it is derived: the authoritative record is an
       append-only log of what happened, and every read model is a fold over it. Agent systems
-      produce that log whether or not they take it seriously — which means the choice is not
+      produce that log whether or not they take it seriously , which means the choice is not
       whether to have one, but whether to get replay, projections and audit out of it, or keep
       treating it as a chat history you occasionally grep.
     </p>
@@ -660,7 +661,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="provenance">
       companion repo · <a href="https://github.com/tacoda/iii-event-sourcing"><code>github.com/tacoda/iii-event-sourcing</code></a><br>
       built twice · once as <a href="https://iii.dev">iii</a> configuration, once from scratch in stdlib Python<br>
-      the workload · the same incident analysis all three repos run — extract claims, propose an explanation, score it, accept<br>
+      the workload · the same incident analysis all three repos run : extract claims, propose an explanation, score it, accept<br>
       verification · every iii command shown was executed against a live engine (0.22.0) before it was written down<br>
       tests · <code>8 passed</code>, offline and deterministic
     </div>
@@ -684,7 +685,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch block"></span>
         <div>
           <dt>Notification</dt>
-          <dd>At-least-once and unordered. A doorbell, not data — and the source of the hazard below.</dd>
+          <dd>At-least-once and unordered. A doorbell, not data , and the source of the hazard below.</dd>
         </div>
       </div>
     </dl>
@@ -724,7 +725,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Nothing is updated in place. A write appends <code>HypothesisScored{confidence: 0.86}</code>
         to a stream; the current confidence is whatever you get by folding the stream. Read models
-        are derived, disposable, and rebuildable — if a projection has a bug you fix the fold and
+        are derived, disposable, and rebuildable : if a projection has a bug you fix the fold and
         replay, rather than migrating corrupted rows.
       </p>
 
@@ -740,7 +741,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
             <tr><td>Fixing a bad read model</td><td>Data migration</td><td>Fix the fold, replay</td></tr>
             <tr><td>"Why is it like this?"</td><td>Forensics</td><td><strong>A query</strong></td></tr>
             <tr><td>Storage</td><td>Bounded by state size</td><td>Grows forever</td></tr>
-            <tr class="flag"><td>Cost of a schema change</td><td>One migration</td><td>Old events are immutable — the fold carries every version, forever</td></tr>
+            <tr class="flag"><td>Cost of a schema change</td><td>One migration</td><td>Old events are immutable (the fold carries every version, forever)</td></tr>
           </tbody>
         </table>
       </div>
@@ -748,11 +749,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">Why this suits agents specifically</span>
         <p>
-          With deterministic code, replay is a debugging convenience — you could always just run it
+          With deterministic code, replay is a debugging convenience , because you could always just run it
           again. With a model in the loop you <em>cannot</em>: re-running gives you a different run.
           The log is the only record of what the agent actually saw and decided. That moves replay
-          from convenience to the only reliable debugging surface you have, and it is why the
-          unbounded-growth row above is a price worth paying here when it often isn't elsewhere.
+          from convenience to the only reliable debugging surface you have, so the unbounded-growth row above becomes a price worth paying here when it often isn't elsewhere.
         </p>
       </div>
     </div>
@@ -771,8 +771,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>An event store wearing a chat-shaped label</h2>
         <p class="thesis">
-          <code>session-manager</code> is documented as a conversation store. It is also, without
-          modification, a correct event log.
+          <code>session-manager</code> is documented as a conversation store, and it is also, without modification, a correct event log.
         </p>
       </div>
     </div>
@@ -780,7 +779,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         A stream is a session. An event is a <code>custom</code> entry whose
-        <code>custom_type</code> is the event type — a real discriminator slot, not something you
+        <code>custom_type</code> is the event type : a real discriminator slot, not something you
         smuggle into the payload. Ordering is an explicit <code>parent_id</code> chain returned on
         every append, so the log is a linked list rather than a timestamp-sorted bag.
       </p>
@@ -810,7 +809,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
             <tr><td>Projection</td><td><code>session::message-added</code> binding → <code>state</code> scope</td><td>config</td></tr>
             <tr><td>Per-aggregate filter</td><td><code>metadata</code> subset match on the binding</td><td>config</td></tr>
             <tr><td>Fork / what-if replay</td><td><code>session::fork</code></td><td>config</td></tr>
-            <tr><td>Aggregate version guard</td><td><code>state::compare-and-set</code> — <em>not</em> in the log</td><td>config</td></tr>
+            <tr><td>Aggregate version guard</td><td><code>state::compare-and-set</code> , <em>not</em> in the log</td><td>config</td></tr>
             <tr class="flag"><td>Optimistic concurrency on append</td><td>—</td><td><strong>absent</strong></td></tr>
           </tbody>
         </table>
@@ -831,8 +830,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Two writers, two success responses, one surviving event</h2>
         <p class="thesis">
-          The dangerous kind of missing feature is not the one that errors. It is the one with a
-          convincing near-miss.
+          The dangerous kind of missing feature is the one with a convincing near-miss rather than the one that errors.
         </p>
       </div>
     </div>
@@ -840,7 +838,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         <code>session::append</code> has no conditional write. Pass <code>expected_revision</code>
-        and it is accepted, ignored, and the append succeeds anyway — no error tells you your
+        and it is accepted, ignored, and the append succeeds anyway , and no error tells you your
         concurrency control does nothing:
       </p>
 
@@ -851,7 +849,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        <code>parent_id</code>, meanwhile, <em>is</em> real and <em>is</em> validated — an unknown
+        <code>parent_id</code>, meanwhile, <em>is</em> real and <em>is</em> validated : an unknown
         parent returns <code>session/parent_not_found</code>. So it looks exactly like the
         conditional-append primitive. It isn't. Two writers appending at the same parent both
         succeed:
@@ -872,7 +870,7 @@ $ iii trigger session::get-message entry_id=e_fd3ce7e1ffe6
       </figure>
 
       <p>
-        A's event is durable — you can fetch it by id — but it sits on a sibling branch that
+        A's event is durable, and you can fetch it by id, but it sits on a sibling branch that
         <code>session::messages</code> does not walk. Any projection reading the ordinary way will
         never see it. A's writer received a success response. Nothing, anywhere, reports a problem.
       </p>
@@ -882,7 +880,7 @@ $ iii trigger session::get-message entry_id=e_fd3ce7e1ffe6
         <p>
           The version guard has to live in <code>state</code>, and the ordering is not negotiable:
           <strong>compare-and-set first, append second.</strong> Append first and you have written
-          an event you cannot un-append — the log is append-only, which is the point, and which
+          an event you cannot un-append , because the log is append-only, which is the point, and which
           means a concurrency mistake is permanent. There is also no branch enumeration
           (<code>session::leaves</code> does not exist; <code>include_branches</code> is not
           honored), so recovering an orphaned entry requires already knowing its
@@ -905,7 +903,7 @@ $ iii trigger session::get-message entry_id=e_fd3ce7e1ffe6
       <div>
         <h2>Four lines that upstream doesn't have</h2>
         <p class="thesis">
-          Writing the missing feature by hand is the fastest way to judge how missing it really is.
+          Writing the missing feature by hand settles how missing it really is.
         </p>
       </div>
     </div>
@@ -924,7 +922,7 @@ $ iii trigger session::get-message entry_id=e_fd3ce7e1ffe6
       </figure>
 
       <p>
-        Four lines. Which is what makes the absence notable — this is not a hard feature, and its
+        Four lines. Which is what makes the absence notable : this is not a hard feature, and its
         convincing near-miss is what makes it dangerous rather than merely missing.
       </p>
 
@@ -950,7 +948,7 @@ assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
       <p>
         Identical events. Identical fold function. One projection is right and one is silently
         wrong, and the only difference is whether it trusted the delivery order. No exception is
-        raised in either case — the wrong one just reports a wrong number.
+        raised in either case , and the wrong one just reports a wrong number.
       </p>
     </div>
   </section>
@@ -968,8 +966,7 @@ assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
       <div>
         <h2>Four findings, one of which applies everywhere</h2>
         <p class="thesis">
-          The ordering one is not about iii. It is about every event-sourced system with an
-          asynchronous notification channel.
+          The ordering one is about every event-sourced system with an asynchronous notification channel, not about iii.
         </p>
       </div>
     </div>
@@ -980,7 +977,7 @@ assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
           <strong>The log being ordered does not make your projections ordered.</strong> iii's log
           is ordered by parent chain. Its notifications are explicitly "at-least-once and
           unordered". Those two facts live in different documents, and the gap between them is
-          where wrong dashboards come from. Check this in whatever you are using — the two
+          where wrong dashboards come from. Check this in whatever you are using , because the two
           guarantees are almost never stated in the same place.
         </li>
         <li>
@@ -998,7 +995,7 @@ assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
         <li>
           <strong>Replay is worth more with a model in the loop.</strong> Forking a stream just
           before a model call and replaying it with a different prompt is a genuinely better
-          debugging loop than re-running and hoping — because re-running does not reproduce the run.
+          debugging loop than re-running and hoping , because re-running does not reproduce the run.
         </li>
       </ul>
     </div>
@@ -1017,8 +1014,7 @@ assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
       <div>
         <h2>You already have the log. Decide whether it counts.</h2>
         <p class="thesis">
-          The work is not producing events. It is committing to the log being authoritative, and
-          getting the ordering discipline right.
+          The work is committing to the log being authoritative and getting the ordering discipline right, not producing events.
         </p>
       </div>
     </div>

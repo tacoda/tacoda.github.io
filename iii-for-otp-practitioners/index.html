@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Actors and Supervision for Agents · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
-<meta name="description" content="OTP built twice — as iii configuration and from scratch. Half of it ports as pure config, half dissolves, and the part you actually lose is the mailbox. By Ian Johnson.">
+<meta name="description" content="OTP built twice , as iii configuration and from scratch. Half of it ports as pure config, half dissolves, and the part you actually lose is the mailbox. By Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://www.tacoda.dev/iii-for-otp-practitioners/">
 
@@ -647,7 +648,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <p class="standfirst">
       If you have written Elixir, you carry a mental model of distributed systems shaped like a
       supervision tree: processes that hold state, die, and get restarted. Durable-queue systems
-      model the same territory differently — state outlives the thing computing it, and failure is
+      model the same territory differently : state outlives the thing computing it, and failure is
       a property of a message rather than a process. Most of OTP survives that translation as pure
       configuration. The parts that don't survive are more interesting than the parts that do,
       because they were answers to a question the other architecture never asks.
@@ -661,7 +662,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="provenance">
       companion repo · <a href="https://github.com/tacoda/iii-otp"><code>github.com/tacoda/iii-otp</code></a><br>
       built twice · once as <a href="https://iii.dev">iii</a> configuration, once from scratch in stdlib Python<br>
-      the workload · the same incident analysis all three repos run — extract claims, propose an explanation, score it, accept<br>
+      the workload · the same incident analysis all three repos run : extract claims, propose an explanation, score it, accept<br>
       verification · every iii command shown was executed against a live engine (0.22.0) before it was written down<br>
       tests · <code>10 passed</code>, offline and deterministic
     </div>
@@ -678,7 +679,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>Dissolves</dt>
-          <dd>The concept has no referent here. Not a missing feature — the problem it solved does not arise.</dd>
+          <dd>The concept has no referent here. Not a missing feature : the problem it solved does not arise.</dd>
         </div>
       </div>
       <div class="signal">
@@ -726,12 +727,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         The actor model puts state inside a process. The process is the unit of identity, the unit
         of concurrency, and the unit of failure, all at once. That bundling is what makes OTP
-        elegant: because the three coincide, one mechanism — supervision — handles all three.
+        elegant: because the three coincide, one mechanism, supervision, handles all three.
       </p>
       <p>
         A durable-queue system unbundles them. Identity is a key. Concurrency is a queue lane.
         Failure is a message delivery. Because they no longer coincide, no single mechanism covers
-        all three — but each one gets a mechanism better suited to it than a supervision tree was.
+        all three , but each one gets a mechanism better suited to it than a supervision tree was.
       </p>
 
       <div class="tablewrap">
@@ -748,7 +749,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
             <tr><td>Recovery</td><td>Restart and rebuild</td><td>Retry; the state never left</td></tr>
             <tr><td>Ordering</td><td><strong>Guaranteed between two processes</strong></td><td>Best effort; breaks under retry</td></tr>
             <tr><td>Delivery</td><td>At-most-once, never duplicated</td><td>At-least-once; be idempotent</td></tr>
-            <tr><td>Back-pressure</td><td>None — mailboxes grow until the node dies</td><td><strong>Queue depth, concurrency caps, DLQ</strong></td></tr>
+            <tr><td>Back-pressure</td><td>None (mailboxes grow until the node dies)</td><td><strong>Queue depth, concurrency caps, DLQ</strong></td></tr>
             <tr class="flag"><td>Audit trail</td><td>Whatever you logged</td><td>The log <em>is</em> the system</td></tr>
           </tbody>
         </table>
@@ -779,8 +780,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Three declarations, no source file</h2>
         <p class="thesis">
-          The interesting part is not that this is possible. It is that the callback module —
-          the thing you would assume has to be code — turns out to be data.
+          The interesting part is not that this is possible, but that the callback module, the thing you would assume has to be code, turns out to be data.
         </p>
       </div>
     </div>
@@ -838,7 +838,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           <code>state::compare-and-set</code> exists and works, returning
           <code>{"swapped": false, "current": …}</code> on conflict. This matters because the
           <code>workflow</code> worker's own documentation states there is no CAS and instructs you
-          to file an engine feature request — that guidance is out of date as of state 0.22.2.
+          to file an engine feature request , and that guidance is out of date as of state 0.22.2.
           <code>state::barrier</code> (a fan-in condition for trigger bindings) and
           <code>state::claim-namespace</code> (singleton election over a function prefix) are
           likewise undocumented. Enumerate <code>engine::functions::list</code> before believing any
@@ -905,7 +905,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         Note the row that says <em>free</em>. Hot code upgrade is the thing OTP is famous for
-        making possible and notorious for making painful — <code>code_change/3</code>, appups,
+        making possible and notorious for making painful : <code>code_change/3</code>, appups,
         relups. Here the callback is a list of operations in a config entry, and config
         hot-reloads. You get the capability by accident, because you gave up expressing the
         callback as code.
@@ -926,7 +926,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The supervisor works perfectly and the work never finishes</h2>
         <p class="thesis">
-          Writing OTP by hand is what makes the "dissolves" column legible — and it surfaces the
+          Writing OTP by hand is what makes the "dissolves" column legible , and it surfaces the
           one property the translation genuinely costs you.
         </p>
       </div>
@@ -937,8 +937,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         The from-scratch half is a <code>Mailbox</code> (strict FIFO), a <code>GenServer</code>
         (state plus a serialized loop), and a <code>Supervisor</code> with
         <code>one_for_one</code> / <code>rest_for_one</code> and a real restart-intensity window.
-        Restart intensity — the thing everyone forgets, and without which a crash loop is
-        indistinguishable from a busy system — is about fifteen lines.
+        Restart intensity : the thing everyone forgets, and without which a crash loop is
+        indistinguishable from a busy system , is about fifteen lines.
       </p>
 
       <figure class="code">
@@ -983,12 +983,12 @@ final state per child:
       <div class="callout">
         <span class="label">This is not a bug in the implementation. It is OTP.</span>
         <p>
-          In BEAM the answer is that the sender retries — and the sender is usually another
+          In BEAM the answer is that the sender retries , and the sender is usually another
           supervised process a microsecond away, so nobody notices the cost. With an agentic stage,
           the sender is a model call you already paid for. Losing the in-flight message on restart
           is a very different proposition when replaying it costs a few cents and several seconds.
           That is the strongest practical argument for moving the unit of failure from the process
-          to the message — which is exactly what the durable-queue translation does.
+          to the message , which is exactly what the durable-queue translation does.
         </p>
       </div>
     </div>
@@ -1037,7 +1037,7 @@ final state per child:
 
       <ul>
         <li>
-          <strong>Restart.</strong> No process owns the state, so there is nothing to restart — the
+          <strong>Restart.</strong> No process owns the state, so there is nothing to restart : the
           state is already there. The unit of failure moved to the message, and message failure is
           already handled by retries.
         </li>
@@ -1093,7 +1093,7 @@ final state per child:
       <p>
         <strong>Ordering under retry.</strong> A BEAM mailbox is a mailbox precisely because it is
         ordered: two messages sent from A to B arrive in send order, always. The queue worker
-        documents its own divergence — a failed FIFO message is re-queued via <code>nack</code>
+        documents its own divergence : a failed FIFO message is re-queued via <code>nack</code>
         rather than blocking the poller, so a message enqueued <em>after</em> the failure can be
         delivered before the retried one catches up.
       </p>
@@ -1119,7 +1119,7 @@ queue: A then B, unless A stumbles.</span></code></pre>
         accepts <code>delaySeconds</code> and <code>visibilityTimeout</code> "for parity" and
         ignores both. But look at what <code>send_after</code> is actually used for: call timeouts
         (<code>timeout_ms</code> covers it), periodic work (<code>cron</code>), retry backoff (the
-        queue does it natively), and business-time scheduling. Only the fourth is uncovered — a
+        queue does it natively), and business-time scheduling. Only the fourth is uncovered : a
         scheduling feature, not a hole in the actor model.
       </p>
 
@@ -1128,7 +1128,7 @@ queue: A then B, unless A stumbles.</span></code></pre>
         <p>
           Grouped FIFO only applies to <em>named</em> queues created through
           <code>queue::define</code>. A plain <code>durable:subscriber</code> binding stays globally
-          serial — one actor at a time across the entire system. Same code, same config file,
+          serial : one actor at a time across the entire system. Same code, same config file,
           silently 1x instead of 10x. Assert your engine version at boot the way the harness worker
           does; it refuses to start if its queue cannot be ensured.
         </p>
@@ -1167,14 +1167,14 @@ queue: A then B, unless A stumbles.</span></code></pre>
         </p>
         <p>
           <strong>The mailbox is what you actually lose.</strong> Going in, the interesting gap
-          looked like supervision — and supervision dissolves. The property worth mourning is
+          looked like supervision , and supervision dissolves. The property worth mourning is
           strict FIFO between two endpoints, and the durable-queue translation cannot give it back,
           because its retry mechanism is what breaks the order.
         </p>
         <p>
           <strong>Then ask whether actors were the right lens at all.</strong> Supervision assumes
           failure is crash-stop and detectable. A confident wrong answer exits zero and returns a
-          well-formed payload — nothing in the from-scratch implementation would notice, and
+          well-formed payload , nothing in the from-scratch implementation would notice, and
           nothing in the iii translation would either. OTP offers superb machinery for the failure
           mode agents mostly do not have.
         </p>

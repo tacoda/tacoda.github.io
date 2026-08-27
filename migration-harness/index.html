@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Migration Harness · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -824,8 +825,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">What the census actually tells you</h3>
       <ul>
-        <li><strong>Shape D is not a migration.</strong> Every one of those tolerance comparisons exists because somebody was papering over float error. In integer cents the tolerance is meaningless, and each site is a question: was this hiding a real discrepancy? Some of them were. That is a bug hunt wearing a migration's clothes.</li>
-        <li><strong>Shape C is a policy question first.</strong> Where exactly does rounding happen, and in whose favour? Until a human answers that, no tool of any kind can do the work correctly. This is the brick-coloured category and it is what actually sinks migrations.</li>
+        <li><strong>Shape D is not a migration.</strong> Every one of those tolerance comparisons exists because somebody was papering over float error. In integer cents the tolerance is meaningless, and each site is a question: was this hiding a real discrepancy? Some of them were, which makes it a bug hunt wearing a migration's clothes.</li>
+        <li><strong>Shape C is a policy question first.</strong> Where exactly does rounding happen, and in whose favour? Until a human answers that, no tool of any kind can do the work correctly. That is the brick-coloured category, and it is what actually sinks migrations.</li>
         <li><strong>The ratio is the plan.</strong> 87/13 says write the codemod. If the census had come back 40/60 the whole approach would be wrong, and you would want to know that before building anything.</li>
       </ul>
 
@@ -1105,7 +1106,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Last</span>
-          <span class="what">Delete the old field. This is the only irreversible step and it happens weeks after the code is done, once the parallel writes have agreed in production for long enough to believe them.</span>
+          <span class="what">Delete the old field. That is the only irreversible step, and it happens weeks after the code is done, once the parallel writes have agreed in production for long enough to believe them.</span>
         </li>
       </ol>
 
@@ -1140,7 +1141,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>What the split actually bought</h2>
         <p class="thesis">
-          The interesting number is not the time saved. It is where the human attention went.
+          The interesting number is not the time saved but where the human attention went.
         </p>
       </div>
     </div>

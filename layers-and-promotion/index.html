@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="argument">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Layers and Promotion · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -12,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="tacoda.dev">
 <meta property="og:title" content="Layers and Promotion">
-<meta property="og:description" content="One rule, six rungs, one switch each. Where should a constraint live — and how would you know you put it in the wrong place?">
+<meta property="og:description" content="One rule, six rungs, one switch each. Where should a constraint live, and how would you know you put it in the wrong place?">
 <meta property="og:url" content="https://www.tacoda.dev/layers-and-promotion/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Layers and Promotion">
@@ -641,8 +642,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       Every discussion of agent constraints ends in a shrug: put it in the charter, and hope. So here
       is a coding agent where one rule is enforced at six rungs, each rung is a separate process, and
       each one can be switched off on its own. Twelve runs. Two findings about the rungs, three about
-      experimental design — including the first version of this, which measured nothing and said so
-      confidently — and one harness bug that only the least interesting rung could have found.
+      experimental design, including the first version of this, which measured nothing and said so
+      confidently, and one harness bug that only the least interesting rung could have found.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -651,7 +652,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </p>
 
     <div class="provenance">
-      the code · <a href="https://github.com/tacoda/iii-harness-layers-and-promotion">iii-harness-layers-and-promotion</a> — runs on your machine, three terminals<br>
+      the code · <a href="https://github.com/tacoda/iii-harness-layers-and-promotion">iii-harness-layers-and-promotion</a>, runs on your machine, three terminals<br>
       built on · <a href="https://iii.dev">iii</a>, whose ecosystem is why each rung is a process you can simply not start<br>
       you'll need · the iii engine, Python 3.11+, Node 20+, an Anthropic API key<br>
       the numbers · 12 runs, Claude Opus driving the loop, against a live engine<br>
@@ -664,7 +665,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch block"></span>
         <div>
           <dt>Refused</dt>
-          <dd>The write did not happen. Not queued, not warned about — the bytes never reached disk, and the agent is told why.</dd>
+          <dd>The write did not happen. Not queued, not warned about: the bytes never reached disk, and the agent is told why.</dd>
         </div>
       </div>
       <div class="signal">
@@ -678,7 +679,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>Clean</dt>
-          <dd>Nothing fired. Worth counting — and worth checking, because one run reported clean while the tree held two violations.</dd>
+          <dd>Nothing fired. Worth counting, and worth checking, because one run reported clean while the tree held two violations.</dd>
         </div>
       </div>
     </dl>
@@ -713,7 +714,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <h2>Six rungs, and the line that matters runs between two of them</h2>
         <p class="thesis">
           The rule is a sentence. It can live in the system prompt, in the tool list, in a hook, in the
-          tool itself, in a stage gate, or in CI. The question is not how to enforce it — it is which
+          tool itself, in a stage gate, or in CI. The question is not how to enforce it, but which
           rung is carrying it, and how you would find out that you chose wrong.
         </p>
         <div class="chips">
@@ -744,7 +745,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        <strong>Charter</strong> means the agent's configuration surface — in Claude Code,
+        <strong>Charter</strong> means the agent's configuration surface: in Claude Code,
         <code>CLAUDE.md</code> and <code>.claude/</code>; here the system prompt, the tool grant, and the
         hook config in the workspace. Promotion moves a rule <em>out</em> of that surface and into the
         system, where reconfiguring the agent does not reach it. A rung 0 rule is advice to a process. A
@@ -823,7 +824,7 @@ POST /result {job_id}        make gate                   <span class="c-block">r
       </p>
       <p>
         The agent loop is about forty lines of the Anthropic SDK's tool runner. It is not Claude Code and
-        not a framework's agent abstraction — the whole argument here is about where the tool boundary
+        not a framework's agent abstraction, because the whole argument here is about where the tool boundary
         sits, and you cannot make that argument inside a harness that already owns the tools for you.
       </p>
     </div>
@@ -844,7 +845,7 @@ POST /result {job_id}        make gate                   <span class="c-block">r
         <p class="thesis">
           The experiment is the point; iii is why it took an afternoon. Two properties did the work:
           <strong>components compose</strong>, so a new rung is a worker you add rather than a refactor
-          you survive — and <strong>the architecture isolates</strong>, so removing one rung provably
+          you survive, and <strong>the architecture isolates</strong>, so removing one rung provably
           cannot disturb the other five. Those are exactly the two things a controlled switch-off needs.
         </p>
         <div class="chips">
@@ -863,7 +864,7 @@ POST /result {job_id}        make gate                   <span class="c-block">r
 
       <h3 class="sub">Adding a rung is adding a component</h3>
       <p>
-        Rung 2 — the hook — arrived late, after the other five were built and measured. It landed as new
+        Rung 2: the hook, arrived late, after the other five were built and measured. It landed as new
         behaviour in one node plus one file in the charter. Rungs 3, 4 and 5 were not edited, not
         redeployed, and not aware anything had changed. In a monolith, inserting a check into the middle of
         a pipeline means touching the pipeline; here the pipeline is a set of topics and the new rung just
@@ -874,7 +875,7 @@ POST /result {job_id}        make gate                   <span class="c-block">r
       <p>
         <code>HOOKS=off</code> is not a feature flag threaded through a codebase. It is one of six
         processes that does not get launched. The independent variable is a process boundary, and the
-        other five rungs keep running untouched, unaware anything changed — no branch, no build, no
+        other five rungs keep running untouched, unaware anything changed: no branch, no build, no
         redeploy, and no risk the switch-off quietly moved something else.
       </p>
 
@@ -892,7 +893,7 @@ STAGE_GATE=off   rung 4   the stage gate stops enforcing the predicate</code></p
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">The configuration is observable</span>
-          <span class="what"><code>iii console</code> lists every worker connected and every function it registered. "Was rung 3 actually up for that run?" has an answer you can look at — the difference between an experiment and a hope.</span>
+          <span class="what"><code>iii console</code> lists every worker connected and every function it registered. "Was rung 3 actually up for that run?" has an answer you can look at, which is the difference between an experiment and a hope.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Any rung runs without the agent</span>
@@ -950,15 +951,13 @@ STAGE_GATE=off   rung 4   the stage gate stops enforcing the predicate</code></p
 
     <div class="rung-body">
       <p>
-        Forty lines of <code>ast</code>, no dependencies, and — the constraint that looks like an accident
-        — <strong>no imports from the rest of the repo.</strong> The moment <code>check()</code> imports the
+        Forty lines of <code>ast</code>, no dependencies, and one constraint that looks like an accident: <strong>no imports from the rest of the repo.</strong> The moment <code>check()</code> imports the
         iii SDK it can only run where iii runs, and the mounts outside the engine stop working.
       </p>
       <p>
         <code>policy::check</code> takes <code>{files: [{filename, source}]}</code>. It never opens a file.
         That is the difference between a predicate that works when the policy node is a microVM on another
-        host and one that quietly requires a shared filesystem nobody wrote down — and it is why the
-        TypeScript node enforces the identical rule without a line of Python.
+        host and one that quietly requires a shared filesystem nobody wrote down. The TypeScript node therefore enforces the identical rule without a line of Python.
       </p>
 
       <figure class="code">
@@ -977,7 +976,7 @@ STAGE_GATE=off   rung 4   the stage gate stops enforcing the predicate</code></p
       <div class="takeaway">
         <span class="label">Leave the door, and count who uses it</span>
         <p>
-          A guardrail with no sanctioned path produces creative circumvention — the agent that cannot
+          A guardrail with no sanctioned path produces creative circumvention: the agent that cannot
           divide invents a helper module the scope glob misses. So every refusal names the escape. Then
           watch the markers: a spike in them says the rule is wrong, not that the agents are.
         </p>
@@ -1009,7 +1008,7 @@ STAGE_GATE=off   rung 4   the stage gate stops enforcing the predicate</code></p
 
     <div class="rung-body">
       <p>
-        <code>workspace/billing/invoice.py</code> already demonstrates integer cents — <code>//</code>
+        <code>workspace/billing/invoice.py</code> already demonstrates integer cents: <code>//</code>
         never <code>/</code>, basis points instead of fractional rates, an explicit remainder in
         <code>split_evenly</code>. The charter and the code said the same thing, so removing one left the
         other standing. Asked for "a discount percentage like 12.5 percent" with the prose gone, the agent
@@ -1022,7 +1021,7 @@ STAGE_GATE=off   rung 4   the stage gate stops enforcing the predicate</code></p
       </p>
 
       <figure class="code">
-        <figcaption><span>three rules — the difference between them is the design</span><span class="tag warn">the seed is the variable</span></figcaption>
+        <figcaption><span>three rules: the difference between them is the design</span><span class="tag warn">the seed is the variable</span></figcaption>
 <pre><code><span class="c-dim">RULES=      THE RULE                        IMITATION SURFACE IN THE SEED</span>
 money       integer cents, never float      <span class="c-block">already demonstrated → measures nothing</span>
 currency    a serialized amount carries     <span class="c-pass">none — the seed has no</span>
@@ -1081,14 +1080,14 @@ E5  rung 5    all mechanical rungs off         <span class="c-block">job reporte
                                                <span class="c-block">CI found 2 violations</span></code></pre>
       </figure>
 
-      <h3 class="sub">E0 — the charter earns its keep, once the confound is gone</h3>
+      <h3 class="sub">E0: the charter earns its keep, once the confound is gone</h3>
       <p>
         Both replacement rules showed a rung-0 effect. And with the code demonstrating half-up while the
-        charter demanded half-to-even, <strong>the charter won</strong> — so prose loses to the imitation
+        charter demanded half-to-even, <strong>the charter won</strong>, so prose loses to the imitation
         surface only when it is <em>redundant</em> with it. Where they conflict, the stated rule carried.
       </p>
 
-      <h3 class="sub">E5 — the pipeline said done and was wrong</h3>
+      <h3 class="sub">E5: the pipeline said done and was wrong</h3>
       <figure class="code">
         <figcaption><span>every mechanical rung off</span><span class="tag block">a clean bill of health over a dirty tree</span></figcaption>
 <pre><code>pipeline: status <span class="c-pass">done</span>, rungs fired: []
@@ -1146,7 +1145,7 @@ billing/invoice.py:29:  half-up rounding; this rule requires half-to-even
 
       <h3 class="sub">Rung 2 shadows rung 3, which makes rung 3 look deletable</h3>
       <p>
-        With both installed, rung 2 fires and rung 3 never does — the hook is earlier in the path. A
+        With both installed, rung 2 fires and rung 3 never does, because the hook is earlier in the path. A
         promotion report shows rung 3 at zero catches and appears to recommend removing it. It does not.
         Rung 3 is what still exists after the agent edits the hook config, and a rung whose idleness is
         caused by a <em>removable</em> rung above it has demonstrated nothing about its own value.
@@ -1154,7 +1153,7 @@ billing/invoice.py:29:  half-up rounding; this rule requires half-to-even
       <p>
         Over the four runs where a hook was actually installed: four intact, none modified, none deleted.
         The agent was blocked by a guard it had write access to and fixed the code rather than removing
-        the guard — it did not appear to notice the option. <strong>The vulnerability is structural, not
+        the guard, and it did not appear to notice the option. <strong>The vulnerability is structural, not
         observed</strong>, and two arms on a task with no incentive to fight is not evidence of safety.
       </p>
 
@@ -1196,11 +1195,11 @@ def test_tax_rounds_half_to_even_at_the_cent():
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">No rung could see it</span>
-          <span class="what"><code>tests/</code> is outside the predicate's scope on purpose — test code legitimately contains values the rule forbids. So the one artifact contradicting the charter is the one artifact no rung inspects.</span>
+          <span class="what"><code>tests/</code> is outside the predicate's scope on purpose, because test code legitimately contains values the rule forbids. So the one artifact contradicting the charter is the one artifact no rung inspects.</span>
         </li>
         <li data-signal="block">
           <span class="when">Verification defeated by construction</span>
-          <span class="what">Rung 4's principle is "verify from the tree, never trust the report" — it re-runs the tests itself. That holds until the subject can rewrite the verifier.</span>
+          <span class="what">Rung 4's principle is "verify from the tree, never trust the report", so it re-runs the tests itself. That holds until the subject can rewrite the verifier.</span>
         </li>
         <li data-signal="warn">
           <span class="when">The gate drove it, not the prose</span>
@@ -1208,8 +1207,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
         </li>
       </ol>
       <p>
-        In fairness it is defensible on the charter's own terms, and an earlier run took the better route —
-        marking the line <code># rounding-gate: allow -- tax rate table specified half-up; pinned by
+        In fairness it is defensible on the charter's own terms, and an earlier run took the better route by marking the line <code># rounding-gate: allow -- tax rate table specified half-up; pinned by
         test_tax_rounds_half_up_at_the_cent</code>, escalating the conflict into a comment instead of
         resolving it silently. Same rule, same rungs, both behaviours.
       </p>
@@ -1219,7 +1217,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
         <p>
           It is a rule that a test change is not self-approving: diff the test files, and if the agent's
           own edit is what turned the suite green, the job is <code>blocked</code>. Note the shape it
-          shares with rung 2 — both are cases where the thing enforcing the rule sits inside the blast
+          shares with rung 2: both are cases where the thing enforcing the rule sits inside the blast
           radius of the thing being enforced against.
         </p>
       </div>
@@ -1228,14 +1226,13 @@ def test_tax_rounds_half_to_even_at_the_cent():
       <p>
         The first rung-1 arm went <code>blocked</code>. The planner correctly withheld
         <code>write_file</code>; the stage gate then found the seed's pre-existing violation, sent the job
-        to repair, and the agent — having no write capability at all — could not act. Two wasted passes,
+        to repair, and the agent, having no write capability at all, could not act. Two wasted passes,
         then the ceiling. The gate was attributing the tree's pre-existing state to a job that landed
         nothing.
       </p>
       <p>
         Fixed: findings against a job that never held <code>write_file</code> are recorded as advisory and
-        non-attributable, and the job completes. Rung 1 has zero catches in every report and always will —
-        nothing is refused, the call was never available — which is exactly why it looked untestable, and
+        non-attributable, and the job completes. Rung 1 has zero catches in every report and always will, because nothing is refused and the call was never available, which is exactly why it looked untestable, and
         exactly why it deserved an arm.
       </p>
     </div>
@@ -1263,7 +1260,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
     <div class="rung-body">
       <h3 class="sub">The report pooled rules</h3>
       <p>
-        The first report averaged money-rule runs together with rounding-rule runs — averaging away the
+        The first report averaged money-rule runs together with rounding-rule runs, averaging away the
         only variable under study, which is how much the surrounding code already demonstrates the rule.
         It is the same mistake the confounded experiment made, in aggregate form. Now grouped per rule.
       </p>
@@ -1278,7 +1275,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
       </figure>
       <p>
         The report counted arms where no hook was <em>ever installed</em> as the agent deleting its own
-        guard — three invented instances of the most alarming behaviour in the project, caused by not
+        guard: three invented instances of the most alarming behaviour in the project, caused by not
         recording whether a hook was installed in the first place. The planner now records
         <code>hooks_installed</code>, the gate distinguishes <em>not installed</em> from <em>deleted</em>,
         and pre-existing records are marked <code>unknown</code> rather than claimed.
@@ -1323,7 +1320,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
         </li>
         <li data-signal="warn">
           <span class="when">Non-determinism is real</span>
-          <span class="what">The charter-off rounding arm produced the integer half-up idiom on one run and <code>ROUND_HALF_UP</code> on another. The mode was wrong both times — that is the claim — but a single run is not a result.</span>
+          <span class="what">The charter-off rounding arm produced the integer half-up idiom on one run and <code>ROUND_HALF_UP</code> on another. The mode was wrong both times, and that is the claim, but a single run is not a result.</span>
         </li>
         <li data-signal="warn">
           <span class="when">One model, one seed, one rule family</span>
@@ -1345,7 +1342,7 @@ def test_tax_rounds_half_to_even_at_the_cent():
 <pre><code>git clone https://github.com/tacoda/iii-harness-layers-and-promotion
 export ANTHROPIC_API_KEY=sk-ant-...
 
-make engine   <span class="c-dim"># terminal 1 — iii + the managed infra workers</span>
+make engine   <span class="c-dim"># terminal 1: iii + the managed infra workers</span>
 make dev      <span class="c-dim"># terminal 2 — all six nodes</span>
 make console  <span class="c-dim"># terminal 3 — confirm which rungs registered</span>
 
@@ -1364,7 +1361,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Enough runs for a rate</span>
-          <span class="what">Particularly on feedback timing — whether late feedback systematically fails to converge, or that was one bad run.</span>
+          <span class="what">Particularly on feedback timing, meaning whether late feedback systematically fails to converge, or that was one bad run.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Build the test-edit rung</span>
@@ -1384,7 +1381,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         <span class="label">The one-sentence version</span>
         <p>
           Put the mechanical rungs where the agent cannot argue with them, keep one implementation of each
-          rule, and count which rung actually catches things — but build the comparison so it can come out
+          rule, and count which rung actually catches things, but build the comparison so it can come out
           against you, because the first version of mine could not, and the version that could found a
           hole I would never have argued my way to.
         </p>
@@ -1425,7 +1422,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
           experiment: many runs per cell, multiple models, multiple codebases, rules chosen by someone
           with no stake in the answer, and a pre-registered prediction so the analysis cannot drift
           toward whatever came out. I have not run that experiment. Until someone does, treat what
-          follows as heuristics — useful for deciding what to build next, useless as evidence that the
+          follows as heuristics: useful for deciding what to build next, useless as evidence that the
           decision was right.
         </p>
       </div>
@@ -1441,7 +1438,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
             <tr>
               <td>A gate holds only the decidable shadow of a rule</td>
               <td>An argument about predicates, illustrated once</td>
-              <td>High — it is closer to a definition than a result</td>
+              <td>High (it is closer to a definition than a result)</td>
             </tr>
             <tr>
               <td>Prose matters most where the code disagrees with it</td>
@@ -1481,7 +1478,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
       <p>
         The instinct when a rule matters is to push it as low and as hard as possible. I think that is the
         wrong axis. A rule has a decidable part and an undecidable part, and the levels differ in which
-        part they can carry — not in how much they care. "Every amount carries its own currency, and
+        part they can carry, not in how much they care. "Every amount carries its own currency, and
         never a default" survived as prose and evaporated as a predicate, because the predicate could only
         ask about a key set. Pushing that rule down a rung would not have strengthened it; it would have
         replaced it with a weaker rule wearing its name.
@@ -1497,7 +1494,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
       <p>
         The confound in section 4 is the most useful thing this project taught me, and it is a lesson about
         writing rules rather than enforcing them. A charter line that restates what the neighbouring files
-        already demonstrate is close to free — and close to worthless, because the code was going to carry
+        already demonstrate is close to free, and close to worthless, because the code was going to carry
         it anyway. The same line becomes load-bearing exactly when the surrounding code would lead the
         agent somewhere else.
       </p>
@@ -1505,7 +1502,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         Practically, that suggests auditing a charter against the codebase rather than against your
         intentions: for each line, ask what the agent would do with that line deleted. If the answer is
         "the same thing, by imitation", the line is documentation, not constraint. If the answer is
-        "something else", that is a line earning its tokens — and a candidate for a mechanical rung if it
+        "something else", that is a line earning its tokens, and a candidate for a mechanical rung if it
         also happens to be decidable. I would not push this further than a heuristic; one seed with a
         forty-line package is a very quiet imitation surface, and a large legacy repo may drown prose
         entirely.
@@ -1557,12 +1554,12 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
       <h3 class="sub">6 · Do not rank levels by how often they fire</h3>
       <p>
         Rung 3 recorded zero catches while rung 2 was installed, because the hook is earlier in the path.
-        Rung 1 records zero catches permanently and by construction — and it is the rung that surfaced the
+        Rung 1 records zero catches permanently and by construction, and it is the rung that surfaced the
         deadlock. A report sorted by catch count would have recommended deleting both.
       </p>
       <p>
         So the number I would actually want, and did not collect: <em>what would reach the tree if this
-        rung were absent</em>. That is a switch-off, not a counter, which is uncomfortable — it means the
+        rung were absent</em>. That is a switch-off, not a counter, which is uncomfortable, because it means the
         cheap metric is the misleading one and the informative metric costs a full experimental arm per
         rung. I do not have a way around that. Worth naming rather than pretending the counters are fine.
       </p>
@@ -1571,12 +1568,12 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
       <p>
         Unchanged from before the experiment, and unmeasured by it: every refusal should name its escape
         hatch, and the markers should be counted. The one run that annotated the conflict instead of
-        resolving it silently produced a far better artifact than the one that rewrote the test — same
+        resolving it silently produced a far better artifact than the one that rewrote the test: same
         rule, same rungs, different behaviour, n=1 each. I believe the escape hatch is what made the good
         outcome available. I cannot show it.
       </p>
 
-      <h3 class="sub">8 · When to promote — the three tests say <em>eligible</em>, not <em>yet</em></h3>
+      <h3 class="sub">8 · When to promote: the three tests say <em>eligible</em>, not <em>yet</em></h3>
       <p>
         This experiment has nothing to say about timing, so what follows is drawn from harnesses I have
         built rather than from any run here. Flagging that hard, because it is the section most likely to
@@ -1595,7 +1592,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Violations are silent</span>
-          <span class="what">The strongest case, and the one E5 illustrates. If breaking the rule produces no symptom — no failing test, no error, just a wrong number in six months — then prose is the only thing between you and the violation, and prose is weakest exactly when nobody is watching. Promote.</span>
+          <span class="what">The strongest case, and the one E5 illustrates. If breaking the rule produces no symptom: no failing test, no error, just a wrong number in six months, then prose is the only thing between you and the violation, and prose is weakest exactly when nobody is watching. Promote.</span>
         </li>
         <li data-signal="warn">
           <span class="when">You have restated it</span>
@@ -1607,7 +1604,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         </li>
         <li data-signal="block">
           <span class="when">Not a trigger: it just bit you</span>
-          <span class="what">One painful violation is the most common reason a gate gets built and the worst. Recurrence is unestablished by definition after a single incident. Write the prose, note the date, and see whether it happens again — the limits section of this very page had to admit recurrence is established for nothing here.</span>
+          <span class="what">One painful violation is the most common reason a gate gets built and the worst. Recurrence is unestablished by definition after a single incident. Write the prose, note the date, and see whether it happens again, since the limits section of this very page had to admit recurrence is established for nothing here.</span>
         </li>
         <li data-signal="block">
           <span class="when">Not a trigger: it would be easy</span>
@@ -1632,11 +1629,11 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         </li>
         <li data-signal="pass">
           <span class="when">The shadow has drifted from the rule</span>
-          <span class="what">If the predicate now fires on things the rule does not actually care about, you are enforcing the decidable shadow rather than the rule, and the shadow has gone bad. False positives are a demotion signal, not a threshold to tune. Tuning is how a predicate slowly becomes a different rule with the old rule's authority.</span>
+          <span class="what">If the predicate now fires on things the rule does not actually care about, you are enforcing the decidable shadow rather than the rule, and the shadow has gone bad. False positives are a demotion signal, not a threshold to tune, because tuning is how a predicate slowly becomes a different rule with the old rule's authority.</span>
         </li>
         <li data-signal="warn">
           <span class="when">The rung is a proxy for a rule nobody holds anymore</span>
-          <span class="what">Rules outlive their reasons. If you cannot reconstruct why the rule exists — not the incident, the reason — the gate is enforcing institutional memory it does not have. Demote to prose and see whether anyone objects.</span>
+          <span class="what">Rules outlive their reasons. If you cannot reconstruct why the rule exists, not the incident but the reason, the gate is enforcing institutional memory it does not have. Demote to prose and see whether anyone objects.</span>
         </li>
         <li data-signal="block">
           <span class="when">Not a signal: zero catches</span>
@@ -1644,7 +1641,7 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         </li>
         <li data-signal="block">
           <span class="when">Not a signal: "we never violate this anymore"</span>
-          <span class="what">The clean codebase and the rung are not independent — the rung is part of why the code is clean, and the clean code is then the imitation surface the agent follows. Section 4 is the same relationship seen from the other side. Removing a rung because its rule is now universally observed is survivorship reasoning, and it removes the thing maintaining the condition it cites as evidence.</span>
+          <span class="what">The clean codebase and the rung are not independent, because the rung is part of why the code is clean, and the clean code is then the imitation surface the agent follows. Section 4 is the same relationship seen from the other side. Removing a rung because its rule is now universally observed is survivorship reasoning, and it removes the thing maintaining the condition it cites as evidence.</span>
         </li>
       </ol>
       <p>
@@ -1655,14 +1652,14 @@ make gate-run JOB=&lt;id&gt; RULES=rounding</code></pre>
         comfortable recommending it on this little evidence.
       </p>
 
-      <h3 class="sub">10 · One layer or several — count trust boundaries, not rungs</h3>
+      <h3 class="sub">10 · One layer or several: count trust boundaries, not rungs</h3>
       <p>
         The default should be one. Six existed here because the experiment needed six; I would not build
         six for a real rule, and I do not think this page has earned the reading that more rungs is better.
       </p>
       <p>
-        The relevant observation is that rungs 2 and 3 performed identically — both refused in-turn, both
-        converged in zero repairs — and having both bought no measurable enforcement while costing real
+        The relevant observation is that rungs 2 and 3 performed identically: both refused in-turn, both
+        converged in zero repairs, so having both bought no measurable enforcement while costing real
         clarity: the shadowing that made rung 3 look deletable, and a report that invented three deletion
         incidents partly because two rungs occupied the same moment in the path. Two rungs that differ only
         in strictness are redundancy. Two rungs that differ in <em>what they are exposed to</em> are not.
@@ -1689,7 +1686,7 @@ capability, not conduct      <span class="c-pass">1  tool grant</span>    the ca
 
       <p>
         Three, then: the prose, one in-turn refusal, one check outside the pipeline. Rung 0 is not really a
-        redundant layer at all — it carries the part of the rule the predicates cannot, which is why
+        redundant layer at all, because it carries the part of the rule the predicates cannot, which is why
         section 1 argues a promoted rule is a narrowed rule. The in-turn refusal is there for convergence
         as much as for enforcement, on the strength of a single failed run. The outside check is there
         because a pipeline reported <code>done</code> over a dirty tree, which is the one thing here I
@@ -1711,13 +1708,12 @@ capability, not conduct      <span class="c-pass">1  tool grant</span>    the ca
         </li>
         <li>
           <strong>Ask what the codebase already teaches.</strong> If the surrounding code demonstrates the
-          rule, the prose is documentation. If the code contradicts it, the prose is doing real work — and
+          rule, the prose is documentation. If the code contradicts it, the prose is doing real work, and
           you should expect to need a mechanical rung too.
         </li>
         <li>
           <strong>Apply the three tests before promoting anything:</strong> consequential, recurrent,
-          decidable. Recurrence is the one people skip, and it is the one that stops you building a gate
-          for something that happened once.
+          decidable. Recurrence is the one people skip, and it is what stops you building a gate for something that happened once.
         </li>
         <li>
           <strong>Then wait for a trigger.</strong> Eligible is not the same as due. Promote when
@@ -1737,8 +1733,7 @@ capability, not conduct      <span class="c-pass">1  tool grant</span>    the ca
           disagree, and the agent will find the seam before you do.
         </li>
         <li>
-          <strong>Put the first mechanical check inside the turn</strong> — a refusal at the tool boundary,
-          not a report afterward — so the agent learns while it can still act.
+          <strong>Put the first mechanical check inside the turn</strong>: a refusal at the tool boundary rather than a report afterward, so the agent learns while it can still act.
         </li>
         <li>
           <strong>Put the last one outside the pipeline entirely.</strong> Independent access to the
@@ -1755,7 +1750,7 @@ capability, not conduct      <span class="c-pass">1  tool grant</span>    the ca
         <li>
           <strong>Review for demotion on a schedule, because it will never happen on demand.</strong>
           Rising escape markers, false positives, or a rule whose reason nobody can reconstruct are all
-          candidates. Demote by one rung — drop the predicate, keep the prose — rather than deleting the
+          candidates. Demote by one rung, dropping the predicate but keeping the prose, rather than deleting the
           rule outright, so being wrong costs you a review comment instead of a forgotten constraint.
         </li>
         <li>
@@ -1775,7 +1770,7 @@ capability, not conduct      <span class="c-pass">1  tool grant</span>    the ca
           The ladder is a decent way to think about where a rule lives, and I would build the next harness
           this way. That is a preference formed by experience, not a conclusion licensed by data. Twelve
           runs can show you a mechanism exists; they cannot tell you how often it matters, and the two
-          get confused constantly in writing about agents — including, twice, in my own report on this
+          get confused constantly in writing about agents, including, twice, in my own report on this
           project. If you take one thing from the section, take the shape of the argument rather than any
           of its numbers, and build your comparison so it is capable of coming out against you.
         </p>

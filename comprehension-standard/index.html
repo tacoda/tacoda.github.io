@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+  <meta name="voice-register" content="informational">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Comprehension Standard v0.1 · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -678,7 +679,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>The evidence</dt>
-          <dd>The test that goes red if the claim is wrong. This is the part that turns an opinion into a fact.</dd>
+          <dd>The test that goes red if the claim is wrong. A red test turns an opinion into a fact.</dd>
         </div>
       </div>
     </dl>
@@ -848,7 +849,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="none">
           <span class="when">seam</span>
-          <span class="what"><strong>Entry and exit.</strong> Where does data reach this code, and where does the effect land: a response, a row, a file, a charge. This is the field that catches "I read the function but not its callers," which is the most common way a change looks understood and is not.</span>
+          <span class="what"><strong>Entry and exit.</strong> Where does data reach this code, and where does the effect land: a response, a row, a file, a charge. This field catches "I read the function but not its callers," which is the most common way a change looks understood and is not.</span>
         </li>
         <li data-signal="warn">
           <span class="when">policy</span>
@@ -856,7 +857,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="block">
           <span class="when">falsifier</span>
-          <span class="what"><strong>Name the case that would make this wrong, then name the test that covers it.</strong> This is the field that separates reading from understanding. If you cannot describe a world in which this change is incorrect, you don't yet know what it does. <code>NONE</code> is permitted, and it means you shipped a declared risk instead of a hidden one.</span>
+          <span class="what"><strong>Name the case that would make this wrong, then name the test that covers it.</strong> That pairing separates reading from understanding. If you cannot describe a world in which this change is incorrect, you don't yet know what it does. <code>NONE</code> is permitted, and it means you shipped a declared risk instead of a hidden one.</span>
         </li>
       </ol>
 
@@ -948,8 +949,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         <p>
           A level describes a change at merge time, not an engineer's seniority. A staff engineer
           merges an L1 dependency bump on Tuesday. A first-year engineer merges an L3 change to a
-          pricing rule on Wednesday. Reading the levels as a career ladder is the fastest way to
-          turn a useful tool into an insult.
+          pricing rule on Wednesday. Read the levels as a career ladder and you turn a useful tool into an insult.
         </p>
       </div>
     </div>
@@ -979,7 +979,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Default</span>
-          <span class="what"><strong>L2 for ordinary changes.</strong> All four fields, a real falsifier, a test that covers it. This is the working bar and it should feel routine, not ceremonial.</span>
+          <span class="what"><strong>L2 for ordinary changes.</strong> All four fields, a real falsifier, a test that covers it. That is the working bar, and it should feel routine, not ceremonial.</span>
         </li>
         <li data-signal="block">
           <span class="when">Raise to L3</span>
@@ -987,7 +987,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="warn">
           <span class="when">Drop to L1</span>
-          <span class="what"><strong>Changes with no semantics:</strong> formatting, generated files, copy edits, dependency bumps with an unchanged lock. Name the categories explicitly in your charter. An unwritten exemption list expands to fit the deadline.</span>
+          <span class="what"><strong>Changes with no semantics:</strong> formatting, generated files, copy edits, dependency bumps with an unchanged lock. Name the categories explicitly in your charter, because an unwritten exemption list expands to fit the deadline.</span>
         </li>
         <li data-signal="none">
           <span class="when">Never L0</span>
@@ -1062,7 +1062,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         <span class="label">Team-level, on purpose</span>
         <p>
           Every conformance item describes something the team does, never something a person scores.
-          This is not politeness. A standard that produces per-person numbers becomes a performance
+          None of this is politeness. A standard that produces per-person numbers becomes a performance
           instrument within a quarter, and the moment it does, people optimize the number instead of
           the understanding, and you have paid for the ceremony without buying the comprehension.
         </p>
@@ -1203,8 +1203,8 @@ if __name__ == "__main__":
 
       <h3 class="sub">Where it is weakest</h3>
       <ul>
-        <li><strong><code>falsifier</code> is the field people fake first.</strong> The tell is a falsifier that restates the happy path inverted ("it would be wrong if it returned the wrong value"). A real falsifier names a specific input and a specific wrong outcome.</li>
-        <li><strong>It is uncomfortable on very large diffs.</strong> One sentence for a 900-line change is either a lie or an argument for splitting the change. Usually the second.</li>
+        <li><strong><code>falsifier</code> is the field people fake first.</strong> The tell is a falsifier that restates the happy path inverted ("it would be wrong if it returned the wrong value"). A real falsifier, by contrast, names a specific input and a specific wrong outcome.</li>
+        <li><strong>The standard is uncomfortable on very large diffs.</strong> One sentence for a 900-line change is either a lie or an argument for splitting the change. Usually the second.</li>
         <li><strong>It does nothing for code already merged.</strong> This is a bar on new changes. Comprehension debt already in the tree needs a different instrument.</li>
         <li><strong>v0.1 is small-team evidence.</strong> It has been used on small teams. There is no data on how it behaves across a large organization, and claiming otherwise would be exactly the kind of plausible, unfalsifiable statement this document exists to catch.</li>
       </ul>
@@ -1250,7 +1250,7 @@ if __name__ == "__main__":
       <ul>
         <li>Field names that survived contact with teams that did not write them.</li>
         <li>An exemption list that stopped needing constant patching, which is the signal it finally describes reality.</li>
-        <li>Actual evidence about faking: how often blocks are filled fluently and wrongly, and whether reviewers catch it. That is the number that decides whether this standard does anything at all.</li>
+        <li>Actual evidence about faking: how often blocks are filled fluently and wrongly, and whether reviewers catch it. That number decides whether this standard does anything at all.</li>
       </ul>
 
       <div class="takeaway">
