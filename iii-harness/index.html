@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: reviewed 2026-08-27, kept impersonal by author decision">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building a Harness with iii · Harness Engineering · Ian Johnson</title>
@@ -643,10 +644,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>The harness is the <em>graph</em>, not the agent</h1>
     <p class="standfirst">
       The default mental picture of an AI system is one agent with many tools. The other shape is
-      many small nodes with one job each, wired together through a durable queue, where the model
-      call is just what happens inside some of them. This is that shape built end to end: a topic
-      goes in, a briefing on its neighboring disciplines comes out, and there is exactly one agent
-      loop in the entire system.
+      many small nodes with one job each, wired together through a durable queue. In that shape the
+      model call is just what happens inside some of them. This is that shape built end to end: a
+      topic goes in, a briefing on its neighboring disciplines comes out. Exactly one agent loop
+      runs in the entire system.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -667,14 +668,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch warn"></span>
         <div>
           <dt>Node</dt>
-          <dd>A worker with one job. Registers functions, subscribes to a topic, and knows nothing about its neighbours.</dd>
+          <dd>A worker with one job. Registers functions, subscribes to a queue topic, and knows nothing about its neighbors.</dd>
         </div>
       </div>
       <div class="signal">
         <span class="swatch block"></span>
         <div>
           <dt>Queue</dt>
-          <dd>The durable handoff. A published topic is the only way one node reaches the next.</dd>
+          <dd>The durable handoff. Publishing a queue topic is the only way one node reaches the next.</dd>
         </div>
       </div>
       <div class="signal">
@@ -738,9 +739,9 @@ POST /result {job_id} ◄── <span class="c-warn">api-worker</span> reads sta
       </figure>
 
       <p>
-        Notice how little of this is agentic. Four of the five model-calling nodes are a single
-        constrained LLM call with a fixed input and a fixed output shape. Only
-        <code>research-worker</code> runs a real loop, because only research genuinely needs one:
+        Notice how little of this is agentic. Four of the five model-calling nodes are one
+        constrained LLM call with a fixed input and output shape. Only
+        <code>research-worker</code> runs a real loop, because only research needs one:
         the number of searches is not knowable in advance. Everything else is a transformation that
         happens to use a model.
       </p>
@@ -754,7 +755,7 @@ POST /result {job_id} ◄── <span class="c-warn">api-worker</span> reads sta
           <tbody>
             <tr><td>Time to first version</td><td><strong>Faster.</strong> One file, one prompt</td><td>Slower. Six workers and a config</td></tr>
             <tr><td>Where a failure lands</td><td>Somewhere in a long transcript</td><td><strong>On one node, with its topic and job id</strong></td></tr>
-            <tr><td>Retry granularity</td><td>The whole task</td><td><strong>The failed step</strong></td></tr>
+            <tr><td>Retry granularity</td><td>The whole task</td><td><strong>The failed stage</strong></td></tr>
             <tr><td>Crash mid-run</td><td>The run is gone</td><td><strong>The queue still holds the handoff</strong></td></tr>
             <tr><td>Cost control</td><td>One model for everything</td><td><strong>Per-node model and effort</strong></td></tr>
             <tr><td>Long-running work</td><td>Bounded by one session</td><td><strong>Bounded by nothing; it is a queue</strong></td></tr>
@@ -766,11 +767,11 @@ POST /result {job_id} ◄── <span class="c-warn">api-worker</span> reads sta
       <div class="callout">
         <span class="label">The honest case against this shape</span>
         <p>
-          That last row cuts both ways. A pipeline cannot decide it needs a seventh stage; you
-          decided the stages when you drew the graph. If the work genuinely varies in structure from
-          run to run, a single agent with good tools will beat a fixed graph, and no amount of
-          durability makes up for a topology that does not match the problem. Reach for this when
-          the <em>stages</em> are stable and the <em>content</em> is not.
+          That last row cuts both ways. A pipeline cannot decide it needs a seventh stage, because
+          you decided the stages when you drew the graph. If the work varies in structure from run
+          to run, one agent with good tools will beat a fixed graph. That mismatch is not one
+          durability can fix. Reach for this shape when the <em>stages</em> are stable and the
+          <em>content</em> is not.
         </p>
       </div>
     </div>
@@ -814,26 +815,26 @@ workers:
       </figure>
 
       <p>
-        Five lines. Each expands into a real subsystem configured in <code>config/</code>: the HTTP
-        server binds <code>0.0.0.0:3111</code> with a request timeout and a concurrency limit, the
-        state store enables trigger fan-out, the queue picks a persistence adapter, and
+        Five lines. Each one expands into a real subsystem configured in <code>config/</code>. The
+        HTTP server binds <code>0.0.0.0:3111</code> with a request timeout and a concurrency limit,
+        and the state store enables trigger fan-out. The queue picks a persistence adapter, and
         observability turns on traces, metrics, and logs under the service name
         <code>concept-expander</code>.
       </p>
 
       <p>
-        The comment matters as much as the config. The pipeline nodes are deliberately <em>not</em>
-        declared here, because they need <code>ANTHROPIC_API_KEY</code> and this file is in git. They
-        self-connect as local processes and read the key from the host environment. When you want a
-        node running as an engine-managed microVM instead, it ships an <code>iii.worker.yaml</code>
-        and the key is injected through the manifest's <code>env:</code> map.
+        The comment matters as much as the config. This file deliberately leaves the pipeline nodes
+        <em>out</em>, because they need <code>ANTHROPIC_API_KEY</code> and git tracks the file. They
+        self-connect as local processes and read the key from the host environment. To run a node as
+        an engine-managed microVM instead, ship an <code>iii.worker.yaml</code>: the manifest's
+        <code>env:</code> map injects the key.
       </p>
 
       <div class="takeaway">
         <span class="label">The line worth drawing</span>
         <p>
           Declared infrastructure goes in the repo. Anything that needs a secret stays out of it
-          until there is a manifest to inject the secret properly. That split is visible in this
+          until a manifest exists to inject that secret. That split is visible in this
           config, and getting it wrong is how keys end up in git history.
         </p>
       </div>
@@ -898,26 +899,27 @@ def publish(topic: str, job_id: str) -&gt; None:
 
       <p>
         Everything a node can do to the outside world goes through <code>worker.trigger</code> with
-        a <code>function_id</code>. Reading state is <code>state::get</code>. Writing it is
-        <code>state::set</code>. Handing off is <code>iii::durable::publish</code>. Calling another
-        node's capability is that node's function id. One verb, and the id says which subsystem you
-        are talking to.
+        a <code>function_id</code>. Reading state is <code>state::get</code>, and writing it is
+        <code>state::set</code>. Handing off is <code>iii::durable::publish</code>, and calling
+        another node's capability is that node's function id. One verb, and the id says which
+        subsystem you are talking to.
       </p>
 
       <p>
         The consequence is that nodes have no imports of each other. <code>planner-worker</code> does
-        not know <code>research-worker</code> exists. It publishes to <code>expand.research</code>
-        and stops caring. That is what makes a node independently restartable, independently
-        deployable, and independently rewritable in a different language, which is exactly why one
-        of these six is TypeScript and the other five are Python without that being a problem.
+        not know <code>research-worker</code> exists: it publishes to <code>expand.research</code>
+        and stops caring. Because of that decoupling, you can restart, redeploy, or rewrite one node
+        on its own, in a different language. One of these six is TypeScript and the
+        other five are Python for that reason.
       </p>
 
       <div class="callout">
         <span class="label">The tradeoff hiding in that decoupling</span>
         <p>
-          Nothing checks that <code>expand.research</code> has a subscriber. Publish to a topic
-          nobody listens to and the job simply stops advancing, with no error anywhere. That is the cost of a string-keyed graph, which is what makes the <code>stage</code> field on the job object
-          in rung 3 is not optional bookkeeping.
+          Nothing checks that <code>expand.research</code> has a subscriber. Publish to a queue topic
+          nobody listens to and the job stops advancing, with no error anywhere. That silence is the
+          cost of a string-keyed graph, which is why the <code>stage</code> field in rung 3 is not
+          optional bookkeeping.
         </p>
       </div>
     </div>
@@ -937,7 +939,7 @@ def publish(topic: str, job_id: str) -&gt; None:
         <h2>The queue carries a job id, and nothing else</h2>
         <p class="thesis">
           Every message on the wire is <code>{"job_id": "..."}</code>. The actual work product lives
-          in the state store under that id, and each node reads it, adds its piece, and advances the
+          in the state store under that id. Each node reads it, adds its piece, and advances the
           stage.
         </p>
         <div class="chips">
@@ -996,15 +998,15 @@ return {
         </li>
         <li data-signal="warn">
           <span class="when">The catch</span>
-          <span class="what">Two nodes handling the same job concurrently would clobber each other. This pipeline is strictly sequential, so that does not arise. A fan-out stage would need the merge this design avoids.</span>
+          <span class="what">Two nodes handling the same job concurrently would clobber each other. This pipeline is strictly sequential, so that clash does not arise. A fan-out stage would need the merge this design avoids.</span>
         </li>
       </ol>
 
       <p>
         The <code>stage</code> field is what makes a stalled run diagnosable. A job sitting at
-        <code>research</code> for ten minutes tells you which node to look at, and a job sitting at a
-        stage whose subscriber never started tells you why nothing is happening. Without it, a
-        pipeline that stops looks exactly like a pipeline that is slow.
+        <code>research</code> for ten minutes tells you which node to look at. It also names the
+        stage whose subscriber never started, so you learn why nothing is happening. Without that
+        field, a pipeline that stops looks exactly like a pipeline that is slow.
       </p>
     </div>
   </section>
@@ -1077,19 +1079,19 @@ def research_handler(payload: dict) -&gt; None:
 
       <p>
         The tool function body is one <code>worker.trigger</code>. The model thinks it is calling
-        <code>web_search</code>; what actually happens is a message to <code>tools-worker</code>,
-        which owns the search capability for the whole system. Swapping the search provider is a
-        change in one node that no other node notices, and the generous
+        <code>web_search</code>. The real event is a message to <code>tools-worker</code>,
+        which owns the search capability for the whole system. Swapping the search provider then changes
+        one node, and no other node notices. The generous
         <code>timeout_ms</code> is there because a cross-node tool call is a network round trip, not
         a function call.
       </p>
 
       <h3 class="sub">The sentence doing the most work</h3>
       <p>
-        <strong>"Do not write a final essay yet."</strong> Without it, a capable model reads
-        "research this topic" and delivers a polished writeup, which then becomes the input to three
-        more stages that each want to write their own. The instruction that keeps a pipeline stage in
-        its lane is usually a prohibition, not a description, and each node's prompt in this repo
+        <strong>"Do not write a final essay yet."</strong> Without that line, a capable model reads
+        "research this topic" and delivers a polished writeup. That writeup then becomes the input to
+        three more stages, each of which wants to write its own. The instruction that holds a stage
+        inside its scope is usually a prohibition, not a description, and every node's prompt here
         carries one.
       </p>
 
@@ -1097,9 +1099,9 @@ def research_handler(payload: dict) -&gt; None:
         <span class="label">Put the loop where the uncertainty is</span>
         <p>
           Agent loops are expensive and hard to observe. Four of these six nodes do not need one, so
-          they do not get one. Deciding per-node, rather than making the whole system agentic
-          because one part of it has to be, is most of what keeps this shape affordable and
-          debuggable.
+          they do not get one. Decide per node instead of making the whole system agentic
+          because one part of it has to be. That choice is most of what keeps this shape affordable
+          and debuggable.
         </p>
       </div>
     </div>
@@ -1118,9 +1120,9 @@ def research_handler(payload: dict) -&gt; None:
       <div>
         <h2>Three ways in, one of them for debugging</h2>
         <p class="thesis">
-          The same pipeline is reachable over HTTP, from the CLI one node at a time, and through a
-          script that does the whole thing. The middle one is the one you will actually use while
-          building.
+          You reach the same pipeline over HTTP, from the CLI, or from a script. The CLI hits one
+          node at a time, and the script does the whole thing. The middle one is the one you will
+          use most while building.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>http</b> :3111/expand · /result</span>
@@ -1146,7 +1148,7 @@ iii --config config.yaml
       </figure>
 
       <p>
-        The interesting entry point is not the HTTP one. It is this:
+        The interesting entry point is not the HTTP one. Try this instead:
       </p>
 
       <figure class="code">
@@ -1156,10 +1158,10 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
       </figure>
 
       <p>
-        Any node's function can be invoked by id with a synthetic payload, without the HTTP layer and
-        without the stages before it. That means a broken synthesis step is reproduced by triggering
-        <code>synthesis</code> against a job id that already has findings, instead of re-running four
-        minutes of research to get back to the failure. In a monolithic agent the equivalent is
+        You can invoke any node's function by id with a synthetic payload, skipping the HTTP layer
+        and earlier stages. So a broken synthesis stage is reproducible. Trigger
+        <code>synthesis</code> against a job id that already has findings, and skip the four
+        minutes of research. In a monolithic agent the equivalent is
         replaying a transcript and hoping.
       </p>
 
@@ -1194,8 +1196,8 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
       <div>
         <h2>When to reach for a graph, and when not to</h2>
         <p class="thesis">
-          This shape is not better than one agent with good tools, only better at specific things,
-          and worse at others, and the honest version of that list is short.
+          This shape is not better than one agent with good tools, only better at some things and
+          worse at others. The honest version of that list is short.
         </p>
       </div>
     </div>
@@ -1205,25 +1207,25 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
       <ul>
         <li><strong>The stages are stable.</strong> You can name them before you start, and they do not change per run.</li>
         <li><strong>The work outlives a session.</strong> Minutes to hours, where "keep an agent loop open" stops being an answer.</li>
-        <li><strong>Steps deserve different budgets.</strong> A planner is a cheap call; research is expensive. One model and one effort level for both is waste at one end and a constraint at the other.</li>
+        <li><strong>Stages deserve different budgets.</strong> A planner is a cheap call; research is expensive. So one model and one effort level for both is waste at one end and a constraint at the other.</li>
         <li><strong>Partial progress is worth keeping.</strong> If losing four minutes of research to a crash in synthesis is unacceptable, the durable handoff is the whole reason to be here.</li>
       </ul>
 
       <h3 class="sub">Do not reach for it when</h3>
       <ul>
-        <li><strong>The structure varies per run.</strong> A fixed graph cannot decide it needs a different shape today, and that is the disqualifying condition.</li>
+        <li><strong>The structure varies per run.</strong> A fixed graph cannot decide it needs a different shape today, and that gap is disqualifying.</li>
         <li><strong>The whole thing takes ten seconds.</strong> The queue, the state store, and six processes are pure overhead against one call that finishes before the infrastructure finishes starting.</li>
-        <li><strong>You have not proved the pipeline yet.</strong> Write it as one agent first. Split it when a stage starts deserving its own budget, its own retry, or its own language.</li>
+        <li><strong>You have not proved the pipeline yet.</strong> Write it as one agent first. Then split it when a stage starts deserving its own budget, its own retry, or its own language.</li>
       </ul>
 
       <div class="callout">
         <span class="label">The failure this shape does not fix</span>
         <p>
           Durability protects the handoff, not the content. If <code>neighbors-worker</code> returns
-          a confident list of disciplines that are subtly wrong, the queue delivers that wrongness to
-          synthesis with perfect reliability, and the briefing at the end is fluent and incorrect.
-          Every node is still a place where a model can be plausibly wrong, and nothing about the
-          topology changes that. It only changes how easily you can find which node did it.
+          a confident list of subtly wrong disciplines, the queue delivers that wrongness to
+          synthesis with perfect reliability. Then the briefing at the end is fluent and incorrect.
+          Every node is a place where a model can be plausibly wrong. Still, the topology changes
+          none of that risk. It changes only how fast you can find which node did it.
         </p>
       </div>
 
@@ -1235,19 +1237,19 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
         </li>
         <li data-signal="block">
           <span class="when">This page</span>
-          <span class="what">Compose from parts instead. Many processes, one loop total, and the wiring is the artifact you are actually designing.</span>
+          <span class="what">Compose from parts instead. Many processes, one loop total, and the wiring is the artifact you are designing.</span>
         </li>
         <li data-signal="pass">
           <span class="when">The factory</span>
-          <span class="what"><a href="/factory/">A lights-on factory</a> is this shape applied to software delivery, with governance gates and provenance on a queue that takes a tracker card and returns a merged pull request.</span>
+          <span class="what"><a href="/factory/">A lights-on factory</a> is this shape applied to software delivery. Governance gates and provenance sit on the same queue, which takes a tracker card and returns a merged pull request.</span>
         </li>
       </ol>
 
       <div class="takeaway">
         <span class="label">The one-sentence version</span>
         <p>
-          When the stages are known and the content is not, make the wiring durable and put the
-          agent loop only where the uncertainty actually lives.
+          Known stages, unknown content: make the wiring durable, and put the agent loop only where
+          the uncertainty lives.
         </p>
       </div>
     </div>

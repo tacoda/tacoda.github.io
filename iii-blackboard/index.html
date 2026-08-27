@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Blackboard Architecture for Agents · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -647,10 +648,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>The oldest multi-agent architecture is the <em>least used</em></h1>
     <p class="standfirst">
       Hearsay-II solved speech understanding in 1975 with a shape almost nobody reaches for now:
-      a shared knowledge space, a set of specialists that each declare when they are worth waking,
-      and no control flow at all. Nothing calls anything. That last property is why it fits agents
-      better than the pipeline you probably drew instead : a pipeline commits to the order of
-      operations at design time, and an agent's whole value is deciding at runtime.
+      a shared knowledge space, plus knowledge sources that each declare when they are worth waking.
+      The shape has no control flow at all: nothing calls anything. That last property is why it
+      fits agents better than the pipeline you probably drew instead. A pipeline commits to the
+      order of operations at design time, and an agent's whole value is deciding at runtime.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -678,14 +679,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch block"></span>
         <div>
           <dt>Activation condition</dt>
-          <dd>A predicate over the blackboard deciding whether a specialist is worth waking. The load-bearing part.</dd>
+          <dd>A predicate over the blackboard deciding whether a knowledge source is worth waking. The load-bearing part.</dd>
         </div>
       </div>
       <div class="signal">
         <span class="swatch pass"></span>
         <div>
           <dt>Control</dt>
-          <dd>Which eligible specialist runs next. An optimization with plain code; cost control with a model in the loop.</dd>
+          <dd>Which eligible knowledge source runs next. An optimization with plain code; cost control with a model in the loop.</dd>
         </div>
       </div>
     </dl>
@@ -723,12 +724,13 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        The blackboard is a shared, structured store partitioned into <em>levels</em> : raw input,
+        The blackboard is a shared, structured store, partitioned into <em>levels</em>: raw input,
         derived evidence, candidate hypotheses, the solution. Independent <strong>knowledge
-        sources</strong> watch it. Each declares an <strong>activation condition</strong>: a
-        predicate over the blackboard's contents that says when this specialist has something to
-        contribute. When a condition matches, that KS becomes eligible; a control component picks
-        which eligible KS runs; it posts its contribution, which may make others eligible.
+        sources</strong> watch it. Each one declares an <strong>activation condition</strong>, which
+        is a predicate over the blackboard's contents. The predicate says when that knowledge source
+        has something to contribute. When it matches, the knowledge source becomes eligible, and a
+        control component picks which eligible one runs. It posts its contribution, and that
+        contribution can make others eligible.
       </p>
 
       <figure class="code">
@@ -753,7 +755,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           </thead>
           <tbody>
             <tr><td>Order of operations</td><td>Decided when you draw it</td><td>Decided per step, from current state</td></tr>
-            <tr><td>Adding a capability</td><td>Rewire the graph</td><td>Add a KS; nothing else changes</td></tr>
+            <tr><td>Adding a capability</td><td>Rewire the graph</td><td>Add a knowledge source; nothing else changes</td></tr>
             <tr><td>A stage with nothing to do</td><td>Runs anyway, or you branch</td><td>Its condition doesn't match. It doesn't run</td></tr>
             <tr><td>Partial results</td><td>Usually a failed run</td><td><strong>Quiescence: an honest outcome</strong></td></tr>
             <tr class="flag"><td>Predictability</td><td><strong>You know what will happen</strong></td><td>You know what <em>can</em> happen, not what will</td></tr>
@@ -765,10 +767,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">The honest case against</span>
         <p>
           That last row is the price, and it is a real one. A blackboard run is harder to reason
-          about before it happens and harder to test exhaustively. If your stages are genuinely fixed (intake, validate, transform, emit) a pipeline is clearer, cheaper, and easier to
-          debug, and you should build that instead. Reach for a blackboard when the
-          <em>set</em> of applicable steps varies per input, which is exactly the case a fixed graph
-          handles worst.
+          about before it happens, and harder to test exhaustively. If your stages never change (intake,
+          validate, transform, emit), a pipeline is clearer, cheaper, and easier to debug. So build the
+          pipeline instead. When the <em>set</em> of applicable steps varies per input, reach for a
+          blackboard. A fixed graph handles that variation worst.
         </p>
       </div>
     </div>
@@ -787,16 +789,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The activation condition is already a config field</h2>
         <p class="thesis">
-          The part you would expect to write as code, the predicate deciding whether a specialist wakes, turns out to be a declarative slot on a trigger binding.
+          You would expect to write the predicate that wakes a knowledge source as code. On iii it is a declarative slot on a trigger binding.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        Levels are <code>state</code> scopes; nothing needs creating, they exist on first write.
-        Knowledge sources are functions bound to a <code>state</code> trigger. The interesting
-        piece is <code>conditions</code> : an array on the binding, where <code>fp::condition</code>
+        Levels are <code>state</code> scopes, and nothing needs creating: they exist on first write.
+        A knowledge source is any function you bind to a <code>state</code> trigger. The interesting
+        piece is <code>conditions</code>: an array on the binding, where <code>fp::condition</code>
         expresses the precondition as data:
       </p>
 
@@ -831,20 +833,20 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
 
       <p>
         That reason string is the detail worth stealing. Opportunistic control is the hardest kind
-        to debug precisely because there is no call stack to read , so "why didn't anything happen?"
-        is the characteristic failure. Here every scheduling decision explains itself, and you did
-        not have to instrument anything to get it. Classic blackboard implementations built that
-        by hand.
+        to debug, because there is no call stack to read. So "why didn't anything happen?" is the
+        characteristic failure. Here every scheduling decision explains itself, and you did
+        not have to instrument anything to get it. Classic blackboard implementations built those
+        explanations by hand.
       </p>
 
       <div class="callout">
         <span class="label">One typo builds a blackboard where nothing ever fires</span>
         <p>
-          Paths are <strong>JSON pointer</strong> : <code>/new_value/confidence</code>, not
-          <code>new_value.confidence</code>. A dotted path is not an error: it resolves to
-          "nothing", the condition evaluates to <code>skip</code>, and the knowledge source simply
-          never wakes. No exception, no warning, no failed binding , just a system that quietly
-          does nothing. This cost me a confused ten minutes and it will cost you the same.
+          Paths are <strong>JSON pointer</strong>: <code>/new_value/confidence</code>, not
+          <code>new_value.confidence</code>. A dotted path is not an error. It resolves to
+          "nothing", the condition evaluates to <code>skip</code>, and the knowledge source
+          never wakes. You get no exception, no warning, and no failed binding, just a system that
+          quietly does nothing. This typo cost me a confused ten minutes, and it will cost you the same.
         </p>
       </div>
     </div>
@@ -890,11 +892,11 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
       </div>
 
       <p>
-        The agenda gap is a deployment detail with real consequences: the builtin and redis queue
-        adapters ignore message priority entirely, so a single-node blackboard has an
-        <em>unordered</em> agenda. Every eligible KS still runs; you just lose control over which
-        one runs first, which, as the next rung shows, is the difference between an optimization and
-        a bill.
+        The agenda gap is a deployment detail with real consequences. The builtin and redis queue
+        adapters ignore message priority, so a single-node blackboard has an
+        <em>unordered</em> agenda. Every eligible knowledge source still runs, so you only lose
+        control over which one runs first. The next rung shows why that ordering is the difference
+        between an optimization and a bill.
       </p>
     </div>
   </section>
@@ -912,16 +914,16 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
       <div>
         <h2>Two hundred lines, and most of it isn't the blackboard</h2>
         <p class="thesis">
-          Building it with nothing underneath shows you which parts iii was quietly handling.
+          Building a blackboard with nothing underneath shows which parts iii was handling for you.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        The store, the knowledge sources and the control loop are small. What takes the space is
-        everything around them : content-hash compare-and-set, a change log so the loop can tell
-        progress from stalling, and the termination logic.
+        The store, the knowledge sources, and the control loop are small. Everything around them
+        takes the space: content-hash compare-and-set, a change log so the loop can tell progress
+        from stalling, and the termination logic.
       </p>
 
       <figure class="code">
@@ -945,16 +947,16 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
       </figure>
 
       <p>
-        Four outcomes, and only one of them is "solved". That is the honest shape of opportunistic
-        control, and writing it out is what makes the earlier gap concrete: <strong>nothing calls
-        anything, so nothing naturally ends.</strong> Termination is a thing you build. It looks
-        free in the diagram.
+        Four outcomes, and only one of them is "solved". Those four are the honest shape of
+        opportunistic control. Writing them out makes the earlier gap concrete: <strong>nothing
+        calls anything, so nothing ends on its own.</strong> Termination is a thing you build, and
+        it looks free in the diagram.
       </p>
 
       <p>
-        <code>stalled</code> is the one I did not anticipate. A knowledge source whose condition
-        stays true but which contributes nothing will be selected forever , the single way this
-        loop livelocks. The check is three lines and it is not optional.
+        <code>stalled</code> is the one I did not anticipate. If a knowledge source keeps its
+        condition true but contributes nothing, control selects it forever. That repeat selection is
+        the single way this loop livelocks. The check is three lines, and it is not optional.
       </p>
 
       <figure class="code">
@@ -994,27 +996,28 @@ conf:    0.86</code></pre>
       <ul>
         <li>
           <strong>The activation condition is the whole architecture.</strong> Everything else is
-          bookkeeping. Get the predicates wrong and a blackboard is a hash map with extra steps , and because a wrong predicate fails <em>silently</em> (nothing fires), it is the failure
-          you should build your tests around.
+          bookkeeping. Get the predicates wrong and a blackboard is a hash map with extra steps. A
+          wrong predicate fails <em>silently</em>, because nothing fires, so build your tests around
+          that failure.
         </li>
         <li>
           <strong>Opportunism needs a termination story, and it is yours.</strong> Both
           implementations needed an explicit quiescence check. iii's <code>state::barrier</code>
-          answers "wait for N contributions", not "nothing is eligible anymore" , a different
-          question, and the one that actually ends a run.
+          answers "wait for N contributions". It does not answer "nothing is eligible anymore", and
+          that second question is the one that ends a run.
         </li>
         <li>
           <strong>Agent knowledge sources make the priority function load-bearing.</strong> With
-          deterministic specialists, running them in a poor order costs microseconds. With
-          model-backed ones it costs a model call, in dollars and seconds. The agenda stops being
-          an optimization and becomes the cost control , which is what makes iii's priority gap
-          matter more than it first appears.
+          deterministic knowledge sources, running them in a poor order costs microseconds. With
+          model-backed ones it costs a model call, in dollars and seconds. So the agenda stops being
+          an optimization and becomes the cost control. That shift is why iii's priority gap matters
+          more than it first appears.
         </li>
         <li>
           <strong>Partial results are a first-class outcome.</strong> A pipeline that can't finish
           has failed. A blackboard that reaches quiescence has told you something true: given what
-          is known, no specialist can contribute further. For agent systems , which routinely hit
-          the edge of what they can determine , that is a far more useful thing to return than an
+          the blackboard holds, no knowledge source can contribute further. Agent systems often hit
+          the edge of what they can determine, so that partial answer is more useful than an
           exception.
         </li>
       </ul>
@@ -1022,10 +1025,10 @@ conf:    0.86</code></pre>
       <div class="callout">
         <span class="label">The reframe worth keeping</span>
         <p>
-          Agents are usually wired as pipelines because that is what the tooling suggests, not
-          because the work is pipeline-shaped. If you have ever added a conditional branch to skip
-          a stage that had nothing to do, you have started hand-rolling activation conditions. The
-          blackboard is what that becomes if you take it seriously.
+          Most teams wire agents as pipelines because that is what the tooling suggests, not
+          because the work is pipeline-shaped. If you have ever added a branch to skip a stage with
+          nothing to do, you have started hand-rolling activation conditions. The blackboard is what
+          those branches become when you commit to them.
         </p>
       </div>
     </div>
@@ -1053,28 +1056,30 @@ conf:    0.86</code></pre>
     <div class="rung-body">
       <div class="takeaway">
         <p>
-          <strong>Use a blackboard when the set of applicable steps varies per input.</strong> Not when the content varies, since a pipeline handles that fine, but when you genuinely cannot say in advance which specialists apply. That is the case a fixed graph handles worst and
-          the case agent systems hit constantly.
+          <strong>Use a blackboard when the set of applicable steps varies per input.</strong> Not
+          when the content varies, because a pipeline handles varying content fine. Use one when you
+          cannot name in advance which knowledge sources apply, because a fixed graph handles that
+          case worst. Agent systems hit it often.
         </p>
         <p>
-          <strong>On iii, most of it is configuration.</strong> Levels are state scopes, knowledge
+          <strong>On iii, most of the architecture is configuration.</strong> Levels are state scopes, knowledge
           sources are bound functions, activation conditions are <code>fp::condition</code>
           entries, and contention is <code>compare-and-set</code>. You get self-explaining
           scheduling decisions for free. You do not get an ordered agenda without RabbitMQ, and you
           do not get quiescence detection at all.
         </p>
         <p>
-          <strong>Build the termination logic first.</strong> It is the part that looks free in the
-          diagram, is absent from both substrates, and determines whether your system stops or
-          spins. Everything else is genuinely as easy as it looks.
+          <strong>Build the termination logic first.</strong> It looks free in the diagram, and it
+          is absent from both substrates. It decides whether your system stops or spins. Everything
+          else is as easy as it looks.
         </p>
       </div>
 
       <p>
-        The companion repo has both implementations side by side, plus a demo that walks the
+        The companion repo has both implementations side by side. It also has a demo that walks the
         activation conditions flipping between <code>allow</code> and <code>skip</code> against a
-        live engine. Six tests, offline and deterministic; the one worth reading first is
-        <code>test_quiescence_when_nothing_eligible</code>, because that outcome is the whole
+        live engine. The six tests are offline and deterministic. Read
+        <code>test_quiescence_when_nothing_eligible</code> first, because that outcome is the whole
         architecture in one assertion.
       </p>
     </div>

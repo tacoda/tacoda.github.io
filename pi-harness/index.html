@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Building a Harness with pi · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -645,7 +646,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       and a renderer. Only one of those has anything to do with code. Strip the builtin tools,
       replace the system prompt, register tools for a different domain, and you have a harness for
       something else entirely. This is that move carried all the way to a URL: a read-only SQL
-      analytics service for people who cannot write SQL, built on pi's extension surfaces with no
+      analytics service for people who cannot write SQL. Built on pi's extension surfaces, with no
       fork and no from-scratch agent loop.
     </p>
     <p class="byline">
@@ -712,8 +713,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>What is actually coding-specific about a coding agent?</h2>
         <p class="thesis">
-          Almost nothing. Take the inventory honestly and the coding is a thin layer of tools and a
-          system prompt sitting on top of machinery that does not care what domain it is in.
+          Almost nothing. Take the inventory honestly: the coding is a thin layer of tools and a
+          system prompt. The machinery underneath does not care what domain it is in.
         </p>
       </div>
     </div>
@@ -739,17 +740,18 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Two rows are domain-specific and the rest is general infrastructure that took real work to
         build. The interesting question is not "how do I write an agent loop" but "why would I write
-        a second one". If a coding agent exposes its extension surfaces properly, the fastest path
-        to a non-coding harness is to remove the two coding-specific parts and supply your own.
+        a second one". If a coding agent exposes its extension surfaces, remove the two
+        coding-specific parts and supply your own. That subtraction is the fastest path to a
+        non-coding harness.
       </p>
 
       <h3 class="sub">The harness this builds</h3>
       <p>
         The user is a support lead, an ops person, or a PM. They have a question in plain English,
-        <em>"how many accounts churned in June?"</em>, and no SQL. The harness inspects the schema,
-        writes one guarded read-only <code>SELECT</code>, runs it against a replica, sanity-checks
-        the result, and answers in a sentence with the number in it. Every question and every query
-        that ran is written to an audit log.
+        <em>"how many accounts churned in June?"</em>, and no SQL. The harness inspects the schema
+        and writes one guarded read-only <code>SELECT</code>. It runs the query against a replica,
+        sanity-checks the result, and answers in a sentence with the number in it. The extension
+        appends every question and every query that ran to an audit log.
       </p>
 
       <figure class="code">
@@ -770,7 +772,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           Every organization has a queue of "could an AI just answer this" questions that are not
           coding questions: analytics, triage, log spelunking, document lookup. The instinct is to
           build a bespoke agent for each. A coding agent you have already paid for, adopted, and
-          learned to operate is usually the better substrate, and the work is subtraction rather
+          learned to operate is usually the better substrate. The work there is subtraction rather
           than construction.
         </p>
       </div>
@@ -804,10 +806,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         <code>--no-builtin-tools</code> drops <code>read</code>, <code>write</code>,
-        <code>edit</code>, and <code>bash</code> at the pi layer. This is not cosmetic. It means the
-        agent has no general-purpose way to touch the filesystem or shell out, so the only verbs it
-        has are the ones you register. An agent whose entire vocabulary is four domain tools cannot
-        wander, because there is nowhere to wander to.
+        <code>edit</code>, and <code>bash</code> at the pi layer. That flag is not cosmetic. It
+        leaves the agent no general-purpose way to touch the filesystem or shell out. So the only
+        verbs it has are the ones you register. An agent whose entire vocabulary is four domain tools
+        cannot wander, because there is nowhere to wander to.
       </p>
 
       <p>
@@ -822,18 +824,17 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        That comment is doing more work than it looks like. Because the prompt is a file in the
-        project rather than a flag in a launcher, it is reviewable, diffable, and versioned with the
-        tools it describes. A system prompt passed as a command-line argument is a system prompt
-        nobody reviews.
+        That comment records a design decision. The prompt is a file in the project, not a flag in
+        a launcher. So you can review it, diff it, and version it with the tools it describes. A
+        system prompt passed as a command-line argument is a system prompt nobody reviews.
       </p>
 
       <div class="takeaway">
         <span class="label">The general move</span>
         <p>
           Subtract the domain, then declare the new one. If your substrate has no equivalent of
-          <code>--no-builtin-tools</code>, that is a strong signal it will fight you: a harness you
-          cannot narrow is a harness whose blast radius you do not control.
+          <code>--no-builtin-tools</code>, treat that absence as a warning. A harness you cannot
+          narrow is a harness whose blast radius you do not control.
         </p>
       </div>
     </div>
@@ -866,7 +867,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="none">
           <span class="when">list_tables</span>
-          <span class="what">Tables plus row counts. The agent has no <code>ls</code>, so this is how it finds out what exists at all.</span>
+          <span class="what">Tables plus row counts. The agent has no <code>ls</code>, so this tool is how it finds out what exists at all.</span>
         </li>
         <li data-signal="none">
           <span class="when">describe_table</span>
@@ -878,25 +879,24 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="pass">
           <span class="when">save_finding</span>
-          <span class="what">Append a record to <code>sql-output/findings.jsonl</code>. The only write in the whole harness, and it writes to a mounted output directory rather than anywhere the data lives.</span>
+          <span class="what">Append a record to <code>sql-output/findings.jsonl</code>. The only write in the whole harness, and it goes to a mounted output directory, not anywhere the data lives.</span>
         </li>
       </ol>
 
       <p>
-        Registration is ordinary and that is the point. <code>pi.registerTool</code> five times and
-        <code>pi.registerCommand("ask", …)</code> once, in a single TypeScript file. There is no
-        agent loop in that file, no retry logic, no context management, no renderer. All of that is
-        inherited.
+        Registration is ordinary, and the plainness is the point. <code>pi.registerTool</code> five
+        times and <code>pi.registerCommand("ask", …)</code> once, in a single TypeScript file. There
+        is no agent loop in that file, no retry logic, no context management, no renderer. All of it
+        comes from pi.
       </p>
 
       <div class="callout">
         <span class="label">The design test for a tool set</span>
         <p>
           Ask what the agent could do that you have not thought about. With four narrow tools the
-          answer is genuinely short, and you can enumerate it. With <code>bash</code> in the
-          registry the answer is "anything the container can do", and you are back to relying on
-          isolation for everything. Narrow tools are cheaper than sandboxes and easier to reason
-          about.
+          answer is short, and you can enumerate it. With <code>bash</code> in the registry the
+          answer is "anything the container can do", and isolation becomes your only defense.
+          Narrow tools are cheaper than sandboxes and easier to reason about.
         </p>
       </div>
     </div>
@@ -915,9 +915,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Three belts, because network egress is not optional</h2>
         <p class="thesis">
-          A file-only harness can be air-gapped with <code>--network none</code>. This one cannot:
-          the model API is on the network. So the containment has to live at the data layer instead,
-          and it is layered so that no single mistake exposes a write.
+          You can air-gap a file-only harness with <code>--network none</code>. This harness cannot:
+          the model API is on the network. So the containment lives at the data layer, in three
+          belts, arranged so no single mistake exposes a write.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>strategy D</b> tool gate</span>
@@ -932,15 +932,15 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Belt 1</span>
-          <span class="what"><strong>The connection.</strong> <code>node:sqlite</code> opened with <code>readOnly: true</code>. SQLite rejects every write at the engine level, which is the belt that holds even if the other two have a bug.</span>
+          <span class="what"><strong>The connection.</strong> <code>node:sqlite</code> opened with <code>readOnly: true</code>. SQLite rejects every write at the engine level, so this belt holds even if the other two have a bug.</span>
         </li>
         <li data-signal="block">
           <span class="when">Belt 2</span>
-          <span class="what"><strong>The statement guard.</strong> A single <code>SELECT</code> or <code>WITH</code> only. Defense in depth, and it gives the model a clean reason string instead of a raw SQLite error it will flail against.</span>
+          <span class="what"><strong>The statement guard.</strong> A single <code>SELECT</code> or <code>WITH</code> only. Defense in depth: it gives the model a clean reason string instead of a raw SQLite error it cannot interpret.</span>
         </li>
         <li data-signal="block">
           <span class="when">Belt 3</span>
-          <span class="what"><strong>The whitelist.</strong> Table names are checked against the live schema before they are ever interpolated, so schema introspection cannot be turned into a string-building primitive.</span>
+          <span class="what"><strong>The whitelist.</strong> The extension checks table names against the live schema before it interpolates them. Schema introspection therefore cannot become a string-building primitive.</span>
         </li>
       </ol>
 
@@ -977,27 +977,27 @@ function checkReadOnly(sql: string): { ok: boolean; reason?: string } {
       </figure>
 
       <p>
-        Without <code>scrub</code>, a legitimate query containing the word "update" inside a string
-        literal gets rejected, and a semicolon inside a literal reads as statement stacking. A guard
-        that produces false refusals on valid work is a guard the operator eventually removes, so
-        the scrubbing is not a nicety, but what keeps the belt in place.
+        Without <code>scrub</code>, belt 2 rejects a legitimate query that contains the word
+        "update" inside a string literal. It also reads a semicolon inside a literal as statement
+        stacking. A guard that produces false refusals on valid work is a guard the operator
+        eventually removes. The scrubbing is therefore what keeps the belt in place.
       </p>
 
       <h3 class="sub">The guard has a runnable spec</h3>
       <p>
-        The rules are duplicated as plain JavaScript in <code>docker/sql-guard.test.mjs</code>. The
-        source carries a comment saying so, and saying that changing one means changing the other.
-        That duplication is a deliberate trade: a security rule with an executable spec you can run
-        in the container is worth more than a rule with a single definition and no test.
+        The repo duplicates the rules as plain JavaScript in <code>docker/sql-guard.test.mjs</code>.
+        The source carries a comment saying so, and saying that changing one means changing the
+        other. That duplication is a deliberate trade: the spec runs in the container. A security
+        rule with a runnable spec beats a rule with a single definition and no test.
       </p>
 
       <div class="takeaway">
         <span class="label">Match the belt to the threat</span>
         <p>
           The reflex answer for agent isolation is the network sandbox. It does not apply here,
-          because the harness must reach the model API. Naming the belts honestly, and knowing which
-          one is load-bearing (the read-only connection) rather than assuming the container is doing
-          the work, is the difference between security and the feeling of it.
+          because the harness must reach the model API. So name the belts, and know which one is
+          load-bearing: the read-only connection, not the container. That knowledge is the difference
+          between security and the feeling of it.
         </p>
       </div>
     </div>
@@ -1017,7 +1017,7 @@ function checkReadOnly(sql: string): { ok: boolean; reason?: string } {
         <h2>A skill for the method, a template for the kickoff</h2>
         <p class="thesis">
           Tools give the agent verbs. They do not give it a method. The answer loop is a skill the
-          model loads when the question arrives, and <code>/ask</code> is the one-line entry point a
+          model loads when the question arrives. And <code>/ask</code> is the one-line entry point a
           non-engineer actually types.
         </p>
         <div class="chips">
@@ -1030,7 +1030,7 @@ function checkReadOnly(sql: string): { ok: boolean; reason?: string } {
     <div class="rung-body">
       <p>
         Skills load on demand, so the method costs nothing on turns that do not need it. The
-        description is the trigger, and it is written as a set of conditions rather than a topic:
+        description is the trigger, and it names a set of conditions rather than a topic:
       </p>
 
       <figure class="code">
@@ -1044,10 +1044,10 @@ description: Plain-English-to-SQL answer loop (understand the question →
       </figure>
 
       <p>
-        Two details in that description are worth stealing. The loop is spelled out as an arrow
-        chain, so the model has the whole method before it reads the body. And the load condition
-        names three concrete triggers rather than saying "load when relevant", which is the
-        instruction that produces skills that never load or always do.
+        Two details in that description are worth copying. It spells the loop out as an arrow chain,
+        so the model has the method before the body. And the load condition names three concrete
+        triggers instead of "load when relevant". That vaguer instruction produces skills that never
+        load or always do.
       </p>
 
       <h3 class="sub">Where the method lives, and why not in the system prompt</h3>
@@ -1070,8 +1070,9 @@ description: Plain-English-to-SQL answer loop (understand the question →
         <span class="label">The step people leave out</span>
         <p>
           The playbook's loop includes <em>sanity-check</em> before <em>answer</em>. A query that
-          runs is not a query that answers the question asked, and the failure mode of this harness
-          is not a crash: it is a confident sentence containing the wrong number. That step is cheap, and it is what stands between a fluent answer and a wrong one.
+          runs is not a query that answers the question asked. The failure mode of this harness is
+          not a crash: it is a confident sentence containing the wrong number. That step is cheap,
+          and it is what stands between a fluent answer and a wrong one.
         </p>
       </div>
     </div>
@@ -1091,8 +1092,7 @@ description: Plain-English-to-SQL answer loop (understand the question →
         <h2>One command, and an outer belt</h2>
         <p class="thesis">
           A harness a colleague cannot start is a demo. The launcher collapses build, seed, and run
-          into one command, and the container is the belt that sits outside everything the extension
-          does.
+          into one command. The container is the outer belt, outside everything the extension does.
         </p>
         <div class="chips">
           <span class="chip kind-cmd"><b>strategy F</b> bin/pi-sql</span>
@@ -1118,26 +1118,25 @@ description: Plain-English-to-SQL answer loop (understand the question →
       </figure>
 
       <p>
-        Read the mount list rather than the flags. Exactly one host artifact is visible to the
-        harness, mounted read-only, and it is a database file. Not a home directory, not a source
-        tree, not an SSH agent socket. Most of what makes a container safe is what you decline to
-        mount into it.
+        Read the mount list rather than the flags. Exactly one host artifact reaches the harness: a
+        database file, mounted read-only. Not a home directory, not a source tree, not an SSH agent
+        socket. Most of what makes a container safe is what you decline to mount into it.
       </p>
 
       <h3 class="sub">Ergonomics that decide whether it gets used</h3>
       <ul>
         <li><strong>Builds on first run.</strong> No separate build step to forget.</li>
-        <li><strong>Seeds the sample database on first run</strong>, as the host user, so the resulting file is owned by you and can then be mounted read-only.</li>
-        <li><strong>Allocates a TTY only when stdout is one</strong>, which is what lets the same launcher work interactively and in CI.</li>
-        <li><strong>Takes a different database as an argument</strong>, so pointing it at a real replica is a path, not a rebuild.</li>
+        <li><strong>Seeds the sample database on first run</strong>, as the host user. You own the file, so you can mount it read-only.</li>
+        <li><strong>Allocates a TTY only when stdout is one</strong>, so the same launcher works interactively and in CI.</li>
+        <li><strong>Takes a different database as an argument</strong>, so a real replica is a path, not a rebuild.</li>
       </ul>
 
       <div class="takeaway">
         <span class="label">The launcher is part of the harness</span>
         <p>
-          Every one of those bullets is a reason someone does not fall back to running the thing
-          unguarded on their laptop "just this once". Convenience is a security property when the
-          alternative to your safe path is a fast unsafe one.
+          Every one of those bullets keeps someone from running the harness unguarded on a laptop,
+          "just this once". Convenience is a security property when the alternative to your safe
+          path is a fast unsafe one.
         </p>
       </div>
     </div>
@@ -1180,14 +1179,14 @@ description: Plain-English-to-SQL answer loop (understand the question →
         </li>
         <li data-signal="block">
           <span class="when">Edge</span>
-          <span class="what">nginx terminates TLS, enforces basic auth, and routes both paths. The harness itself has no idea authentication exists, which is the correct division.</span>
+          <span class="what">nginx terminates TLS, enforces basic auth, and routes both paths. The harness itself does not know that authentication exists, which is the correct division.</span>
         </li>
       </ol>
 
       <p>
-        The one-shot mode built for CI in rung 5 is what makes the REST adapter a configuration file
-        rather than a service rewrite. That was not planned in advance; it is what happens when the
-        launcher is written to work when stdout is not a terminal.
+        Rung 5 built the one-shot mode for CI. That mode is what makes the REST adapter a
+        configuration file rather than a service rewrite. Nobody planned that reuse: it happens when
+        you write the launcher to work when stdout is not a terminal.
       </p>
 
       <h3 class="sub">The six surfaces, end to end</h3>
@@ -1218,7 +1217,7 @@ description: Plain-English-to-SQL answer loop (understand the question →
         </li>
         <li data-signal="block">
           <span class="when">This page</span>
-          <span class="what">Same class of substrate, <em>different job</em>. The extension surfaces are used to change what the agent is for, not to fence in what it already does.</span>
+          <span class="what">Same class of substrate, <em>different job</em>. These surfaces change what the agent is for, rather than fencing in what it already does.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Neighbours</span>
@@ -1229,9 +1228,9 @@ description: Plain-English-to-SQL answer loop (understand the question →
       <div class="takeaway">
         <span class="label">The one-sentence version</span>
         <p>
-          If a coding agent exposes a system prompt, a tool registry, a way to drop the builtins,
-          and a launch profile, it is a general agent harness wearing a coding costume. Take the
-          costume off before you write a new one.
+          A coding agent with a system prompt, a tool registry, a way to drop the builtins, and a
+          launch profile is already a general harness. The coding is only a costume, so take it off
+          before you write a new one.
         </p>
       </div>
     </div>

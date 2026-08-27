@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Actors and Supervision for Agents · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
@@ -646,12 +647,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Half of OTP does not port. It <em>dissolves</em>.</h1>
     <p class="standfirst">
-      If you have written Elixir, you carry a mental model of distributed systems shaped like a
-      supervision tree: processes that hold state, die, and get restarted. Durable-queue systems
-      model the same territory differently : state outlives the thing computing it, and failure is
-      a property of a message rather than a process. Most of OTP survives that translation as pure
-      configuration. The parts that don't survive are more interesting than the parts that do,
-      because they were answers to a question the other architecture never asks.
+      If you have written Elixir, you carry a supervision tree in your head: processes hold state,
+      die, and get restarted. But a durable-queue system models the same territory differently.
+      State outlives the thing computing it, so failure belongs to a message rather than to a
+      process. Most of OTP survives that translation as pure configuration. The parts that do not
+      survive are more interesting, because they answered a question the other architecture never
+      asks.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -679,7 +680,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>Dissolves</dt>
-          <dd>The concept has no referent here. Not a missing feature : the problem it solved does not arise.</dd>
+          <dd>The concept has no referent here. Not a missing feature: the problem it solved does not arise.</dd>
         </div>
       </div>
       <div class="signal">
@@ -730,9 +731,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         elegant: because the three coincide, one mechanism, supervision, handles all three.
       </p>
       <p>
-        A durable-queue system unbundles them. Identity is a key. Concurrency is a queue lane.
-        Failure is a message delivery. Because they no longer coincide, no single mechanism covers
-        all three , but each one gets a mechanism better suited to it than a supervision tree was.
+        A durable-queue system unbundles them: identity is a key, concurrency is a queue lane, and
+        failure is a message delivery. Because they no longer coincide, no single mechanism covers
+        all three. But each one gets a mechanism better suited to it than a supervision tree was.
       </p>
 
       <div class="tablewrap">
@@ -780,16 +781,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Three declarations, no source file</h2>
         <p class="thesis">
-          The interesting part is not that this is possible, but that the callback module, the thing you would assume has to be code, turns out to be data.
+          Building a GenServer this way is not the surprise. The callback module is the surprise: the thing you would assume has to be code turns out to be data.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        Start with the mailbox. A named FIFO queue whose <code>message_group_field</code> is the
-        actor id: messages sharing a group value run in order, different groups run concurrently.
-        That one field is the difference between a mailbox and a work pool.
+        Start with the mailbox: a named FIFO queue whose <code>message_group_field</code> is the
+        actor id. Messages that share a group value run in order, and different groups run
+        concurrently. That one field is the difference between a mailbox and a work pool.
       </p>
 
       <figure class="code">
@@ -806,10 +807,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        Now the callback. <code>state::update</code> takes an ordered list of atomic operations,
-        applies them to a <code>(scope, key)</code>, and returns both the old and new value. That
-        is <code>handle_call/3</code>: a state transition and a reply, expressed as data rather
-        than a function body.
+        Now the callback. <code>state::update</code> takes an ordered list of atomic operations and
+        applies them to a <code>(scope, key)</code>. It returns both the old value and the new one.
+        That pair is <code>handle_call/3</code>: a state transition and a reply, written as data
+        rather than as a function body.
       </p>
 
       <figure class="code">
@@ -826,19 +827,19 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        That is a durable, per-actor-serialized, retry-backed, idempotency-keyed message send into
-        a persistent state machine, and there is no source file anywhere in it. The supervisor is a
-        <code>worker-compose.yaml</code> dependency graph. Monitors are trigger bindings. Restart
-        intensity is <code>max_retries</code> and a dead-letter queue.
+        That one command is a durable, per-actor-serialized, retry-backed, idempotency-keyed
+        message send into a persistent state machine. Still, no source file appears anywhere in it.
+        The supervisor is a <code>worker-compose.yaml</code> dependency graph, monitors are trigger
+        bindings, and restart intensity is <code>max_retries</code> plus a dead-letter queue.
       </p>
 
       <div class="callout">
         <span class="label">Three functions that are in no README</span>
         <p>
           <code>state::compare-and-set</code> exists and works, returning
-          <code>{"swapped": false, "current": …}</code> on conflict. This matters because the
-          <code>workflow</code> worker's own documentation states there is no CAS and instructs you
-          to file an engine feature request , and that guidance is out of date as of state 0.22.2.
+          <code>{"swapped": false, "current": …}</code> on conflict. The correction matters, because
+          the <code>workflow</code> worker's own documentation states there is no CAS. It tells you
+          to file an engine feature request instead. That guidance is out of date as of state 0.22.2.
           <code>state::barrier</code> (a fan-in condition for trigger bindings) and
           <code>state::claim-namespace</code> (singleton election over a function prefix) are
           likewise undocumented. Enumerate <code>engine::functions::list</code> before believing any
@@ -904,11 +905,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        Note the row that says <em>free</em>. Hot code upgrade is the thing OTP is famous for
-        making possible and notorious for making painful : <code>code_change/3</code>, appups,
-        relups. Here the callback is a list of operations in a config entry, and config
-        hot-reloads. You get the capability by accident, because you gave up expressing the
-        callback as code.
+        Note the row that says <em>free</em>. OTP is famous for making hot code upgrade possible and
+        notorious for making it painful: <code>code_change/3</code>, appups, relups. Here the
+        callback is a list of operations in a config entry, and config hot-reloads. You get the
+        capability by accident, because you gave up expressing the callback as code.
       </p>
     </div>
   </section>
@@ -926,19 +926,19 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The supervisor works perfectly and the work never finishes</h2>
         <p class="thesis">
-          Writing OTP by hand is what makes the "dissolves" column legible , and it surfaces the
-          one property the translation genuinely costs you.
+          Writing OTP by hand makes the "dissolves" column legible. It also surfaces the one
+          property the translation genuinely costs you.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        The from-scratch half is a <code>Mailbox</code> (strict FIFO), a <code>GenServer</code>
-        (state plus a serialized loop), and a <code>Supervisor</code> with
-        <code>one_for_one</code> / <code>rest_for_one</code> and a real restart-intensity window.
-        Restart intensity : the thing everyone forgets, and without which a crash loop is
-        indistinguishable from a busy system , is about fifteen lines.
+        The from-scratch half is three classes: a <code>Mailbox</code> (strict FIFO), a
+        <code>GenServer</code> (state plus a serialized loop), and a <code>Supervisor</code>. That
+        supervisor carries <code>one_for_one</code>, <code>rest_for_one</code>, and a real
+        restart-intensity window. Restart intensity is about fifteen lines, and it is the thing
+        everyone forgets. Without that window, a crash loop looks the same as a busy system.
       </p>
 
       <figure class="code">
@@ -952,12 +952,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Once you have written <em>that</em> line, the mapping table stops being a claim and starts
         being obvious. On iii there is no such line to write, because the state was never in the
-        process. There is nothing to rebuild.
+        process. So nothing needs rebuilding.
       </p>
 
       <p>
         The demo runs the shared workflow with one injected provider failure. The supervisor does
-        its job flawlessly:
+        its job:
       </p>
 
       <figure class="code">
@@ -975,20 +975,20 @@ final state per child:
       </figure>
 
       <p>
-        Every process is healthy. The cascade was correct. And the run produced nothing, because
-        the restart cleared <code>score</code>'s mailbox and the message that caused the crash is
-        gone. <strong>Supervision restores the process, never the message.</strong>
+        Every process is healthy, and the cascade was correct. Still, the run produced nothing,
+        because the restart cleared the mailbox for <code>score</code>. That mailbox held the
+        message that caused the crash, so the message went with it.
+        <strong>Supervision restores the process, never the message.</strong>
       </p>
 
       <div class="callout">
         <span class="label">This is not a bug in the implementation. It is OTP.</span>
         <p>
-          In BEAM the answer is that the sender retries , and the sender is usually another
-          supervised process a microsecond away, so nobody notices the cost. With an agentic stage,
-          the sender is a model call you already paid for. Losing the in-flight message on restart
-          is a very different proposition when replaying it costs a few cents and several seconds.
-          That is the strongest practical argument for moving the unit of failure from the process
-          to the message , which is exactly what the durable-queue translation does.
+          In BEAM the answer is that the sender retries. That sender is usually another supervised
+          process a microsecond away, so nobody notices the cost. With an agentic stage, the sender
+          is a model call you already paid for. Then losing the in-flight message costs a few cents
+          and several seconds to replay. So move the unit of failure off the process and onto the
+          message. That move is the strongest practical argument for the durable-queue translation.
         </p>
       </div>
     </div>
@@ -1016,9 +1016,10 @@ final state per child:
     <div class="rung-body">
       <p>
         The fact is this: <strong>state lives in volatile memory inside something that can
-        die.</strong> Supervision exists to restart that thing. Restart intensity exists to stop
-        supervision from looping forever. Links exist to stop collaborators from acting on state
-        that died with its owner. The registry exists because pids are ephemeral and unroutable.
+        die.</strong> Supervision exists to restart that thing, and restart intensity exists to
+        stop supervision from looping forever. Links exist to stop collaborators from acting on
+        state that died with its owner. The registry exists for one more reason: pids are ephemeral
+        and unroutable.
       </p>
 
       <figure class="code">
@@ -1037,15 +1038,15 @@ final state per child:
 
       <ul>
         <li>
-          <strong>Restart.</strong> No process owns the state, so there is nothing to restart : the
-          state is already there. The unit of failure moved to the message, and message failure is
-          already handled by retries.
+          <strong>Restart.</strong> No process owns the state, so there is nothing to restart: the
+          state is already there. The unit of failure moved to the message, and retries already
+          handle message failure.
         </li>
         <li>
           <strong>Restart intensity.</strong> Three retries with exponential backoff, then
-          dead-letter. Same job done better: the poison message is <em>preserved</em>, inspectable,
-          and replayable with <code>iii::queue::redrive</code> once you fix the cause. OTP
-          escalates and the message is gone.
+          dead-letter. The dead-letter queue does the same job better: it keeps the poison message
+          and lets you inspect it. Redrive it with <code>iii::queue::redrive</code> once you fix the cause.
+          OTP escalates instead and loses the message.
         </li>
         <li>
           <strong>Registry.</strong> A registry maps a stable name onto an unstable pid. Here the
@@ -1053,8 +1054,8 @@ final state per child:
         </li>
         <li>
           <strong>Links and EXIT.</strong> Links protect collaborators from acting on state that
-          died. There is no stale memory to protect against. What survives is cascade for genuine
-          <em>data</em> dependencies, which the compose daemon already does.
+          died. But no stale memory exists here to protect against. What survives is cascade for
+          genuine <em>data</em> dependencies, which the compose daemon already does.
         </li>
       </ul>
 
@@ -1063,8 +1064,8 @@ final state per child:
         <p>
           It is tempting to score this as "iii is missing supervision." That reading is backwards.
           Supervision is a solution, and solutions only look like requirements until you change the
-          problem. The right question for any substrate is not <em>does it have a supervisor</em>
-          but <em>what does it do with state, and what follows from that</em>.
+          problem. The right question for any substrate is not <em>whether it has a supervisor</em>.
+          Ask what it does with state, and what follows from that answer.
         </p>
       </div>
     </div>
@@ -1091,11 +1092,10 @@ final state per child:
 
     <div class="rung-body">
       <p>
-        <strong>Ordering under retry.</strong> A BEAM mailbox is a mailbox precisely because it is
-        ordered: two messages sent from A to B arrive in send order, always. The queue worker
-        documents its own divergence : a failed FIFO message is re-queued via <code>nack</code>
-        rather than blocking the poller, so a message enqueued <em>after</em> the failure can be
-        delivered before the retried one catches up.
+        <strong>Ordering under retry.</strong> A BEAM mailbox keeps order: two messages sent from A
+        to B arrive in send order, always. The queue worker documents its own divergence: a failed
+        FIFO message goes back on the queue via <code>nack</code>. That nack keeps the poller
+        running, so a message enqueued <em>after</em> the failure can arrive before the retried one.
       </p>
 
       <figure class="code">
@@ -1109,18 +1109,18 @@ queue: A then B, unless A stumbles.</span></code></pre>
       </figure>
 
       <p>
-        No configuration closes this. Handlers have to be order-independent, or carry sequence
-        numbers and park what arrives early. If your domain has genuine causal chains, this is the
-        constraint that shapes your design, and it is the strongest argument for staying on BEAM.
+        No configuration closes that gap. Handlers have to be order-independent, or carry sequence
+        numbers and park what arrives early. If your domain has genuine causal chains, that
+        constraint shapes your design. It is also the strongest argument for staying on BEAM.
       </p>
 
       <p>
-        <strong>Delayed delivery.</strong> There is no <code>Process.send_after</code>. The queue
+        <strong>Delayed delivery.</strong> iii has no <code>Process.send_after</code>. The queue
         accepts <code>delaySeconds</code> and <code>visibilityTimeout</code> "for parity" and
-        ignores both. But look at what <code>send_after</code> is actually used for: call timeouts
-        (<code>timeout_ms</code> covers it), periodic work (<code>cron</code>), retry backoff (the
-        queue does it natively), and business-time scheduling. Only the fourth is uncovered : a
-        scheduling feature, not a hole in the actor model.
+        ignores both. But <code>send_after</code> does four jobs, and three of them already have
+        cover. Call timeouts go to <code>timeout_ms</code>, periodic work goes to
+        <code>cron</code>, and the queue handles retry backoff natively. That leaves business-time
+        scheduling: a scheduling feature, not a hole in the actor model.
       </p>
 
       <div class="callout">
@@ -1128,9 +1128,9 @@ queue: A then B, unless A stumbles.</span></code></pre>
         <p>
           Grouped FIFO only applies to <em>named</em> queues created through
           <code>queue::define</code>. A plain <code>durable:subscriber</code> binding stays globally
-          serial : one actor at a time across the entire system. Same code, same config file,
-          silently 1x instead of 10x. Assert your engine version at boot the way the harness worker
-          does; it refuses to start if its queue cannot be ensured.
+          serial: one actor at a time across the entire system. Same code, same config file,
+          silently 1x instead of 10x. Assert your engine version at boot, the way the harness worker
+          does. That worker refuses to start unless it can ensure its queue.
         </p>
       </div>
     </div>
@@ -1159,22 +1159,22 @@ queue: A then B, unless A stumbles.</span></code></pre>
       <div class="takeaway">
         <p>
           <strong>The translation is real but partial, and the partiality is informative.</strong>
-          A GenServer falls out of three declarations. A supervision tree falls out of a
-          <code>depends_on</code> graph. Monitors, timers, process groups, ETS and barriers are all
-          trigger bindings or state scopes. Restart, restart intensity, the registry and links have
-          no referent at all. Ordering under retry and delayed delivery are the two places you give
-          something up.
+          A GenServer falls out of three declarations, and a supervision tree falls out of a
+          <code>depends_on</code> graph. Then monitors, timers, process groups, ETS and barriers are
+          all trigger bindings or state scopes. But restart, restart intensity, the registry and
+          links have no referent at all. That leaves ordering under retry and delayed delivery, the
+          two places you give something up.
         </p>
         <p>
-          <strong>The mailbox is what you actually lose.</strong> Going in, the interesting gap
-          looked like supervision , and supervision dissolves. The property worth mourning is
-          strict FIFO between two endpoints, and the durable-queue translation cannot give it back,
-          because its retry mechanism is what breaks the order.
+          <strong>The mailbox is what you lose.</strong> Going in, the interesting gap looked like
+          supervision, and supervision dissolves. The property worth mourning is strict FIFO between
+          two endpoints. The durable-queue translation cannot give it back, because its own retry
+          mechanism breaks the order.
         </p>
         <p>
           <strong>Then ask whether actors were the right lens at all.</strong> Supervision assumes
-          failure is crash-stop and detectable. A confident wrong answer exits zero and returns a
-          well-formed payload , nothing in the from-scratch implementation would notice, and
+          failure is crash-stop and detectable. But a confident wrong answer exits zero and returns
+          a well-formed payload. Nothing in the from-scratch implementation would notice it, and
           nothing in the iii translation would either. OTP offers superb machinery for the failure
           mode agents mostly do not have.
         </p>
@@ -1183,9 +1183,9 @@ queue: A then B, unless A stumbles.</span></code></pre>
       <p>
         That last point is why this is a series rather than an essay. The same incident-analysis
         workflow runs over a <a href="/iii-blackboard/">blackboard</a>, where control is
-        opportunistic and partial results are a legitimate outcome, and over an
+        opportunistic and partial results are a legitimate outcome. It also runs over an
         <a href="/iii-event-sourcing/">event log</a>, where history is the system and replay is the
-        debugging surface. Both answer pressures that agent systems actually have. Read them next.
+        debugging surface. Both answer pressures that agent systems really do have. Read them next.
       </p>
     </div>
   </section>
