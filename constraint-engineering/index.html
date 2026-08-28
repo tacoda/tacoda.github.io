@@ -7,18 +7,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Constraint Engineering · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
-<meta name="description" content="Agent design as a modelling discipline, separate from the machinery that runs it. A constraint carries four attributes. Capabilities run a second ladder. Plus the complete primitive catalogue, the harness and factory patterns, the human-in-the-loop patterns, and the anti-patterns. By Ian Johnson.">
+<meta name="description" content="Agent design as a modeling discipline, separate from the machinery that runs it. A constraint carries four attributes. Capabilities run a second ladder. Plus the complete primitive catalog, the harness and factory patterns, the human-in-the-loop patterns, and the anti-patterns. By Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://www.tacoda.dev/constraint-engineering/">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="tacoda.dev">
 <meta property="og:title" content="Constraint Engineering">
-<meta property="og:description" content="Agent design is domain modelling. Two ladders, one axis: how much is text the model reinterprets, and how much is code it can only call.">
+<meta property="og:description" content="Agent design is domain modeling. Two ladders, one axis: how much is text the model reinterprets, and how much is code it can only call.">
 <meta property="og:url" content="https://www.tacoda.dev/constraint-engineering/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Constraint Engineering">
-<meta name="twitter:description" content="The conceptual model for agent design, and the catalogue of patterns that sit on it.">
+<meta name="twitter:description" content="The conceptual model for agent design, and the catalog of patterns that sit on it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -794,6 +794,10 @@ td.cov.n { color: var(--rule); }
 .rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
 .rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .nongoals { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.8; }
+a.xref { color: var(--brick); text-decoration: none;
+  border-bottom: 1px dotted var(--brick-soft); }
+a.xref:hover, a.xref:focus-visible { border-bottom-style: solid; }
+td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 .nongoals b { color: var(--ink-2); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.62rem; }
 </style>
 </head>
@@ -810,10 +814,10 @@ td.cov.n { color: var(--rule); }
     </div>
     <h1>Model the constraint first, then <em>pick the machinery</em>.</h1>
     <p class="standfirst">
-      Agent reliability work looks like infrastructure. It is domain modelling, and the object it
+      Agent reliability work looks like infrastructure. It is domain modeling, and the object it
       models is a constraint. One constraint carries four independent attributes: whose rule it is,
       what mechanism carries it, what happens when it fires, and whether a model or a machine decides.
-      Collapse any two and your harness stops travelling. I have no number for how much variance to
+      Collapse any two and your harness stops traveling. I have no number for how much variance to
       accept. This page is the apparatus for holding one you pick yourself.
     </p>
     <p class="byline">
@@ -825,12 +829,12 @@ td.cov.n { color: var(--rule); }
     <div class="provenance">
       the argument · domain design, not infrastructure. No queues, no wiring, no framework<br>
       where it sits · the DevOps area, spanning development and platform, and owned by neither alone<br>
-      the frame · domain-driven design and object orientation, borrowed on purpose. Section 1 and section 5 carry the mappings<br>
-      the primitives · about fifty, catalogued in section 10 by family, context and rung<br>
+      the frame · domain-driven design and object orientation, borrowed on purpose. <a class="xref" href="#s-1">Section 1</a> and <a class="xref" href="#s-5">section 5</a> carry the mappings<br>
+      the primitives · about fifty, cataloged in <a class="xref" href="#s-12">section 12</a> by family, context and rung<br>
       the patterns · 24 harness · 24 factory · 12 human-in-the-loop · 18 anti-patterns<br>
       the implementation · wipp, a factory of mine. Private, so this page carries the design rather than a clone URL<br>
       what it runs against · three repositories, one of them itself, on a stock agent SDK<br>
-      what is honest · the band has no published number, including from me. Section 0 says why that is still worth naming<br>
+      what is honest · the band has no published number, including from me. <a class="xref" href="#s-0">Section 0</a> says why that is still worth naming<br>
       reads alongside · <a href="/layers-and-promotion/">Layers and Promotion</a> (the measured version) · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> · <a href="/guardrails/">Five Guardrails</a> · <a href="/factory/">The Factory</a><br>
       license · CC BY 4.0. Take the model, not the vocabulary
     </div>
@@ -871,29 +875,33 @@ td.cov.n { color: var(--rule); }
     <ol>
       <li class="part">I · the model</li>
       <li><a href="#s-0"><span class="n">0</span> The band</a></li>
-      <li><a href="#s-1"><span class="n">1</span> Modelling</a></li>
+      <li><a href="#s-1"><span class="n">1</span> Modeling</a></li>
       <li><a href="#s-2"><span class="n">2</span> Four attributes</a></li>
       <li><a href="#s-3"><span class="n">3</span> Three contexts</a></li>
       <li><a href="#s-4"><span class="n">4</span> Five families</a></li>
       <li><a href="#s-5"><span class="n">5</span> Two chains</a></li>
       <li><a href="#s-6"><span class="n">6</span> The chain</a></li>
       <li><a href="#s-7"><span class="n">7</span> What a rung sees</a></li>
-      <li><a href="#s-8"><span class="n">8</span> One identity</a></li>
-      <li><a href="#s-9"><span class="n">9</span> Honest by default</a></li>
-      <li class="part">II · the catalogue</li>
-      <li><a href="#s-10"><span class="n">10</span> Primitives</a></li>
-      <li><a href="#s-11"><span class="n">11</span> Harness patterns</a></li>
-      <li><a href="#s-12"><span class="n">12</span> Factory patterns</a></li>
-      <li><a href="#s-13"><span class="n">13</span> The human path</a></li>
-      <li><a href="#s-14"><span class="n">14</span> Anti-patterns</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Across a graph</a></li>
+      <li><a href="#s-9"><span class="n">9</span> One identity</a></li>
+      <li><a href="#s-10"><span class="n">10</span> Honest by default</a></li>
+      <li><a href="#s-11"><span class="n">11</span> Prose that lies</a></li>
+      <li class="part">II · the catalog</li>
+      <li><a href="#s-12"><span class="n">12</span> Primitives</a></li>
+      <li><a href="#s-13"><span class="n">13</span> Harness patterns</a></li>
+      <li><a href="#s-14"><span class="n">14</span> Factory patterns</a></li>
+      <li><a href="#s-15"><span class="n">15</span> The human path</a></li>
+      <li><a href="#s-16"><span class="n">16</span> Anti-patterns</a></li>
       <li class="part">III · the discipline</li>
-      <li><a href="#s-15"><span class="n">15</span> Sub-disciplines</a></li>
-      <li><a href="#s-16"><span class="n">16</span> Promotion</a></li>
-      <li><a href="#s-17"><span class="n">17</span> Demotion</a></li>
-      <li><a href="#s-18"><span class="n">18</span> Two roles</a></li>
+      <li><a href="#s-17"><span class="n">17</span> Sub-disciplines</a></li>
+      <li><a href="#s-18"><span class="n">18</span> Mining the record</a></li>
+      <li><a href="#s-19"><span class="n">19</span> Promotion</a></li>
+      <li><a href="#s-20"><span class="n">20</span> Demotion</a></li>
+      <li><a href="#s-21"><span class="n">21</span> What it costs</a></li>
+      <li><a href="#s-22"><span class="n">22</span> Two roles</a></li>
       <li class="part">IV · the standard</li>
-      <li><a href="#s-19"><span class="n">19</span> Terms</a></li>
-      <li><a href="#s-20"><span class="n">20</span> Conformance</a></li>
+      <li><a href="#s-23"><span class="n">23</span> Terms</a></li>
+      <li><a href="#s-24"><span class="n">24</span> Conformance</a></li>
     </ol>
   </nav>
 
@@ -901,12 +909,12 @@ td.cov.n { color: var(--rule); }
     <span class="kicker">Part I</span>
     <h2>The model</h2>
     <p>
-      What a constraint is, what it is made of, where it can live, and how it moves. Ten sections, and
-      no machinery in any of them. Part II catalogues what you build on top.
+      What a constraint is, what it is made of, where it can live, and how it moves. Twelve sections, and
+      no machinery in any of them. Part II catalogs what you build on top.
     </p>
   </div>
 
-  <!-- ============ 0 ============ -->
+   <!-- ============ 0 ============ -->
   <section class="rung" id="s-0">
     <div class="rung-head">
       <div class="rung-index">
@@ -917,7 +925,7 @@ td.cov.n { color: var(--rule); }
         <span class="meter-label">The band</span>
       </div>
       <div>
-        <h2>The organisation is setting a risk appetite, and calling it a style guide</h2>
+        <h2>The organization is setting a risk appetite, and calling it a style guide</h2>
         <p class="thesis">
           Businesses already know how to do this. They write a risk appetite, define tolerances,
           build controls, and keep a register of the exceptions. Agent output needs the same
@@ -934,7 +942,7 @@ td.cov.n { color: var(--rule); }
 
     <div class="rung-body">
       <p>
-        Call it a <strong>reliability band</strong>: the range of agent output an organisation will
+        Call it a <strong>reliability band</strong>: the range of agent output an organization will
         accept without a human reading every line. A wide band is cheap to run and expensive to
         trust. A narrow one costs a gate at every seam, and the gates are the budget. Nobody argues
         about the band directly, so the merge queue settles it one pull request at a time.
@@ -959,24 +967,24 @@ td.cov.n { color: var(--rule); }
       <p>
         Push the business analogy one step further, because it predicts the failure. A risk framework
         dies two ways. People who cannot see the work own the controls, or people who can see it
-        handle the exceptions quietly. Both have exact analogues in a harness, and section 18 covers
+        handle the exceptions quietly. Both have exact analogues in a harness, and <a class="xref" href="#s-22">section 22</a> covers
         the role that prevents them.
       </p>
     </div>
   </section>
 
-  <!-- ============ 1 ============ -->
+   <!-- ============ 1 ============ -->
   <section class="rung" id="s-1">
     <div class="rung-head">
       <div class="rung-index">
         <span class="num">1</span>
-        <div class="meter" role="img" aria-label="Modelling">
+        <div class="meter" role="img" aria-label="Modeling">
           <i class="on"></i><i></i><i></i><i></i><i></i>
         </div>
-        <span class="meter-label">Modelling</span>
+        <span class="meter-label">Modeling</span>
       </div>
       <div>
-        <h2>Designing an agent is domain modelling, and the machinery is a second job</h2>
+        <h2>Designing an agent is domain modeling, and the machinery is a second job</h2>
         <p class="thesis">
           Two levels sit here, and teams build only one. The conceptual level says what a constraint
           is, what it is made of, and how it may change. The infrastructure level runs it. Skip the
@@ -1006,8 +1014,8 @@ td.cov.n { color: var(--rule); }
         One more placement, because it decides who is in the room. This domain sits where DevOps
         sits. It spans development and platform, and it belongs to neither alone. DevOps merged two
         roles that could not hold a deployment between them. Constraint engineering merges the same
-        two roles, because neither of them can hold a reliability band alone. Section 15 splits the
-        work into sub-disciplines, and section 18 says what each side sees and what each side misses.
+        two roles, because neither of them can hold a reliability band alone. <a class="xref" href="#s-17">Section 17</a> splits the
+        work into sub-disciplines, and <a class="xref" href="#s-22">section 22</a> says what each side sees and what each side misses.
       </p>
 
       <figure class="code diagram">
@@ -1034,7 +1042,7 @@ flowchart TD
       <h3 class="sub">The model in one picture</h3>
       <p>
         Below is the whole model as a graph, and every later section is one region of it. Read the
-        arrows as relationships rather than as flow. Section 19 defines each term once, so treat that
+        arrows as relationships rather than as flow. <a class="xref" href="#s-23">Section 23</a> defines each term once, so treat that
         section as the dictionary and this diagram as the map.
       </p>
       <p>
@@ -1103,7 +1111,7 @@ flowchart TB
       <h3 class="sub">The mapping, because the problems are not new</h3>
       <p>
         I reach for domain-driven design here because I had the machinery working and still could not
-        say what a rule was. The vocabulary is not the point, and section 5 borrows a second frame for
+        say what a rule was. The vocabulary is not the point, and <a class="xref" href="#s-5">section 5</a> borrows a second frame for
         a second reason. Use the mapping to test your model, then throw the words away.
       </p>
 
@@ -1140,13 +1148,13 @@ flowchart TB
           Open your rules and look for an identity. A rule that is only a line in a file loses its
           history the moment you move it or reword it. Then you have no entity, so nothing can be
           promoted, demoted or counted. Every later section assumes a constraint you can name twice
-          and recognise both times.
+          and recognize both times.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 2 ============ -->
+   <!-- ============ 2 ============ -->
   <section class="rung" id="s-2">
     <div class="rung-head">
       <div class="rung-index">
@@ -1161,7 +1169,7 @@ flowchart TB
         <p class="thesis">
           Whose rule it is, what mechanism carries it, what happens when it fires, and who decides.
           Those are four questions with four different answers and, often, four different owners.
-          Model any two as one field and the harness stops travelling.
+          Model any two as one field and the harness stops traveling.
         </p>
         <div class="chips">
           <span class="chip kind-rule"><b>layer</b> org · team · project</span>
@@ -1198,13 +1206,13 @@ escape: swallow-ok
       <p>
         I shipped the layer field and then read it nowhere for months. For that whole time a company
         standard and one repository's local opinion were the same kind of object. So the harness was
-        something you copied rather than something you shared, which is a modelling bug rather than a
+        something you copied rather than something you shared, which is a modeling bug rather than a
         coding one.
       </p>
 
       <div class="tablewrap">
         <table class="wide">
-          <caption><span>what each collapse costs</span><span class="tag block">all four are modelling errors</span></caption>
+          <caption><span>what each collapse costs</span><span class="tag block">all four are modeling errors</span></caption>
           <thead>
             <tr><th scope="col">The collapse</th><th scope="col">What it looks like</th><th scope="col">What breaks</th></tr>
           </thead>
@@ -1216,7 +1224,7 @@ escape: swallow-ok
             </tr>
             <tr data-signal="warn">
               <td class="k">policy into rung</td>
-              <td><code>warn</code> is modelled as a lower rung</td>
+              <td><code>warn</code> is modeled as a lower rung</td>
               <td>a rule you wanted <em>measured</em> is instead <em>unenforced</em>, and the counts look the same</td>
             </tr>
             <tr data-signal="block">
@@ -1240,7 +1248,7 @@ escape: swallow-ok
         refuses in silence, which is worse than either option.
       </p>
       <p>
-        Verdict is the attribute I added last, and section 5 is where it earns its place. Read it now
+        Verdict is the attribute I added last, and <a class="xref" href="#s-5">section 5</a> is where it earns its place. Read it now
         as a plain fact about the mechanism. Either a model read the work and judged, or code read it
         and settled. Those two fail in different ways, so the record has to keep them apart.
       </p>
@@ -1256,7 +1264,7 @@ escape: swallow-ok
     </div>
   </section>
 
-  <!-- ============ 3 ============ -->
+   <!-- ============ 3 ============ -->
   <section class="rung" id="s-3">
     <div class="rung-head">
       <div class="rung-index">
@@ -1364,7 +1372,7 @@ flowchart TD
     </div>
   </section>
 
-  <!-- ============ 4 ============ -->
+   <!-- ============ 4 ============ -->
   <section class="rung" id="s-4">
     <div class="rung-head">
       <div class="rung-index">
@@ -1445,7 +1453,7 @@ flowchart TD
         <p>
           I used to write that a capability has no ladder, because it never refuses anything. The
           first half of that is right and the second half hid something. A capability does not climb
-          the constraint chain, and it has a chain of its own. Section 5 is that chain. It exists
+          the constraint chain, and it has a chain of its own. <a class="xref" href="#s-5">Section 5</a> is that chain. It exists
           because the question came up: are commands, skills, sub-agents and tool servers the same
           shape as rules, hooks and gates?
         </p>
@@ -1465,7 +1473,7 @@ flowchart TD
       </p>
       <p>
         Context is the other half of this family, and the trade is direct. You pay for everything in
-        the window on every turn, and it crowds out the rules that matter. Section 17 counts
+        the window on every turn, and it crowds out the rules that matter. <a class="xref" href="#s-20">Section 20</a> counts
         that cost as one of the five kinds of rot.
       </p>
 
@@ -1480,7 +1488,7 @@ flowchart TD
     </div>
   </section>
 
-  <!-- ============ 5 ============ -->
+   <!-- ============ 5 ============ -->
   <section class="rung" id="s-5">
     <div class="rung-head">
       <div class="rung-index">
@@ -1568,11 +1576,11 @@ flowchart TD
         </table>
       </div>
 
-      <h3 class="sub">Knowledge and behaviour, which is the split underneath</h3>
+      <h3 class="sub">Knowledge and behavior, which is the split underneath</h3>
       <p>
         A capability carries two things: what the agent knows, and what the agent does. The chain
-        moves weight from the first to the second. A command is knowledge with no behaviour, and a
-        tool server is behaviour whose knowledge you never see. The middle two carry both, in
+        moves weight from the first to the second. A command is knowledge with no behavior, and a
+        tool server is behavior whose knowledge you never see. The middle two carry both, in
         different proportions, which is why they are the hard ones to place.
       </p>
 
@@ -1583,7 +1591,7 @@ flowchart TD
             <tr>
               <th scope="col">Rung</th>
               <th scope="col">Carries knowledge</th>
-              <th scope="col">Carries behaviour</th>
+              <th scope="col">Carries behavior</th>
               <th scope="col">Hides its internals</th>
             </tr>
           </thead>
@@ -1651,7 +1659,7 @@ flowchart TD
 
       <h3 class="sub">The object-orientation mapping, which is exact in one place</h3>
       <p>
-        Knowledge and behaviour bundled together, with the internals hidden, is the oldest idea in
+        Knowledge and behavior bundled together, with the internals hidden, is the oldest idea in
         object orientation. The mapping is close enough to be useful, and the places it fails are
         worth more than the places it fits.
       </p>
@@ -1718,7 +1726,7 @@ flowchart TD
                 a <b>test that runs the child under a deny-all parent</b> and checks it still refuses ·
                 record the <b>effective</b> grant on the provenance row, not the declared one
               </td>
-              <td><em>not a class hierarchy. There is nothing to specialise</em></td>
+              <td><em>not a class hierarchy. There is nothing to specialize</em></td>
             </tr>
             <tr data-signal="warn">
               <td class="k">the schema types the arguments, not the meaning</td>
@@ -1749,14 +1757,14 @@ flowchart TD
           Move a capability up its chain when you need the boundary enforced rather than respected.
           A skill is the right answer for knowledge the model should read and adapt. A sub-agent is
           the right answer when the parent's context is the problem. A tool server is the right answer
-          when the behaviour must be identical for every caller, including the ones you did not write.
-          Each step costs an interface, and section 12 counts what that interface buys in delivery.
+          when the behavior must be identical for every caller, including the ones you did not write.
+          Each step costs an interface, and <a class="xref" href="#s-14">section 14</a> counts what that interface buys in delivery.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 6 ============ -->
+   <!-- ============ 6 ============ -->
   <section class="rung" id="s-6">
     <div class="rung-head">
       <div class="rung-index">
@@ -1856,7 +1864,7 @@ flowchart TD
   R4d["4d · factory deterministic · a gate on the diff and the publish"]
   R0 -- "recurs, and someone can name the case" --> R2
   R2 -- "other repositories need it too" --> R3i
-  R3i -- "the judgement became a predicate" --> R3d
+  R3i -- "the judgment became a predicate" --> R3d
   R3d -- "the tree matters more than the call" --> R4i
   R4i -- "the reviewer keeps saying the same thing" --> R4d
   R4d -- "the gate fires on cases nobody meant" --> R4i
@@ -1899,7 +1907,7 @@ flowchart TD
     </div>
   </section>
 
-  <!-- ============ 7 ============ -->
+   <!-- ============ 7 ============ -->
   <section class="rung" id="s-7">
     <div class="rung-head">
       <div class="rung-index">
@@ -2051,17 +2059,122 @@ flowchart TD
           A stage gate sees two things: the finished diff, and what the pipeline is about to publish.
           No tool writes a commit message, a pull request body or a review comment, and none of them
           appear in a diff. Give your model no rung that sees published text, and every rule about
-          what your organisation says in public goes unenforced while looking enforced.
+          what your organization says in public goes unenforced while looking enforced.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 8 ============ -->
+   <!-- ============ 8 ============ -->
   <section class="rung" id="s-8">
     <div class="rung-head">
       <div class="rung-index">
         <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Across a graph">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Across a graph</span>
+      </div>
+      <div>
+        <h2>What crosses into a sub-agent, and what quietly does not</h2>
+        <p class="thesis">
+          A rule that reaches your main turn does not automatically reach a child turn. Some rungs
+          cross a context boundary and some cannot, and the split is not the one people expect. The
+          deeper your graph, the less prose can hold it.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>crosses</b> mechanism</span>
+          <span class="chip kind-rule"><b>does not</b> prose</span>
+          <span class="chip kind-config"><b>partitions</b> budget</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <a class="xref" href="#s-5">Section 5</a> gave a sub-agent its own context window, and that isolation is the point. It is also
+        the problem, because a fresh context window starts without your charter. So ask three
+        questions of every child turn. Does it see the rules? Does it inherit the grant? Which rung
+        catches it when it breaks something?
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption><span>what crosses into a child turn</span><span class="tag block">the first row is the one that surprises people</span></caption>
+          <thead>
+            <tr><th scope="col">What</th><th scope="col">Crosses</th><th scope="col">Why</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">rung 0 · the rule</td><td><b>no,</b> unless you copy it in</td><td>prose lives in a context window, and the child got a new one</td></tr>
+            <tr data-signal="pass"><td class="k">rung 1 · the grant</td><td><b>yes,</b> and it can only narrow</td><td>the parent declares what the child may call, so this is the one inheritance that works</td></tr>
+            <tr data-signal="warn"><td class="k">rung 2 · the hook</td><td><b>yes</b></td><td>the runner fires it on an event, and it does not care which turn caused the event</td></tr>
+            <tr data-signal="block"><td class="k">rung 3i · the judging phase</td><td><b>no</b></td><td>judging is a phase of one turn. A child needs its own, or none</td></tr>
+            <tr data-signal="pass"><td class="k">rung 3d · the predicate</td><td><b>yes,</b> if it is mounted in the harness</td><td>it sits in front of every call from any turn. Mount it in the parent's prompt and it crosses nothing</td></tr>
+            <tr data-signal="pass"><td class="k">rung 4i and 4d</td><td><b>yes,</b> once</td><td>delivery sees the joined result, so a child's work is graded but a child is not</td></tr>
+            <tr data-signal="warn"><td class="k">memory and context</td><td><b>no,</b> and that is deliberate</td><td>isolation is what you paid for. Passing it all through buys you a slower parent</td></tr>
+            <tr data-signal="block"><td class="k">the budget</td><td><b>it partitions, and it must not copy</b></td><td>hand each of five children the job budget and you authorized five times the spend</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Read the first and fifth rows together, because together they are the argument. Prose does not
+        survive a context boundary, and a predicate mounted in the harness does. So a fleet that leans
+        on rung 0 gets weaker with every level of fan-out. One that leans on rung 3d does not.
+      </p>
+
+      <figure class="code diagram">
+        <figcaption><span>one parent, two children, and what reaches them</span><span class="tag warn">the charter stops at the boundary</span></figcaption>
+<pre class="mermaid">
+flowchart TB
+  H["the harness · rung 3d mounted here, in front of every call"]
+  P["the parent turn · charter loaded, rung 0 present"]
+  C1["child turn · a fresh context window"]
+  C2["child turn · a fresh context window"]
+  H --> P
+  P -- "task and grant, never the charter" --> C1
+  P -- "task and grant, never the charter" --> C2
+  H -- "every call, from any turn" --> C1
+  H -- "every call, from any turn" --> C2
+  C1 --> J["the join"]
+  C2 --> J
+  J --> G["rung 4d · grades the joined result, not each child"]
+  class H pass
+  class P warn
+  class C1 block
+  class C2 block
+  class J dim
+  class G warn
+</pre>
+      </figure>
+
+      <h3 class="sub">Counting, when there are many children</h3>
+      <p>
+        A rule mounted once still fires many times per job, so a per-job count hides which child broke
+        it. Record the firing against the rung and the child that caused it. Otherwise a fan-out of
+        twenty makes one badly briefed child look like a rule that fires constantly.
+      </p>
+      <p>
+        The identity of the rule does not change inside a child, and neither does its layer. Only the
+        record needs the extra field. That is a small change, and skipping it is how a healthy fleet
+        reports a rule as noisy.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The design rule this hands you</span>
+        <p>
+          Decide how deep your graph goes before you decide where your rules live. One turn deep, prose
+          is fine and cheap. Two or more turns deep, anything that matters belongs at rung 1, rung 2 or
+          rung 3d. Those are the three that cross a boundary without you copying anything.
+        </p>
+      </div>
+    </div>
+  </section>
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
         <div class="meter" role="img" aria-label="One identity">
           <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
         </div>
@@ -2158,7 +2271,7 @@ sequenceDiagram
       </p>
       <p>
         <code>locked</code> marks the floor of the band, and it stays deliberately rare. It names the
-        rules an organisation has closed to a project's judgement. Either way the surviving rule
+        rules an organization has closed to a project's judgment. Either way the surviving rule
         carries a record of the collision, because a standard replaced in silence is worse than both
         outcomes.
       </p>
@@ -2175,11 +2288,12 @@ sequenceDiagram
     </div>
   </section>
 
-  <!-- ============ 9 ============ -->
-  <section class="rung" id="s-9">
+ 
+   <!-- ============ 10 ============ -->
+  <section class="rung" id="s-10">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">9</span>
+        <span class="num">10</span>
         <div class="meter" role="img" aria-label="Honest by default">
           <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
         </div>
@@ -2252,7 +2366,7 @@ sequenceDiagram
       </p>
       <p>
         The <code>why</code> field earns its place at one moment, years later. A rung whose reason
-        nobody can reconstruct is enforcing institutional memory it does not have. Section 17 turns a
+        nobody can reconstruct is enforcing institutional memory it does not have. <a class="xref" href="#s-20">Section 20</a> turns a
         missing <code>why</code> into a deletion signal for that reason.
       </p>
 
@@ -2280,20 +2394,125 @@ sequenceDiagram
     </div>
   </section>
 
+   <!-- ============ 11 ============ -->
+  <section class="rung" id="s-11">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">11</span>
+        <div class="meter" role="img" aria-label="Prose that lies">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Prose that lies</span>
+      </div>
+      <div>
+        <h2>Injected text is a rule at rung 0, and the model cannot tell the difference</h2>
+        <p class="thesis">
+          Rung 0 is prose the model reads and applies. Injected text is prose the model reads and
+          applies. Those are the same operation, which is why no rule that matters for security can
+          rest on an inferential rung alone.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>injectable</b> 0 · 3i · 4i</span>
+          <span class="chip kind-gate"><b>not injectable</b> 1 · 2 · 3d · 4d · 5</span>
+          <span class="chip kind-config"><b>the split</b> who reads it</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A model reading its charter and a model reading a poisoned file are doing one thing: turning
+        tokens into behavior. Nothing in the context window is labeled trustworthy. So a sentence in
+        an issue comment, a dependency README, a retrieved document or a tool result arrives with one
+        standing. It is the standing of a rule you wrote and reviewed.
+      </p>
+      <p>
+        The verdict attribute makes this precise, which is the reason it is worth having. An
+        inferential rung decides by reading, so anything that can be read can argue with it. A
+        deterministic rung decides by running code, and code does not get persuaded.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption><span>which rungs an attacker can talk to</span><span class="tag block">the injectable column is the inferential column</span></caption>
+          <thead>
+            <tr><th scope="col">Rung</th><th scope="col">Injectable</th><th scope="col">What that means</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">0 · rule</td><td class="cov y">yes</td><td>prose against prose, and the newer prose is often closer to the question</td></tr>
+            <tr data-signal="pass"><td class="k">1 · grant</td><td class="cov n">no</td><td>the tool is absent, and no sentence conjures one</td></tr>
+            <tr data-signal="pass"><td class="k">2 · hook</td><td class="cov n">no</td><td>the runner fires it, and the model is not consulted</td></tr>
+            <tr data-signal="block"><td class="k">3i · judging phase</td><td class="cov y">yes</td><td>a judge that reads the work also reads whatever the work contains</td></tr>
+            <tr data-signal="pass"><td class="k">3d · predicate</td><td class="cov n">no</td><td>it inspects the call, not the argument for the call</td></tr>
+            <tr data-signal="block"><td class="k">4i · review stage</td><td class="cov y">yes</td><td>the reviewer reads a diff an attacker may have written</td></tr>
+            <tr data-signal="pass"><td class="k">4d · stage gate</td><td class="cov n">no</td><td>it runs a predicate over a tree</td></tr>
+            <tr data-signal="pass"><td class="k">5 · CI</td><td class="cov n">no</td><td>outside the process, and outside the conversation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The pattern is exact: every inferential rung is injectable, and every deterministic one is
+        not. That is no coincidence. The thing that lets an inferential rung judge the undecidable is
+        the same thing that lets an attacker address it.
+      </p>
+
+      <h3 class="sub">The recursive version, which is the one to worry about</h3>
+      <p>
+        <a class="xref" href="#s-5">Section 5</a> called a skill's boundary a convention rather than a wall. Here is what that
+        convention costs. If an agent can write to its own charter, its own skill files or its own
+        rubric, then it can author rung 0. An attacker who reaches any of those files has not bypassed
+        your rules. They have written new ones.
+      </p>
+      <p>
+        So treat the rule files, the skill files and the rubrics as code rather than as content. They
+        get a review, they get an owner, and no turn writes them without a human merging it. That is
+        the same containment argument as <a class="xref" href="#s-9">section 9</a>, pointed at a different target.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption><span>defenses, and what each one actually buys</span><span class="tag warn">none of these is complete</span></caption>
+          <thead>
+            <tr><th scope="col">Defense</th><th scope="col">Buys</th><th scope="col">Does not buy</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">a deterministic rung under every security rule</td><td>a decision an attacker cannot address</td><td>anything for rules code cannot settle</td></tr>
+            <tr data-signal="pass"><td class="k">withhold the capability</td><td>a violation nobody can express, injected or not</td><td>capabilities the work genuinely needs</td></tr>
+            <tr data-signal="warn"><td class="k">mark provenance on every token</td><td>the model can be told which text is untrusted</td><td>a guarantee it will act on the marking</td></tr>
+            <tr data-signal="warn"><td class="k">treat tool output and retrieved text as data</td><td>a stated rule, and a testable one</td><td>enforcement, because the rule itself sits at rung 0</td></tr>
+            <tr data-signal="pass"><td class="k">humans own the rule and skill files</td><td>rung 0 stops being agent-writable</td><td>protection from what the agent reads elsewhere</td></tr>
+            <tr data-signal="warn"><td class="k">a classifier on input or output</td><td>a measurable filter with a known error rate</td><td>certainty, and it is itself inferential</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">The sentence to take from this section</span>
+        <p>
+          Put a deterministic rung under every rule whose violation would be a security incident.
+          Treat the inferential rung above it as a filter rather than a control. <a class="xref" href="#s-24">Section 24</a> carries
+          this as a numbered rule, and <a href="/prompt-injection/">Prompt Injection</a> is where I
+          work through the attacks themselves.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <div class="part-rule">
     <span class="kicker">Part II</span>
-    <h2>The catalogue</h2>
+    <h2>The catalog</h2>
     <p>
-      Every primitive the model names, then the patterns people build from them. The catalogue is
+      Every primitive the model names, then the patterns people build from them. The catalog is
       here so you can see what you are choosing against. Nobody runs all of it, and I do not.
     </p>
   </div>
 
-  <!-- ============ 10 ============ -->
-  <section class="rung" id="s-10">
+   <!-- ============ 12 ============ -->
+  <section class="rung" id="s-12">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">10</span>
+        <span class="num">12</span>
         <div class="meter" role="img" aria-label="Primitives">
           <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
         </div>
@@ -2304,7 +2523,7 @@ sequenceDiagram
         <p class="thesis">
           About fifty things, and each one belongs to exactly one family. Place a primitive in the
           wrong family and you will manage it with the wrong lifecycle. That is the most common
-          modelling error, and the table below is the fix.
+          modeling error, and the table below is the fix.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>constraint</b> 12</span>
@@ -2325,7 +2544,7 @@ sequenceDiagram
 
       <div class="tablewrap">
         <table class="xwide">
-          <caption><span>the primitive catalogue</span><span class="tag warn">one primitive, one family</span></caption>
+          <caption><span>the primitive catalog</span><span class="tag warn">one primitive, one family</span></caption>
           <thead>
             <tr>
               <th scope="col">Primitive</th><th scope="col">What it is</th>
@@ -2393,7 +2612,7 @@ sequenceDiagram
             <tr><td class="k">checkpoint</td><td>a restorable point in the work</td><td>factory</td><td>&mdash;</td><td>nothing checkpoints the world outside the tree</td></tr>
             <tr><td class="k">contract</td><td>what was asked, and what done means</td><td>factory</td><td>&mdash;</td><td>the system working from it may never rewrite it</td></tr>
             <tr><td class="k">amendment</td><td>a human's answer to a mid-flight question</td><td>factory</td><td>&mdash;</td><td>it must travel to every later check, or reviewers grade a withdrawn requirement</td></tr>
-            <tr><td class="k">artefact</td><td>a produced file, diff, message or comment</td><td>factory</td><td>4d</td><td>published text is an artefact that no diff shows</td></tr>
+            <tr><td class="k">artifact</td><td>a produced file, diff, message or comment</td><td>factory</td><td>4d</td><td>published text is an artifact that no diff shows</td></tr>
           </tbody>
         </table>
       </div>
@@ -2410,11 +2629,11 @@ sequenceDiagram
     </div>
   </section>
 
-  <!-- ============ 11 ============ -->
-  <section class="rung" id="s-11">
+   <!-- ============ 13 ============ -->
+  <section class="rung" id="s-13">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">11</span>
+        <span class="num">13</span>
         <div class="meter" role="img" aria-label="Harness patterns">
           <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
         </div>
@@ -2495,7 +2714,7 @@ flowchart TB
 
             <tr class="group"><td colspan="5">Shaping what the model sees</td></tr>
             <tr><td class="k">retrieval</td><td>query an index instead of loading the corpus</td><td>retrieval index · context</td><td>an index to keep fresh</td><td>it retrieves the wrong chunk and answers with confidence</td></tr>
-            <tr><td class="k">compaction</td><td>summarise the transcript so the turn fits</td><td>transcript · context</td><td>detail you cannot get back</td><td>the summary drops a constraint and nothing notices</td></tr>
+            <tr><td class="k">compaction</td><td>summarize the transcript so the turn fits</td><td>transcript · context</td><td>detail you cannot get back</td><td>the summary drops a constraint and nothing notices</td></tr>
             <tr><td class="k">scratchpad</td><td>the agent writes its reasoning to a file</td><td>scratchpad</td><td>a file to clean up</td><td>it becomes memory nobody gave a layer or an expiry</td></tr>
             <tr><td class="k">todo steering</td><td>the agent keeps a visible, editable task list</td><td>todo list</td><td>very little</td><td>the list drifts from the contract and nobody compares them</td></tr>
             <tr><td class="k">prompt caching</td><td>keep a stable prefix warm across calls</td><td>context · ordering</td><td>ordering constraints on your prompt</td><td>a changed prefix silently costs more and nothing reports it</td></tr>
@@ -2507,7 +2726,7 @@ flowchart TB
             <tr><td class="k">deterministic tool wrapper</td><td>the tool refuses, so the model never gets the chance</td><td>predicate · rung 3d</td><td>writing the predicate</td><td>a second path to the same effect walks straight past it</td></tr>
             <tr><td class="k">sandboxed execution</td><td>run commands where the damage is bounded</td><td>sandbox</td><td>setup, and a slower loop</td><td>the sandbox holds the credentials, so it bounds nothing</td></tr>
             <tr><td class="k">structured output</td><td>constrain the answer to a schema</td><td>schema · rung 3d</td><td>rigidity</td><td>the schema fits perfectly and the content is wrong</td></tr>
-            <tr><td class="k">injection defence</td><td>treat retrieved text and tool output as data, never instructions</td><td>rung 3d · classifier</td><td>false positives</td><td>the rule lives only in prose, where the injected text also lives</td></tr>
+            <tr><td class="k">injection defense</td><td>treat retrieved text and tool output as data, never instructions</td><td>rung 3d · classifier</td><td>false positives</td><td>the rule lives only in prose, where the injected text also lives</td></tr>
 
             <tr class="group"><td colspan="5">Judging the work</td></tr>
             <tr><td class="k">reviewer with no editor</td><td>a phase that judges and cannot repair</td><td>sub-agent · rung 1 · 3i</td><td>one extra pass</td><td>nothing downstream acts on what it found</td></tr>
@@ -2521,7 +2740,7 @@ flowchart TB
       <p>
         Four of those rows are the same idea at different prices. Least privilege, the deterministic
         wrapper, the reviewer with no editor and structured output all remove the ability to express a
-        violation. That is the cheapest enforcement in the model, and section 16 gives it a name.
+        violation. That is the cheapest enforcement in the model, and <a class="xref" href="#s-19">section 19</a> gives it a name.
       </p>
       <p>
         The judging patterns need one warning that the table cannot carry. A model grading its own
@@ -2535,18 +2754,18 @@ flowchart TB
         <p>
           If you run one of these, run the deterministic tool wrapper. Mount it in front of every
           call, rather than inside the tools you wrote. No other pattern here reaches calls you did
-          not write. That reach is what makes a stock tool safe to hand an agent, so treat the rest
-          of the list as optional next to it.
+          not write. That reach is what makes a stock tool safe to hand an agent. Treat the rest of
+          the list as optional next to it.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 12 ============ -->
-  <section class="rung" id="s-12">
+   <!-- ============ 14 ============ -->
+  <section class="rung" id="s-14">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">12</span>
+        <span class="num">14</span>
         <div class="meter" role="img" aria-label="Factory patterns">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
         </div>
@@ -2571,7 +2790,7 @@ flowchart TB
       <p>
         A factory is a pipeline with a record under it. Work arrives as a contract, gets an isolated
         place to happen, passes through stages, and stops at gates. What separates a factory from a
-        script is the record: every stage writes what it did, so the counts in section 17 exist.
+        script is the record: every stage writes what it did, so the counts in <a class="xref" href="#s-20">section 20</a> exist.
       </p>
 
       <figure class="code diagram">
@@ -2636,7 +2855,7 @@ flowchart TB
 
             <tr class="group"><td colspan="5">Deciding what ships</td></tr>
             <tr><td class="k">review stage</td><td>a second pass reads the finished work against the contract</td><td>rung 4i · rubric</td><td>one whole pass</td><td>the reviewer shares the author's prompt, so it shares the blind spot</td></tr>
-            <tr><td class="k">merge queue</td><td>integration is serialised, so nothing merges into a moving target</td><td>ordering</td><td>latency</td><td>agents race the queue and rebase over each other</td></tr>
+            <tr><td class="k">merge queue</td><td>integration is serialized, so nothing merges into a moving target</td><td>ordering</td><td>latency</td><td>agents race the queue and rebase over each other</td></tr>
             <tr><td class="k">eval gate</td><td>a scored set must not regress before work ships</td><td>eval · golden set</td><td>maintaining the set</td><td>the set becomes the thing being optimised, so it stops measuring</td></tr>
             <tr><td class="k">canary run</td><td>run the new configuration beside the old one</td><td>record · eval</td><td>double the cost</td><td>nobody compares the two, so it is just double the cost</td></tr>
             <tr><td class="k">progressive rollout</td><td>widen the blast radius in named steps</td><td>ordering · budget</td><td>slowness, on purpose</td><td>there is no defined step backwards</td></tr>
@@ -2676,11 +2895,11 @@ flowchart TB
     </div>
   </section>
 
-  <!-- ============ 13 ============ -->
-  <section class="rung" id="s-13">
+   <!-- ============ 15 ============ -->
+  <section class="rung" id="s-15">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">13</span>
+        <span class="num">15</span>
         <div class="meter" role="img" aria-label="The human path">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
         </div>
@@ -2820,18 +3039,18 @@ sequenceDiagram
         <p>
           Never put an inferential rung last in front of an irreversible action. A judging phase is a
           good rung, and it is not reproducible. So it cannot stand alone between an agent and a
-          deletion you cannot undo. Put a predicate under it, or put a human at it, and section 5
+          deletion you cannot undo. Put a predicate under it, or put a human at it, and <a class="xref" href="#s-5">section 5</a>
           lists what closes that gap.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- ============ 14 ============ -->
-  <section class="rung" id="s-14">
+   <!-- ============ 16 ============ -->
+  <section class="rung" id="s-16">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">14</span>
+        <span class="num">16</span>
         <div class="meter" role="img" aria-label="Anti-patterns">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
         </div>
@@ -2845,7 +3064,7 @@ sequenceDiagram
           tell you whether you are holding the band.
         </p>
         <div class="chips">
-          <span class="chip kind-gate"><b>modelling</b> 6</span>
+          <span class="chip kind-gate"><b>modeling</b> 6</span>
           <span class="chip kind-hook"><b>enforcement</b> 6</span>
           <span class="chip kind-make"><b>evidence</b> 6</span>
         </div>
@@ -2863,7 +3082,7 @@ sequenceDiagram
             </tr>
           </thead>
           <tbody>
-            <tr class="group"><td colspan="4">Modelling</td></tr>
+            <tr class="group"><td colspan="4">Modeling</td></tr>
             <tr data-signal="block"><td class="k">the copied harness</td><td>every repository holds its own copy of the rules</td><td>copies drift, and no two repositories enforce the same thing</td><td>one identity per rule, shipped with the harness</td></tr>
             <tr data-signal="block"><td class="k">rung as strictness</td><td>"important rules go higher up the ladder"</td><td>authority collapses into mechanism, so nothing travels</td><td>keep layer and rung as separate fields</td></tr>
             <tr data-signal="warn"><td class="k">the nameless rule</td><td>a rule is a line of prose in a long file</td><td>with no identity it cannot be promoted, demoted or counted</td><td>give every constraint a stable id</td></tr>
@@ -2881,7 +3100,7 @@ sequenceDiagram
 
             <tr class="group"><td colspan="4">Evidence</td></tr>
             <tr data-signal="warn"><td class="k">the uncounted hatch</td><td>an escape exists and nobody totals its use</td><td>you lose the exceptions register, which was the point of the hatch</td><td>count hatch uses per rule, and read a rise as a demotion signal</td></tr>
-            <tr data-signal="warn"><td class="k">aggregate counting</td><td>firings are totalled per rule, across every rung</td><td>you cannot tell which rung is doing the work</td><td>count per rung, always</td></tr>
+            <tr data-signal="warn"><td class="k">aggregate counting</td><td>firings are totaled per rule, across every rung</td><td>you cannot tell which rung is doing the work</td><td>count per rung, always</td></tr>
             <tr data-signal="block"><td class="k">idle-counting the quiet rungs</td><td>the tool grant and CI look dead in the report</td><td>your evidence argues for deleting the two backstops</td><td>exclude both by name, and say why in the report</td></tr>
             <tr data-signal="warn"><td class="k">the self-graded eval</td><td>the judge and the author share a prompt and a context</td><td>you measure agreement rather than correctness</td><td>a separate context, and a published rubric</td></tr>
             <tr data-signal="block"><td class="k">the contract the system rewrites</td><td>the agent edits the acceptance criteria as it works</td><td>every later check grades against a target that moved</td><td>the authored contract is immutable, and amendments ride alongside</td></tr>
@@ -2922,11 +3141,11 @@ sequenceDiagram
     </p>
   </div>
 
-  <!-- ============ 15 ============ -->
-  <section class="rung" id="s-15">
+   <!-- ============ 17 ============ -->
+  <section class="rung" id="s-17">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">15</span>
+        <span class="num">17</span>
         <div class="meter" role="img" aria-label="Sub-disciplines">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
         </div>
@@ -2937,7 +3156,7 @@ sequenceDiagram
         <p class="thesis">
           Constraint engineering is one job with eleven sub-disciplines. They sort cleanly by scope,
           from one model call up to the whole fleet. They do not sort by team at all, which is the
-          finding that matters and the reason section 18 argues for one role.
+          finding that matters and the reason <a class="xref" href="#s-22">section 22</a> argues for one role.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>prompt</b> one call</span>
@@ -2989,17 +3208,17 @@ flowchart TB
             </tr>
           </thead>
           <tbody>
-            <tr data-signal="pass"><td class="k">prompt</td><td>what a single call actually says, and in what order</td><td>one call</td><td>harness</td><td><em>development</em></td><td>11</td></tr>
-            <tr data-signal="warn"><td class="k">context</td><td>what the model is told, and what it costs to tell it every turn</td><td>one turn</td><td>charter · harness</td><td><em>both</em></td><td>5 · 11 · 17</td></tr>
-            <tr data-signal="warn"><td class="k">tool</td><td>the capability surface: grants, schemas, servers, boundaries</td><td>one turn</td><td>harness</td><td><em>both</em></td><td>6 · 10 · 11</td></tr>
-            <tr data-signal="warn"><td class="k">harness</td><td>the mechanism that holds one turn, and the rungs inside it</td><td>one turn</td><td>harness</td><td><em>both</em></td><td>7 · 8 · 11</td></tr>
-            <tr data-signal="warn"><td class="k">memory</td><td>what persists between turns, and what it silently governs</td><td>one turn, forever</td><td>harness</td><td><em>development</em></td><td>5 · 10</td></tr>
-            <tr data-signal="block"><td class="k">loop</td><td>what happens between turns: retries, revisions, and when to stop</td><td>between turns</td><td>factory</td><td><em>both</em></td><td>12 · 13</td></tr>
-            <tr data-signal="block"><td class="k">graph</td><td>many turns and many agents, and everywhere work waits</td><td>many jobs</td><td>factory</td><td><em>platform</em></td><td>12</td></tr>
-            <tr data-signal="block"><td class="k">governance</td><td>the band, the layers, the locked floor, the exceptions register</td><td>the fleet</td><td>all three</td><td><em>platform</em></td><td>0 · 9 · 18</td></tr>
-            <tr data-signal="pass"><td class="k">eval</td><td>measuring what no rule can decide, at any scope</td><td>cuts across</td><td>anywhere</td><td><em>both</em></td><td>10 · 16</td></tr>
-            <tr data-signal="pass"><td class="k">security</td><td>injection, containment, least privilege, blast radius</td><td>cuts across</td><td>all three</td><td><em>both</em></td><td>6 · 8 · 11 · 13</td></tr>
-            <tr data-signal="pass"><td class="k">cost</td><td>budgets, routing, caching, and attributing spend to a job</td><td>cuts across</td><td>harness · factory</td><td><em>platform</em></td><td>11 · 12</td></tr>
+            <tr data-signal="pass"><td class="k">prompt</td><td>what a single call actually says, and in what order</td><td>one call</td><td>harness</td><td><em>development</em></td><td><a class="xref" href="#s-13">13</a></td></tr>
+            <tr data-signal="warn"><td class="k">context</td><td>what the model is told, and what it costs to tell it every turn</td><td>one turn</td><td>charter · harness</td><td><em>both</em></td><td><a class="xref" href="#s-5">5</a> · <a class="xref" href="#s-13">13</a> · <a class="xref" href="#s-20">20</a></td></tr>
+            <tr data-signal="warn"><td class="k">tool</td><td>the capability surface: grants, schemas, servers, boundaries</td><td>one turn</td><td>harness</td><td><em>both</em></td><td><a class="xref" href="#s-6">6</a> · <a class="xref" href="#s-12">12</a> · <a class="xref" href="#s-13">13</a></td></tr>
+            <tr data-signal="warn"><td class="k">harness</td><td>the mechanism that holds one turn, and the rungs inside it</td><td>one turn</td><td>harness</td><td><em>both</em></td><td><a class="xref" href="#s-7">7</a> · <a class="xref" href="#s-9">9</a> · <a class="xref" href="#s-13">13</a></td></tr>
+            <tr data-signal="warn"><td class="k">memory</td><td>what persists between turns, and what it silently governs</td><td>one turn, forever</td><td>harness</td><td><em>development</em></td><td><a class="xref" href="#s-5">5</a> · <a class="xref" href="#s-12">12</a></td></tr>
+            <tr data-signal="block"><td class="k">loop</td><td>what happens between turns: retries, revisions, and when to stop</td><td>between turns</td><td>factory</td><td><em>both</em></td><td><a class="xref" href="#s-14">14</a> · <a class="xref" href="#s-15">15</a></td></tr>
+            <tr data-signal="block"><td class="k">graph</td><td>many turns and many agents, and everywhere work waits</td><td>many jobs</td><td>factory</td><td><em>platform</em></td><td><a class="xref" href="#s-14">14</a></td></tr>
+            <tr data-signal="block"><td class="k">governance</td><td>the band, the layers, the locked floor, the exceptions register</td><td>the fleet</td><td>all three</td><td><em>platform</em></td><td><a class="xref" href="#s-0">0</a> · <a class="xref" href="#s-10">10</a> · <a class="xref" href="#s-22">22</a></td></tr>
+            <tr data-signal="pass"><td class="k">eval</td><td>measuring what no rule can decide, at any scope</td><td>cuts across</td><td>anywhere</td><td><em>both</em></td><td><a class="xref" href="#s-12">12</a> · <a class="xref" href="#s-19">19</a></td></tr>
+            <tr data-signal="pass"><td class="k">security</td><td>injection, containment, least privilege, blast radius</td><td>cuts across</td><td>all three</td><td><em>both</em></td><td><a class="xref" href="#s-6">6</a> · <a class="xref" href="#s-9">9</a> · <a class="xref" href="#s-13">13</a> · <a class="xref" href="#s-15">15</a></td></tr>
+            <tr data-signal="pass"><td class="k">cost</td><td>budgets, routing, caching, and attributing spend to a job</td><td>cuts across</td><td>harness · factory</td><td><em>platform</em></td><td><a class="xref" href="#s-13">13</a> · <a class="xref" href="#s-14">14</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -3017,7 +3236,7 @@ flowchart TB
         refuse to sit anywhere, because each of them is a question you ask at every scope.
       </p>
       <p>
-        Read the <em>sits with</em> column and the point of section 18 arrives early. Two of eleven
+        Read the <em>sits with</em> column and the point of <a class="xref" href="#s-22">section 22</a> arrives early. Two of eleven
         sit with platform, one sits with development, and eight sit with both. A split that leaves
         eight shared disciplines is not a split. It is a standing meeting.
       </p>
@@ -3034,11 +3253,168 @@ flowchart TB
     </div>
   </section>
 
-  <!-- ============ 16 ============ -->
-  <section class="rung" id="s-16">
+   <!-- ============ 18 ============ -->
+  <section class="rung" id="s-18">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">16</span>
+        <span class="num">18</span>
+        <div class="meter" role="img" aria-label="Mining the record">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Mining the record</span>
+      </div>
+      <div>
+        <h2>Mining the session log, and joining it to the evals</h2>
+        <p class="thesis">
+          Every number this page asks for already exists, unaggregated, in the logs you are already
+          writing. Counts say what happened and evals say whether it was good. Neither one decides a
+          promotion alone, and the interesting cases are where they disagree.
+        </p>
+        <div class="chips">
+          <span class="chip kind-make"><b>counts</b> what happened</span>
+          <span class="chip kind-config"><b>evals</b> whether it was good</span>
+          <span class="chip kind-gate"><b>the join</b> what to do</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A session log holds the prompts and every tool call, with its arguments and its result. It
+        also holds every refusal, the hook output, the phase boundaries, the tokens and the timings.
+        That is the
+        raw material for the entire evidence family. Nobody has to instrument anything new to start,
+        which makes this the cheapest rung of the whole apparatus.
+      </p>
+      <p>
+        One warning before the table. The log format belongs to your runner, so this is the least
+        portable part of the model. The signals below are stable and the parser you write is not, and
+        I would keep that parser small for exactly that reason.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption><span>what to extract, and what each signal decides</span><span class="tag pass">all of it comes from logs you already keep</span></caption>
+          <thead>
+            <tr>
+              <th scope="col">Signal</th><th scope="col">Where it comes from</th>
+              <th scope="col">What it decides</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">firings per rung</td><td>every refusal event, tagged with the rule id and the rung that caught it</td><td>promotion, demotion, and whether a backstop is doing all the work</td></tr>
+            <tr data-signal="block"><td class="k">hatch uses per rule</td><td>the escape marker, in the diff or in the call that carried it</td><td>a rising count means the rule and its predicate have come apart</td></tr>
+            <tr data-signal="warn"><td class="k">tool call histogram</td><td>the call stream, counted by tool</td><td>which capabilities are never used, and can therefore be withheld at rung 1</td></tr>
+            <tr data-signal="block"><td class="k">second-path evidence</td><td>shell commands that wrote files, next to the edit tools that did not</td><td>whether a rung has a blind spot. This is how I found mine</td></tr>
+            <tr data-signal="warn"><td class="k">refusal to success distance</td><td>how many turns pass between a refusal and the work continuing</td><td>whether a refusal teaches. A long distance means the message is bad, not the rule</td></tr>
+            <tr data-signal="warn"><td class="k">repeat refusal rate</td><td>the same rule firing more than once inside one job</td><td>the rule is unteachable at that rung, or the brief is not reaching the retry</td></tr>
+            <tr data-signal="pass"><td class="k">variance</td><td>one case, replayed N times through a judging rung, verdicts compared</td><td>whether an inferential rung is judging or guessing</td></tr>
+            <tr data-signal="warn"><td class="k">context cost per rule</td><td>charter bytes loaded, times the turns that loaded them</td><td>context debt, which is the rot that hides because silence looks free</td></tr>
+            <tr data-signal="pass"><td class="k">cost per job</td><td>token counts on the trace, summed to the job's record</td><td>attribution, without which no change to the model can be justified</td></tr>
+            <tr data-signal="pass"><td class="k">phase timing</td><td>span boundaries</td><td>where the loop stalls, and which phase to split or delete</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="code diagram">
+        <figcaption><span>from logs to a proposal</span><span class="tag warn">the join is the step people skip</span></figcaption>
+<pre class="mermaid">
+flowchart TB
+  L["session logs · prompts, calls, refusals, hooks, tokens, spans"]
+  X["a small parser · one row per event"]
+  C["counts · per rung, per rule, per child, per job"]
+  E["evals · a score over a fixed set"]
+  J["the join · counts beside scores"]
+  D["the decision matrix"]
+  P["a proposal, as a pull request"]
+  L --> X --> C
+  E --> J
+  C --> J
+  J --> D --> P
+  class L dim
+  class X warn
+  class C pass
+  class E pass
+  class J block
+  class D block
+  class P warn
+</pre>
+      </figure>
+
+      <h3 class="sub">The join, which is where the decision actually lives</h3>
+      <p>
+        Counts on their own are ambiguous. A rule that stopped firing might be a rule nobody needs, or
+        a rung that went blind. Evals on their own are worse, because a score that moved tells you
+        nothing about which rung moved it. Put them side by side and the four cases separate cleanly.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption><span>firings against eval score, and what each cell argues for</span><span class="tag block">only one cell argues for demotion</span></caption>
+          <thead>
+            <tr><th scope="col"></th><th scope="col">The eval held</th><th scope="col">The eval dropped</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn">
+              <td class="k">firings fell</td>
+              <td><b>demote or delete,</b> after you have ruled out a second path. The behavior improved, or the rung stopped seeing</td>
+              <td><b>the rung went blind.</b> The violations still happen and something stopped catching them. Fix the mount, never demote</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k">firings rose</td>
+              <td><b>the rule is too broad.</b> It fires on cases the prose never meant, and quality did not need it. Narrow it</td>
+              <td><b>leave the rung alone.</b> Something upstream regressed and the rung is doing its job. Go and find the regression</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The top-right cell is the expensive one, because it looks exactly like the top-left in a report
+        that shows only counts. A team watching firings alone reads a falling number as progress and
+        demotes the rung that was protecting them. That is the argument for the join in one sentence.
+      </p>
+
+      <h3 class="sub">A count belongs to a version of the predicate</h3>
+      <p>
+        A predicate that changed is a different classifier, so firings recorded under the old one are
+        not evidence about the new one. Stamp every count with the predicate version. Then reset the
+        variance measurement whenever that version changes, because a variance number averaged across
+        two predicates describes neither.
+      </p>
+      <p>
+        The rule's identity survives the rewrite, which is what <a class="xref" href="#s-1">section 1</a> asks for. Its evidence does
+        not, and the distinction is easy to miss because both live in the same row.
+      </p>
+
+      <h3 class="sub">Test the predicate, not only the judge</h3>
+      <p>
+        A predicate is a classifier with a false positive rate and a false negative rate, and almost
+        nobody measures either. Give it a fixture set: cases that must fire, and cases that must not.
+        Run it in CI beside everything else.
+      </p>
+      <p>
+        This is the cheaper twin of a golden set, and the page has so far prescribed golden sets only
+        for the inferential rungs. That is backwards. A deterministic rung is the easy one to test, so
+        test it first and spend the expensive measurement on the judge.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">What I actually do, and where it falls short</span>
+        <p>
+          I parse the logs and read the counts by hand, and nothing schedules it. So the loop in
+          <a class="xref" href="#s-20">section 20</a> runs whenever I remember it. That is the one rule of <a class="xref" href="#s-24">section 24</a> my own
+          factory misses. Build the parser first and the schedule second, because a parser you run
+          monthly still beats a dashboard you never wrote.
+        </p>
+      </div>
+    </div>
+  </section>
+  <!-- ============ 19 ============ -->
+  <section class="rung" id="s-19">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">19</span>
         <div class="meter" role="img" aria-label="Promotion">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
@@ -3164,11 +3540,11 @@ flowchart TB
     </div>
   </section>
 
-  <!-- ============ 17 ============ -->
-  <section class="rung" id="s-17">
+   <!-- ============ 20 ============ -->
+  <section class="rung" id="s-20">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">17</span>
+        <span class="num">20</span>
         <div class="meter" role="img" aria-label="Demotion">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
@@ -3289,11 +3665,117 @@ flowchart LR
     </div>
   </section>
 
-  <!-- ============ 18 ============ -->
-  <section class="rung" id="s-18">
+   <!-- ============ 21 ============ -->
+  <section class="rung" id="s-21">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">18</span>
+        <span class="num">21</span>
+        <div class="meter" role="img" aria-label="What it costs">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">What it costs</span>
+      </div>
+      <div>
+        <h2>What this apparatus costs, and when not to build it</h2>
+        <p class="thesis">
+          Everything on this page is overhead. It produces no feature, and no customer ever sees it.
+          Most teams should stop at the first conformance level, and a page that argued otherwise
+          would be selling something.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>level 1</b> an afternoon</span>
+          <span class="chip kind-hook"><b>level 2</b> ongoing</span>
+          <span class="chip kind-gate"><b>level 3</b> a slice of someone, forever</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The strongest objection to all of this is that it is a lot of machinery for what began as a
+        style guide. That objection is right about levels two and three, and wrong about level one.
+        Level one is a schema and a habit, and it costs an afternoon.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption><span>what each level costs to build and to keep</span><span class="tag warn">the third column is the one teams underestimate</span></caption>
+          <thead>
+            <tr>
+              <th scope="col">Level</th><th scope="col">To build</th>
+              <th scope="col">To keep</th><th scope="col">Worth it when</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass">
+              <td class="k">1 · modeled</td>
+              <td>four fields, named families, one direction on the dependency</td>
+              <td>almost nothing, because it is a schema</td>
+              <td>always. No team is small enough for this not to pay</td>
+            </tr>
+            <tr data-signal="warn">
+              <td class="k">2 · enforced</td>
+              <td>predicates, their mounts, containment, one rung outside the process</td>
+              <td>predicate maintenance, and the false positives people will complain about</td>
+              <td>more than one repository, more than a few people, or one incident already</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k">3 · measured</td>
+              <td>a log parser, records, provenance, variance runs, an eval set, a sampling audit</td>
+              <td>a real slice of one person's week, forever, plus storage and eval upkeep</td>
+              <td>the cost of one bad merge exceeds the cost of the apparatus</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        I cannot tell you where that last crossover sits, and the reason is worth stating plainly. It
+        depends on the width of your band, and <a class="xref" href="#s-0">section 0</a> already admitted that nobody has a number for
+        the band. So the crossover is a judgment. Anyone handing you a threshold for it is guessing
+        with more confidence than I have.
+      </p>
+
+      <h3 class="sub">Four situations where you should not build this</h3>
+      <div class="tablewrap">
+        <table class="wide">
+          <caption><span>when the model does not apply</span><span class="tag pass">stated so the rest of the page stays honest</span></caption>
+          <thead>
+            <tr><th scope="col">Situation</th><th scope="col">Why</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">a human reads every line</td><td>your band is already as narrow as it goes, so there is nothing left to hold</td></tr>
+            <tr data-signal="pass"><td class="k">one person, one repository</td><td>the layer attribute has nothing to carry, and a shared standard has nobody to share with</td></tr>
+            <tr data-signal="pass"><td class="k">exploratory or research work</td><td>constraints are for output you mean to keep, and the point here is finding out what to keep</td></tr>
+            <tr data-signal="pass"><td class="k">a prototype you will throw away</td><td>the apparatus would outlive the code, which is the wrong way round</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        One failure deserves naming on its own, because this page could cause it. An apparatus nobody
+        maintains reports success into a void, which <a class="xref" href="#s-10">section 10</a> already warned about in a smaller way.
+        A level three you cannot staff is worse than a level one you actually run, because it produces
+        numbers that look like evidence.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The order to build it in</span>
+        <p>
+          Four fields on your rules. Then one predicate with two mounts. Then the log parser, because
+          it is cheap and it tells you which rule to work on next. Then the eval set, then variance,
+          then the audit. Anyone who starts at the dashboard builds a dashboard, and anyone who starts
+          at the schema finds out what the dashboard should have shown.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 22 ============ -->
+  <section class="rung" id="s-22">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">22</span>
         <div class="meter" role="img" aria-label="Two roles">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
@@ -3304,7 +3786,7 @@ flowchart LR
         <p class="thesis">
           Platform decides what ships and what a project may not lower. Development knows which rules
           are actually wrong. Split those across two teams that meet quarterly and nobody holds the
-          band. Section 15 already showed why: eight of the eleven sub-disciplines belong to both.
+          band. <a class="xref" href="#s-17">Section 17</a> already showed why: eight of the eleven sub-disciplines belong to both.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>platform</b> the floor</span>
@@ -3392,11 +3874,12 @@ flowchart LR
     </p>
   </div>
 
-  <!-- ============ 19 ============ -->
-  <section class="rung" id="s-19">
+ 
+   <!-- ============ 23 ============ -->
+  <section class="rung" id="s-23">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">19</span>
+        <span class="num">23</span>
         <div class="meter" role="img" aria-label="Terms">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
@@ -3419,7 +3902,7 @@ flowchart LR
 
     <div class="rung-body">
       <p>
-        Take the model and rename all of it if your organisation already has words for these things.
+        Take the model and rename all of it if your organization already has words for these things.
         What must not change is the count. Four attributes, three contexts, five families, two chains.
         Rename a term and the model survives, and merge two terms and it does not.
       </p>
@@ -3431,65 +3914,65 @@ flowchart LR
             <tr><th scope="col">Term</th><th scope="col">Definition</th><th scope="col">Kind</th><th scope="col">Where</th></tr>
           </thead>
           <tbody>
-            <tr><td class="k">amendment</td><td>a human's answer to a mid-flight question, which travels beside the contract and never edits it</td><td>state</td><td>13</td></tr>
-            <tr><td class="k">artefact</td><td>anything a job produces: a file, a diff, a commit message, a pull request body, a comment</td><td>state</td><td>10</td></tr>
-            <tr><td class="k">band</td><td>the range of agent output an organisation accepts without a human reading every line</td><td>concept</td><td>0</td></tr>
-            <tr><td class="k">blast radius</td><td>how much damage a wrong decision does, and whether it can be undone</td><td>concept</td><td>13</td></tr>
-            <tr><td class="k">budget</td><td>the tokens, money or wall clock one job may spend before it escalates</td><td>setting</td><td>10</td></tr>
-            <tr><td class="k">capability</td><td>a component whose removal lets the agent do less</td><td>family</td><td>4</td></tr>
-            <tr><td class="k">capability chain</td><td>command, then skill, then sub-agent, then tool server, ordered by how much each hides</td><td>concept</td><td>5</td></tr>
-            <tr><td class="k">charter</td><td>the bounded context of one project, and the standing instructions that state what it is about</td><td>context</td><td>3</td></tr>
-            <tr><td class="k">checkpoint</td><td>a point in the work that can be restored</td><td>state</td><td>10</td></tr>
-            <tr><td class="k">classifier</td><td>a model that scores an input or an output rather than producing work</td><td>constraint</td><td>10</td></tr>
-            <tr><td class="k">command</td><td>a named entry point a human types, which expands in place and hides nothing</td><td>capability</td><td>5</td></tr>
-            <tr><td class="k">constraint</td><td>a component whose removal lets the agent do more. The entity this model is about</td><td>family</td><td>2 · 4</td></tr>
-            <tr><td class="k">constraint chain</td><td>rungs 0, 2, 3i, 3d, 4i and 4d, ordered by reach and authority</td><td>concept</td><td>6</td></tr>
-            <tr><td class="k">containment</td><td>the rule that a predicate resolves against the tree it came from and may not leave it</td><td>constraint</td><td>8</td></tr>
-            <tr><td class="k">context</td><td>one of charter, harness or factory. Never the context window, which is a separate term</td><td>concept</td><td>3</td></tr>
-            <tr><td class="k">context window</td><td>what the model sees on a single call, and what is paid for on every turn</td><td>state</td><td>10</td></tr>
-            <tr><td class="k">contract</td><td>the written statement of what was asked and what done means, which no downstream system may rewrite</td><td>state</td><td>13</td></tr>
-            <tr><td class="k">convention</td><td>a stated pattern with no predicate under it</td><td>constraint</td><td>10</td></tr>
-            <tr><td class="k">cost row</td><td>the tokens and money attributed to one job</td><td>evidence</td><td>10</td></tr>
-            <tr><td class="k">demotion</td><td>a move down the constraint chain, proposed by evidence and merged by a human</td><td>concept</td><td>17</td></tr>
-            <tr><td class="k">deterministic</td><td>a verdict reached by code reading the work</td><td>attribute</td><td>2 · 6</td></tr>
-            <tr><td class="k">escape hatch</td><td>the sanctioned way to deviate from a rule, whose every use is counted</td><td>constraint</td><td>9</td></tr>
-            <tr><td class="k">eval</td><td>a scored measurement over a fixed set, which measures and never refuses</td><td>evidence</td><td>16</td></tr>
-            <tr><td class="k">evidence</td><td>a component that measures and never refuses</td><td>family</td><td>4</td></tr>
-            <tr><td class="k">factory</td><td>the bounded context of delivery: how work ships</td><td>context</td><td>3</td></tr>
-            <tr><td class="k">family</td><td>one of five aggregates, each with its own lifecycle and consistency boundary</td><td>concept</td><td>4</td></tr>
-            <tr><td class="k">gate</td><td>a stop between two stages in the factory</td><td>constraint</td><td>10</td></tr>
-            <tr><td class="k">golden set</td><td>the fixed inputs an eval runs on, which nothing under test may edit</td><td>evidence</td><td>10</td></tr>
-            <tr><td class="k">guard</td><td>a check inside a stage that stops that stage</td><td>constraint</td><td>10</td></tr>
-            <tr><td class="k">harness</td><td>the bounded context of development: how a single turn happens</td><td>context</td><td>3</td></tr>
-            <tr><td class="k">hook</td><td>a repository script the runner calls on an event, at rung 2</td><td>constraint</td><td>10</td></tr>
-            <tr><td class="k">identity</td><td>the name of a constraint, stable across repositories and across rewrites of its predicate</td><td>attribute</td><td>1 · 8</td></tr>
-            <tr><td class="k">inferential</td><td>a verdict reached by a model reading the work and judging it</td><td>attribute</td><td>2 · 6</td></tr>
-            <tr><td class="k">judging phase</td><td>a phase inside the turn that reads the work and refuses, at rung 3i</td><td>constraint</td><td>6</td></tr>
-            <tr><td class="k">layer</td><td>whose constraint it is: org, team or project. It says who may change the rule</td><td>attribute</td><td>2</td></tr>
-            <tr><td class="k"><code>locked</code></td><td>the invariant marker. It names a shipped rule a project may not lower</td><td>attribute</td><td>8</td></tr>
-            <tr><td class="k">memory</td><td>a fact carried between sessions, which governs later work whether or not anyone scoped it</td><td>state</td><td>4</td></tr>
-            <tr><td class="k">mount</td><td>one place a predicate is asked. One predicate has many mounts</td><td>concept</td><td>8</td></tr>
-            <tr><td class="k">phase</td><td>a named step of a turn with its own prompt and its own grants</td><td>capability</td><td>10</td></tr>
-            <tr><td class="k">policy</td><td>what happens when a constraint fires: refuse, ask or warn</td><td>attribute</td><td>2</td></tr>
-            <tr><td class="k">predicate</td><td>the decision procedure a rung asks. Written once, mounted many times</td><td>constraint</td><td>8</td></tr>
-            <tr><td class="k">promotion</td><td>a move up the constraint chain, proposed by evidence and merged by a human</td><td>concept</td><td>16</td></tr>
-            <tr><td class="k">provenance</td><td>the record of what produced an artefact, from what inputs, under what effective grant</td><td>evidence</td><td>10</td></tr>
-            <tr><td class="k">record</td><td>the durable row for one job</td><td>evidence</td><td>10</td></tr>
-            <tr><td class="k">review stage</td><td>a factory pass that reads the finished work and returns a verdict, at rung 4i</td><td>constraint</td><td>6</td></tr>
-            <tr><td class="k">rubric</td><td>the published criteria a judging rung applies</td><td>evidence</td><td>10</td></tr>
-            <tr><td class="k">rule</td><td>a named constraint with prose, metadata and an optional predicate</td><td>constraint</td><td>10</td></tr>
-            <tr><td class="k">rung</td><td>which mechanism carries a constraint. Rungs 0, 1, 2, 3i, 3d, 4i, 4d and 5</td><td>attribute</td><td>6 · 7</td></tr>
-            <tr><td class="k">sandbox</td><td>a bounded place a command may run, holding no credential it does not need</td><td>capability</td><td>10</td></tr>
-            <tr><td class="k">setting</td><td>a component whose change moves a value and never a rung</td><td>family</td><td>4</td></tr>
-            <tr><td class="k">skill</td><td>instructions loaded on demand, chosen by the model from a description</td><td>capability</td><td>5</td></tr>
-            <tr><td class="k">stage gate</td><td>a factory gate over the finished diff and over what is published, at rung 4d</td><td>constraint</td><td>6</td></tr>
-            <tr><td class="k">state</td><td>a component that persists, and therefore governs work it never saw</td><td>family</td><td>4</td></tr>
-            <tr><td class="k">sub-agent</td><td>a separate context window with its own prompt and its own declared tool grant</td><td>capability</td><td>5</td></tr>
-            <tr><td class="k">tool server</td><td>a separate process exposing tools over a protocol, of which the caller sees only a schema</td><td>capability</td><td>5</td></tr>
-            <tr><td class="k">turn</td><td>one pass of the harness: a prompt, the calls it produces, and the work that results</td><td>concept</td><td>11</td></tr>
-            <tr><td class="k">variance</td><td>the disagreement of an inferential rung with itself across runs of the same case</td><td>evidence</td><td>17</td></tr>
-            <tr><td class="k">verdict</td><td>who decides a constraint: inferential or deterministic. Also, a pass or fail with its evidence</td><td>attribute</td><td>2 · 6</td></tr>
-            <tr><td class="k">worktree</td><td>an isolated checkout one job owns</td><td>capability</td><td>10</td></tr>
+            <tr><td class="k">amendment</td><td>a human's answer to a mid-flight question, which travels beside the contract and never edits it</td><td>state</td><td><a class="xref" href="#s-15">15</a></td></tr>
+            <tr><td class="k">artifact</td><td>anything a job produces: a file, a diff, a commit message, a pull request body, a comment</td><td>state</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">band</td><td>the range of agent output an organization accepts without a human reading every line</td><td>concept</td><td><a class="xref" href="#s-0">0</a></td></tr>
+            <tr><td class="k">blast radius</td><td>how much damage a wrong decision does, and whether it can be undone</td><td>concept</td><td><a class="xref" href="#s-15">15</a></td></tr>
+            <tr><td class="k">budget</td><td>the tokens, money or wall clock one job may spend before it escalates</td><td>setting</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">capability</td><td>a component whose removal lets the agent do less</td><td>family</td><td><a class="xref" href="#s-4">4</a></td></tr>
+            <tr><td class="k">capability chain</td><td>command, then skill, then sub-agent, then tool server, ordered by how much each hides</td><td>concept</td><td><a class="xref" href="#s-5">5</a></td></tr>
+            <tr><td class="k">charter</td><td>the bounded context of one project, and the standing instructions that state what it is about</td><td>context</td><td><a class="xref" href="#s-3">3</a></td></tr>
+            <tr><td class="k">checkpoint</td><td>a point in the work that can be restored</td><td>state</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">classifier</td><td>a model that scores an input or an output rather than producing work</td><td>constraint</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">command</td><td>a named entry point a human types, which expands in place and hides nothing</td><td>capability</td><td><a class="xref" href="#s-5">5</a></td></tr>
+            <tr><td class="k">constraint</td><td>a component whose removal lets the agent do more. The entity this model is about</td><td>family</td><td><a class="xref" href="#s-2">2</a> · <a class="xref" href="#s-4">4</a></td></tr>
+            <tr><td class="k">constraint chain</td><td>rungs 0, 2, 3i, 3d, 4i and 4d, ordered by reach and authority</td><td>concept</td><td><a class="xref" href="#s-6">6</a></td></tr>
+            <tr><td class="k">containment</td><td>the rule that a predicate resolves against the tree it came from and may not leave it</td><td>constraint</td><td><a class="xref" href="#s-9">9</a></td></tr>
+            <tr><td class="k">context</td><td>one of charter, harness or factory. Never the context window, which is a separate term</td><td>concept</td><td><a class="xref" href="#s-3">3</a></td></tr>
+            <tr><td class="k">context window</td><td>what the model sees on a single call, and what is paid for on every turn</td><td>state</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">contract</td><td>the written statement of what was asked and what done means, which no downstream system may rewrite</td><td>state</td><td><a class="xref" href="#s-15">15</a></td></tr>
+            <tr><td class="k">convention</td><td>a stated pattern with no predicate under it</td><td>constraint</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">cost row</td><td>the tokens and money attributed to one job</td><td>evidence</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">demotion</td><td>a move down the constraint chain, proposed by evidence and merged by a human</td><td>concept</td><td><a class="xref" href="#s-20">20</a></td></tr>
+            <tr><td class="k">deterministic</td><td>a verdict reached by code reading the work</td><td>attribute</td><td><a class="xref" href="#s-2">2</a> · <a class="xref" href="#s-6">6</a></td></tr>
+            <tr><td class="k">escape hatch</td><td>the sanctioned way to deviate from a rule, whose every use is counted</td><td>constraint</td><td><a class="xref" href="#s-10">10</a></td></tr>
+            <tr><td class="k">eval</td><td>a scored measurement over a fixed set, which measures and never refuses</td><td>evidence</td><td><a class="xref" href="#s-19">19</a></td></tr>
+            <tr><td class="k">evidence</td><td>a component that measures and never refuses</td><td>family</td><td><a class="xref" href="#s-4">4</a></td></tr>
+            <tr><td class="k">factory</td><td>the bounded context of delivery: how work ships</td><td>context</td><td><a class="xref" href="#s-3">3</a></td></tr>
+            <tr><td class="k">family</td><td>one of five aggregates, each with its own lifecycle and consistency boundary</td><td>concept</td><td><a class="xref" href="#s-4">4</a></td></tr>
+            <tr><td class="k">gate</td><td>a stop between two stages in the factory</td><td>constraint</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">golden set</td><td>the fixed inputs an eval runs on, which nothing under test may edit</td><td>evidence</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">guard</td><td>a check inside a stage that stops that stage</td><td>constraint</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">harness</td><td>the bounded context of development: how a single turn happens</td><td>context</td><td><a class="xref" href="#s-3">3</a></td></tr>
+            <tr><td class="k">hook</td><td>a repository script the runner calls on an event, at rung 2</td><td>constraint</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">identity</td><td>the name of a constraint, stable across repositories and across rewrites of its predicate</td><td>attribute</td><td><a class="xref" href="#s-1">1</a> · <a class="xref" href="#s-9">9</a></td></tr>
+            <tr><td class="k">inferential</td><td>a verdict reached by a model reading the work and judging it</td><td>attribute</td><td><a class="xref" href="#s-2">2</a> · <a class="xref" href="#s-6">6</a></td></tr>
+            <tr><td class="k">judging phase</td><td>a phase inside the turn that reads the work and refuses, at rung 3i</td><td>constraint</td><td><a class="xref" href="#s-6">6</a></td></tr>
+            <tr><td class="k">layer</td><td>whose constraint it is: org, team or project. It says who may change the rule</td><td>attribute</td><td><a class="xref" href="#s-2">2</a></td></tr>
+            <tr><td class="k"><code>locked</code></td><td>the invariant marker. It names a shipped rule a project may not lower</td><td>attribute</td><td><a class="xref" href="#s-9">9</a></td></tr>
+            <tr><td class="k">memory</td><td>a fact carried between sessions, which governs later work whether or not anyone scoped it</td><td>state</td><td><a class="xref" href="#s-4">4</a></td></tr>
+            <tr><td class="k">mount</td><td>one place a predicate is asked. One predicate has many mounts</td><td>concept</td><td><a class="xref" href="#s-9">9</a></td></tr>
+            <tr><td class="k">phase</td><td>a named step of a turn with its own prompt and its own grants</td><td>capability</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">policy</td><td>what happens when a constraint fires: refuse, ask or warn</td><td>attribute</td><td><a class="xref" href="#s-2">2</a></td></tr>
+            <tr><td class="k">predicate</td><td>the decision procedure a rung asks. Written once, mounted many times</td><td>constraint</td><td><a class="xref" href="#s-9">9</a></td></tr>
+            <tr><td class="k">promotion</td><td>a move up the constraint chain, proposed by evidence and merged by a human</td><td>concept</td><td><a class="xref" href="#s-19">19</a></td></tr>
+            <tr><td class="k">provenance</td><td>the record of what produced an artifact, from what inputs, under what effective grant</td><td>evidence</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">record</td><td>the durable row for one job</td><td>evidence</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">review stage</td><td>a factory pass that reads the finished work and returns a verdict, at rung 4i</td><td>constraint</td><td><a class="xref" href="#s-6">6</a></td></tr>
+            <tr><td class="k">rubric</td><td>the published criteria a judging rung applies</td><td>evidence</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">rule</td><td>a named constraint with prose, metadata and an optional predicate</td><td>constraint</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">rung</td><td>which mechanism carries a constraint. Rungs 0, 1, 2, 3i, 3d, 4i, 4d and 5</td><td>attribute</td><td><a class="xref" href="#s-6">6</a> · <a class="xref" href="#s-7">7</a></td></tr>
+            <tr><td class="k">sandbox</td><td>a bounded place a command may run, holding no credential it does not need</td><td>capability</td><td><a class="xref" href="#s-12">12</a></td></tr>
+            <tr><td class="k">setting</td><td>a component whose change moves a value and never a rung</td><td>family</td><td><a class="xref" href="#s-4">4</a></td></tr>
+            <tr><td class="k">skill</td><td>instructions loaded on demand, chosen by the model from a description</td><td>capability</td><td><a class="xref" href="#s-5">5</a></td></tr>
+            <tr><td class="k">stage gate</td><td>a factory gate over the finished diff and over what is published, at rung 4d</td><td>constraint</td><td><a class="xref" href="#s-6">6</a></td></tr>
+            <tr><td class="k">state</td><td>a component that persists, and therefore governs work it never saw</td><td>family</td><td><a class="xref" href="#s-4">4</a></td></tr>
+            <tr><td class="k">sub-agent</td><td>a separate context window with its own prompt and its own declared tool grant</td><td>capability</td><td><a class="xref" href="#s-5">5</a></td></tr>
+            <tr><td class="k">tool server</td><td>a separate process exposing tools over a protocol, of which the caller sees only a schema</td><td>capability</td><td><a class="xref" href="#s-5">5</a></td></tr>
+            <tr><td class="k">turn</td><td>one pass of the harness: a prompt, the calls it produces, and the work that results</td><td>concept</td><td><a class="xref" href="#s-13">13</a></td></tr>
+            <tr><td class="k">variance</td><td>the disagreement of an inferential rung with itself across runs of the same case</td><td>evidence</td><td><a class="xref" href="#s-20">20</a></td></tr>
+            <tr><td class="k">verdict</td><td>who decides a constraint: inferential or deterministic. Also, a pass or fail with its evidence</td><td>attribute</td><td><a class="xref" href="#s-2">2</a> · <a class="xref" href="#s-6">6</a></td></tr>
+            <tr><td class="k">worktree</td><td>an isolated checkout one job owns</td><td>capability</td><td><a class="xref" href="#s-12">12</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -3506,11 +3989,11 @@ flowchart LR
     </div>
   </section>
 
-  <!-- ============ 20 ============ -->
-  <section class="rung" id="s-20">
+   <!-- ============ 24 ============ -->
+  <section class="rung" id="s-24">
     <div class="rung-head">
       <div class="rung-index">
-        <span class="num">20</span>
+        <span class="num">24</span>
         <div class="meter" role="img" aria-label="Conformance">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
@@ -3520,12 +4003,12 @@ flowchart LR
         <h2>Scope, the rules, and what a conformance claim requires</h2>
         <p class="thesis">
           A standard that only describes is a style guide. This section is the part you can hold a
-          design against. It carries the scope, twenty-two normative rules, three conformance levels,
+          design against. It carries the scope, twenty-nine normative rules, three conformance levels,
           and the evidence each level demands. My own factory does not reach level three.
         </p>
         <div class="chips">
           <span class="chip kind-rule"><b>scope</b></span>
-          <span class="chip kind-gate"><b>22 rules</b></span>
+          <span class="chip kind-gate"><b>29 rules</b></span>
           <span class="chip kind-make"><b>3 levels</b></span>
           <span class="chip kind-config"><b>evidence</b></span>
         </div>
@@ -3533,7 +4016,7 @@ flowchart LR
     </div>
 
     <div class="rung-body">
-      <h3 class="sub">20.1 · Scope</h3>
+      <h3 class="sub">24.1 · Scope</h3>
       <p>
         This standard covers the conceptual design of agent constraints. It says what a constraint is
         and what it is made of. It also says which context holds it, which mechanism enforces it, and
@@ -3543,44 +4026,51 @@ flowchart LR
       <p class="nongoals">
         <b>Out of scope</b><br>
         Any specific framework, SDK, runner, queue or pipeline. The model is deliberately portable.<br>
-        A number for the reliability band. Section 0 says why I will not invent one.<br>
+        A number for the reliability band. <a class="xref" href="#s-0">Section 0</a> says why I will not invent one.<br>
         Model selection, prompt wording, and anything that changes with the next release.<br>
-        Organisational structure. Section 18 argues for one role and does not draw your org chart.
+        Organizational structure. <a class="xref" href="#s-22">Section 22</a> argues for one role and does not draw your org chart.
       </p>
 
-      <h3 class="sub">20.2 · The rules</h3>
+      <h3 class="sub">24.2 · The rules</h3>
       <p>
-        Twenty-two rules, each traceable to the section that argues for it. Read them as the shortest
+        Twenty-nine rules, each traceable to the section that argues for it. Read them as the shortest
         form of this page. If you disagree with one, the section behind it is where the argument lives.
         That argument is the part I would rather you took.
       </p>
 
       <ol class="standard">
-        <li><span class="t">Give every constraint an <b>identity</b> that survives a rewrite of its predicate, its prose and its rung.</span><span class="ref">§ 1 · 8</span></li>
-        <li><span class="t">Store <b>layer, rung, policy and verdict</b> as four fields. Never derive one from another.</span><span class="ref">§ 2</span></li>
-        <li><span class="t">Keep the dependency one way. The factory may know the harness, and the harness must not know the factory.</span><span class="ref">§ 3</span></li>
-        <li><span class="t">Place every component in exactly one <b>family</b>, and manage it with that family's lifecycle.</span><span class="ref">§ 4</span></li>
-        <li><span class="t">Move a capability up its own chain when the boundary must be <b>enforced rather than respected</b>.</span><span class="ref">§ 5</span></li>
-        <li><span class="t">Declare the tool grant on <b>every sub-agent</b>. Never inherit one, because forgetting widens the blast radius.</span><span class="ref">§ 5</span></li>
-        <li><span class="t">Never let an <b>inferential rung be the last thing</b> in front of an irreversible action.</span><span class="ref">§ 5 · 13</span></li>
-        <li><span class="t">Write the <b>predicate once</b> and mount it at every rung that needs it.</span><span class="ref">§ 8</span></li>
-        <li><span class="t">A predicate <b>resolves against the tree it came from</b> and may not leave it.</span><span class="ref">§ 8</span></li>
-        <li><span class="t">Keep the <b>backstop</b> when you promote. Two rungs are two boundaries, not two strictnesses.</span><span class="ref">§ 6</span></li>
-        <li><span class="t">Default every unreadable field to the <b>visible failure</b>, never to the quiet one.</span><span class="ref">§ 9</span></li>
-        <li><span class="t">Let the <b>project win a collision</b> unless the shipped rule is locked, and record either outcome.</span><span class="ref">§ 8</span></li>
-        <li><span class="t">A gate <b>fails open on its own bug</b>, and the breakage is counted against the rule.</span><span class="ref">§ 9</span></li>
-        <li><span class="t">Every constraint records a <b>why</b>, and loses its rung when that why no longer survives.</span><span class="ref">§ 9 · 17</span></li>
-        <li><span class="t">Keep at least one rung <b>outside</b> the process that produced the work and the process that checked it.</span><span class="ref">§ 9</span></li>
-        <li><span class="t">Record every firing against the <b>rung that caught it</b>, never only against the rule.</span><span class="ref">§ 17</span></li>
-        <li><span class="t">Count <b>escape-hatch use per rule</b>, and read a rising count as a demotion signal.</span><span class="ref">§ 9 · 17</span></li>
-        <li><span class="t">Measure <b>variance</b> at every inferential rung, by running one case several times.</span><span class="ref">§ 17</span></li>
-        <li><span class="t">Exclude the <b>tool grant and CI</b> from idle counts, by name, and say so in the report.</span><span class="ref">§ 17</span></li>
-        <li><span class="t">Give the charter a <b>fixed size</b>, so a new rule displaces an old one.</span><span class="ref">§ 17</span></li>
-        <li><span class="t">The <b>authored contract is immutable</b>, and an amendment travels to every later check.</span><span class="ref">§ 13</span></li>
-        <li><span class="t">Every promotion and demotion is a <b>proposal a human merges</b>. Nothing applies itself.</span><span class="ref">§ 16 · 18</span></li>
+        <li><span class="t">Give every constraint an <b>identity</b> that survives a rewrite of its predicate, its prose and its rung.</span><span class="ref">§ <a class="xref" href="#s-1">1</a> · <a class="xref" href="#s-9">9</a></span></li>
+        <li><span class="t">Store <b>layer, rung, policy and verdict</b> as four fields. Never derive one from another.</span><span class="ref">§ <a class="xref" href="#s-2">2</a></span></li>
+        <li><span class="t">Keep the dependency one way. The factory may know the harness, and the harness must not know the factory.</span><span class="ref">§ <a class="xref" href="#s-3">3</a></span></li>
+        <li><span class="t">Place every component in exactly one <b>family</b>, and manage it with that family's lifecycle.</span><span class="ref">§ <a class="xref" href="#s-4">4</a></span></li>
+        <li><span class="t">Move a capability up its own chain when the boundary must be <b>enforced rather than respected</b>.</span><span class="ref">§ <a class="xref" href="#s-5">5</a></span></li>
+        <li><span class="t">Declare the tool grant on <b>every sub-agent</b>. Never inherit one, because forgetting widens the blast radius.</span><span class="ref">§ <a class="xref" href="#s-5">5</a></span></li>
+        <li><span class="t">Never let an <b>inferential rung be the last thing</b> in front of an irreversible action.</span><span class="ref">§ <a class="xref" href="#s-5">5</a> · <a class="xref" href="#s-15">15</a></span></li>
+        <li><span class="t">Write the <b>predicate once</b> and mount it at every rung that needs it.</span><span class="ref">§ <a class="xref" href="#s-9">9</a></span></li>
+        <li><span class="t">A predicate <b>resolves against the tree it came from</b> and may not leave it.</span><span class="ref">§ <a class="xref" href="#s-9">9</a></span></li>
+        <li><span class="t">Keep the <b>backstop</b> when you promote. Two rungs are two boundaries, not two strictnesses.</span><span class="ref">§ <a class="xref" href="#s-6">6</a></span></li>
+        <li><span class="t">Default every unreadable field to the <b>visible failure</b>, never to the quiet one.</span><span class="ref">§ <a class="xref" href="#s-10">10</a></span></li>
+        <li><span class="t">Let the <b>project win a collision</b> unless the shipped rule is locked, and record either outcome.</span><span class="ref">§ <a class="xref" href="#s-9">9</a></span></li>
+        <li><span class="t">A gate <b>fails open on its own bug</b>, and the breakage is counted against the rule.</span><span class="ref">§ <a class="xref" href="#s-10">10</a></span></li>
+        <li><span class="t">Every constraint records a <b>why</b>, and loses its rung when that why no longer survives.</span><span class="ref">§ <a class="xref" href="#s-10">10</a> · <a class="xref" href="#s-20">20</a></span></li>
+        <li><span class="t">Keep at least one rung <b>outside</b> the process that produced the work and the process that checked it.</span><span class="ref">§ <a class="xref" href="#s-10">10</a></span></li>
+        <li><span class="t">Record every firing against the <b>rung that caught it</b>, never only against the rule.</span><span class="ref">§ <a class="xref" href="#s-20">20</a></span></li>
+        <li><span class="t">Count <b>escape-hatch use per rule</b>, and read a rising count as a demotion signal.</span><span class="ref">§ <a class="xref" href="#s-10">10</a> · <a class="xref" href="#s-20">20</a></span></li>
+        <li><span class="t">Measure <b>variance</b> at every inferential rung, by running one case several times.</span><span class="ref">§ <a class="xref" href="#s-20">20</a></span></li>
+        <li><span class="t">Exclude the <b>tool grant and CI</b> from idle counts, by name, and say so in the report.</span><span class="ref">§ <a class="xref" href="#s-20">20</a></span></li>
+        <li><span class="t">Give the charter a <b>fixed size</b>, so a new rule displaces an old one.</span><span class="ref">§ <a class="xref" href="#s-20">20</a></span></li>
+        <li><span class="t">The <b>authored contract is immutable</b>, and an amendment travels to every later check.</span><span class="ref">§ <a class="xref" href="#s-15">15</a></span></li>
+        <li><span class="t">Every promotion and demotion is a <b>proposal a human merges</b>. Nothing applies itself.</span><span class="ref">§ <a class="xref" href="#s-19">19</a> · <a class="xref" href="#s-22">22</a></span></li>
+        <li><span class="t">Put a <b>deterministic rung under every rule</b> whose violation would be a security incident.</span><span class="ref">§ <a class="xref" href="#s-11">11</a></span></li>
+        <li><span class="t">Humans own the rule files, the skill files and the rubrics. <b>No turn writes rung 0.</b></span><span class="ref">§ <a class="xref" href="#s-11">11</a></span></li>
+        <li><span class="t">Two or more turns deep, carry what matters at rung 1, 2 or 3d. <b>Prose does not cross a context boundary.</b></span><span class="ref">§ <a class="xref" href="#s-8">8</a></span></li>
+        <li><span class="t"><b>Partition the budget</b> across children, and never copy it to each one.</span><span class="ref">§ <a class="xref" href="#s-8">8</a></span></li>
+        <li><span class="t">Stamp every count with the <b>predicate version</b>, and reset variance when that version changes.</span><span class="ref">§ <a class="xref" href="#s-18">18</a></span></li>
+        <li><span class="t">Give every predicate a <b>fixture set</b>: cases that must fire, and cases that must not.</span><span class="ref">§ <a class="xref" href="#s-18">18</a></span></li>
+        <li><span class="t">Read counts <b>beside eval scores</b>, never alone. Only one of the four cases argues for a demotion.</span><span class="ref">§ <a class="xref" href="#s-18">18</a></span></li>
       </ol>
 
-      <h3 class="sub">20.3 · Conformance levels</h3>
+      <h3 class="sub">24.3 · Conformance levels</h3>
       <p>
         Three levels, and each one subsumes the one below it. Most teams reach the first in an
         afternoon and never reach the third. Calling both of those conformant would make the word
@@ -3598,7 +4088,7 @@ flowchart LR
           </thead>
           <tbody>
             <tr data-signal="warn">
-              <td class="k">1 · modelled</td>
+              <td class="k">1 · modeled</td>
               <td>the design exists and is separable from the machinery</td>
               <td>1 to 4</td>
               <td>a rule file showing four distinct fields · a named family for every component · a context map with one arrow direction</td>
@@ -3606,13 +4096,13 @@ flowchart LR
             <tr data-signal="pass">
               <td class="k">2 · enforced</td>
               <td>the model is carried by mechanisms, and it fails honestly</td>
-              <td>1 to 15</td>
+              <td>1 to 15 · 23 to 26</td>
               <td>one predicate with more than one mount · a rung outside the harness and the factory · a broken gate that let work through and got counted · a recorded collision</td>
             </tr>
             <tr data-signal="block">
               <td class="k">3 · measured</td>
               <td>evidence moves the model, on a schedule nobody has to remember</td>
-              <td>1 to 22</td>
+              <td>all 29</td>
               <td>per-rung counts · hatch counts per rule · a variance number for one inferential rung · cost per job · a scheduled analysis pass that has opened a demotion proposal</td>
             </tr>
           </tbody>
@@ -3624,15 +4114,15 @@ flowchart LR
         <p>
           wipp does not reach level three. The rule it misses is the scheduled analysis pass, because
           I run that by hand and nothing reminds me. That is the gap I would close first, and
-          it is the same gap section 18 names. A standard whose author quietly exempts himself is
+          it is the same gap <a class="xref" href="#s-22">section 22</a> names. A standard whose author quietly exempts himself is
           worth less than the paper it is printed on.
         </p>
       </div>
 
-      <h3 class="sub">20.4 · How this standard changes</h3>
+      <h3 class="sub">24.5 · How this standard changes</h3>
       <p>
         The counts are the stable part. Four attributes, three contexts, five families, two chains,
-        and the rungs on each. Rename any term to match what your organisation already says, and keep
+        and the rungs on each. Rename any term to match what your organization already says, and keep
         the counts. Merging two of them is what breaks the model.
       </p>
       <p>
@@ -3664,7 +4154,7 @@ flowchart LR
       <a href="/guardrails/">Five Guardrails</a> (the altitudes) ·
       <a href="/factory/">The Factory</a> (delivery) ·
       <a href="/eval-loop/">The Eval Loop</a> (what no rule can decide)</div>
-    <div>Colour is semantic:
+    <div>Color is semantic:
       <span style="color:var(--brick)">brick blocks</span> ·
       <span style="color:var(--gold)">gold warns</span> ·
       <span style="color:var(--forest)">forest passes</span>.</div>
@@ -3703,7 +4193,7 @@ flowchart LR
     fontSize: "13px"
   });
 
-  /* Same four signal colours the prose uses: brick blocks, gold warns,
+  /* Same four signal colors the prose uses: brick blocks, gold warns,
      forest passes, and dim is structure rather than a step. */
   const signals = () => [
     `classDef block fill:${token("--brick-wash")},stroke:${token("--brick")},color:${token("--ink")}`,
@@ -3718,7 +4208,7 @@ flowchart LR
       securityLevel: "strict",
       theme: "base",
       themeVariables: themeVariables(),
-      flowchart: { htmlLabels: false, curve: "linear", rankSpacing: 38,
+      flowchart: { htmlLabels: false, curve: "basis", rankSpacing: 38,
                    nodeSpacing: 28, padding: 8, useMaxWidth: true,
                    wrappingWidth: 240 },
       sequence: { useMaxWidth: true, mirrorActors: false }
