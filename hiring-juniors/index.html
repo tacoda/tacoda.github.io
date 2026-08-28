@@ -663,10 +663,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>Stop asking whether they can <em>build it</em>.</h1>
     <p class="standfirst">
       The junior loop rested on one signal: give them a small problem, see if working code comes back.
-      That signal is gone. Allow the agent and everyone passes; ban it and you are deliberately
-      measuring the one condition that will never occur again in their career. Most teams picked the
-      ban and are now screening hard for a skill they do not want. The replacement is not a harder
-      puzzle. It is handing them code the agent wrote and asking whether it should merge.
+      That signal is gone. Allow the agent and everyone passes, but ban it and you are deliberately
+      measuring the one condition that will never occur again in their career. So most teams picked
+      the ban, and they now screen hard for a skill they do not want. The replacement is not a harder
+      puzzle: it is handing them the agent's code and asking whether it should merge.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -756,17 +756,17 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        The banned branch feels rigorous, which is why it won. Worth stating what it actually
-        does: it selects for the candidates who best simulate a working environment that no longer
-        exists, and it selects against people who have already adapted to the one that does. If your
-        team writes code with an agent every day, an interview that forbids one is not a higher bar. It
-        is a different bar, pointed somewhere else.
+        The banned branch feels rigorous, which is why it won. Worth stating what it does: it selects
+        for the candidates who best simulate a working environment that no longer exists. It also
+        selects against people who have already adapted to the one that does. If your
+        team writes code with an agent every day, an interview that forbids one is not a higher bar,
+        just a different bar, pointed somewhere else.
       </p>
       <p>
         The way out is not a cleverer puzzle, but noticing that the thing you were using production
         as a proxy for was never production. You wanted to know whether this person will eventually be
-        able to tell right from plausible, which is directly testable, in forty-five minutes, and it
-        always was. Nobody bothered because the proxy used to be cheaper.
+        able to tell right from plausible, which is testable in forty-five minutes, and always was.
+        Nobody bothered because the proxy used to be cheaper.
       </p>
 
       <div class="takeaway">
@@ -792,8 +792,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The unsupervised take-home cannot be saved</h2>
         <p class="thesis">
-          Not because candidates cheat. Because authorship is no longer attributable, and no honour
-          system fixes an unfalsifiable claim.
+          Not because candidates cheat, but because authorship is no longer attributable, and no
+          honour system fixes an unfalsifiable claim.
         </p>
       </div>
     </div>
@@ -801,19 +801,19 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         A take-home now returns a well-structured, tested, documented submission from almost everyone,
-        and you cannot tell from the artifact who understood it. Asking candidates not to use an agent
-        puts the honest ones at a disadvantage against the rest, which is a bad design in any process
-        and an especially bad one in a process about integrity.
+        and the artifact cannot say who understood it. Asking candidates not to use an agent
+        penalises the honest ones relative to the rest, which is bad design in any process and worse
+        in a process about integrity.
       </p>
       <p>
         There is a partial rescue that some teams use: let them use anything, then spend thirty minutes
-        interrogating the submission. That works, and it is strictly worse than skipping the take-home
+        interrogating the submission. That works, and is strictly worse than skipping the take-home
         and spending the same thirty minutes on material you prepared. You lose nothing and you stop
         asking for six hours of unpaid work whose output you have decided to ignore.
       </p>
 
       <div class="callout">
-        <span class="label">What the take-home was really doing</span>
+        <span class="label">What the take-home was measuring</span>
         <p>
           Filtering by willingness to spend a weekend, which correlated with enthusiasm and also with
           not having caring responsibilities, a second job, or a current employer. That was always a
@@ -837,7 +837,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <h2>Be honest about what each stage can see</h2>
         <p class="thesis">
           An interview is a low-bandwidth, high-noise channel. It always was. The useful move is
-          matching each stage to something it can actually resolve.
+          matching each stage to something it can resolve.
         </p>
       </div>
     </div>
@@ -878,7 +878,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
             <tr class="total">
               <td>Every stage combined</td>
               <td>A rough floor on comprehension today.</td>
-              <td>Rate of improvement, which is what you are actually buying.</td>
+              <td>Rate of improvement, which is what you are buying.</td>
             </tr>
           </tbody>
         </table>
@@ -925,11 +925,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="none">
           <span class="when">0:00 → 0:05</span>
-          <span class="what">Context: what the program is for, what the ticket asked for, what the business rule is. Give the business rule explicitly. Withholding it tests telepathy.</span>
+          <span class="what">Context: what the program is for, what the ticket asked for, what the business rule is. State the business rule up front. Withholding it tests telepathy.</span>
         </li>
         <li data-signal="pass">
           <span class="when">0:05 → 0:25</span>
-          <span class="what">They read. Anything goes: run it, test it, ask the agent, ask you. Say out loud that using the agent is expected, because half of them will assume it is a trap.</span>
+          <span class="what">They read. Anything goes: run it, test it, ask the agent, ask you. Say out loud that you expect them to use the agent, because half will assume it is a trap.</span>
         </li>
         <li data-signal="warn">
           <span class="when">0:25 → 0:40</span>
@@ -943,16 +943,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">Choosing the material</h3>
       <ul>
-        <li><strong>Self-contained, ~60 lines, common language.</strong> Offer a choice of two languages. A defect in your stack tests familiarity with your stack, which is not what a junior is being hired for.</li>
-        <li><strong>One defect, from the taxonomy.</strong> A policy inversion or a test that cannot fail are the two best for this purpose: both are invisible to the suite and neither requires local knowledge once you have stated the business rule.</li>
-        <li><strong>Roughly one candidate in four gets a clean diff.</strong> And you say nothing about it. Correctly approving a clean change, with reasons, is a full pass and is the single most informative outcome you can get.</li>
+        <li><strong>Self-contained, ~60 lines, common language.</strong> Offer a choice of two languages. A defect in your stack tests familiarity with your stack, which is not what you are hiring a junior for.</li>
+        <li><strong>One defect, from the taxonomy.</strong> A policy inversion or a test that cannot fail are the two best for this purpose. Both are invisible to the suite, and neither requires local knowledge once you have stated the business rule.</li>
+        <li><strong>About one candidate in four gets a clean diff.</strong> And you say nothing about it. Correctly approving a clean change, with reasons, is a full pass and the most informative outcome you can get.</li>
       </ul>
 
       <div class="callout">
         <span class="label">The clean diff is not a trick</span>
         <p>
-          If every candidate's diff is defective, word gets out within a month and you are then testing
-          whether people have been briefed. More importantly, a candidate who finds a bug in a correct
+          If every candidate's diff is defective, word gets out within a month and you are testing
+          whether people were briefed. And a candidate who finds a bug in a correct
           change has told you something serious: they will do that to their colleagues' work every week
           for years.
         </p>
@@ -974,7 +974,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <h2>Score it on the rubric you already train with</h2>
         <p class="thesis">
           Same four points as reverse-review, which gives the interview a property most interviews
-          lack: it predicts performance on the programme they will actually be put through.
+          lack: it predicts performance on the programme you will put them through.
         </p>
       </div>
     </div>
@@ -998,9 +998,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Weight <em>proved</em> above <em>found</em> for a junior. Finding the defect is partly luck at
         this level; going and checking before committing to an answer is a disposition, and disposition
-        is what survives training. A candidate who misses the defect, says "I am not sure about this
-        line, here is how I would find out", and is then right about the method is a better outcome
-        than one who spots it and cannot say why.
+        is what survives training. Take the candidate who misses the defect and says "I am not sure
+        about this line, here is how I would find out". If the method they name is the right one, that
+        beats spotting the defect and not saying why.
       </p>
 
       <div class="takeaway">
@@ -1037,7 +1037,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">25 min · one thing</span>
-          <span class="what">One thing they built or worked on. Not "tell me about it": <em>what would you do differently, and what did you not understand at the time?</em> The second half of that question is the one that separates people, and it is answerable honestly by someone whose project was mostly agent-written.</span>
+          <span class="what">One thing they built or worked on. Not "tell me about it": <em>what would you do differently, and what did you not understand at the time?</em> The second half of that question separates people, and someone whose project was mostly agent-written can answer it without lying.</span>
         </li>
         <li data-signal="warn">
           <span class="when">20 min · ambiguity</span>
@@ -1046,10 +1046,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </ol>
 
       <p>
-        That plus the exercise is the loop. Everything else people put in a junior process, the system
-        design round, the second technical screen, the culture panel, is measuring something you cannot
-        act on or something you already know. Cutting them costs you nothing and buys you a candidate
-        pool that has not been ground down before day one.
+        That plus the exercise is the loop. Everything else people put in a junior process is measuring
+        something you cannot act on or something you already know. That covers the system design round,
+        the second technical screen, and the culture panel. Cutting them costs you nothing and buys you
+        a candidate pool that has not been ground down before day one.
       </p>
     </div>
   </section>
@@ -1067,8 +1067,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Five things that have stopped carrying information</h2>
         <p class="thesis">
-          Some were always weak. All five are now close to zero, and two of them are actively
-          misleading.
+          Some were always weak, but all five are now close to zero, and two of them mislead.
         </p>
       </div>
     </div>
@@ -1081,7 +1080,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Algorithm puzzles</span>
-          <span class="what">Measures preparation, and preparation is now nearly free and thoroughly automated. You are ranking candidates on how recently they ground through a practice set.</span>
+          <span class="what">Measures preparation, and preparation is now nearly free and wholly automated, so you are ranking candidates on how recently they ground through a practice set.</span>
         </li>
         <li data-signal="block">
           <span class="when">Build a small app</span>
@@ -1089,11 +1088,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Side-project portfolio</span>
-          <span class="what">Once a decent proxy for curiosity. Now a proxy for having had unstructured time, since the artifact costs a weekend to produce regardless of understanding. Ask about one project in depth instead of counting them.</span>
+          <span class="what">Once a decent proxy for curiosity, now a proxy for having had unstructured time, since the artifact costs a weekend to produce regardless of understanding. Ask about one project in depth instead of counting them.</span>
         </li>
         <li data-signal="block">
           <span class="when">"Explain this code" as a quiz</span>
-          <span class="what">Asking someone to narrate what a function does tests the same thing the agent does best. Ask what would make it <em>wrong</em>, which is the question the model cannot answer for you.</span>
+          <span class="what">Asking someone to narrate what a function does tests what the agent does best. Ask what would make it <em>wrong</em>, which is the question the model cannot answer for you.</span>
         </li>
       </ol>
     </div>
@@ -1112,8 +1111,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Five things worth more than they used to be</h2>
         <p class="thesis">
-          All five are observable in the ninety minutes above, and none of them require the candidate
-          to already be good at your stack.
+          All five are observable in the ninety minutes above, and none require the candidate to
+          already know your stack.
         </p>
       </div>
     </div>
@@ -1130,15 +1129,15 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="pass">
           <span class="when">Asks about the rule</span>
-          <span class="what">Reaching for the business rule rather than the algorithm. The single most transferable instinct on this list, and the one the agent structurally lacks.</span>
+          <span class="what">Reaching for the business rule rather than the algorithm: the single most transferable instinct on this list, and the one the agent structurally lacks.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Holds, or folds well</span>
-          <span class="what">Under one round of pushback: do they either hold with a reason or concede with a reason? Both are fine. Silent capitulation is the thing to note.</span>
+          <span class="what">Under one round of pushback: do they hold with a reason or concede with a reason? Both are fine. Silent capitulation is the thing to note.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Notices the hole</span>
-          <span class="what">Spots the missing case in the spec without being led there. Cheap to test, hard to fake, and it is most of what a first year of usefulness consists of.</span>
+          <span class="what">Spots the missing case in the spec without anyone pointing at it. Cheap to test, hard to fake, and it is most of what a first year of usefulness consists of.</span>
         </li>
       </ol>
 
@@ -1146,9 +1145,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">One question that does a lot of work</span>
         <p>
           "What would have to be true for this to be wrong?" Ask it in the exercise and again about
-          their own past project. It is the same question the mentor asks in reverse-review, which
-          means a strong answer here genuinely forecasts a strong first quarter rather than merely
-          correlating with one.
+          their own past project. It is the same question the mentor asks in reverse-review, so a
+          strong answer here forecasts a strong first quarter instead of just correlating with one.
         </p>
       </div>
     </div>
@@ -1165,9 +1163,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="meter-label">Noise</span>
       </div>
       <div>
-        <h2>What you will accidentally measure instead</h2>
+        <h2>What you will measure by accident instead</h2>
         <p class="thesis">
-          A comprehension exercise has its own biases. They are manageable, and only if you name them
+          A comprehension exercise has its own biases, and they are manageable only if you name them
           first.
         </p>
       </div>
@@ -1181,13 +1179,13 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           know about your domain is measuring prior access, not aptitude.
         </li>
         <li>
-          <strong>Thinking aloud.</strong> Fluent narration is a separate skill from reading carefully,
-          and it is unevenly distributed for reasons that have nothing to do with engineering. Let
+          <strong>Thinking aloud.</strong> Fluent narration is a separate skill from close reading,
+          and it is unevenly distributed for reasons unrelated to engineering. Let
           people work in silence and ask at the end. Read the written verdict, not the monologue.
         </li>
         <li>
-          <strong>Surprise.</strong> Send the format in advance. A candidate who has been told what to
-          expect shows you their judgment; one who has not shows you their startle response.
+          <strong>Surprise.</strong> Send the format in advance. A candidate told what to
+          expect shows you their judgment; one who was not shows you their startle response.
         </li>
         <li>
           <strong>Your own defect.</strong> If you wrote the planted defect and find it obvious, you
@@ -1220,23 +1218,23 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The interview is not where the accuracy comes from</h2>
         <p class="thesis">
-          You cannot see rate of improvement in ninety minutes. You can see it clearly in thirty days.
-          Spend accordingly.
+          You cannot see rate of improvement in ninety minutes, but you can see it in thirty days.
+          Spend where the signal is.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        Every organisation that is unhappy with its junior hiring responds by lengthening the
-        interview, and it does not work, because the variable that actually decides the outcome is not
-        present in the room. How fast does this person improve when told something? No format resolves
-        that from a single sitting, and a sixth round does not get you closer to it.
+        Every organisation unhappy with its junior hiring responds by lengthening the interview, and it
+        does not work: the variable that decides the outcome is not in the room. How fast does this
+        person improve when told something? No format resolves that from a single sitting, and a sixth
+        round does not get you closer to it.
       </p>
       <p>
         What does resolve it is a first month with a gate in it. If a new engineer is doing spoken
-        claims from day one and a weekly rep from week three, you will know by day thirty whether
-        feedback lands, and you will know it from evidence rather than impression. That is a far better
+        claims from day one and a weekly rep from week three, day thirty tells you whether feedback
+        lands. And it tells you from evidence rather than impression. That is a far better
         instrument than any interview, and it is available to anyone willing to run the first month on
         purpose.
       </p>
@@ -1264,9 +1262,9 @@ flowchart LR
       </figure>
 
       <p>
-        This is not an argument for a careless interview, but an argument that the marginal hour is
-        worth far more after the offer than before it, and that a team with a real
-        <a href="/first-ninety-days/">first ninety days</a> can afford a shorter loop precisely because
+        None of this argues for a careless interview. It argues that the marginal hour is worth far
+        more after the offer than before it. A team with a real
+        <a href="/first-ninety-days/">first ninety days</a> can afford a shorter loop, because
         it is no longer asking the interview to do something interviews cannot do.
       </p>
 
@@ -1274,8 +1272,8 @@ flowchart LR
         <span class="label">Where to start</span>
         <p>
           Replace the take-home with the forty-five minute exercise and change nothing else. It costs
-          less of everyone's time than what it replaces, it produces a scored artifact two people can
-          disagree about productively, and it is the only stage in most loops that is measuring the
+          less of everyone's time than what it replaces, and it produces a scored artifact two people
+          can argue over and get somewhere. In most loops it is also the only stage measuring the
           thing the job now consists of.
         </p>
       </div>

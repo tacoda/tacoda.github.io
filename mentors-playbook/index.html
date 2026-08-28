@@ -642,10 +642,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>Grading a review is a different skill from <em>doing</em> one.</h1>
     <p class="standfirst">
       Reverse-review documents what the junior does and gives the senior ten minutes of facilitation
-      advice. That advice is enough for week one and runs out somewhere around week five, when the
-      questions get harder: what makes a planted defect worth missing, why two mentors score the same
-      card two points apart, and what it means when someone earns the same three rubric points for
-      eight weeks running. This is the other half.
+      advice. That advice is enough for week one. It runs out around week five, when the questions get
+      harder: what makes a planted defect worth missing, and why two mentors score one card two points
+      apart. Hardest of all: what it means when someone earns the same three rubric points for eight
+      weeks running. This is the other half.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -672,7 +672,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch warn"></span>
         <div>
           <dt>The drift</dt>
-          <dd>Every failure mode here ends the same way, with the exercise quietly reverting to a normal code review.</dd>
+          <dd>Every failure mode here ends the same way, with the exercise reverting to a normal code review.</dd>
         </div>
       </div>
       <div class="signal">
@@ -713,8 +713,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>You are not grading correctness</h2>
         <p class="thesis">
-          You already know whether the diff is wrong. The thing being measured is whether their
-          confidence tracked the evidence, and that is a separate question with a separate answer.
+          You already know whether the diff is wrong. The exercise measures whether their confidence
+          tracked the evidence, and that is a separate question with a separate answer.
         </p>
       </div>
     </div>
@@ -724,10 +724,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         The natural instinct in the defend phase is to compare their verdict to yours and score the
         distance. That instinct is why most attempts at this drift back into normal review by week
         five. A reviewer can arrive at your exact verdict by luck, by pattern-matching the rubric, or
-        by having seen the diff earlier in the week, and none of those are the skill.
+        by having seen the diff earlier in the week. None of those is the skill.
       </p>
       <p>
-        What you are actually watching is the relationship between two things: how sure they said they
+        What you are watching is the relationship between two things: how sure they said they
         were, and how much they had. A confident catch backed by a red test and a confident catch
         backed by a feeling look identical on the card and are opposite results. Most of the technique
         on this page exists to pull those two apart.
@@ -768,8 +768,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Seeding a defect worth missing</h2>
         <p class="thesis">
-          A good planted defect is one a competent person misses for a reason. A bad one is merely
-          hidden, and hiding things teaches nothing.
+          A good planted defect is one a competent person misses for a reason. A bad one just hides
+          something, and hiding things teaches nothing.
         </p>
         <div class="chips">
           <span class="chip kind-rule"><b>rule</b> one defect per diff</span>
@@ -796,7 +796,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="pass">
           <span class="when">Well dressed</span>
-          <span class="what">The surrounding code is clean and idiomatic. Defects nested in obviously bad code teach "distrust bad code", which everyone already does.</span>
+          <span class="what">The surrounding code is clean and idiomatic. Defects nested in bad code teach "distrust bad code", which everyone already does.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Near</span>
@@ -809,7 +809,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <li><strong>The trick question.</strong> An off-by-one buried inside an unfamiliar API. It measures exposure to that API, which is not on the rubric and never will be.</li>
         <li><strong>The two-defect diff.</strong> Usually authored when the first defect felt too easy. Split it into two weeks instead.</li>
         <li><strong>The language edge case.</strong> Mutable default arguments, integer caching, truthiness of an empty collection. Fun, memorable, and almost never the shape real agent defects take.</li>
-        <li><strong>The one you find clever.</strong> Cleverness in a seed correlates strongly with unteachability. If explaining the answer takes you four minutes, it was the wrong seed.</li>
+        <li><strong>The one you find clever.</strong> Cleverness in a seed correlates with unteachability. If explaining the answer takes you four minutes, it was the wrong seed.</li>
       </ul>
 
       <div class="takeaway">
@@ -846,7 +846,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Any team with more than one mentor has this problem and almost none of them measure it. The
         junior experiences it as arbitrary: the same quality of work scores three one week and one the
-        next, depending on who was in the room. Nothing convinces somebody the whole exercise is theatre more quickly.
+        next, depending on who was in the room. Nothing convinces somebody faster that the whole exercise is theatre.
       </p>
 
       <h3 class="sub">The drill</h3>
@@ -874,8 +874,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           One mentor accepts a regression test as a durable fix; another demands a lint rule or a gate.
           Both are defensible and the reviewer cannot read minds. The resolution is not to argue it in
-          the abstract but to write down your team's altitude rule: which classes of defect earn a
-          sentence in the charter, which earn a check, and which earn a gate that refuses. That
+          the abstract but to write down your team's altitude rule. Which classes of defect earn a sentence in
+          the charter, which earn a check, and which earn a gate that refuses? That
           document is useful far beyond this exercise.
         </p>
       </div>
@@ -916,7 +916,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <div class="tablewrap">
         <table>
-          <caption>trajectories and what each one actually is</caption>
+          <caption>trajectories and what each one is</caption>
           <thead>
             <tr><th>Pattern over 6+ weeks</th><th>What it usually is</th><th>The move</th></tr>
           </thead>
@@ -956,9 +956,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        The two flagged rows are the ones that get misread as effort problems. Both are usually
-        produced by the mentor: the first by a diff pool that is always defective, the second by
-        material that is too hard, too easy, or too samey to generate any signal at all.
+        The two flagged rows are the ones that get misread as effort problems. The mentor usually
+        produces both. The first comes from a diff pool that is always defective, the second from
+        material too hard, too easy, or too samey to generate any signal.
       </p>
     </div>
   </section>
@@ -976,8 +976,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Four ways a rubric gets played</h2>
         <p class="thesis">
-          Not cheating. Ordinary, mostly unconscious optimisation toward the thing being measured, and
-          the reason it needs naming is that it is invisible in the score.
+          Not cheating. Ordinary, mostly unconscious optimisation toward the thing the rubric measures,
+          and the reason it needs naming is that it is invisible in the score.
         </p>
       </div>
     </div>
@@ -986,7 +986,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Class-stuffing</span>
-          <span class="what">A class gets named for every finding, because naming one is worth a point. The classes are increasingly decorative. <strong>Counter:</strong> require the class to predict a second place in this repo where the same class could occur. Memorised vocabulary cannot do that; understood vocabulary does it easily.</span>
+          <span class="what">A class gets named for every finding, because naming one is worth a point. Each class is more decorative than the last. <strong>Counter:</strong> require the class to predict a second place in this repo where the same class could occur. Memorised vocabulary cannot do that; understood vocabulary can.</span>
         </li>
         <li data-signal="block">
           <span class="when">The hedge</span>
@@ -1005,7 +1005,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">Do not punish any of these</span>
         <p>
-          All four are evidence that the rubric is being taken seriously, which is better than the
+          All four are evidence that the reviewer takes the rubric seriously, which is better than the
           alternative. Name the game, apply the counter, move on. A mentor who treats optimisation as
           dishonesty gets a reviewer who optimises more carefully and stops telling you things.
         </p>
@@ -1055,7 +1055,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">If they fold</span>
-          <span class="what">Do not say "actually you were right." Say: "walk me back through why you wrote it down." Make them rebuild the reasoning under their own power first, then reveal. The rebuild is the whole lesson.</span>
+          <span class="what">Saying "actually you were right" ends the drill. Ask instead: "walk me back through why you wrote it down", and make them rebuild the reasoning under their own power before the reveal. The rebuild is the whole lesson.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Always reveal</span>
@@ -1073,10 +1073,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        The target failure mode is worth stating plainly, because it is what justifies the risk. An
+        The target failure mode is worth stating, because it is what justifies the risk. An
         engineer who cannot find defects is early in their career. An engineer who finds them and
         abandons them whenever a confident person disagrees will still be doing that at eight years
-        in, and by then nobody is checking whether they were right.
+        in. And by then nobody is checking whether they were right.
       </p>
     </div>
   </section>
@@ -1125,9 +1125,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </ol>
 
       <p>
-        The group format is better than the one-to-one version in one specific way: hearing three peers
-        reach three different verdicts on the same lines is a more convincing argument for humility
-        than anything a senior can say. It is worse in one way too, which is that quiet people can
+        The group format beats the one-to-one version in one specific way. Hearing three peers reach
+        three different verdicts on the same lines argues for humility better than anything a senior
+        says. It is worse in one way too, which is that quiet people can
         hide. Rotate who presents their card first, and read the written cards rather than trusting
         the discussion.
       </p>
@@ -1165,7 +1165,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="warn">
           <span class="when">Seeded → live</span>
-          <span class="what">Four reps completed with at least two correct classifications. The miss rate will jump immediately and that is expected, because live diffs mostly contain nothing wrong.</span>
+          <span class="what">Four reps completed with at least two correct classifications. Expect the miss rate to jump immediately, because live diffs mostly contain nothing wrong.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Live → self-directed</span>
@@ -1214,7 +1214,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="warn">
           <span class="when">The cadence</span>
-          <span class="what">Did it actually run twelve times, or six times with gaps? Fifteen minutes weekly beats an hour monthly by a wide margin, and a skipped week is usually the mentor's diary rather than the junior's.</span>
+          <span class="what">Did it run twelve times, or six times with gaps? Fifteen minutes weekly beats an hour monthly by a wide margin, and a skipped week is usually the mentor's diary rather than the junior's.</span>
         </li>
         <li data-signal="warn">
           <span class="when">The load</span>
@@ -1222,17 +1222,17 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Then, the person</span>
-          <span class="what">Only after the first three are ruled out. And then say it specifically.</span>
+          <span class="what">Only after the first three are ruled out. And then be specific.</span>
         </li>
       </ol>
 
       <div class="callout">
         <span class="label">Say the specific thing</span>
         <p>
-          "You are not improving" is unusable and lands as a verdict on character. "You have lost
-          'proved' eleven weeks running, we tried writing the test first and it did not move, and I do
-          not have another idea yet" is usable, honest about your own uncertainty, and gives them
-          something to push against.
+          "You are not improving" is unusable and lands as a verdict on character. Try instead: "You
+          have lost 'proved' eleven weeks running, we tried writing the test first and it did not
+          move, and I do not have another idea yet". That version is usable, honest about your own
+          uncertainty, and gives them something to push against.
         </p>
       </div>
 
@@ -1240,8 +1240,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         Then distinguish three cases, because they need different responses. <strong>Not yet</strong>
         is the most common and deserves more time and a different approach. <strong>Cannot</strong> is
         rare, hard to establish, and should never be concluded from one exercise in isolation.
-        <strong>Will not</strong> is not a mentoring problem at all: it is a management conversation
-        about whether the person wants this job, and running more reps will not surface it any faster.
+        <strong>Will not</strong> is not a mentoring problem at all. It is a management conversation
+        about whether the person wants this job, and more reps will not surface it faster.
       </p>
     </div>
   </section>
@@ -1273,7 +1273,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Never losing</span>
-          <span class="what">You have never conceded a point in a defend phase. Either you are exceptional or you are using authority, and the base rate strongly favours the second.</span>
+          <span class="what">You have never conceded a point in a defend phase. Either you are exceptional or you are using authority, and the base rate favours the second.</span>
         </li>
         <li data-signal="block">
           <span class="when">Clever seeds</span>
@@ -1285,7 +1285,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Skipped weeks</span>
-          <span class="what">The cadence is the intervention. An exercise that runs when the calendar is kind teaches that it is optional, which is precisely the lesson you are trying not to teach.</span>
+          <span class="what">The cadence is the intervention. An exercise that runs when the calendar is kind teaches that it is optional, which is the lesson you are trying not to teach.</span>
         </li>
       </ol>
 

@@ -642,10 +642,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Ninety days to a junior who can say <em>wait</em>.</h1>
     <p class="standfirst">
-      The pieces already exist: a standard that says what a merge requires, an exercise that trains
-      the catch, a lab that shows what a plausible wrong answer feels like from the inside. What is
-      missing is the order. Handed all four at once on day one, a new engineer reads them as opinions.
-      Sequenced, they are a ladder. Three phases, one hour of senior time a week, and a bar at the end
+      The pieces exist: a standard for what a merge requires, an exercise that trains the catch, a lab
+      that shows how a plausible wrong answer feels from the inside. What is missing is the order,
+      because handed all four at once on day one, a new engineer reads them as opinions. Sequenced,
+      the same four are a ladder. Three phases, one hour of senior time a week, and a bar at the end
       that you either clear or repeat.
     </p>
     <p class="byline">
@@ -725,23 +725,23 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        Every part of this already works on its own. A team can adopt the Comprehension Standard in an
-        afternoon. Reverse-review runs in thirty minutes a week. The workshop is one hour. Send a new
-        hire all three on their first morning and you will get polite agreement and no behavior change,
-        because none of it is load-bearing yet. They have not been fooled. Nothing in their week
-        depends on any of it.
+        Every part of this already works on its own. Adopting the Comprehension Standard takes an
+        afternoon, reverse-review takes thirty minutes a week, and the workshop is one hour. Send a new
+        hire all three on their first morning and you will get polite agreement and no behavior change.
+        None of it is load-bearing yet. Nothing has fooled them, and nothing in their week depends on
+        any of it.
       </p>
       <p>
         The sequence below exists to make each piece land at the moment it becomes obvious. The
-        workshop is a revelation at day thirty-five and trivia at day one, and the reason is simply
-        that by day thirty-five they have personally shipped something they did not understand and
-        watched a senior find it in ninety seconds. The material has not changed. The reader has.
+        workshop is a revelation at day thirty-five and trivia at day one. By then the junior has
+        personally shipped something they did not understand, and watched a senior find it in ninety
+        seconds. The material has not changed. The reader has.
       </p>
 
       <div class="takeaway">
         <span class="label">The organizing rule</span>
         <p>
-          Teach the rule after the pain, not before it. Every phase boundary below is placed where the
+          Teach the rule after the pain, not before it. Every phase boundary below sits where the
           junior has just accumulated enough evidence to want the next rule.
         </p>
       </div>
@@ -784,15 +784,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        The phases are ordered by what they cost the junior to fake. Comprehension can be faked for
-        about a week. Catching can be faked for roughly one diff, because the classification asks
-        <em>which kind</em> of wrong it is and a guess does not survive that question. Authoring
-        cannot be faked at all: either a rule they wrote is running in the team's harness or it is not.
+        The phase order follows what each one costs the junior to fake. A junior can fake
+        comprehension for about a week. They can fake catching for roughly one diff, because the
+        classification asks <em>which kind</em> of wrong it is. A guess does not survive that question.
+        Nobody can fake authoring: either a rule they wrote is running in the team's harness or it is
+        not.
       </p>
       <p>
         Nothing here removes the agent. The junior uses it from day one, all day, the same as everyone
-        else. What the ninety days build is the part of the job the agent does not do, which is
-        deciding whether what it produced should exist.
+        else. The ninety days build the part of the job the agent does not do: deciding whether its
+        output should exist.
       </p>
     </div>
   </section>
@@ -838,7 +839,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="warn">
           <span class="when">Before review</span>
-          <span class="what">They write nothing. They walk to the senior, or open a call, and <strong>say</strong> the four claims aloud: what changed, why it is correct, what it could break, and how they would know if it broke.</span>
+          <span class="what">They write nothing. Instead they walk to the senior, or open a call, and <strong>say</strong> the four claims aloud. The claims: what changed, why it is correct, what it could break, and how they would know if it broke.</span>
         </li>
         <li data-signal="block">
           <span class="when">On a stumble</span>
@@ -853,25 +854,24 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">Why spoken, not written</span>
         <p>
-          A written explanation can be generated by the same agent that wrote the change, and it will
-          be a good one. Speech is not pasteable, so for the first two weeks the claims are verbal
-          specifically to close that door, and the door can be reopened at day fifteen once the habit
-          is real.
+          The same agent that wrote the change can generate a written explanation, and it will be a
+          good one. Speech is not pasteable, so the claims stay verbal for the first two weeks to
+          close that door. You can reopen the door at day fifteen, once the habit is real.
         </p>
       </div>
 
       <p>
         Expect the first three days to be uncomfortable and the change volume to look bad. It is
-        supposed to. A junior who ships six understood changes in week one is ahead of one who ships
-        twenty that a senior will be maintaining alone in March.
+        supposed to. Six understood changes in week one beat twenty that a senior will be maintaining
+        alone in March.
       </p>
 
       <h3 class="sub">Phase gate</h3>
       <p>
         Move on when the four claims land clean on two consecutive changes without prompting. For most
         people that is somewhere between day eight and day fourteen. If it is day twenty, that is
-        information worth having early, and it is much cheaper to learn now than at the end of a
-        probation period.
+        information worth having early. It is much cheaper to learn now than at the end of a probation
+        period.
       </p>
     </div>
   </section>
@@ -909,11 +909,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         you use.
       </p>
       <p>
-        Use seeded diffs with answer keys for the whole of this phase. Live diffs feel more real and
-        are much worse for training, because when a junior misses something in a live diff nobody can
-        say with certainty what was there to be missed. With a seeded diff the miss is unambiguous, and
-        so is the near-miss, which is the more useful signal: they saw the right line and named the
-        wrong class.
+        Use seeded diffs with answer keys for the whole of this phase. Live diffs feel more real, and
+        they are much worse for training. When a junior misses something, nobody can say with certainty
+        what was there to miss. With a seeded diff the miss is unambiguous, and so is the near-miss,
+        which is the more useful signal. They saw the right line and named the wrong class.
       </p>
 
       <h3 class="sub">What gets scored</h3>
@@ -933,15 +932,15 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        Keep a running list of every class they have caught. It has two uses later: it is the raw
-        material for the charter rule in phase three, and it is the evidence base for the promotion
-        conversation that a junior in the agent era otherwise struggles to build.
+        Keep a running list of every class they have caught. That list has two uses later. First, it
+        is raw material for the charter rule in phase three. Second, it is the evidence base for the
+        promotion conversation that a junior in the agent era otherwise struggles to build.
       </p>
 
       <h3 class="sub">Phase gate</h3>
       <p>
         Four reps completed, at least two with a correct classification. Their claims from days 1 to 10
-        continue throughout; they can now be written rather than spoken.
+        continue throughout, though the junior can now write them rather than speak them.
       </p>
     </div>
   </section>
@@ -974,21 +973,20 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         <a href="/junior-to-senior/">The workshop</a> puts the junior in front of a change where every
         test passes and the behavior is wrong in a way that costs money. Read cold on day one, it is a
-        clever puzzle. Read at day thirty-five, after four weeks of defending claims and four reps of
-        finding planted defects, it is the moment the whole thing clicks, because they recognize the
-        shape from their own week.
+        clever puzzle. Read at day thirty-five, after four weeks of defending claims and four reps
+        against planted defects, the whole thing clicks: they recognize the shape from their own week.
       </p>
       <p>
         The workshop's second half is where the ninety days turn. It moves from "how do I catch this"
-        to "what would have caught this without me", which is the first time the junior is asked to
-        think about the system rather than the diff. That question is what phase three is built on, so
-        do not skip the second half for time.
+        to "what would have caught this without me". That is the first time the junior has to think
+        about the system rather than the diff. Phase three builds on that question, so do not skip the
+        second half for time.
       </p>
 
       <h3 class="sub">The rest of the fortnight</h3>
       <ul>
         <li>Weekly reverse-review continues, still seeded, one notch harder.</li>
-        <li>Change size comes off the leash. They are trusted with multi-file work now.</li>
+        <li>Change size comes off the leash, so trust them with multi-file work now.</li>
         <li>They start keeping the defect list themselves rather than the senior keeping it for them.</li>
       </ul>
 
@@ -996,8 +994,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">Placement, not content</span>
         <p>
           Nothing about the workshop changes between day one and day thirty-five. The only variable
-          you control is whether the person in the chair has already been fooled twice. Spend that
-          variable well.
+          you control is whether an agent has already fooled the person in the chair twice. So spend
+          that variable well.
         </p>
       </div>
     </div>
@@ -1030,9 +1028,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Reverse-review now runs on real diffs off the team's queue. The miss rate goes up and the
         confidence goes down, both correctly. Live diffs mostly contain nothing wrong, which is itself
-        the lesson: a clean review that says "I looked at these four things and they are fine, here is
-        why" is a real deliverable, and a junior who cannot produce one will start inventing findings
-        to look useful.
+        the lesson. A clean review that says "I looked at these four things and they are fine, here is
+        why" is a real deliverable. Without that skill, the junior starts inventing findings to look
+        useful.
       </p>
 
       <h3 class="sub">The pushback drill</h3>
@@ -1127,10 +1125,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">Do not skip this</span>
         <p>
-          A junior who never authors a rule stays a person who changes code, and there are now a great
-          many very fast tools that also change code. Authoring the constraint is the first piece of
-          work in the ninety days that an agent could not have done, because it requires knowing what
-          went wrong here, to us, and why the last three fixes did not hold.
+          A junior who never authors a rule stays a person who changes code. There are now a great many
+          very fast tools that also change code. Authoring the constraint is the first piece of work in
+          the ninety days that an agent could not have done. It requires knowing what went wrong here,
+          to us, and why the last three fixes did not hold.
         </p>
       </div>
     </div>
@@ -1175,9 +1173,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li>
           <strong>The trail survives them.</strong> Anyone should be able to reconstruct why the change
-          looks the way it does from the PR alone: what was tried, what was rejected, what the agent
-          suggested that they turned down and why. That last item matters most. A record of rejections
-          is the clearest evidence that judgment was applied.
+          looks the way it does from the PR alone. It has to show what they tried, what they rejected,
+          and what the agent suggested that they turned down and why. That last item matters most,
+          because a record of rejections is the clearest evidence that they applied judgment.
         </li>
       </ul>
 
@@ -1227,7 +1225,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        Roughly one hour a week, and most of it is not additional. The claims replace a code read the
+        Roughly one hour a week, and most of it is not extra. The claims replace a code read the
         senior was doing anyway; the final review is the review they would have done regardless. The
         genuinely new spend is about four hours across three months, which is the reverse-review slot
         and the workshop.

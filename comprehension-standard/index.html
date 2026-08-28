@@ -642,7 +642,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>Don't merge a change you can't <em>explain</em></h1>
     <p class="standfirst">
       An agent can produce more correct-looking code in a day than a team can understand in a week.
-      Nothing stops that except a rule about what you are allowed to merge. Every team says it wants
+      Nothing stops that except a rule about what you may merge. Every team says it wants
       to understand its own code. A standard is what turns that sentiment into something you can
       adopt, cite in a policy, check in a pull request, and argue about when it gets inconvenient.
       This is that document, and it is deliberately short.
@@ -749,7 +749,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         <p>
           Wiring this up takes an afternoon. Meaning it takes longer, because the first week it will
           block a change somebody wants merged, and the standard is only worth anything if it holds
-          that week. A gate the team routinely waves through is worse than no gate: it teaches
+          that week. A gate the team waves through is worse than no gate: it teaches
           people that written rules here are decorative.
         </p>
       </div>
@@ -788,14 +788,14 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         "Explain" is doing real work in that sentence, so pin it down. Explaining is not summarizing
         the diff back. A diff summary is a restatement of syntax, and the agent will write you a
         beautiful one on request. Explaining means you can say what the change <em>does to the
-        system</em>, where it enters and where it leaves, what rule it obeys, and what would have to
-        be true for it to be wrong. Those four things are section 2.
+        system</em>, where it enters and where it leaves, and what rule it obeys. Then the hard one:
+        what would have to be true for it to be wrong. Those four things are section 2.
       </p>
 
       <p>
-        The law binds the person who merges, not the person or process that wrote the code. This is
-        the point. When an agent writes the change, authorship stops being a useful place to put
-        accountability, because the author has none: it doesn't get paged, doesn't sit in the
+        The law binds the person who merges, not the person or process that wrote the code. That
+        distinction is the point. When an agent writes the change, authorship stops being a useful
+        place to put accountability. The author has none: it doesn't get paged, doesn't sit in the
         postmortem, doesn't answer for the outage. Merging is the last human decision in the chain,
         so that is where the obligation lands.
       </p>
@@ -803,10 +803,9 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div class="takeaway">
         <span class="label">Why a law and not a guideline</span>
         <p>
-          Guidelines lose to deadlines, quietly and every time. The one obligation that cannot be
-          delegated to a tool is the obligation to understand, so it gets stated as an absolute and
-          the exceptions get written down in advance (section 4) rather than invented under
-          pressure.
+          Guidelines lose to deadlines, quietly and every time. Understanding is the one obligation
+          a team cannot hand to a tool. So the standard states it as an absolute and writes the
+          exceptions down in advance (section 4), not under pressure.
         </p>
       </div>
     </div>
@@ -849,15 +848,15 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="none">
           <span class="when">seam</span>
-          <span class="what"><strong>Entry and exit.</strong> Where does data reach this code, and where does the effect land: a response, a row, a file, a charge. This field catches "I read the function but not its callers," which is the most common way a change looks understood and is not.</span>
+          <span class="what"><strong>Entry and exit.</strong> Where does data reach this code, and where does the effect land: a response, a row, a file, a charge. This field catches the author who read the function but not its callers, which is the most common way a change looks understood and is not.</span>
         </li>
         <li data-signal="warn">
           <span class="when">policy</span>
-          <span class="what"><strong>Cite the rule this obeys.</strong> A charter rule, a doc, a ticket, an ADR. If nothing anywhere in the repo answers "why is it written this way," write <code>CHARTER-GAP</code> and open the gap as an issue. That is a finding, not a failure, and it is one of the more valuable things a junior produces.</span>
+          <span class="what"><strong>Cite the rule this obeys.</strong> A charter rule, a doc, a ticket, an ADR. If nothing in the repo answers "why is it written this way," write <code>CHARTER-GAP</code> and open an issue. That is a finding, not a failure, and it is one of the more valuable things a junior produces.</span>
         </li>
         <li data-signal="block">
           <span class="when">falsifier</span>
-          <span class="what"><strong>Name the case that would make this wrong, then name the test that covers it.</strong> That pairing separates reading from understanding. If you cannot describe a world in which this change is incorrect, you don't yet know what it does. <code>NONE</code> is permitted, and it means you shipped a declared risk instead of a hidden one.</span>
+          <span class="what"><strong>Name the case that would make this wrong, then name the test that covers it.</strong> That pairing separates reading from understanding. If you cannot describe a world in which this change is incorrect, you don't yet know what it does. The standard allows <code>NONE</code>, and it means you shipped a declared risk instead of a hidden one.</span>
         </li>
       </ol>
 
@@ -872,7 +871,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         <p>
           Asking the agent to write your comprehension block produces four fluent, plausible, often
           correct sentences and teaches you nothing, which inverts the point of the exercise. Write
-          it first, in your own words. Then, if you like, ask the agent to argue with it. Getting
+          it first, in your own words. Then, if you like, ask the agent to argue with it: getting
           corrected after you have committed to an answer is how the judgment actually forms.
         </p>
       </div>
@@ -892,8 +891,8 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div>
         <h2>Four levels of comprehension</h2>
         <p class="thesis">
-          Understanding is not binary, so the standard grades it. Each level is defined by evidence
-          somebody else can check, not by how confident the author feels.
+          Understanding is not binary, so the standard grades it, and each level rests on evidence
+          somebody else can check, not on how confident the author feels.
         </p>
       </div>
     </div>
@@ -909,7 +908,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
             <tr>
               <td><strong>L0</strong> Passing</td>
               <td>"The tests passed."</td>
-              <td>A green pipeline. No claim is made about the change itself, and none should be inferred from green.</td>
+              <td>A green pipeline. It makes no claim about the change itself, and nobody should read one into green.</td>
             </tr>
             <tr>
               <td><strong>L1</strong> Restatement</td>
@@ -919,12 +918,12 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
             <tr>
               <td><strong>L2</strong> Falsification</td>
               <td>"I can say how it would be wrong, and I checked."</td>
-              <td>All four fields filled. <code>falsifier</code> is covered by a named test, and that test goes red when the change is reverted or broken.</td>
+              <td>All four fields filled. A named test covers the <code>falsifier</code>, and that test goes red if you revert or break the change.</td>
             </tr>
             <tr>
               <td><strong>L3</strong> Defense</td>
               <td>"I can say why this way and not the other way."</td>
-              <td>L2, plus the author names the alternative that was not taken and why this one is the choice the codebase's policy requires. Survives a reviewer arguing the alternative.</td>
+              <td>L2, plus the author names the alternative not taken and why this one is the choice the codebase's policy requires. Survives a reviewer arguing the alternative.</td>
             </tr>
           </tbody>
         </table>
@@ -949,7 +948,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         <p>
           A level describes a change at merge time, not an engineer's seniority. A staff engineer
           merges an L1 dependency bump on Tuesday. A first-year engineer merges an L3 change to a
-          pricing rule on Wednesday. Read the levels as a career ladder and you turn a useful tool into an insult.
+          pricing rule on Wednesday. Read the levels as a career ladder, and you turn a useful tool into an insult.
         </p>
       </div>
     </div>
@@ -991,7 +990,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="none">
           <span class="when">Never L0</span>
-          <span class="what">L0 is a description of what green means, not a bar anyone is allowed to merge at. It exists in this document so that "the tests passed" has a name and can be recognized as the non-claim it is.</span>
+          <span class="what">L0 describes what green means, not a bar anyone may merge at. It exists in this document so that "the tests passed" has a name, and so a reviewer can call it the non-claim it is.</span>
         </li>
       </ol>
 
@@ -1004,8 +1003,8 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div class="callout">
         <span class="label">The failure mode to watch</span>
         <p>
-          The bar does not erode by being argued down. It erodes by exemption creep: one urgent
-          change waved through, then the next one citing the first as precedent. If you skip the
+          The bar does not erode because somebody argued it down; it erodes by exemption creep: one
+          urgent change waved through, then the next one citing the first as precedent. If you skip the
           bar, record that you skipped it and why, in the PR, in the same block. A logged exception
           is a decision. An unlogged one is a new default.
         </p>
@@ -1026,7 +1025,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div>
         <h2>What it means to conform</h2>
         <p class="thesis">
-          Conformance is a property of a team's process. There is no auditor, no badge, and no way
+          Conformance is a property of a team's process: there is no auditor, no badge, and no way
           to fail it other than by not doing it.
         </p>
       </div>
@@ -1038,7 +1037,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <ol class="sequence">
         <li data-signal="warn">
           <span class="when">1 · The law</span>
-          <span class="what">The law is written in the charter <em>the agent reads</em>, not only in a wiki page humans have bookmarked. If the agent never sees it, it is not part of the system.</span>
+          <span class="what">The law lives in the charter <em>the agent reads</em>, not only in a wiki page humans have bookmarked. If the agent never sees it, it is not part of the system.</span>
         </li>
         <li data-signal="warn">
           <span class="when">2 · The claim</span>
@@ -1046,15 +1045,15 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="block">
           <span class="when">3 · The bar</span>
-          <span class="what">The merge bar is written down, including the L3 list and the exemption list, and exceptions are logged in the PR rather than taken silently.</span>
+          <span class="what">The team writes the merge bar down, including the L3 list and the exemption list. Exceptions go in the PR, never silently.</span>
         </li>
         <li data-signal="block">
           <span class="when">4 · The gaps</span>
-          <span class="what"><code>CHARTER-GAP</code> is routed somewhere a human owns and answers. If it is only typed into a box and never read, field three of the block is theater.</span>
+          <span class="what"><code>CHARTER-GAP</code> reaches a human who owns and answers it. If people only type it into a box and never read it, field three of the block is theater.</span>
         </li>
         <li data-signal="pass">
           <span class="when">5 · The review</span>
-          <span class="what">Reviews examine the claims, not only the diff. A reviewer who never disputes a <code>falsifier</code> is not reviewing comprehension. <a href="/reverse-review/">Reverse-review</a> is the exercise that trains this.</span>
+          <span class="what">Reviews examine the claims, not only the diff, and a reviewer who never disputes a <code>falsifier</code> is not reviewing comprehension. <a href="/reverse-review/">Reverse-review</a> is the exercise that trains this.</span>
         </li>
       </ol>
 
@@ -1062,9 +1061,9 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         <span class="label">Team-level, on purpose</span>
         <p>
           Every conformance item describes something the team does, never something a person scores.
-          None of this is politeness. A standard that produces per-person numbers becomes a performance
-          instrument within a quarter, and the moment it does, people optimize the number instead of
-          the understanding, and you have paid for the ceremony without buying the comprehension.
+          None of this is politeness. A standard that produces per-person numbers becomes a
+          performance instrument within a quarter. Then people optimize the number instead of the
+          understanding, and you have paid for the ceremony without buying the comprehension.
         </p>
       </div>
     </div>
@@ -1083,8 +1082,8 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div>
         <h2>Reference implementation</h2>
         <p class="thesis">
-          A template that asks for the claim, and a gate that refuses a pull request without one.
-          Both are short enough to read in full, which is deliberate.
+          A template that asks for the claim, and a gate that refuses a pull request without one,
+          both short enough to read in full, which is deliberate.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>template</b> .github/pull_request_template.md</span>
@@ -1154,7 +1153,7 @@ if __name__ == "__main__":
 
       <p>
         Roughly twenty-five lines, and that is the whole enforceable surface. Everything else in this
-        document is a decision a team makes, which is the correct division of labor: machines are
+        document is a decision a team makes. That split is the right division of labor: machines are
         good at insisting a step happened, and bad at judging whether it happened well.
       </p>
 
@@ -1162,10 +1161,10 @@ if __name__ == "__main__":
         <span class="label">What this gate cannot do</span>
         <p>
           It checks that four fields exist and are not placeholders. It has no opinion about whether
-          the sentences are true. A confident, articulate, entirely wrong block passes cleanly, and
-          any honest description of this standard has to say so. The gate buys one thing: nobody
-          merges without <em>making</em> the claim, and a claim on the record is something a reviewer
-          can dispute. Disputing it is human work.
+          they are true, so a confident, articulate, entirely wrong block passes cleanly, and any
+          honest description of this standard has to say so. The gate buys one thing: nobody
+          merges without <em>making</em> the claim, and a claim on the record invites dispute.
+          Disputing it is human work.
           <a href="/reverse-review/">Reverse-review</a> is how a team gets good at that work.
         </p>
       </div>
@@ -1185,7 +1184,7 @@ if __name__ == "__main__":
       <div>
         <h2>Scope, non-goals, and known weaknesses</h2>
         <p class="thesis">
-          What this standard refuses to be, and where it is most likely to fail you. Both stated
+          What this standard refuses to be, and where it is most likely to fail you, both stated
           before you adopt it rather than after.
         </p>
       </div>
@@ -1195,15 +1194,15 @@ if __name__ == "__main__":
       <h3 class="sub">Non-goals</h3>
       <ul>
         <li><strong>Not a certification.</strong> No badge, no exam, no auditor, no registry. If someone sells you compliance with this, they made that up.</li>
-        <li><strong>Not a performance metric.</strong> Block fill rate never belongs in a review packet. Score it and you will get four true sentences guarding a change nobody read.</li>
+        <li><strong>Not a performance metric.</strong> Block fill rate never belongs in a review packet: score it and you will get four true sentences guarding a change nobody read.</li>
         <li><strong>Not a replacement</strong> for tests, types, static analysis, or review. It sits on top of those and assumes they exist.</li>
         <li><strong>Not a maturity model.</strong> There are no organizational tiers to ascend. A team either does the five things in section 5 or does not.</li>
-        <li><strong>Not anti-agent.</strong> Use the agent for everything, including as a tutor on the code it just wrote. The standard governs what you merge, not what you generate.</li>
+        <li><strong>Not anti-agent.</strong> Use the agent for everything, including as a tutor on the code it just wrote, because the standard governs what you merge, not what you generate.</li>
       </ul>
 
       <h3 class="sub">Where it is weakest</h3>
       <ul>
-        <li><strong><code>falsifier</code> is the field people fake first.</strong> The tell is a falsifier that restates the happy path inverted ("it would be wrong if it returned the wrong value"). A real falsifier, by contrast, names a specific input and a specific wrong outcome.</li>
+        <li><strong><code>falsifier</code> is the field people fake first.</strong> The tell is a falsifier restating the happy path inverted ("it would be wrong if it returned the wrong value"). A real falsifier, by contrast, names a specific input and a specific wrong outcome.</li>
         <li><strong>The standard is uncomfortable on very large diffs.</strong> One sentence for a 900-line change is either a lie or an argument for splitting the change. Usually the second.</li>
         <li><strong>It does nothing for code already merged.</strong> This is a bar on new changes. Comprehension debt already in the tree needs a different instrument.</li>
         <li><strong>v0.1 is small-team evidence.</strong> It has been used on small teams. There is no data on how it behaves across a large organization, and claiming otherwise would be exactly the kind of plausible, unfalsifiable statement this document exists to catch.</li>
@@ -1212,8 +1211,8 @@ if __name__ == "__main__":
       <div class="takeaway">
         <span class="label">The one thing it does grade</span>
         <p>
-          Diffs and reviews. Never people. If your adoption of this standard ends with a dashboard
-          ranking engineers, you have built something else and should stop calling it this.
+          Diffs and reviews. Never people. If your adoption ends with a dashboard ranking
+          engineers, you have built something else and should stop calling it this.
         </p>
       </div>
     </div>
@@ -1241,7 +1240,7 @@ if __name__ == "__main__":
       <h3 class="sub">Forking</h3>
       <ul>
         <li><strong>Keep the law.</strong> Everything else is implementation. A fork that drops the law is a different document and should have a different name.</li>
-        <li><strong>Change the fields to fit your domain.</strong> A team shipping infrastructure might swap <code>seam</code> for <code>blast-radius</code>. A team on regulated data might add <code>data-class</code>. Four to five fields is the working range; past that, people stop reading them.</li>
+        <li><strong>Change the fields to fit your domain.</strong> A team shipping infrastructure might swap <code>seam</code> for <code>blast-radius</code>. A team on regulated data might add <code>data-class</code>. Four to five fields is the working range, and past that people stop reading them.</li>
         <li><strong>Set your own L3 list.</strong> The one in section 4 is a starting point, not a claim about your business.</li>
         <li><strong>Version your fork and date it.</strong> A standard nobody can cite by version cannot be argued with, and being arguable is most of the value.</li>
       </ul>
@@ -1250,7 +1249,7 @@ if __name__ == "__main__":
       <ul>
         <li>Field names that survived contact with teams that did not write them.</li>
         <li>An exemption list that stopped needing constant patching, which is the signal it finally describes reality.</li>
-        <li>Actual evidence about faking: how often blocks are filled fluently and wrongly, and whether reviewers catch it. That number decides whether this standard does anything at all.</li>
+        <li>Actual evidence about faking: how often blocks are filled fluently and wrongly, and whether reviewers catch it, because that number decides whether this standard does anything at all.</li>
       </ul>
 
       <div class="takeaway">

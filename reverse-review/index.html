@@ -662,7 +662,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>The junior reviews the agent. The senior reviews <em>the review</em>.</h1>
     <p class="standfirst">
-      Code review was built for a world where a human wrote the code and the scarce thing was
+      Code review assumed a world where a human wrote the code and the scarce thing was
       correctness. The agent writes the code now, and the scarce thing is judgment. So point the
       review the other way: the junior reviews the agent's diff, then defends that review, and the
       senior grades the review rather than the code. It costs a senior fifteen minutes instead of an
@@ -766,9 +766,9 @@ flowchart LR
       <p>
         The agent already writes acceptable code most of the time, so a senior line-editing that code
         is spending scarce attention on the abundant thing. What is scarce is somebody who can look
-        at a fluent, passing, confident change and say "wait." That is not knowledge you can be
-        handed. It is trained by being wrong, repeatedly, in front of someone who can tell you why.
-        Reverse-review is a container for exactly that, with a fixed cost.
+        at a fluent, passing, confident change and say "wait." That is not knowledge anybody can
+        hand you. Instead, you train it by being wrong, repeatedly, in front of someone who can tell
+        you why. Reverse-review is a container for that, with a fixed cost.
       </p>
 
       <p>
@@ -826,7 +826,7 @@ flowchart LR
         </li>
         <li data-signal="warn">
           <span class="when">0:05 → 0:20</span>
-          <span class="what"><strong>Review.</strong> Fill the card (section 2). Write the prediction line <em>before</em> running anything. Then run the tests, read the callers, use the agent as a reference if you want. Fifteen minutes, then pens down whether or not you are finished.</span>
+          <span class="what"><strong>Review.</strong> Fill the card (section 2). Write the prediction line <em>before</em> running anything. Then run the tests, read the callers, use the agent as a reference if you want. Fifteen minutes, then pens down whether or not you finished.</span>
         </li>
         <li data-signal="block">
           <span class="when">0:20 → 0:30</span>
@@ -837,9 +837,9 @@ flowchart LR
       <div class="callout">
         <span class="label">Pens down means pens down</span>
         <p>
-          A review that ran out of clock is a legitimate outcome, and worth saying out loud: "I did
-          not get to the migration, so I am not confident about the data path." That sentence is a
-          senior-shaped sentence. Knowing the edge of what you checked is a large part of the skill,
+          A review that ran out of clock is a legitimate outcome, worth saying out loud. "I did
+          not get to the migration, so I am not confident about the data path" is a senior-shaped
+          sentence. Knowing the edge of what you checked is a large part of the skill,
           and an exercise with an unlimited clock never teaches it.
         </p>
       </div>
@@ -890,7 +890,7 @@ flowchart LR
       <ol class="sequence">
         <li data-signal="warn">
           <span class="when">prediction</span>
-          <span class="what">Written first, before the tests run, before the agent is consulted. Being wrong on paper is free, and it is how you find out whether your instincts are calibrated. A reviewer who never predicts never learns that they are consistently wrong about the same class of thing.</span>
+          <span class="what">Written first, before the tests run, before you consult the agent. Being wrong on paper is free, and it is how you find out whether your instincts are calibrated. A reviewer who never predicts never learns that they are consistently wrong about the same class of thing.</span>
         </li>
         <li data-signal="none">
           <span class="when">verdict</span>
@@ -902,11 +902,11 @@ flowchart LR
         </li>
         <li data-signal="pass">
           <span class="when">proof</span>
-          <span class="what">A test that goes red, or a concrete input and the wrong output it produces. Anything less is written down honestly as <em>unproved suspicion</em>, which is a perfectly respectable thing to hand a senior. It is not a catch.</span>
+          <span class="what">A test that goes red, or a concrete input and the wrong output it produces. Anything less goes down honestly as <em>unproved suspicion</em>, which is a respectable thing to hand a senior. It is not a catch.</span>
         </li>
         <li data-signal="none">
           <span class="when">durable fix</span>
-          <span class="what">Which surface stops this from recurring: fix the code, write the rule the agent reads, add the hook that refuses it, or deliberately do nothing because the defect is not worth the constraint. Saying "nothing, because" is a real answer and often the right one.</span>
+          <span class="what">Which surface stops this from recurring: fix the code, write the rule the agent reads, or add the hook that refuses it. Or deliberately do nothing, because the defect is not worth the constraint. Saying "nothing, because" is a real answer and often the right one.</span>
         </li>
       </ol>
     </div>
@@ -982,15 +982,15 @@ flowchart LR
         <span class="label">Why the suite does not save you</span>
         <p>
           Every one of these seven can pass a full test run. Some pass because the case was never
-          tested (1, 2, 6), some because the failure was caught and hidden (4), one because the test
-          is a decoration (3), and two because the code is doing exactly what the codebase told it to
-          (5, 7). Green means the tests that exist passed. It has never meant the code is correct,
-          and the agent has made the gap between those two statements much wider.
+          tested (1, 2, 6), and some because the code caught the failure and hid it (4). One passes
+          because the test is a decoration (3), and two because the code is doing exactly what the
+          codebase told it to (5, 7). Green means the tests that exist passed. It has never meant the
+          code is correct, and the agent has made the gap between those two statements much wider.
         </p>
       </div>
 
       <p>
-        Seven is not a complete list and should not be treated as one. It is a starting vocabulary.
+        Seven is not a complete list, so do not treat it as one. It is a starting vocabulary.
         When your team catches something that does not fit, name it, write the row, and add it to
         your fork. A team with its own eighth and ninth class is a team that has been paying
         attention.
@@ -1059,11 +1059,11 @@ flowchart LR
       <div class="callout">
         <span class="label">Deal clean diffs, and do not announce it</span>
         <p>
-          If every diff in the exercise contains a planted defect, you are not training reviewers,
-          you are training a false-positive machine that will find a bug in anything because it has
+          If every diff in the exercise contains a planted defect, you are not training reviewers.
+          You are training a false-positive machine that finds a bug in anything, because it has
           learned that finding one is how you pass. Roughly one in four should be genuinely clean.
-          Correctly accepting a clean diff, with reasons, is a full four points and should be praised
-          exactly as loudly as a catch.
+          Correctly accepting a clean diff, with reasons, is a full four points, so praise it as
+          loudly as a catch.
         </p>
       </div>
     </div>
@@ -1092,11 +1092,11 @@ flowchart LR
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Don't</span>
-          <span class="what"><strong>Give the answer first.</strong> Ask instead: "what would have to be true for this to be wrong?" It is the question that generates the skill, and handing over the answer spends the whole exercise to save four minutes.</span>
+          <span class="what"><strong>Give the answer first.</strong> Ask instead: "what would have to be true for this to be wrong?" That question generates the skill. Handing over the answer spends the whole exercise to save four minutes.</span>
         </li>
         <li data-signal="block">
           <span class="when">Don't</span>
-          <span class="what"><strong>React to the diff in front of them.</strong> The moment you frown at line 40, the search is over. Keep your face out of it until the verdict is committed.</span>
+          <span class="what"><strong>React to the diff in front of them.</strong> The moment you frown at line 40, the search is over. Keep your face out of it until the junior commits the verdict.</span>
         </li>
         <li data-signal="block">
           <span class="when">Don't</span>
@@ -1104,11 +1104,11 @@ flowchart LR
         </li>
         <li data-signal="pass">
           <span class="when">Do</span>
-          <span class="what"><strong>Say what you distrusted, and why, after the verdict.</strong> Seniors flinch at certain diffs before they can articulate the reason. Articulating it afterward is the single most valuable thing you have to give, and it is exactly what never comes up in normal review.</span>
+          <span class="what"><strong>Say what you distrusted, and why, after the verdict.</strong> Seniors flinch at certain diffs before they can articulate the reason. Articulating it afterward is the single most valuable thing you have to give, and it is what never comes up in normal review.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Do</span>
-          <span class="what"><strong>Treat a <code>CHARTER-GAP</code> as your bug.</strong> If "why is it written this way" is not answered anywhere in the repo, the team owes them that answer, and it should be written down that day. This is the exercise paying rent back to the codebase.</span>
+          <span class="what"><strong>Treat a <code>CHARTER-GAP</code> as your bug.</strong> If "why is it written this way" is not answered anywhere in the repo, the team owes them that answer, so write it down that day. This is the exercise paying rent back to the codebase.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Do</span>
@@ -1171,7 +1171,7 @@ flowchart LR
         Which is worth saying plainly, because it is the honest limit of this page: reverse-review
         makes a senior's time go about four times further. It does not create one out of nothing. If
         your team has nobody who can say what the business rule actually is, that is a much larger
-        problem than your review process, and it will not be solved by an exercise.
+        problem than your review process. An exercise will not solve it.
       </p>
     </div>
   </section>
@@ -1218,9 +1218,9 @@ flowchart LR
       </ol>
 
       <p>
-        Those timelines are what this has looked like in practice on small teams, not a measured
-        curve, and someone doing one card a week in a codebase they know well will move faster than
-        the numbers suggest. Treat them as a shape, not a schedule.
+        Those timelines are what this has looked like in practice on small teams. They are not a
+        measured curve, and someone doing one card a week in a codebase they know well will move
+        faster than the numbers suggest. Treat them as a shape, not a schedule.
       </p>
 
       <div class="takeaway">
@@ -1289,7 +1289,7 @@ git apply -R ../../fulcorum-reverse-review/diffs/03-test-that-cannot-fail.diff</
       <div class="takeaway">
         <span class="label">Better than the seed: your own repo</span>
         <p>
-          Seeded diffs teach the taxonomy. Your own codebase teaches the thing that actually matters,
+          Seeded diffs teach the taxonomy. Your own codebase teaches the thing that matters,
           because class 1 and class 7 only exist relative to a real policy and a real prevailing
           pattern. Once the vocabulary is in place, switch to reviewing actual agent output from last
           week's work and never go back.

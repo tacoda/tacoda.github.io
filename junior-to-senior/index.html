@@ -663,9 +663,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>How to grow from junior to senior in the <em>age of AI</em></h1>
     <p class="standfirst">
       The agent changes what it means to be junior more than what it means to be senior. A senior
-      already has the judgment the tool can't supply. A junior is building that judgment at the
-      exact moment the tool offers to skip it: it hands you working code faster than you can
-      understand it, and the whole pull is to accept the diff and move on. This workshop is the
+      already has the judgment the tool can't supply, and a junior is building that judgment at the
+      exact moment the tool offers to skip it. The tool hands you working code faster than you can
+      understand it, so the whole pull is to accept the diff and move on. This workshop is the
       structured refusal to skip.
     </p>
     <p class="byline">
@@ -734,8 +734,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Before you start, get to green</h2>
         <p class="thesis">
-          You can read code and you've used an AI coding tool once. That's enough. Run this first
-          and confirm a green suite. Nobody debugs their environment on lab time.
+          You can read code and you've used an AI coding tool once. That's enough. But run this
+          first and confirm a green suite, because nobody debugs their environment on lab time.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>seed</b> seed/</span>
@@ -753,8 +753,8 @@ pip install pytest &amp;&amp; pytest      <span class="c-pass"># 3 passed — yo
       </figure>
 
       <p>
-        <strong>⟲ No local setup?</strong> Pair with someone who's green, or run it in any browser
-        Python sandbox. The seed is two small files.
+        <strong>⟲ No local setup?</strong> Then pair with someone who's green, or run it in any
+        browser Python sandbox. The seed is two small files.
       </p>
 
       <p>
@@ -868,7 +868,7 @@ python app.py                                <span class="c-block"># cash total 
         A nickel doesn't sound like much. It's a nickel on 40% of cash totals, every register, every
         day, taken from customers who trusted the marked price. That's the bug that becomes a refund
         program. The shipped suite only used totals that round the same way either direction, so it
-        never noticed the flip. The diff rounds to the <em>nearest</em> nickel, the textbook
+        never noticed the flip. That diff rounds to the <em>nearest</em> nickel, the textbook
         cash-rounding scheme, written with a <code>float</code>, instead of <em>down</em>, the
         charter's customer's-favor policy.
       </p>
@@ -891,7 +891,8 @@ python app.py                                <span class="c-block"># cash total 
         <h2>Run the five questions</h2>
         <p class="thesis">
           Open <code>seed/money.py</code> and read the change you just applied. With a partner if
-          you can, work down the five questions from the card, out loud. Write your answers down.
+          you can, work down the five questions from the card, out loud, and write your answers
+          down.
         </p>
       </div>
     </div>
@@ -1003,7 +1004,7 @@ python app.py                                <span class="c-block"># cash total 
         <strong>Feedforward</strong> is a <em>rule</em> in <code>CLAUDE.md</code> that shapes the
         code <em>before</em> it's written. <strong>Feedback</strong> is a <em>hook</em> in
         <code>.claude/hooks/</code> that checks the result <em>after</em> and refuses a bad one.
-        Both are already on. Open the <code>seed/</code> folder in your agent and run two quick
+        Both are already on, so open the <code>seed/</code> folder in your agent and run two quick
         prompts.
       </p>
 
@@ -1016,7 +1017,7 @@ to a nickel now that pennies are gone.</code></pre>
       <p>
         With the rounding rule in <code>CLAUDE.md</code>, it rounds <strong>down</strong>, in the
         customer's favor (<code>total_cents - total_cents % 5</code>). Without that rule a capable
-        agent rounds to the <em>nearest</em> nickel, the overcharge from step 2. The rule is the
+        agent rounds to the <em>nearest</em> nickel, the overcharge from step 2, so the rule is the
         difference.
       </p>
 
@@ -1156,16 +1157,17 @@ amount is 1080 — cash rounded against the customer.</span></code></pre>
         <h2>Think it through: the policy just changed</h2>
         <p class="thesis">
           The company changes its mind: cash should now always round <strong>up</strong>, the
-          merchant's favor, never the customer's. You want the agent to write round-<em>up</em> code
-          from now on. <strong>What has to change?</strong> Talk it out before you read the answer.
+          merchant's favor, never the customer's. So you want the agent to write round-<em>up</em>
+          code from now on. <strong>What has to change?</strong> Talk it out before you read the
+          answer.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        The tempting answer is "edit the rule." That is necessary but <em>not sufficient</em>, and
-        the gap is the whole lesson. Three things describe the rounding policy, and all three have to
+        The tempting answer, "edit the rule," is necessary but <em>not enough</em>, and the gap is
+        the whole lesson. Three things describe the rounding policy, and all three have to
         move together.
       </p>
 
@@ -1196,15 +1198,15 @@ if got != want:                <span class="c-dim"># block when the code failed 
 
       <h3 class="sub">Why you still have to change the code</h3>
       <p>
-        At the size of this seed the rule is right in front of the agent and the contradiction is
-        glaring, so a capable agent follows the rule and even flags the stale code as wrong. (We
-        tested exactly this contradiction on fresh agents, rule says up, code says down, and they
-        rounded up every time, one of them explicitly calling out the old code as non-compliant.)
-        <strong>The imitation problem is a scale effect.</strong> In a real codebase, thousands of
-        lines, the rule one entry in a long charter, round-down rounding repeated across dozens of
-        call sites, the <em>prevailing pattern in the code</em> becomes the strongest signal the
-        agent has, and it copies that pattern past a rule it barely weighs. The lab is too small to
-        reproduce this; the takeaway is what it points at.
+        At the size of this seed the rule is right in front of the agent, and the contradiction is
+        glaring. So a capable agent follows the rule and even flags the stale code as wrong. We
+        tested exactly this contradiction on fresh agents: the rule said up, the code said down.
+        They rounded up every time, and one of them explicitly called out the old code as
+        non-compliant. <strong>The imitation problem is a scale effect.</strong> In a real codebase
+        of thousands of lines, the rule is one entry in a long charter, and round-down rounding
+        repeats across dozens of call sites. There the <em>prevailing pattern in the code</em>
+        becomes the strongest signal the agent has, so it copies that pattern past a rule it barely
+        weighs. The lab is too small to reproduce this; the takeaway is what it points at.
       </p>
 
       <div class="callout">
@@ -1212,13 +1214,14 @@ if got != want:                <span class="c-dim"># block when the code failed 
         <p>
           Rounding direction is a simple, local decision the model can derive from the rule alone,
           which is exactly why the lab agents got it right. The rules imitation actually defeats are
-          the <em>design-level</em> ones, where most of a charter's rules live: "use ports and
-          adapters," "no business logic in controllers," "depend on interfaces, not concretes." There
-          is no one-line correct answer to copy; the agent infers "how we do it here" from the
-          surrounding code. If most of the codebase ignores the rule, the counterexamples <em>are</em>
-          the pattern, and the agent replicates them. The more non-compliant code, the stronger the
-          pull. The cost of a rule the code contradicts isn't a wrong penny; it's an architecture that
-          drifts further from its own charter with every change.
+          the <em>design-level</em> ones, where most of a charter's rules live. Those rules read like
+          "use ports and adapters," "no business logic in controllers," or "depend on interfaces,
+          not concretes," and there is no one-line correct answer to copy. So the agent infers "how
+          we do it here" from the surrounding code. If most of the codebase ignores the rule, the
+          counterexamples <em>are</em> the pattern, and the agent replicates them. The more
+          non-compliant code, the stronger the pull. The cost of a rule the code contradicts isn't a
+          wrong penny; it's an architecture that drifts further from its own charter with every
+          change.
         </p>
       </div>
 
@@ -1237,9 +1240,9 @@ if got != want:                <span class="c-dim"># block when the code failed 
         <span class="label">The durable fix</span>
         <p>
           The hook removes the gamble: it blocks any round-down result regardless of what the agent
-          weighed, in the lab and at scale alike. But the hook is a backstop. The durable fix is to
-          <strong>make the code correct</strong>. When nothing in the tree rounds down, there is no
-          contradictory pattern to imitate and no defect left in production. Feedforward, feedback,
+          weighed, in the lab and at scale alike. But the hook is a backstop. So the durable fix is
+          to <strong>make the code correct</strong>. Once nothing in the tree rounds down, there is
+          no contradictory pattern to imitate and no defect left in production. Feedforward, feedback,
           <em>and</em> the code itself have to agree.
         </p>
       </div>
@@ -1298,15 +1301,15 @@ flowchart LR
 
       <p>
         Each surface narrows the <strong>behavior band</strong>, the range of things the agent might
-        do. Reliability is just a tight band. Add a surface and the band gets narrower.
+        do. Reliability is just a tight band, so add a surface and the band gets narrower.
       </p>
 
       <div class="callout">
         <span class="label">The honest part</span>
         <p>
-          This lab is a toy. A two-line <code>round_cash</code> does not deserve a rule and two
-          hooks. In real life you'd read it once and move on; you would never gate something this
-          small. Every rule and hook costs effort to write and, worse, to keep true as the code
+          This lab is a toy: a two-line <code>round_cash</code> does not deserve a rule and two
+          hooks. In real life you'd read it once and move on, and you would never gate something
+          this small. Every rule and hook costs effort to write and, worse, to keep true as the code
           changes. So the goal is never <em>the most</em> constraints. It's <strong>the fewest
           constraints that buy a tight-enough band</strong>: you add one only when something real
           needs it. Money, security, data integrity, a policy with legal or financial weight.
@@ -1314,9 +1317,9 @@ flowchart LR
       </div>
 
       <p>
-        Where does that pay for itself? Not here, in a production app. Many files, many tests, many
+        Where does that pay for itself? Not here. In a production app: many files, many tests, many
         policies and requirements, many contributors, an agent making changes all day. There the code
-        surface is huge, no human reads every diff, and comprehension alone can't scale. A few
+        surface is huge, no human reads every diff, and comprehension alone can't scale. So a few
         well-placed rules and hooks on the things that actually carry risk keep the band tight when
         nothing else can. That is when the two mechanisms you practiced today earn their cost, and
         knowing <em>when not</em> to reach for them is as much the senior's job as knowing how.
@@ -1327,26 +1330,26 @@ flowchart LR
         <li>The comprehension card: the daily rule, the five questions, the five moves.</li>
         <li>A filled card applied to a real agent diff.</li>
         <li>A test you wrote that catches the planted overcharge.</li>
-        <li>A working mental model: three surfaces bound an agent, the rule you write (instruction), the code it imitates, and the hook that checks it (feedback), and reliability is just a tight behavior band.</li>
+        <li>A working mental model: three surfaces bound an agent, the rule you write (instruction), the code it imitates, and the hook that checks it (feedback). Reliability is just a tight behavior band.</li>
       </ul>
 
       <p>
         But the card is only the method. What carries it into Monday is a handful of shifts in how
-        you <em>think</em>, and not one of them is about typing faster. The agent already types
-        faster than you. Your edge is everything it can't do: knowing what "correct" means here, and
+        you <em>think</em>, and not one of them is about typing faster. After all, the agent already
+        types faster than you. Your edge is everything it can't do: knowing what "correct" means here, and
         noticing when the fluent answer isn't it.
       </p>
 
       <p>
-        Start from what the job actually is. Writing code was never the point, it was always the
+        Start from what the job actually is. Writing code was never the point, but always the
         means. The job is solving a business problem: someone needs a bill settled correctly, a
         customer not overcharged, a policy honored. Code is how we've done that, but the "round down,
         customer's favor" policy is the <em>why</em> the code exists at all. The agent commoditizes
         the means, it produces the code faster than you can, which doesn't shrink your job, it
         <em>reveals</em> it. What's left when the typing is free is the part that was always the real
-        work: understanding the problem well enough to know what correct even means. Seniority was
-        always that understanding, not the typing speed. The agent just made it impossible to hide
-        behind the keyboard.
+        work: understanding the problem well enough to know what correct even means. That
+        understanding was always what seniority meant, not the typing speed. The agent just made it
+        impossible to hide behind the keyboard.
       </p>
 
       <ol class="sequence">
@@ -1364,7 +1367,7 @@ flowchart LR
         </li>
         <li data-signal="none">
           <span class="when">The shift</span>
-          <span class="what"><strong>The agent is a tutor, not an oracle.</strong> Use it to <em>explain</em>, never to <em>skip</em>. Form your own answer before you accept its. Pasting a diff you couldn't defend hands it the judgment that was supposed to be yours.</span>
+          <span class="what"><strong>The agent is a tutor, not an oracle.</strong> Use it to <em>explain</em>, never to <em>skip</em>. So form your own answer before you accept its. Pasting a diff you couldn't defend hands it the judgment that was supposed to be yours.</span>
         </li>
         <li data-signal="block">
           <span class="when">The shift</span>
@@ -1385,14 +1388,14 @@ flowchart LR
       <p>
         And the highest-leverage hour you have: <strong>pair with a senior, and mine the
         <em>why</em>, not the answer.</strong> The <em>what</em> is on the screen; the <em>why</em>
-        is in their head. Bring a filled card and ask about the question you stalled on, not a blank
-        "explain this." Watch what they distrust: seniors flinch at certain diffs before they can say
+        is in their head. So bring a filled card and ask about the question you stalled on, rather
+        than a blank "explain this" prompt. Watch what they distrust: seniors flinch at certain diffs before they can say
         why, and that trained suspicion is exactly what you're building. Study their rejections; a
         diff sent back is a free worked example of the plausible-but-wrong. Then reverse the chair
         and explain <em>your</em> change to them. Where you start hand-waving is where your
         understanding runs out, and now someone's there to catch it before production does. You bring
-        comprehension; the team keeps the charter and harness good enough to guard you. Pairing is
-        where both halves meet.
+        comprehension; the team keeps the charter and harness good enough to guard you, and pairing
+        is where both halves meet.
       </p>
     </div>
   </section>
@@ -1421,9 +1424,9 @@ flowchart LR
       <p>
         <strong>Why an open-source project.</strong> A toy seed can't teach you scale, history, or
         the weight of code other people depend on. A real project can: it's readable at your own
-        pace, its commit history records why every line is the way it is, and its test suite shows
-        what "proven correct" actually looks like. The five questions and five moves are the same;
-        only the code got real.
+        pace, and its commit history records why every line is the way it is. Its test suite also
+        shows what "proven correct" actually looks like. The five questions and five moves are the
+        same; only the code got real.
       </p>
 
       <h3 class="sub">Why SQLite is the one to start on</h3>
@@ -1454,7 +1457,7 @@ flowchart LR
         </li>
         <li data-signal="block">
           <span class="when">Rep 4</span>
-          <span class="what"><strong>Catch the agent wrong (move 5).</strong> Ask your agent to "simplify" or "optimize" one small function. Run the five questions on its diff. Prove it correct, or prove it wrong with a test.</span>
+          <span class="what"><strong>Catch the agent wrong (move 5).</strong> Ask your agent to "simplify" or "optimize" one small function. Then run the five questions on its diff. Prove it correct, or prove it wrong with a test.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Rep 5</span>
@@ -1466,7 +1469,7 @@ flowchart LR
         <span class="label">The habit</span>
         <p>
           Repeat rep 4 weekly on any codebase you touch. The habit is the deliverable, not any one
-          catch. <a href="/reverse-review/">Reverse-review</a> is that rep written up as a
+          catch. And <a href="/reverse-review/">Reverse-review</a> is that rep written up as a
           repeatable 30-minute exercise, with a defect taxonomy and a rubric for scoring it.
         </p>
       </div>
