@@ -1,0 +1,1790 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+  <meta name="voice-register" content="argument">
+  <meta name="voice-english" content="ste">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Constraint Engineering · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="The domain design of a charter, a harness and a factory that travel between repositories. One constraint carries three independent attributes: whose rule it is, what mechanism carries it, and what happens when it fires. Plus the evidence that moves it, and why development and platform are one role. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/constraint-engineering/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Constraint Engineering">
+<meta property="og:description" content="Layer says whose rule it is. Rung says what carries it. Policy says what happens. Model those as one thing and your harness stops travelling.">
+<meta property="og:url" content="https://www.tacoda.dev/constraint-engineering/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Constraint Engineering">
+<meta name="twitter:description" content="The domain design of a charter, harness and factory that travel. Three axes, one band, and the evidence that moves a rule.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #7A7066;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #8D8276;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #8D8276;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #7A7066;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- diagrams ---------- */
+/* Mermaid source lives in the page and renders in the browser. The figure
+   body is transparent so the paper shows through the diagram; until the
+   script runs, the source is visible as text. */
+.code.diagram { background: none; }
+.code.diagram .mermaid {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink-3);
+  text-align: center;
+}
+.code.diagram .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Constraint Engineering</span>
+      <span class="sep">/</span>
+      <span>design</span>
+    </div>
+    <h1>Where each constraint goes, and <em>when to move it</em>.</h1>
+    <p class="standfirst">
+      A charter, a harness and a factory are three places to put a rule, a tool, a hook, an agent or a
+      memory. Most teams choose by how badly they want the thing kept, which is the wrong axis and is
+      why harnesses do not travel. Three questions decide the design instead: where does each thing go
+      and why, what makes it good once it is there, and what evidence moves it. Only some things move.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      the argument · domain design, not infrastructure. No queues, no wiring, no framework<br>
+      the primitives · rule · hook · gate · tool · skill · sub-agent · budget · eval · memory · context · contract<br>
+      the implementation · wipp, a factory of mine. Private, so this page carries the design rather than a clone URL<br>
+      what it runs against · three repositories, one of them itself, on a stock agent SDK<br>
+      what is honest · the band has no published number, including from me. Section 0 says why that is still worth naming<br>
+      reads alongside · <a href="/layers-and-promotion/">Layers and Promotion</a> (the measured version) · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> · <a href="/guardrails/">Five Guardrails</a> · <a href="/factory/">The Factory</a><br>
+      license · CC BY 4.0. Take the model, not the vocabulary
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Layer</dt>
+          <dd>Whose constraint it is, and therefore who may change it. Org, then team, then project, strongest first.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Rung</dt>
+          <dd>Which mechanism carries it. Prose, tool grant, hook, in-harness check, stage gate, CI.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Policy</dt>
+          <dd>What happens when it fires. Refuse, ask a human, or record and allow.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> The band</a></li>
+      <li><a href="#s-1"><span class="n">1</span> Three axes</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Three contexts</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Four lifecycles</a></li>
+      <li><a href="#s-4"><span class="n">4</span> The chain</a></li>
+      <li><a href="#s-5"><span class="n">5</span> One identity</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Honest by default</a></li>
+      <li><a href="#s-7"><span class="n">7</span> The human path</a></li>
+      <li><a href="#s-8"><span class="n">8</span> Promotion</a></li>
+      <li><a href="#s-9"><span class="n">9</span> Demotion</a></li>
+      <li><a href="#s-10"><span class="n">10</span> Two roles</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The band">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The band</span>
+      </div>
+      <div>
+        <h2>The organisation is setting a risk appetite, and calling it a style guide</h2>
+        <p class="thesis">
+          Businesses already know how to do this. They write a risk appetite, define tolerances,
+          build controls, and keep a register of the exceptions. Agent output needs the same
+          apparatus, because the question is never "is this code correct". It is "how much
+          unreviewed variance will we accept, and where do we spend to narrow it".
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>org</b> sets the band</span>
+          <span class="chip kind-rule"><b>team</b> holds it</span>
+          <span class="chip kind-hook"><b>project</b> works inside it</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Call it a <strong>reliability band</strong>: the range of agent output an organisation will
+        accept without a human reading every line. A wide band is cheap to run and expensive to
+        trust. A narrow one costs a gate at every seam, and the gates are the budget. Nobody argues
+        about the band directly, so the merge queue settles it one pull request at a time.
+      </p>
+      <p>
+        Constraint engineering is my name for the work of holding that band. Making a model correct
+        is not the goal, because nobody is offering that. The goal is to constrain the model at
+        several layers, with a different strategy at each. You stop tightening when the output lands
+        inside the band often enough to be worth the tokens.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">What I cannot give you, and will not invent</span>
+        <p>
+          I have no number for the band. Neither does anyone I have read. What follows is the
+          apparatus for holding one once you pick it. Where a constraint goes, what makes it good
+          there, and what evidence moves it. Treat the sections on evidence as the part that lets you
+          set a number later, from your own runs rather than from mine.
+        </p>
+      </div>
+
+      <p>
+        Push the business analogy one step further, because it predicts the failure. A risk framework
+        dies two ways. People who cannot see the work own the controls, or people who can see it
+        handle the exceptions quietly. Both have exact analogues in a harness, and section 10 covers
+        the role that prevents them.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Three axes">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Three axes</span>
+      </div>
+      <div>
+        <h2>One constraint carries three independent attributes</h2>
+        <p class="thesis">
+          Whose rule it is, what mechanism carries it, and what happens when it fires. Those are three
+          questions with three different answers and three different owners. Model them as one number
+          and the harness stops travelling.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>layer</b> org · team · project</span>
+          <span class="chip kind-gate"><b>rung</b> 0 to 5</span>
+          <span class="chip kind-make"><b>policy</b> refuse · ask · warn</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>one rule file, three orthogonal answers</span><span class="tag warn">the rung is not the authority</span></figcaption>
+<pre><code><span class="c-dim">---</span>
+description: A broad except says what it is swallowing and why
+why: A gate that fails silently on its own bug stops the factory invisibly.
+paths: [<span class="c-warn">"workers/**"</span>]
+<span class="c-block">layer: team</span>        <span class="c-dim"># whose rule. Ships with the harness, not the repo</span>
+<span class="c-warn">rung: [3, 4]</span>      <span class="c-dim"># what carries it. Two boundaries, not two strictnesses</span>
+<span class="c-pass">policy: refuse</span>    <span class="c-dim"># what happens. refuse | ask | warn</span>
+locked: false      <span class="c-dim"># may a project override it, or only deviate visibly</span>
+predicate: predicates/name_the_swallow.py
+escape: swallow-ok
+<span class="c-dim">---</span></code></pre>
+      </figure>
+
+      <p>
+        The three axes answer different questions, and confusing any two causes a specific failure.
+        Layer says who ships the rule and who may change it. Rung says which mechanism refuses.
+        Policy says whether a firing stops the work, parks it for a human, or only leaves a record.
+      </p>
+      <p>
+        I shipped the layer field and then read it nowhere for months. For that whole time a company
+        standard and one repository's local opinion were the same kind of object. So the harness was
+        something you copied rather than something you shared, which is a modelling bug rather than a
+        coding one.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>what each confusion costs</span><span class="tag block">all three are modelling errors</span></figcaption>
+<pre><code><span class="c-dim">CONFUSION                        WHAT BREAKS</span>
+layer collapsed into rung        strong rules live high, so authority
+                                 becomes "how much I care"; nothing
+                                 <span class="c-block">travels between repositories</span>
+policy collapsed into rung       "warn" gets modelled as a lower rung,
+                                 so a rule you wanted <span class="c-block">measured</span> is
+                                 instead <span class="c-block">unenforced</span>
+rung collapsed into layer        the org owns every mechanism, so a
+                                 project cannot carry its own rule
+                                 anywhere and <span class="c-block">routes around all of it</span></code></pre>
+      </figure>
+
+      <p>
+        Policy deserves one note, because people leave that axis out. A rule set to <code>ask</code>
+        parks the call and puts a human in the loop. It is honest only at a rung that can hold a call
+        rather than veto it. If your mechanism can only say no, <code>ask</code> becomes a rule that
+        refuses in silence, which is worse than either option.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The design test</span>
+        <p>
+          Take any rule you enforce today and write down its three answers separately. If you cannot
+          name a layer without naming a rung, you have one axis where you need three. Your harness is
+          then a thing you copy into repositories rather than a thing that governs them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Three contexts">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Three contexts</span>
+      </div>
+      <div>
+        <h2>Charter, harness and factory are three domains, named by what they are for</h2>
+        <p class="thesis">
+          Charter is the project: what this repository is about. Harness is development: how a turn
+          happens. Factory is delivery: how work ships. Each owns different components, and the
+          dependency between them points one way only.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>charter</b> project</span>
+          <span class="chip kind-agent"><b>harness</b> development</span>
+          <span class="chip kind-gate"><b>factory</b> delivery</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code diagram">
+        <figcaption><span>three domains, one direction</span><span class="tag pass">the harness must run without the factory</span></figcaption>
+<pre class="mermaid">
+flowchart TD
+  F["factory · delivery · stage · gate · guard · ordering · record"]
+  H["harness · development · prompt · tool · policy · budget · context · phase"]
+  C["charter · project · rule · hook · skill · command · agent · predicate"]
+  F -- "hands in its own delivery rules" --> H
+  H -- "reads what the repository declares" --> C
+  C -- "cannot reach upward" --> X["a charter that configured the harness would be a repo governing the fleet"]
+  class F block
+  class H warn
+  class C pass
+  class X dim
+</pre>
+      </figure>
+
+      <p>
+        The direction matters more than the contents. The factory knows about the harness, and the
+        harness must not know about the factory. Point that arrow both ways and the harness stops
+        running on its own. A developer can then no longer ask the only question they have: what do
+        my charter and my rules do to a turn?
+      </p>
+      <p>
+        That question makes a harness a product rather than a subsystem. Someone working in a
+        repository wants to run one turn, see which rules fired, and see what it cost. They do not
+        want a queue, a worktree or a pull request. If your design cannot serve that, developers build
+        their own, and you get two harnesses that disagree.
+      </p>
+
+      <h3 class="sub">What each domain owns</h3>
+      <figure class="code">
+        <figcaption><span>components by domain</span><span class="tag warn">a component in the wrong domain is the common defect</span></figcaption>
+<pre><code><span class="c-dim">DOMAIN     ABOUT           COMPONENTS                       CHANGES</span>
+charter    this project    rule · hook · skill · command    <span class="c-block">constantly</span>
+                           agent · predicate · convention
+harness    how work is     prompt · tool · policy           <span class="c-warn">rarely</span>
+           done            budget · context · phase
+factory    how work        stage · gate · guard             <span class="c-pass">very rarely</span>
+           is delivered    ordering · record
+
+eval       anywhere        a measurement, for what no rule can decide</code></pre>
+      </figure>
+
+      <p>
+        Those change frequencies are a diagnostic, not a schedule. Proposals should thin out with
+        distance from the project's own code. Most of what goes wrong is something the repository
+        wanted and never said. So a cycle producing three factory changes and no charter ones tells
+        you the distribution is wrong, not that the factory needs work.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The org has opinions at two of these, and the split is not about ownership</span>
+        <p>
+          A company standard about how code gets written belongs in the harness, because it must reach
+          every turn including a developer's local one. A company standard about how code ships
+          belongs in the factory, at the delivery rungs. Both are org-layer rules. They live in
+          different domains because they govern different things, not because different people own
+          them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Four lifecycles">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Four lifecycles</span>
+      </div>
+      <div>
+        <h2>Four families of component, and only the first escalates</h2>
+        <p class="thesis">
+          Promotion is a property of constraints. A skill has no stricter version of itself to become,
+          and a budget does not climb. Give every component the same lifecycle and you will spend
+          months trying to promote things that have nowhere to go.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>constraint</b> escalates</span>
+          <span class="chip kind-skill"><b>capability</b> granted or withheld</span>
+          <span class="chip kind-config"><b>setting</b> tuned</span>
+          <span class="chip kind-make"><b>evidence</b> calibrated</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>every primitive, by family</span><span class="tag block">only the first family has a ladder</span></figcaption>
+<pre><code><span class="c-dim">FAMILY       PRIMITIVES               LIFECYCLE              MOVES HOW?</span>
+<span class="c-block">constraint</span>   rule · hook · gate       add improve remove     <span class="c-block">up and down a rung</span>
+             guard · predicate        migrate promote demote
+             convention
+
+<span class="c-warn">capability</span>   tool · skill · command   add improve remove     <span class="c-warn">granted or withheld</span>
+             sub-agent · phase        migrate                <span class="c-warn">no rung to climb</span>
+
+<span class="c-pass">setting</span>      budget · model · policy  add improve remove     <span class="c-pass">a value changes</span>
+             ordering · turn cap      migrate                <span class="c-pass">never a rung</span>
+             thinking level
+
+<span class="c-dim">evidence</span>     eval · record · log      add improve remove     <span class="c-dim">recalibrated</span>
+             count · verdict          migrate                <span class="c-dim">measures, never refuses</span>
+
+<span class="c-warn">state</span>        memory · context         add improve remove     <span class="c-warn">derived, or scoped</span>
+             transcript · spec        migrate                <span class="c-warn">to a layer and a life</span></code></pre>
+      </figure>
+
+      <p>
+        Two of those families cause most of the confusion. A <strong>capability</strong> and a
+        <strong>constraint</strong> look alike in a config file, because both are entries in a list.
+        They differ in what happens when you remove the entry. Remove a capability and the agent can
+        do less. Remove a constraint and the agent can do more.
+      </p>
+
+      <h3 class="sub">State, which is the family people model last</h3>
+      <p>
+        Memory is the primitive teams reach for first and design last. A fact the system remembers
+        becomes a constraint nobody wrote down. It shapes every later turn, and it has no layer, no
+        owner, no review and no expiry. The default worth holding is <em>derive, don't remember</em>:
+        rebuild what you need from the work record and the repository.
+      </p>
+      <p>
+        When you do need memory, give it what every other primitive has. A layer, so someone owns it.
+        A scope, so it cannot govern work it never saw. An expiry or a re-derivation, so it cannot
+        outlive the thing it described. Memory without those three is drift with a good reputation.
+      </p>
+      <p>
+        Context is the other half of this family, and the trade is direct. Everything you keep in the
+        window is paid for on every turn, and it crowds out the rules that matter. Section 9 counts
+        that cost as one of the four kinds of rot.
+      </p>
+
+      <p>
+        A capability says what an agent <em>can</em> do. It has no "further out of reach" to move to,
+        so promotion means nothing there. Read that as a claim about lifecycle rather than about
+        importance. A skill nobody wrote down is as real a finding as a rule nobody enforced, and both
+        deserve a proposal.
+      </p>
+      <p>
+        Capabilities do cross into the constraint family once, at the cheapest enforcement anywhere.
+        Withhold the tool, and nothing can express the violation. Hand a reviewing phase no editor and
+        it cannot repair what it finds, so there is nothing to refuse and nothing to argue past.
+        Section 8 comes back to that crossing.
+      </p>
+
+      <h3 class="sub">The escalation chain, and what is not on it</h3>
+      <p>
+        Inside the constraint family, escalation is a short chain: prose, then the repository's own
+        hook, then a check inside the harness. Each step puts the rule further out of reach of the
+        thing it constrains. Prose can be reinterpreted, a hook can be deleted by the agent it
+        governs, and a harness check can be neither.
+      </p>
+
+      <figure class="code diagram">
+        <figcaption><span>the chain, and the rungs beside it</span><span class="tag warn">three rungs are carried, not climbed</span></figcaption>
+<pre class="mermaid">
+flowchart LR
+  R0["0 · prose · stated, nothing enforces it"] -- "promote" --> R2["2 · hook · the repo's own, and the agent can delete it"]
+  R2 -- "promote" --> R3["3 · in-harness · the agent cannot reach what refuses"]
+  R3 -- "demote" --> R0
+  G1["1 · tool grant · the capability is absent"]
+  G4["4 · stage gate · the finished diff, and what gets published"]
+  G5["5 · CI · outside the agent and the factory both"]
+  class R0 dim
+  class R2 warn
+  class R3 pass
+  class G1 pass
+  class G4 warn
+  class G5 block
+</pre>
+      </figure>
+
+      <p>
+        Rungs 1, 4 and 5 are real and carried, but they are not steps on that chain. Rung 1 withholds
+        a whole capability rather than deciding a case. Rung 4 judges the finished work, which is
+        delivery rather than development. Rung 5 runs where neither the agent nor the factory reaches
+        it. Promoting a rule moves its position on the chain, and leaves the off-chain rungs where
+        they were.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Why the backstop is kept during a promotion</span>
+        <p>
+          A rule carried at both an in-harness check and a stage gate is not one rule enforced twice as
+          hard. It is one predicate at two boundaries, because an in-harness check sees tool calls and
+          a stage gate sees the finished tree. Moving the chain rung must not silently remove the rung
+          that catches what the moved one cannot see.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="The chain">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The chain</span>
+      </div>
+      <div>
+        <h2>Where each rung actually sits, and what it buys</h2>
+        <p class="thesis">
+          Every rung trades reach against blindness. Choosing one is choosing what it can see and who
+          can remove it, and those two properties are what the design is about. Nothing else about a
+          rung matters much.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>reach</b> what it can see</span>
+          <span class="chip kind-gate"><b>authority</b> who can remove it</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>six rungs, two properties each</span><span class="tag warn">read the blind spot column first</span></figcaption>
+<pre><code><span class="c-dim">RUNG          SEES                    BLIND TO              AGENT CAN REMOVE</span>
+0 prose       everything, weakly      nothing, and          <span class="c-block">it can reinterpret it</span>
+                                      enforces nothing
+1 grant       n/a: the tool is        cases, entirely       <span class="c-pass">no</span>
+              simply absent
+2 hook        every agent that        an agent that does    <span class="c-block">yes, it is a file</span>
+              reads the settings      not read them          in the repository
+3 in-harness  every call the model    inside a shell        <span class="c-pass">no</span>
+              makes, including to     command it does
+              tools you did not write  not parse
+4 stage gate  the finished diff, and  anything mid-turn     <span class="c-pass">no</span>
+              what is published       that was reverted
+5 CI          the merged result       the whole turn        <span class="c-pass">no, nor can the factory</span></code></pre>
+      </figure>
+
+      <p>
+        Rung 2 is the interesting cell, because a hook is charter content and mechanical at the same
+        time. That mix makes it the cheapest mechanical rung to own, and the only one the agent it
+        governs can delete. Every design decision about rung 2 follows from it.
+      </p>
+      <p>
+        Rung 3 taught me the reach lesson expensively. It used to sit inside three editing tools, so a
+        turn writing through a shell heredoc walked straight past it. That happened twice in testing.
+        It now sits in front of every call the model makes, including calls to tools nobody on my side
+        wrote. That move is what makes reaching for stock tools safe.
+      </p>
+      <p>
+        No predicate had a bug, and tightening one would have fixed nothing. A rung watches a path, so
+        ask of any rung whether the thing it governs has a second path. Ask before you tighten
+        anything.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The rung 4 property nobody models</span>
+        <p>
+          A stage gate sees two things: the finished diff, and what the pipeline is about to publish.
+          No tool writes a commit message, a pull request body or a review comment, and none of them
+          appear in a diff. Give your model no rung that sees published text, and every rule about
+          what your organisation says in public goes unenforced while looking enforced.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="One identity">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">One identity</span>
+      </div>
+      <div>
+        <h2>What makes a constraint good: one identity, one predicate, many mounts</h2>
+        <p class="thesis">
+          A rule that travels needs three things. A stable identity across repositories, a decision
+          procedure that exists once, and an answer for when a repository disagrees. Get all three and
+          teams share the harness. Miss one and they copy it.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>id</b> stable across repos</span>
+          <span class="chip kind-hook"><b>predicate</b> written once</span>
+          <span class="chip kind-gate"><b>collision</b> resolved out loud</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A team standard restated in every repository is not a standard. It is a copy, and copies
+        drift. So a shipped rule travels with the harness rather than with any repository, and its
+        predicate travels beside it. Nobody shared a rule whose decision procedure has to exist in
+        every repository it governs. They pasted it.
+      </p>
+      <p>
+        The same predicate then mounts at every rung that needs it: in the repository's hook, in the
+        in-harness check, and in the stage gate. Two implementations of one rule will disagree, and
+        the agent finds the seam before you do. One function, several mounts, and a record of each
+        firing against the rung that caught it.
+      </p>
+
+      <h3 class="sub">When a repository disagrees</h3>
+      <p>
+        Here sits the only genuinely interesting decision in the model, and it is a domain decision
+        rather than a technical one. A project declares a rule with the same identity as a shipped
+        one. Who wins?
+      </p>
+
+      <figure class="code">
+        <figcaption><span>collision, resolved</span><span class="tag pass">either outcome is recorded</span></figcaption>
+<pre><code><span class="c-dim">SHIPPED RULE      PROJECT DECLARES SAME ID      RESULT</span>
+ordinary          a local adaptation           <span class="c-pass">the project wins</span>
+                                               the shipped layer is recorded
+                                               on the surviving rule
+
+<span class="c-block">locked: true</span>      a local adaptation           <span class="c-block">the shipped rule holds</span>
+                                               the attempt is recorded
+                                               on it as an override attempt</code></pre>
+      </figure>
+
+      <p>
+        The project wins by default, because a repository knows things the harness does not. A
+        layering nobody could adapt locally gets routed around within a week. That repeats the
+        risk-appetite argument: nobody obeys a control with no sanctioned deviation, they evade it
+        quietly, and then you lose the register too.
+      </p>
+      <p>
+        <code>locked</code> marks the floor of the band, and it stays deliberately rare. It names the
+        rules an organisation has closed to a project's judgement. Either way the surviving rule
+        carries a record of the collision, because a standard replaced in silence is worse than both
+        outcomes.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The containment rule that comes with all of this</span>
+        <p>
+          A predicate resolves against the tree it came from and may not leave it. A project rule
+          cannot reach out of its repository, and a shipped rule cannot reach out of the harness
+          package. Drop that containment and a rule file becomes a way to run arbitrary code from
+          wherever it points. The layering you built to hold a band becomes the hole in it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Honest by default">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Honest by default</span>
+      </div>
+      <div>
+        <h2>What makes a constraint good: it fails visibly and it says why</h2>
+        <p class="thesis">
+          Every default in this model prefers a mistake that reads as too narrow over one that is
+          quietly too broad. A rule that is wrong where nobody can see it does more damage than no
+          rule, because the band looks held when it is not.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>why</b> required to survive</span>
+          <span class="chip kind-hook"><b>escape</b> counted, not hidden</span>
+          <span class="chip kind-gate"><b>broken</b> reported, never blocking</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>defaults, and the failure each one prefers</span><span class="tag warn">every default has an argument</span></figcaption>
+<pre><code><span class="c-dim">FIELD          UNREADABLE VALUE BECOMES     WHY THAT DIRECTION</span>
+layer          <span class="c-warn">project</span>                     a mistyped org standard governs
+                                            one repo, <span class="c-warn">visibly too narrow</span>,
+                                            rather than silently too broad
+rung           <span class="c-warn">prose</span>                       a typo that silently became a
+                                            gate is <span class="c-block">a rule nobody wrote</span>
+policy         <span class="c-block">refuse</span>                      warn turns a typo into an
+                                            unenforced rule; ask parks a turn
+                                            waiting for a human nobody told
+locked         <span class="c-pass">false</span>                       a rule does not become an iron
+                                            law because someone typed
+                                            <span class="c-dim">locked: probably</span></code></pre>
+      </figure>
+
+      <p>
+        Those four apply one design decision four times. When the model cannot read what someone
+        meant, prefer the visible failure over the quiet one. The same instinct makes a broken gate
+        report itself and let the work through. Fail closed instead and it stops the pipeline for a
+        reason nobody can see.
+      </p>
+      <p>
+        So count a broken predicate against its rule rather than only printing it. A gate that reports
+        itself in prose nobody aggregates is how a rung rots while the table shows nothing. Counting
+        separates a control from a control you can test.
+      </p>
+
+      <h3 class="sub">The refusal is part of the design</h3>
+      <p>
+        What a rule says when it fires is a domain concern. People learn to route around a refusal
+        that names no way out. A good refusal carries the rule's own words, its recorded reason, and
+        its escape hatch. Then it says plainly that someone counts every use of that hatch.
+      </p>
+      <p>
+        The <code>why</code> field earns its place at one moment, years later. A rung whose reason
+        nobody can reconstruct is enforcing institutional memory it does not have. Section 9 turns a
+        missing <code>why</code> into a deletion signal for that reason.
+      </p>
+
+      <h3 class="sub">Who checks the checks</h3>
+      <p>
+        Every gate here fails open on its own bug, which is the right trade and leaves one question
+        unanswered. Whether the gates work cannot be asked of the gates. So at least one rung has to
+        sit outside the process that produced the work, and outside the process that checked it.
+      </p>
+      <p>
+        That is the whole argument for keeping a rung in CI, or anywhere else the agent and the
+        pipeline both cannot reach. It will be the quietest rung you own. It is also the only one that
+        can tell you your other rungs have been reporting success into a void.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Escape hatches are the exceptions register</span>
+        <p>
+          A recorded deviation beats an unsanctioned one nobody logged, which is the argument every
+          risk function makes. So the hatch stays, and the harness counts its use per rule. A rising
+          count does not argue for removing the hatch. It shows the rule and its predicate have come
+          apart, which is a demotion signal.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="The human path">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">The human path</span>
+      </div>
+      <div>
+        <h2>The contract, and the four places a human gets asked</h2>
+        <p class="thesis">
+          Every constraint so far governs how work happens. None of them says what the work is, or
+          what it means for it to be done. The contract does that. The human path is what happens when
+          an agent cannot satisfy it without a decision that is not theirs to make.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>contract</b> the input of record</span>
+          <span class="chip kind-hook"><b>ask</b> mid-turn</span>
+          <span class="chip kind-gate"><b>verdict</b> at the end</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A band means nothing without a statement of what was wanted. So the contract earns first-class
+        status: written down, kept in version control, and never rewritten by the system working from
+        it. Acceptance criteria belong there. A rule can say how to write code, and only the contract
+        says whether this code was the point.
+      </p>
+      <p>
+        That gives evidence somewhere to attach. A claim of done is worth nothing alone, so demand the
+        criteria and the proof that something exercised each one. A verdict with no command under it is
+        unproven rather than done. Treat those two as the same and you will report a band as held.
+      </p>
+
+      <h3 class="sub">Four rungs of asking, and what each one costs</h3>
+      <figure class="code">
+        <figcaption><span>the escalation path to a human</span><span class="tag warn">cheapest at the top</span></figcaption>
+<pre><code><span class="c-dim">WHEN            WHAT IT COSTS          WHAT THE ANSWER BECOMES</span>
+<span class="c-pass">mid-turn</span>        one parked turn        <span class="c-pass">an amendment to the contract</span>
+the agent is    minutes to hours       the work resumes from there
+genuinely
+blocked
+
+<span class="c-warn">at a refusal</span>    one revision           <span class="c-warn">a brief for the next attempt</span>
+a gate said no  a turn each time       the gate's own words, verbatim
+
+<span class="c-warn">at review</span>       a verdict on the       <span class="c-warn">a comment, or a rework</span>
+a second pass   finished work
+reads the diff
+
+<span class="c-block">at the gate</span>     the whole job          <span class="c-block">merge · close · rework</span>
+a person        waits for a human      nothing merges itself</code></pre>
+      </figure>
+
+      <p>
+        The first row is the one worth designing carefully, because it is where a human is cheapest
+        and rarest. An agent that guesses on a contradiction produces confident work against a
+        requirement nobody meant. An agent that asks about naming has turned a hatch into a habit, and
+        you will stop reading the questions.
+      </p>
+      <p>
+        Keep the hatch narrow by design: contradictory requirements, a missing credential, a choice
+        that destroys data, or a direction the contract did not authorise. The agent decides
+        preferences, naming, and anything the codebase already answers, and it reports what it decided.
+        A resumed turn then loses the hatch, because asking the same question twice is not asking.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">An answer amends the contract, and the amendment travels</span>
+        <p>
+          This is the part that is easy to miss and expensive to skip. If a human answers a question
+          mid-flight, every later check must see the contract <em>and</em> the answer. Otherwise a
+          reviewer grades correct work against a requirement that was withdrawn an hour earlier. The
+          authored contract stays untouched, and the amendment rides alongside it.
+        </p>
+      </div>
+
+      <h3 class="sub">Placement follows blast radius, not annoyance</h3>
+      <p>
+        One axis decides more than any other, and almost nobody writes it down. How bad is it if this
+        is wrong, and can you undo it? A constraint about formatting and a constraint about deleting
+        production data are not the same kind of thing. No rung saves you if you placed them by how
+        often they irritate you.
+      </p>
+      <p>
+        Irreversible actions deserve the expensive answers: withhold the capability, or ask a human.
+        Reversible ones deserve the cheap answers: refuse and let the agent adapt, or record and look
+        later. Sort by cost of being wrong before you sort by anything else.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="Promotion">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Promotion</span>
+      </div>
+      <div>
+        <h2>When to move it up, and the test that disqualifies most rules</h2>
+        <p class="thesis">
+          A rule earns a mechanical rung by being consequential, recurrent and decidable. The third
+          test kills most candidates, and the honest answer for the rest is that they stay prose
+          forever. The model has not failed when that happens.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>consequential</b></span>
+          <span class="chip kind-hook"><b>recurrent</b></span>
+          <span class="chip kind-gate"><b>decidable</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Consequential means being wrong costs something, and costs it quietly. Recurrent means it has
+        been broken more than once, by more than one person. Decidable means a machine can settle it
+        without judgement. "No float in the money module" is a predicate over a syntax tree. "Use ports
+        and adapters" is not, and no amount of promotion will make it one.
+      </p>
+      <p>
+        The most valuable rules in most charters fail the third test permanently. Whether someone
+        genuinely exercised a thing, rather than only claiming it, is a judgement about evidence. A
+        predicate could measure the shape of the claim and nothing else. Promote that rule and you get
+        a gate that checks wording and reports itself as enforcement.
+      </p>
+
+      <h3 class="sub">What a promotion actually is</h3>
+      <p>
+        A promotion should be one number in one file, and nothing else. If moving a rule up means
+        rewriting it, re-registering it, or touching code, promotion costs too much and nobody does
+        it. Keep the rung next to the prose it enforces, so there is no second place to forget.
+      </p>
+      <p>
+        Two properties are worth stealing. First, a promotion is a proposal rather than an act: it
+        opens a pull request and a human merges it. Second, promoting to a mechanical rung with no
+        predicate should produce a task instead. Writing the predicate is the actual work, and a rung
+        without one looks enforced from the outside.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>the crossing: when a capability becomes a constraint</span><span class="tag pass">the cheapest enforcement there is</span></figcaption>
+<pre><code><span class="c-dim">THE RULE                          THE HONEST ENFORCEMENT</span>
+"a check does not repair          <span class="c-pass">do not hand the phase an editor</span>
+ what it finds"                   rung 1. No predicate, because
+                                  the violation cannot be expressed
+
+"do not commit secrets"           <span class="c-warn">a predicate, at two boundaries</span>
+                                  rung 3 for the tool call, rung 4
+                                  for whatever the shell wrote
+
+"prove it actually ran"           <span class="c-block">stays prose, plus an eval</span>
+                                  rung 0. Not decidable, and a gate
+                                  here would measure wording</code></pre>
+      </figure>
+
+      <p>
+        People reach for that first row last. Before you write a predicate, ask whether that phase
+        could hold no such capability at all. A rule nothing can violate needs no gate, no escape
+        hatch and no counting.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Where evals belong in this</span>
+        <p>
+          An eval answers what no rule can decide, and it sits at any layer. It never refuses, so it is
+          not a rung and competes with none. Treat it as the instrument that tells you whether you are
+          holding the band, in the region where predicates cannot follow. Without it, nobody measures
+          the undecidable rules, and most of the valuable ones are undecidable.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="Demotion">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Demotion</span>
+      </div>
+      <div>
+        <h2>When to move it down, which is the direction nobody takes</h2>
+        <p class="thesis">
+          A harness ratchets on its own. Every incident argues for one more gate, and nothing ever
+          argues for fewer, because no paragraph has ever failed a build. So demotion and deletion
+          need machinery, and promotion does not.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>technical</b></span>
+          <span class="chip kind-rule"><b>context</b></span>
+          <span class="chip kind-hook"><b>comprehension</b></span>
+          <span class="chip kind-gate"><b>intent</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Anything written down can rot, including the things written down to stop rot. It goes wrong in
+        four distinguishable ways, and naming which one you have makes a count actionable. "Never
+        fires and is six hundred words" and "nobody knows why this exists" look alike in a table and
+        argue for different actions.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>four kinds of rot, and what each argues for</span><span class="tag block">none of these is a verdict</span></figcaption>
+<pre><code><span class="c-dim">KIND            WHAT IT LOOKS LIKE                    ARGUES FOR</span>
+<span class="c-block">technical</span>       a predicate that throws; a gate       <span class="c-block">a fix</span>
+                mounted where it cannot see
+<span class="c-warn">context</span>         long, loaded into every turn,        <span class="c-warn">a deletion, or a demotion</span>
+                never fires
+<span class="c-dim">comprehension</span>   no recorded why; a name that lies    <span class="c-dim">a rewrite, or a deletion if</span>
+                                                     <span class="c-dim">the why does not survive</span>
+<span class="c-pass">intent</span>          the escape hatch doing all the       <span class="c-pass">a demotion, or a narrowing</span>
+                work; firing on cases the
+                prose never meant</code></pre>
+      </figure>
+
+      <p>
+        Context debt hides, because silence looks free. It is not. The harness loads charter content
+        into every turn that touches what it is about, so you pay for a dead rule on all of them. It
+        also dilutes the attention left for the rules that matter.
+      </p>
+      <p>
+        So a rule that never fires is a <strong>demotion</strong> if it still matters, and a
+        <strong>deletion</strong> if nobody can say why it is there. Those are different findings, and
+        the difference is whether the recorded reason survives the evidence. Removal is half the work
+        here rather than the failure case, and it is the half nobody does unprompted.
+      </p>
+
+      <h3 class="sub">Give the charter a fixed budget</h3>
+      <p>
+        Growth is the default, because every incident adds a line and nothing removes one. So set a
+        size for the charter and hold it. When a new rule arrives and the budget is full, something
+        else leaves, and the argument about which one is the useful part.
+      </p>
+      <p>
+        A budget converts an unbounded ratchet into a trade, and it puts deletion on the agenda
+        without anyone needing to feel bad about it. It also stops the slowest failure in this whole
+        design, which is a charter so long that nothing in it gets read.
+      </p>
+
+      <h3 class="sub">Counting catches per rung, not per rule</h3>
+      <p>
+        Record every firing against the rung that caught it. Then "the in-harness check never catches
+        this any more" stays a readable fact rather than vanishing into a rule-level total. When a
+        backstop starts doing all the work, that tells you how turns are writing code. Ask why, not
+        which rung to tighten.
+      </p>
+      <p>
+        Two rungs that fire on the same case earn their keep only as two boundaries. Two rungs that
+        differ in how hard they push are redundancy, and they destroy your ability to tell which one
+        works. Per-rung counting makes that distinction visible.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Two rungs that must never be counted as idle</span>
+        <p>
+          A tool grant never fires by construction: the capability is absent, so there is nothing to
+          catch. CI fires outside anything the pipeline records. Count either as idle and your report
+          argues for demoting the two rungs whose whole value is that they stay quiet. Exclude them by
+          name, or your evidence will be confidently wrong.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 10 ============ -->
+  <section class="rung" id="s-10">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">10</span>
+        <div class="meter" role="img" aria-label="Two roles">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Two roles</span>
+      </div>
+      <div>
+        <h2>Constraint engineering needs both roles, and they are becoming one</h2>
+        <p class="thesis">
+          Platform decides what ships and what a project may not lower. Development knows which rules
+          are actually wrong. Split those across two teams that meet quarterly and nobody holds the
+          band. The work has four disciplines, and they do not divide along the old line.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>context</b></span>
+          <span class="chip kind-agent"><b>harness</b></span>
+          <span class="chip kind-make"><b>loop</b></span>
+          <span class="chip kind-gate"><b>graph</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Constraint engineering is one job with four disciplines. <strong>Context</strong> is what the
+        model is told and what it costs to tell it. <strong>Harness</strong> is the mechanism that
+        holds a single turn. <strong>Loop</strong> is what happens between turns: retries, revisions,
+        and when to stop. <strong>Graph</strong> is many turns and many agents, and where work waits.
+      </p>
+      <p>
+        None of those four belongs to platform or to development. Whoever knows the repository writes
+        the context, and whoever owns the budget pays for it. The loop stays a delivery concern until
+        a revision limit throws away correct work, and then it belongs to everyone. The disciplines
+        cut across the org chart, which argues for one role rather than two.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>what each role owns, and what it cannot see alone</span><span class="tag warn">both failures are real</span></figcaption>
+<pre><code><span class="c-dim">ROLE          OWNS                          CANNOT SEE ALONE</span>
+platform      what ships with the harness   <span class="c-block">which rules are wrong in a</span>
+              the locked floor              <span class="c-block">repository it does not work in</span>
+              the record and the counts
+
+development   the project layer             <span class="c-warn">that its local fix is a company</span>
+              predicates for its own code   <span class="c-warn">standard three other repos need</span>
+              which refusals are noise
+
+<span class="c-dim">alone, each fails a known way:</span>
+platform only  → rules nobody can override, routed around <span class="c-block">within a week</span>
+dev only       → a standard restated per repo, which is <span class="c-warn">a copy that drifts</span></code></pre>
+      </figure>
+
+      <p>
+        The two-way traffic is the point, and the layer axis exists to carry it. Propose a local rule
+        as a team rule once it keeps proving itself in one repository. Bring a shipped rule down when
+        its escape hatch does all the work in three. Both moves are pull requests, and both need
+        someone who sees the repository and the fleet at once.
+      </p>
+
+      <h3 class="sub">What I would not let a system do on its own</h3>
+      <p>
+        Nothing in this model should apply itself. A proposal to change a rule becomes a task or a pull
+        request, and it passes the same gate as any other work. A loop that rewrites its own
+        constraints on its own authority is the one thing here that escapes the band it exists to
+        hold.
+      </p>
+      <p>
+        I run the analysis pass by hand, and nothing schedules it. Call that a real gap rather than a
+        design position, and the piece I would build next. A ratchet that someone inspects only when
+        they remember is still a ratchet.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Where to start, this week</span>
+        <p>
+          Take the rules you already enforce and write three answers next to each: whose it is, what
+          carries it, and what happens when it fires. Where you cannot answer the first without the
+          second, you have found the reason your harness does not travel. Then pick the one rule with
+          the busiest escape hatch and ask what it and its predicate have stopped agreeing about.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Constraint Engineering</strong>, a design note. CC BY 4.0.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Domain design, drawn from wipp, a private factory running against three repositories.</div>
+    <div>Reads alongside · <a href="/layers-and-promotion/">Layers and Promotion</a> (the measured version) ·
+      <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> (what goes in the charter) ·
+      <a href="/harness/">Promotion to the Harness</a> (one rule's climb) ·
+      <a href="/guardrails/">Five Guardrails</a> (the altitudes) ·
+      <a href="/factory/">The Factory</a> (delivery) ·
+      <a href="/eval-loop/">The Eval Loop</a> (what no rule can decide)</div>
+    <div>Colour encodes the axis:
+      <span style="color:var(--brick)">layer</span> ·
+      <span style="color:var(--gold)">rung</span> ·
+      <span style="color:var(--forest)">policy</span>.</div>
+  </footer>
+
+</div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+  const nodes = [...document.querySelectorAll("pre.mermaid")];
+  const source = new Map(nodes.map(el => [el, el.textContent]));
+  const token = name => getComputedStyle(document.documentElement)
+    .getPropertyValue(name).trim();
+
+  /* The palette is read from the page's own tokens, so one definition serves
+     light and dark, prefers-color-scheme and the explicit toggle. Every
+     background stays transparent so the paper shows through. */
+  const themeVariables = () => ({
+    background: "transparent",
+    mainBkg: token("--surface-2"),
+    primaryColor: token("--surface-2"),
+    primaryTextColor: token("--ink"),
+    primaryBorderColor: token("--rule"),
+    nodeBorder: token("--rule"),
+    lineColor: token("--ink-3"),
+    textColor: token("--ink-2"),
+    clusterBkg: "transparent",
+    clusterBorder: token("--rule"),
+    edgeLabelBackground: token("--ground"),
+    /* sequence notes default to mermaid's lemon, which is a second palette */
+    noteBkgColor: token("--surface-2"),
+    noteTextColor: token("--ink"),
+    noteBorderColor: token("--rule"),
+    fontFamily: token("--mono"),
+    fontSize: "13px"
+  });
+
+  /* Same four signal colours the prose uses: brick blocks, gold warns,
+     forest passes, and dim is structure rather than a step. */
+  const signals = () => [
+    `classDef block fill:${token("--brick-wash")},stroke:${token("--brick")},color:${token("--ink")}`,
+    `classDef warn fill:${token("--gold-wash")},stroke:${token("--gold")},color:${token("--ink")}`,
+    `classDef pass fill:${token("--forest-wash")},stroke:${token("--forest")},color:${token("--ink")}`,
+    `classDef dim fill:transparent,stroke:${token("--rule")},color:${token("--ink-3")}`
+  ].join("\n");
+
+  async function render() {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: themeVariables(),
+      flowchart: { htmlLabels: false, curve: "linear", rankSpacing: 38,
+                   nodeSpacing: 28, padding: 8, useMaxWidth: true,
+                   wrappingWidth: 240 },
+      sequence: { useMaxWidth: true, mirrorActors: false }
+    });
+    for (const el of nodes) {
+      el.removeAttribute("data-processed");
+      /* classDef is flowchart grammar; a sequenceDiagram fails to parse with
+         the signal block appended, so it renders without one. */
+      const src = source.get(el);
+      el.textContent = /^\s*(flowchart|graph)\b/m.test(src)
+        ? `${src}\n${signals()}` : src;
+    }
+    await mermaid.run({ nodes });
+  }
+
+  render();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>
