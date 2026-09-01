@@ -632,7 +632,9 @@ svg.mmd .node.stop > rect    { fill: var(--brick-wash);  stroke: var(--brick); }
 svg.mmd .node.warn > rect    { fill: var(--gold-wash);   stroke: var(--gold); }
 svg.mmd .node.go > rect      { fill: var(--forest-wash); stroke: var(--forest); }
 svg.mmd .node .label rect    { fill: none; stroke: none; }
-svg.mmd .node text, svg.mmd .node tspan { fill: var(--ink); font-size: 13px; }
+/* node labels sit at x=0, the node center, so they need the middle anchor the
+   markup omits. Without it they start at center and run off to the right. */
+svg.mmd .node text, svg.mmd .node tspan { fill: var(--ink); font-size: 13px; text-anchor: middle; }
 svg.mmd .flowchart-link      { stroke: var(--ink-3); stroke-width: 1px; fill: none; }
 svg.mmd .marker path,
 svg.mmd .arrowMarkerPath     { fill: var(--ink-3); stroke: var(--ink-3); }
