@@ -29,6 +29,7 @@
   --brick-soft:   #C4614C;
   --brick-wash:   #F4E4E0;
   --gold:         #B8871F;
+  --gold-ink:         #785810;
   --gold-soft:    #D6A93C;
   --gold-wash:    #F7EEDA;
   --forest:       #2F5D3A;
@@ -40,7 +41,7 @@
   --surface-2:    #E8E3D9;
   --ink:          #211C18;
   --ink-2:        #4A423B;
-  --ink-3:        #7A7066;
+  --ink-3:        #6B6157;
   --rule:         #D6CFC2;
   --rule-soft:    #E4DED2;
   --code-bg:      #ECE7DC;
@@ -58,6 +59,7 @@
     --brick-soft: #B9503C;
     --brick-wash: #34211C;
     --gold:       #D8AA43;
+    --gold-ink:       #D8AA43;
     --gold-soft:  #B98F2E;
     --gold-wash:  #322815;
     --forest:     #71A87C;
@@ -69,7 +71,7 @@
     --surface-2:  #2C2621;
     --ink:        #F0EAE1;
     --ink-2:      #C3B9AC;
-    --ink-3:      #8D8276;
+    --ink-3:      #9A8E80;
     --rule:       #3A322B;
     --rule-soft:  #2E2823;
     --code-bg:    #14100D;
@@ -81,6 +83,7 @@
   --brick-soft: #B9503C;
   --brick-wash: #34211C;
   --gold:       #D8AA43;
+  --gold-ink:       #D8AA43;
   --gold-soft:  #B98F2E;
   --gold-wash:  #322815;
   --forest:     #71A87C;
@@ -92,7 +95,7 @@
   --surface-2:  #2C2621;
   --ink:        #F0EAE1;
   --ink-2:      #C3B9AC;
-  --ink-3:      #8D8276;
+  --ink-3:      #9A8E80;
   --rule:       #3A322B;
   --rule-soft:  #2E2823;
   --code-bg:    #14100D;
@@ -103,6 +106,7 @@
   --brick-soft: #C4614C;
   --brick-wash: #F4E4E0;
   --gold:       #B8871F;
+  --gold-ink:       #785810;
   --gold-soft:  #D6A93C;
   --gold-wash:  #F7EEDA;
   --forest:     #2F5D3A;
@@ -114,7 +118,7 @@
   --surface-2:  #E8E3D9;
   --ink:        #211C18;
   --ink-2:      #4A423B;
-  --ink-3:      #7A7066;
+  --ink-3:      #6B6157;
   --rule:       #D6CFC2;
   --rule-soft:  #E4DED2;
   --code-bg:    #ECE7DC;
@@ -393,7 +397,7 @@ a { color: inherit; }
   letter-spacing: 0.1em;
 }
 .chip.kind-rule    { border-left: 3px solid var(--gold);   }
-.chip.kind-rule b  { color: var(--gold); }
+.chip.kind-rule b  { color: var(--gold-ink); }
 .chip.kind-hook    { border-left: 3px solid var(--brick);  }
 .chip.kind-hook b  { color: var(--brick); }
 .chip.kind-gate    { border-left: 3px solid var(--brick);  }
@@ -401,9 +405,9 @@ a { color: inherit; }
 .chip.kind-make    { border-left: 3px solid var(--forest); }
 .chip.kind-make b  { color: var(--forest); }
 .chip.kind-skill   { border-left: 3px solid var(--gold);   }
-.chip.kind-skill b { color: var(--gold); }
+.chip.kind-skill b { color: var(--gold-ink); }
 .chip.kind-cmd     { border-left: 3px solid var(--gold);   }
-.chip.kind-cmd b   { color: var(--gold); }
+.chip.kind-cmd b   { color: var(--gold-ink); }
 .chip.kind-agent   { border-left: 3px solid var(--forest); }
 .chip.kind-agent b { color: var(--forest); }
 .chip.kind-config  { border-left: 3px solid var(--ink-3);  }
@@ -501,7 +505,7 @@ h3.sub::after {
   font-size: 0.6rem;
 }
 .code figcaption .tag.block { color: var(--brick); }
-.code figcaption .tag.warn  { color: var(--gold); }
+.code figcaption .tag.warn  { color: var(--gold-ink); }
 .code figcaption .tag.pass  { color: var(--forest); }
 .code pre {
   margin: 0;
@@ -522,7 +526,7 @@ code {
 }
 pre code { background: none; padding: 0; font-size: inherit; }
 .c-block  { color: var(--brick); }
-.c-warn   { color: var(--gold); }
+.c-warn   { color: var(--gold-ink); }
 .c-pass   { color: var(--forest); }
 .c-dim    { color: var(--ink-3); }
 
@@ -1272,7 +1276,7 @@ if __name__ == "__main__":
     <div>Related · <a href="/reverse-review/">Reverse-review</a> ·
       <a href="/junior-to-senior/">Junior to senior in the age of AI</a></div>
     <div>Colour encodes role:
-      <span style="color:var(--gold)">the claim</span> ·
+      <span style="color:var(--gold-ink)">the claim</span> ·
       <span style="color:var(--brick)">the gate</span> ·
       <span style="color:var(--forest)">the evidence</span>.</div>
   </footer>
