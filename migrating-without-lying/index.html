@@ -1,0 +1,1442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+  <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Migrating Without Lying · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="A migration takes months, and for those months two patterns are correct. Keep the charter true: record today, link the migration doc next to it, and give the agent one criterion for which side a change lands on. Worked on thinning controllers. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/migrating-without-lying/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Migrating Without Lying">
+<meta property="og:description" content="During a migration a codebase has two right answers. The charter records today and links the plan. One criterion decides which side a change lands on.">
+<meta property="og:url" content="https://www.tacoda.dev/migrating-without-lying/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Migrating Without Lying">
+<meta name="twitter:description" content="During a migration a codebase has two right answers. The charter records today and links the plan. One criterion decides which side a change lands on.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-ink:     #785810;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #6B6157;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-ink:   #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #9A8E80;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-ink:   #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #9A8E80;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-ink:   #785810;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #6B6157;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold-ink); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold-ink); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold-ink); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold-ink); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold-ink); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+th, td {
+  padding: 0.4rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- footer ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Migrating Without Lying</span>
+      <span class="sep">/</span>
+      <span>method</span>
+    </div>
+    <h1>A migration gives the code <em>two right answers</em>.</h1>
+    <p class="standfirst">
+      Charters describe the codebase, so a migration puts every charter under strain. Write the
+      target and the charter lies about most of the files. Write the present and the agent
+      re-fattens the controllers you already thinned. The way through: keep recording today, say a
+      migration is open, and link the plan on the same line. Then give the agent one criterion for
+      which side a change lands on. The payoff is a migration that can pause for a quarter and
+      resume.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · anyone keeping a <code>CLAUDE.md</code> honest while the codebase sits between two patterns<br>
+      the worked example · thinning controllers. 23 units, a Rails-shaped app. The pattern swaps<br>
+      what it costs · three charter lines and one feature doc, for as long as the migration runs<br>
+      pairs with · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> (the format) · <a href="/migration-harness/">The Migration Harness</a> (the mechanical bulk)<br>
+      license · CC BY 4.0. Take the format, not the example
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Today's truth</dt>
+          <dd>What the charter records. During a migration that includes the half-moved state, said plainly.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>The migration doc</dt>
+          <dd>One feature doc holds the plan, the target, the position, and the ledger. The charter links it and copies nothing.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>The criterion</dt>
+          <dd>Which side a change lands on. Mechanical, so two runs on one task answer the same way.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Method sections">
+    <ol>
+      <li><a href="#s-0"><span class="n">0</span> Two right answers</a></li>
+      <li><a href="#s-1"><span class="n">1</span> Three moves</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Never the target</a></li>
+      <li><a href="#s-3"><span class="n">3</span> The charter entry</a></li>
+      <li><a href="#s-4"><span class="n">4</span> The migration doc</a></li>
+      <li><a href="#s-5"><span class="n">5</span> The criterion</a></li>
+      <li><a href="#s-6"><span class="n">6</span> Three changes</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Closing it</a></li>
+      <li><a href="#s-8"><span class="n">8</span> When to skip</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The premise</span>
+      </div>
+      <div>
+        <h2>A charter is a description, and a migration breaks descriptions</h2>
+        <p class="thesis">
+          A design migration runs for months. For those months two patterns are correct, and the
+          charter has one field to say so in.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Start from what the agent reads. It reads the charter, and it reads the code near the file it
+        is changing. Those two are the same document in a settled codebase, which is why the charter
+        works at all. A migration pulls them apart, so the agent has to choose, and every way of
+        choosing goes wrong differently.
+      </p>
+
+      <figure class="code">
+        <figcaption><span>three ways to write one charter section</span><span class="tag block">all three are wrong</span></figcaption>
+<pre><code><span class="c-dim">A. THE CHARTER STATES THE TARGET</span>
+   "Controllers stay thin. Logic lives in operations."
+   <span class="c-block">→ true of 9 files, false of 14</span>
+   <span class="c-block">→ the agent writes an operation nothing else resembles</span>
+   <span class="c-block">→ review reads it as inconsistent, and asks for it back</span>
+
+<span class="c-dim">B. THE CHARTER STATES THE PRESENT, AND HIDES THE MIGRATION</span>
+   "Business logic lives in controllers."
+   <span class="c-block">→ the 9 moved files are now the odd ones out</span>
+   <span class="c-block">→ the agent finds one, corrects it, and calls that cleanup</span>
+   <span class="c-block">→ the migration loses ground on unrelated tickets</span>
+
+<span class="c-dim">C. THE CHARTER STATES BOTH, WITH NO CRITERION</span>
+   "Prefer operations for new code where it makes sense."
+   <span class="c-block">→ "where it makes sense" is a judgment, so it varies</span>
+   <span class="c-block">→ two runs on one task pick different sides</span>
+   <span class="c-block">→ the reviewer cannot say which answer was correct</span></code></pre>
+      </figure>
+
+      <p>
+        B is the one that costs real money, because nothing about it looks like damage. The diff
+        reads as an ordinary tidy-up. Nobody flags it in review, and the count of moved files goes
+        down while the ticket it rode in on goes green.
+      </p>
+      <p>
+        C is the one teams actually write, because it sounds reasonable and it is fast to type. It
+        also hands the agent a design decision on every turn, which is the decision you were trying
+        to make once and write down.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">What the agent is missing in all three</span>
+        <p>
+          Not a better rule. It needs to know that a migration is open, that two patterns are legal
+          today, and which one applies here. Those are three facts, and the charter carries all
+          three in a few lines.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="The method">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The method</span>
+      </div>
+      <div>
+        <h2>Three moves, and the charter never stops being true</h2>
+        <p class="thesis">
+          The charter always describes today. The migration doc carries everything about tomorrow.
+          When the migration lands, today becomes what the doc was describing.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>charter</b> today, plus a pointer</span>
+          <span class="chip kind-config"><b>feature doc</b> all migration state</span>
+          <span class="chip kind-hook"><b>check</b> migration.side</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">1. Record today</span>
+          <span class="what">The charter states the pattern that most of the code uses right now. On the same lines, it states that a migration is open and links the doc. It does not state the target, because the doc states it.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">2. Hold the state</span>
+          <span class="what">One feature doc holds the target rule, the plan, the criterion, the ledger of units, the escape hatch, and the done-when. It lives in the repo, humans keep it current, and the pointer makes its target rule law for the units already moved.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">3. Land it</span>
+          <span class="what">The last ledger row closes. The charter states the target as the present truth, and the rule's scope widens from the moved units to every file. The doc moves to done and stays readable as history.</span>
+        </li>
+      </ol>
+
+      <p>
+        The split is not filing preference, because the two files get read on different schedules.
+        The charter enters context on every turn, so its budget is tight and every line competes.
+        The feature doc gets read when the task touches that feature, which is when the detail is
+        worth its tokens. So the charter carries the pointer, and the doc carries the ledger and the
+        rule the moved units answer to.
+      </p>
+      <p>
+        <code>.claude/features/</code> is the natural home for the doc, next to whatever else the
+        agent reads on demand. Still, the location matters much less than the link. Put the pointer
+        on the same lines as the truth it qualifies. That way an agent reading the controllers
+        section finds the migration where it is already looking.
+      </p>
+
+      <div class="callout">
+        <span class="label">A pointer in the wrong place is not a pointer</span>
+        <p>
+          A "current migrations" list at the bottom of the charter looks tidy and fails in practice.
+          The agent reads the controllers section, gets a complete-sounding answer, and acts on it.
+          Nothing sends it further down the file. Adjacency is the whole mechanism, so keep the link
+          inline even when that reads as repetition across sections.
+        </p>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">What the bookkeeping buys, and what it does not</span>
+        <p>
+          It buys nothing on speed. The cost is a file, three charter lines, and one extra pull
+          request per unit. What it buys instead: every state the migration passes through is legal,
+          so the work can stop for a quarter and resume. Position sits in the ledger as a fact,
+          rather than in somebody's memory. A large refactor usually dies because it needs
+          continuous attention, which this one does not. So abandoning it halfway still leaves a
+          documented codebase in two patterns, rather than an undocumented one in three.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Present tense">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Present tense</span>
+      </div>
+      <div>
+        <h2>The charter is in the present tense, always</h2>
+        <p class="thesis">
+          An aspirational charter reads well and behaves badly. It describes a codebase that does not
+          exist yet, so it cannot be checked against the one that does.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        The case for writing the target is not stupid. You want every new file to match the target,
+        the charter is where the agent looks, and stating it there is one line of work. That
+        instinct is right about the goal and wrong about the mechanism. The criterion in §5 gets the
+        same behavior for new code. It also keeps the charter true about the other fourteen files.
+      </p>
+      <p>
+        Falsity has a specific cost here. A charter you can check against the code is a charter a
+        reviewer can enforce and an agent can trust. Once one line is aspirational, every line is
+        suspect, and the next person to hit friction argues that this rule is also just a plan. That
+        argument is hard to answer, because it is partly correct.
+      </p>
+
+      <h3 class="sub">The three facts, and where each one lives</h3>
+      <div class="tablewrap">
+        <table>
+          <caption>one fact per file, and no fact in two files</caption>
+          <thead>
+            <tr><th>Fact</th><th>Lives in</th><th>Why not the other file</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>What the code does today</td>
+              <td>charter</td>
+              <td>The agent needs it on every turn, including turns that never touch the migration.</td>
+            </tr>
+            <tr>
+              <td>That a migration is open</td>
+              <td>charter</td>
+              <td>An agent that has to open a doc to learn a migration exists will not open the doc.</td>
+            </tr>
+            <tr class="total">
+              <td>The target rule and the position</td>
+              <td>feature doc</td>
+              <td>The position changes weekly, and a weekly edit to the charter is how charters rot. The pointer makes the target rule binding from there.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        That last row is where I get it wrong, because I have wanted the ledger in the charter for
+        the visibility. Resist that pull. A ledger in the charter means a charter commit every time
+        a unit moves, and that churn stops anyone reading it as law.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="The charter entry">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The entry</span>
+      </div>
+      <div>
+        <h2>The charter entry, before and during</h2>
+        <p class="thesis">
+          Thinning controllers, as a worked example. Opening the migration adds two sentences and a
+          path. It does not change the sentence that was already true.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>CLAUDE.md · before the migration opens</span><span class="tag block">the old truth</span></figcaption>
+<pre><code><span class="c-block">## Controllers</span>
+Business logic lives in controllers. Models stay thin and hold
+associations, scopes and validations only.
+  <span class="c-warn">none</span> describes the codebase, nothing enforces it
+  <span class="c-dim">2024-09-30 · standing · how this app has always been built</span></code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption><span>CLAUDE.md · the same section, migration open</span><span class="tag warn">two sentences and a path</span></figcaption>
+<pre><code><span class="c-block">## Controllers</span>
+Business logic lives in controllers. Models stay thin and hold
+associations, scopes and validations only.
+
+<span class="c-warn">MIGRATION OPEN.</span> Controllers are moving to operation classes.
+Read <span class="c-pass">.claude/features/thin-controllers.md</span> before you write or change
+any controller. That file names the criterion. Apply it without
+being asked, and say in the PR which side the change landed on.
+  <span class="c-warn">check</span> migration.thin-controllers.side
+  <span class="c-dim">2026-04-02 · MIG-3 · opened. closes when the ledger has no old rows</span></code></pre>
+      </figure>
+
+      <p>
+        Three things in that block are doing work. The old truth stays first and stays unqualified,
+        because it is still how fourteen of twenty-three controllers behave. That notice sits
+        in this section rather than a global list, so an agent reading about controllers cannot miss
+        it. The unprompted instruction is there because "read the doc if relevant" reads as
+        optional. A criterion nobody applies is a criterion you do not have.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Say which side, in the PR</span>
+        <p>
+          One sentence, in the description, naming the side and the ledger row that decided it. It
+          costs the author nothing and it turns a silent design choice into a reviewable claim. It
+          also catches a criterion that has drifted from the codebase, because a reviewer argues
+          with a wrong side once the author writes it down.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="The document">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">One file</span>
+      </div>
+      <div>
+        <h2>The migration doc, in full</h2>
+        <p class="thesis">
+          Seven sections. They answer where we are, where we are going, what has to land first, how
+          to decide today, and what closes it. Anything else belongs in the ticket.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>.claude/features/thin-controllers.md</span><span class="tag pass">the artifact</span></figcaption>
+<pre><code><span class="c-dim"># Migration · thin controllers</span>
+<span class="c-warn">status</span>  open · 9 of 23 units moved · opened 2026-04-02 · MIG-3
+
+<span class="c-block">## Where we are now</span>
+Business logic lives in controllers. 23 controllers hold it. 9 have
+moved to operation classes. 14 have not. Both shapes are correct
+today, and the criterion below says which one your change uses.
+
+<span class="c-pass">## The rule for the new side</span>
+Read this section as the charter entry for every unit the ledger
+marks `new`. It is law for those files, not a plan for them.
+
+A controller parses params, calls one operation, and renders. It
+holds no branching on domain state and no writes.
+  <span class="c-warn">gate</span> controllers.no-writes · <span class="c-block">scope: units marked `new`</span>
+  <span class="c-dim">2026-04-02 · MIG-3 · scope widens to the whole charter when the ledger empties</span>
+
+    def create
+      result = Billing::CreateInvoice.call(invoice_params)
+      result.ok? ? render_invoice(result.invoice) : render_error(result)
+    end
+
+<span class="c-block">## Plan</span>
+Ordered by risk, then by dependency. Supporting work gets its own
+phase, and it lands before the units that need it.
+
+  phase 1 · extract Result and the operation base   <span class="c-warn">prereq</span>  · <span class="c-pass">done</span>
+  phase 2 · read-only controllers, nothing to unwind    9 · <span class="c-pass">done</span>
+  phase 3 · single-write controllers                    8 · <span class="c-warn">in progress</span>
+  phase 4 · land money.cents on the money helpers   <span class="c-warn">prereq</span>  · <span class="c-warn">in review</span>
+  phase 5 · money paths, needs phase 4                  4 · <span class="c-block">blocked</span>
+  phase 6 · split ReportsController, then move it       2 · not started
+
+<span class="c-pass">## The criterion</span>
+1. New controller, or new action on any controller → new side. Always.
+2. Existing action → the ledger row for its controller decides.
+3. One change lands on one side. No change straddles.
+4. Moving a unit is its own change and alters no behavior.
+5. No unit moves before its phase's prereq lands. Check the plan.
+6. Not in the ledger and not new? Stop and ask. Do not guess.
+
+<span class="c-block">## Ledger</span>
+| unit                 | side | moved      | note                     |
+|----------------------|------|------------|--------------------------|
+| InvoicesController   | new  | 2026-04-08 |                          |
+| PaymentsController   | new  | 2026-04-11 |                          |
+| SubscriptionsCtrl    | new  | 2026-04-24 |                          |
+| <span class="c-dim">... 6 more new rows</span>       |      |            |                          |
+| RefundsController    | old  | —          | blocked · phase 5        |
+| WebhooksController   | old  | —          |                          |
+| ReportsController    | old  | —          | 900 lines, split first   |
+| <span class="c-dim">... 11 more old rows</span>      |      |            |                          |
+
+<span class="c-warn">## The escape hatch</span>
+A change may land on the old side of a `new` unit. Add a note to
+that row, with a date and a reason. Two notes on one row means the
+target shape is wrong. Stop the migration and fix the target.
+
+<span class="c-pass">## Done when</span>
+Every row reads `new`. Then: the charter states the target as the
+present truth, the `migration.thin-controllers.side` check is
+deleted, and this file moves to `.claude/features/done/`.</code></pre>
+      </figure>
+
+      <p>
+        The status line sits at the top, because it answers the most common question. A stale status
+        is also easier to spot there. Everything below it exists to answer one agent turn, so
+        nothing in the file argues for the migration. The case for the migration belongs in MIG-3,
+        where people who need convincing will look for it.
+      </p>
+      <p>
+        Notice what the target section is doing. It carries a rule, an altitude, a scope, and a
+        date, in the same format the charter uses. So the charter's pointer hands over authority for
+        one side of the migration, and it does not merely describe a plan. An agent on a
+        <code>new</code> unit reads the doc and finds law there. That is the only reason the charter
+        can stay silent about the target.
+      </p>
+      <p>
+        I keep the plan and the position in one file, not a rule per directory. Two places to look
+        for one answer is the failure this method removes. The escape hatch is the other deliberate
+        choice: a sanctioned exception with a date beats an unsanctioned one. So I set the alarm at
+        two notes rather than one, and a single awkward file cannot stall the whole migration.
+      </p>
+
+      <h3 class="sub">The plan and the ledger answer different questions</h3>
+      <p>
+        The plan is phase-level, and it holds the order, its reason, and how far the team has
+        gotten. The ledger is unit-level and it answers one question per file. Progress reads off
+        the plan and today's decision reads off the ledger, so neither does both jobs badly.
+      </p>
+      <p>
+        Ordering by risk is half of it. Read-only controllers move first, because a mistake there
+        unwinds cheaply. A plan ordered by convenience moves the easy units first, and it leaves
+        every hard one for the month the team runs out of patience.
+      </p>
+      <p>
+        The other half is dependency, which is why two phases here move no controllers at all.
+        Phase 4 is the money helper the money paths need. It sits in the plan as a numbered phase,
+        so somebody owns it and its status shows. A plan that lists only units hides that work.
+        Then the prerequisite surfaces halfway through a move, and the unit stalls in neither shape.
+      </p>
+
+      <h3 class="sub">Who keeps it true</h3>
+      <ul>
+        <li><strong>Humans define the migration.</strong> A person writes the target, sets the criterion, and owns the plan and the ledger. Agents read all four and rewrite none of them.</li>
+        <li><strong>The row flips in the move's commit.</strong> Whoever moved the unit changes its row in the same change. So no checkout holds a ledger that disagrees with its own code.</li>
+        <li><strong>The doc ships with the code.</strong> It is a versioned file in the repo, so every teammate, clone, worktree, and agent session gets the current state. Nobody has to remember to mention the migration.</li>
+      </ul>
+      <p>
+        That last one is why the file belongs in the repo and not in a wiki. A branch that moves
+        three units carries its own ledger, so merging it brings the state along with the code that
+        made it true. The next task on a controller then finds the migration already in front of it,
+        and a task on the mailer never pays for it.
+      </p>
+
+      <h3 class="sub">What the doc does not hold</h3>
+      <ul>
+        <li><strong>The justification.</strong> That is the ticket's job. A doc that argues invites the agent to weigh the argument, and you wanted it to apply a rule.</li>
+        <li><strong>The per-unit recipe.</strong> A paragraph on how to move each of twenty-three controllers will be wrong by the third one. The plan gives the order and the target gives the shape, so whoever moves a unit works out the rest.</li>
+        <li><strong>A completion date.</strong> The plan shows order and the ledger shows position, and both are facts. A date is a guess, and a missed guess makes readers distrust the facts next to it.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="The criterion">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Load-bearing</span>
+      </div>
+      <div>
+        <h2>The criterion is the part that has to be mechanical</h2>
+        <p class="thesis">
+          Every other section here is bookkeeping. This is the part that decides whether two runs on
+          the same ticket produce the same design.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A criterion is good when a reader with no context can apply it and get the same answer you
+        would. Four properties get you there, and each one rules out a criterion that sounds fine in
+        a standup.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">Mechanical</span>
+          <span class="what">It reads a fact, not a situation. A ledger row, a path glob, or a file's location. Never "where it makes sense".</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">Single-sourced</span>
+          <span class="what">One file answers it. If a directory rule and a ledger can disagree, you have shipped the ambiguity you were removing.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">Total</span>
+          <span class="what">Every change gets an answer, including new files and files nobody listed. Rules 1 and 6 in §4 exist for the two gaps.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Checkable</span>
+          <span class="what">A hook can read the ledger and compare it against the changed paths. Then a straddling change fails before review, not during it.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">Four criteria that fail, and how</h3>
+      <div class="tablewrap">
+        <table>
+          <caption>each of these comes up in a real design discussion</caption>
+          <thead>
+            <tr><th>Criterion</th><th>How it fails</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>"Prefer the new pattern"</td>
+              <td>A preference is a judgment. The agent resolves it differently per run, and the reviewer has no ground to stand on.</td>
+            </tr>
+            <tr>
+              <td>"Migrate whatever you touch"</td>
+              <td>Every change straddles by design. Each PR then mixes a behavior change with a move, so a revert takes both.</td>
+            </tr>
+            <tr>
+              <td>"Migrate a file on its third change"</td>
+              <td>Needs commit history the agent has no reliable read on, and the answer shifts between two people on the same file.</td>
+            </tr>
+            <tr class="total">
+              <td>A path glob, when units are directories</td>
+              <td>Does not fail. It is the cheapest criterion that works, so use it and skip the ledger.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        That last row is the boring option and it wins whenever the migration unit lines up with a
+        directory. <code>app/billing/**</code> is new, everything else is old, and the criterion is
+        one line with nothing to maintain. The ledger earns its keep when units cut across the file
+        tree. That is what makes controller thinning a fair example rather than a flattering one.
+      </p>
+
+      <div class="callout">
+        <span class="label">Rule 3 is the one people push back on</span>
+        <p>
+          "No change straddles" feels wasteful, because you are in the file anyway. It buys you
+          reverts that work, reviews that ask one question, and a ledger you can trust. A half-moved
+          unit belongs to neither side. That is the state teams abandon a migration in, leaving the
+          codebase in three patterns instead of two.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Three changes">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">In practice</span>
+      </div>
+      <div>
+        <h2>Three tickets, three different answers</h2>
+        <p class="thesis">
+          The same criterion, applied to the same ledger, on three ordinary tasks. Only one of them
+          moves a unit.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>the agent's decision, three times</span><span class="tag pass">same rule, same ledger</span></figcaption>
+<pre><code><span class="c-dim">TICKET · add a discount field to invoice creation</span>
+  read ledger → InvoicesController · <span class="c-pass">new</span>
+  <span class="c-pass">→ new side.</span> the change goes in Billing::CreateInvoice.
+     the controller keeps parsing params and rendering.
+
+<span class="c-dim">TICKET · fix rounding on refund totals</span>
+  read ledger → RefundsController · <span class="c-block">old</span> · blocked · phase 5
+  <span class="c-block">→ old side.</span> the fix goes in the controller, as it stands.
+     do not move the unit to fix a bug. rule 4.
+
+<span class="c-dim">TICKET · add retry handling to inbound webhooks</span>
+  read ledger → WebhooksController · <span class="c-block">old</span>
+  read plan   → phase 3 · no open prereq, so a move is allowed
+  the new code is ~120 lines and the move would rewrite it
+  <span class="c-warn">→ split into two changes.</span>
+     PR 1 · move WebhooksController. no behavior change. flip row.
+     PR 2 · add retry handling on the new side.</code></pre>
+      </figure>
+
+      <p>
+        The second answer is the one that feels wrong and is right. Fixing a rounding bug inside a
+        controller you plan to delete looks like waste. Still, it keeps the fix small, reviewable,
+        and cherry-pickable to a release branch. The move happens when the ledger says so, not when
+        a bug routes someone through the file.
+      </p>
+      <p>
+        The third answer needs a decision rule, because rules 1 through 6 do not settle it on their
+        own. <strong>Move first when the move would throw the new code away.</strong>
+        The move rewrites a hundred and twenty lines written against the old shape. So you pay for
+        that code twice, and review it twice. A three-line change survives the move, so it lands on
+        the old side and waits.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The agent can run all three of these</span>
+        <p>
+          That is the point of the criterion being mechanical. Read the ledger, match the row, pick
+          the side, and state it in the PR. The one case that comes back to a human is rule 6, when
+          the unit is not in the ledger at all. That question is worth an interruption, because it
+          usually means the ledger has drifted from the codebase.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Closing it">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Landing</span>
+      </div>
+      <div>
+        <h2>Closing the migration, and the promotion you get for free</h2>
+        <p class="thesis">
+          The last row flips. A gate was already running on the moved units, so landing the
+          migration widens its scope instead of inventing it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption><span>CLAUDE.md · after the last row flips</span><span class="tag pass">the new truth</span></figcaption>
+<pre><code><span class="c-block">## Controllers</span>
+A controller parses params, calls one operation, and renders. It
+holds no branching on domain state and no writes.
+  <span class="c-warn">gate</span> controllers.no-writes        <span class="c-pass">← same gate, same id</span>
+  <span class="c-dim">2026-04-02 · MIG-3 · migrated 23 units. completed 2026-06-19</span>
+                                  <span class="c-pass">the scope line is gone</span></code></pre>
+      </figure>
+
+      <p>
+        Look at what moved and what did not. The target rule was a gate throughout, scoped to the
+        units the ledger marked <code>new</code>. A charter-wide gate would have refused fourteen
+        controllers a day, and the team would have learned to bypass it. That scope is what keeps a
+        gate honest before the migration finishes. Now it covers the directory, and the
+        ledger has nothing left to decide. The <code>migration.side</code> check is the rule that
+        goes away, because every change lands on the only side there is.
+      </p>
+      <p>
+        So the migration hands you a promotion, in the sense that
+        <a href="/harness/">promotion to the harness</a> uses the word. This one promotes by scope
+        rather than by altitude. The rule was a gate from the first unit moved, and it ends as a
+        gate over all twenty-three. Each row the team moved widened what the gate could honestly
+        refuse, which is the only order that works.
+      </p>
+
+      <h3 class="sub">Five closing chores, none optional</h3>
+      <ul>
+        <li><strong>Move the target rule into the charter.</strong> Copy it out of the doc, drop the scope line, and keep the gate's identifier. The rule has not changed, so its name should not either.</li>
+        <li><strong>Delete the migration notice.</strong> Both sentences and the path. A pointer to a closed migration sends the agent to read a file that no longer describes anything.</li>
+        <li><strong>Delete the <code>migration.side</code> check.</strong> It now passes for every change, so it costs runtime and teaches nothing.</li>
+        <li><strong>Archive the doc, keep it readable.</strong> <code>.claude/features/done/</code>. It is the record of what moved and when, and <a href="/anatomy-of-a-charter/">deletion day</a> will want it.</li>
+        <li><strong>Delete the old-side code paths.</strong> Search for the base class, the shared concern, the helper nobody calls now. A migration with the old scaffolding still standing is one that can reverse without anyone deciding to.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="label">The charter is one line longer than it was</span>
+        <p>
+          Under a fixed charter budget the migration is not free while it runs, and it costs three
+          lines. After it closes it costs one, and that line replaces the one it displaced. A team
+          running four at once spends a third of its charter on plans. Finish one before opening
+          the next.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="When to skip">
+          <i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Skip it</span>
+      </div>
+      <div>
+        <h2>Four migrations that do not want a document</h2>
+        <p class="thesis">
+          The method costs a file, three charter lines, and a ledger somebody has to keep accurate.
+          Four common cases are cheaper without it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">Under five units</span>
+          <span class="what">Do it in one change and skip the ceremony. A ledger with four rows is a to-do list, and the charter never has to hold two truths at once.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">One mechanical pass</span>
+          <span class="what">A rename or a codemod that lands complete in a single commit. There is no half-state to describe, so the diff is the whole document. See <a href="/migration-harness/">the migration harness</a> for the version with residue.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">No agent in the loop</span>
+          <span class="what">The method buys less when only humans touch the code, because a human notices the migration from the code review. The ledger still helps. The charter lines matter less.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">Target still undecided</span>
+          <span class="what">A doc with a vague target section teaches the agent to guess, which is worse than nothing. Write "spike open, no migration" in the charter, and decide first.</span>
+        </li>
+      </ol>
+
+      <p>
+        The fourth case is the one worth watching for. An open migration with an unsettled target
+        is how a codebase ends up in three patterns. The criterion still routes changes, so work
+        keeps landing on a "new side" whose shape is moving underneath it. Two notes on a ledger row
+        is the alarm for that, and §4 says to stop when it fires.
+      </p>
+      <p>
+        I would rather write the doc slightly too early than slightly too late. A migration that
+        outgrows a five-unit guess is still cheap to write down. Two months of undocumented
+        half-state is not, because someone who was not there has to reconstruct it from the code.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Start with the sentence you cannot write</span>
+        <p>
+          Take a migration your team has open now, and try to write today's truth in one sentence
+          that is true of the whole codebase. If you can write it, you probably do not need any of
+          this. If you cannot, the agent has been guessing on every turn since the migration opened,
+          and the doc needs to exist before the next one.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Migrating Without Lying</strong>, a method. CC BY 4.0.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Pairs with · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> (the entry format) ·
+      <a href="/migration-harness/">The Migration Harness</a> (the mechanical majority) ·
+      <a href="/harness/">Promotion to the Harness</a> (prose, check, gate)</div>
+    <div>The criterion is a constraint like any other ·
+      <a href="/constraint-engineering/">Constraint Engineering</a> ·
+      <a href="/guardrails/">Five Guardrails</a> ·
+      <a href="/audit-trail/">The Audit Trail</a></div>
+    <div>Color encodes the state:
+      <span style="color:var(--brick)">today's truth</span> ·
+      <span style="color:var(--gold-ink)">the migration doc</span> ·
+      <span style="color:var(--forest)">the criterion</span>.</div>
+  </footer>
+
+</div>
+</body>
+</html>
