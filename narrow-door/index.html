@@ -1,0 +1,2989 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+  <meta name="voice-register" content="argument">
+  <meta name="voice-english" content="ste">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Narrow Door · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Tool permissions, and why the list is long because the toolchain is. The two failure modes, the rule syntax that bites, and the move that collapses an allowlist to one screen: make as the only door, Docker as the floor. Rejecting php artisan test and accepting make test, end to end, including the holes make leaves open. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/narrow-door/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Narrow Door">
+<meta property="og:description" content="A permission list is a toolchain decision wearing a config file. Shorten the toolchain and the list shortens itself.">
+<meta property="og:url" content="https://www.tacoda.dev/narrow-door/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Narrow Door">
+<meta name="twitter:description" content="Too loose is a blast radius. Too tight gets switched off. One door in, and a container underneath.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-ink:         #785810;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #6B6157;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-ink:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #9A8E80;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-ink:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #9A8E80;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-ink:       #785810;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #6B6157;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal .swatch.dim    { background: var(--ink-3); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+.railnav li.part {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem 0 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  white-space: nowrap;
+  border-left: 1px solid var(--rule);
+  margin-left: 0.6rem;
+}
+.railnav li.part:first-child { border-left: 0; margin-left: 0; padding-left: 0; }
+
+/* ---------- part divider ---------- */
+.part-rule {
+  padding: clamp(2.5rem, 6vw, 4rem) 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.part-rule .kicker {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  font-weight: 700;
+}
+.part-rule h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.part-rule p {
+  font-size: 0.98rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+}
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold-ink); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold-ink); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold-ink); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold-ink); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold-ink); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- diagrams ---------- */
+/* Mermaid source lives in the page and renders in the browser. The figure
+   body is transparent so the paper shows through the diagram; until the
+   script runs, the source is visible as text. */
+.code.diagram { background: none; }
+.code.diagram .mermaid {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink-3);
+  text-align: center;
+}
+.code.diagram .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+table.wide { min-width: 720px; }
+table.xwide { min-width: 880px; }
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+caption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+caption .tag.block { color: var(--brick); }
+caption .tag.warn  { color: var(--gold-ink); }
+caption .tag.pass  { color: var(--forest); }
+th, td {
+  padding: 0.45rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+  line-height: 1.5;
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  vertical-align: bottom;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.k { font-weight: 700; color: var(--ink); white-space: nowrap; }
+td em { font-style: normal; color: var(--ink-3); }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr[data-signal] td:first-child { border-left: 3px solid var(--rule); }
+tbody tr[data-signal="block"] td:first-child { border-left-color: var(--brick); }
+tbody tr[data-signal="warn"]  td:first-child { border-left-color: var(--gold); }
+tbody tr[data-signal="pass"]  td:first-child { border-left-color: var(--forest); }
+tbody tr.group td {
+  background: var(--surface-2);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule);
+}
+/* coverage marks: full, partial, none */
+td.cov { text-align: center; font-size: 0.9rem; line-height: 1.2; }
+td.cov.y { color: var(--forest); }
+td.cov.p { color: var(--gold-ink); }
+td.cov.n { color: var(--rule); }
+
+/* ---------- matrix ---------- */
+.matrix {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0,1fr) minmax(0,1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--mono);
+  overflow: hidden;
+}
+@media (max-width: 620px) { .matrix { grid-template-columns: minmax(0,1fr); } }
+.matrix > * { background: var(--surface); padding: 0.75rem 0.85rem; }
+.matrix .hd, .matrix .rowhd {
+  background: var(--surface-2);
+  font-size: 0.6rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.matrix .rowhd { display: flex; align-items: center; }
+.matrix .cell .pos {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+.matrix .cell.block .pos { color: var(--brick); }
+.matrix .cell.warn  .pos { color: var(--gold-ink); }
+.matrix .cell.pass  .pos { color: var(--forest); }
+.matrix .cell .m { display: block; font-size: 0.78rem; color: var(--ink); }
+.matrix .cell .n { display: block; font-size: 0.68rem; color: var(--ink-3); margin-top: 0.2rem; }
+
+/* ---------- the standard ---------- */
+.standard {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  counter-reset: std;
+  overflow: hidden;
+}
+.standard li {
+  background: var(--surface);
+  padding: 0.7rem 0.95rem;
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0,1fr) auto;
+  gap: 0.2rem 0.85rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .standard li { grid-template-columns: 1.8rem minmax(0,1fr); }
+  .standard .ref { grid-column: 2; }
+}
+.standard li::before {
+  counter-increment: std;
+  content: counter(std);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.standard .t { font-size: 0.95rem; line-height: 1.45; }
+.standard .t b { font-weight: 600; }
+.standard .ref {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.nongoals { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.8; }
+a.xref { color: var(--brick); text-decoration: none;
+  border-bottom: 1px dotted var(--brick-soft); }
+a.xref:hover, a.xref:focus-visible { border-bottom-style: solid; }
+td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
+.nongoals b { color: var(--ink-2); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.62rem; }
+</style>
+<style>
+/* ---------- permission-page additions ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+
+/* the four rungs get their own chip colors: open to hidden */
+.chip.kind-mcp    { border-left: 3px solid var(--forest); }
+.chip.kind-mcp b  { color: var(--forest); }
+.chip.kind-ctx    { border-left: 3px solid var(--gold);   }
+.chip.kind-ctx b  { color: var(--gold-ink); }
+.chip.kind-cost   { border-left: 3px solid var(--brick);  }
+.chip.kind-cost b { color: var(--brick); }
+
+/* price rail: the two costs, side by side, under a rung heading */
+.price {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--mono);
+  overflow: hidden;
+}
+.price > div { background: var(--surface); padding: 0.7rem 0.85rem; }
+.price dt {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.price dd { margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--ink); line-height: 1.5; }
+.price dd em { font-style: normal; color: var(--ink-3); }
+.price div.standing { border-left: 3px solid var(--brick); }
+.price div.invoked  { border-left: 3px solid var(--gold); }
+.price div.returns  { border-left: 3px solid var(--forest); }
+.price div.hides    { border-left: 3px solid var(--ink-3); }
+
+/* prose lists and cross-references, same as the sibling pages */
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.nongoals { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.8; }
+.nongoals b { color: var(--ink-2); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.62rem; }
+a.xref { color: var(--brick); text-decoration: none; border-bottom: 1px dotted var(--brick-soft); }
+a.xref:hover, a.xref:focus-visible { border-bottom-style: solid; }
+td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Tool Permissions</span>
+      <span class="sep">/</span>
+      <span>design standard</span>
+    </div>
+    <h1>Permissions are the mechanism. <em>Intent</em> is what you meant to model.</h1>
+    <p class="standfirst">
+      A permission rule answers one question: may this string run? The question you actually have is a
+      different one: is this work permitted? Every allowlist is a lossy translation between the two, and
+      the loss is where the accidental grants live. Wrap the work in named tasks and the two questions
+      become one question, because a task is a unit of intent somebody decided on. The list stops
+      approximating what you meant and starts enumerating it.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      the argument · a permission rule models a command string. You meant to model a piece of work<br>
+      the collapse · a <code>make</code> target <em>is</em> the unit of intent, so pointing the list at targets makes the mechanism and the model the same thing<br>
+      the stack · Docker holds the toolchain, <code>make</code> is the only way in, and the allowlist names <code>make</code><br>
+      substitutions · <code>make</code> = your task runner, <code>just</code> or <code>npm run</code> if you prefer · <code>docker compose</code> = your isolation<br>
+      the worked charter · one production Laravel and React portal of mine: 40 rules, a locked toolchain rule, four hook events, 78 <code>make</code> targets. Its allowlist is quoted verbatim, and audited<br>
+      the syntax · Claude Code's, checked against the current permissions reference. The posture applies to any harness that gates tool calls<br>
+      what is honest · that charter is one of the better ones I have, and <a class="xref" href="#s-3">section 3</a> finds seven accidental grants in twenty-four lines of it. <a class="xref" href="#s-12">Section 12.3</a> is what I have not fixed<br>
+      reads alongside · <a href="/guardrails/">Five Guardrails</a> (rung 1 is this page's example, in one screen) · <a href="/capability-ladder/">The Capability Ladder</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="/prompt-injection/">Prompt Injection</a><br>
+      license · CC BY 4.0. Take the posture, not the vocabulary
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Deny</dt>
+          <dd>Evaluated first, from any settings scope, and it cannot carry an exception. A refusal returned to the agent as the result of its call.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Ask</dt>
+          <dd>A prompt, every time, even when a narrower allow rule matches. The middle setting, and the one that decides whether the posture survives the week.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Allow</dt>
+          <dd>The work that runs without interrupting anyone. The sanctioned path, and the shorter it is the more of it you can read.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch dim"></span>
+        <div>
+          <dt>Floor</dt>
+          <dd>What holds when the list is wrong: the container, the sandbox, the credential that is not on the machine.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Sections">
+    <ol>
+      <li class="part">I · the dial</li>
+      <li><a href="#s-0"><span class="n">0</span> Two failure modes</a></li>
+      <li><a href="#s-1"><span class="n">1</span> What a rule is</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Where rules bite</a></li>
+      <li class="part">II · the collapse</li>
+      <li><a href="#s-3"><span class="n">3</span> The gap, in one real file</a></li>
+      <li><a href="#s-4"><span class="n">4</span> The target is the intent</a></li>
+      <li><a href="#s-5"><span class="n">5</span> Docker is the floor</a></li>
+      <li><a href="#s-6"><span class="n">6</span> One refusal, end to end</a></li>
+      <li><a href="#s-7"><span class="n">7</span> What you delete</a></li>
+      <li class="part">III · the residue</li>
+      <li><a href="#s-8"><span class="n">8</span> The holes make leaves</a></li>
+      <li><a href="#s-9"><span class="n">9</span> What deny is not</a></li>
+      <li><a href="#s-10"><span class="n">10</span> When a list cannot say it</a></li>
+      <li class="part">IV · the practice</li>
+      <li><a href="#s-11"><span class="n">11</span> Sizing and auditing</a></li>
+      <li><a href="#s-12"><span class="n">12</span> The artifact</a></li>
+    </ol>
+  </nav>
+
+  <div class="part-rule">
+    <span class="kicker">Part I</span>
+    <h2>The dial</h2>
+    <p>
+      Three sections before any of my opinions: what goes wrong at each end of the dial, what a
+      permission rule actually is, and the six places the syntax does something other than what the
+      person writing it expected.
+    </p>
+  </div>
+
+   <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="Two failure modes">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Two failure modes</span>
+      </div>
+      <div>
+        <h2>Too loose is a blast radius. Too tight is a bypass flag by Thursday</h2>
+        <p class="thesis">
+          Both ends of the dial fail, and they fail asymmetrically. A loose list fails once, loudly,
+          on the day an ambiguous prompt meets a general tool. A tight list fails quietly and
+          continuously, by generating so many prompts that somebody turns the whole thing off. The
+          second failure is the common one and it does not look like a security event. It looks like
+          productivity.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>too loose</b> one bad afternoon</span>
+          <span class="chip kind-rule"><b>too tight</b> prompt fatigue, then bypass</span>
+          <span class="chip kind-make"><b>the fix</b> fewer things to permit</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <em>Harness Engineering</em> tells this the long way in the chapter on bounding tools. A staff
+        engineer wires up a server exposing a <code>runSql</code> tool that takes a string and runs it.
+        No allowlist of statement types, no dry run, no confirmation. The task is a schema cleanup, the
+        planning doc has moved, the agent infers intent from stale schema comments and runs
+        <code>DROP TABLE</code> on the wrong table. Staging is restored from the previous night's
+        snapshot and nothing ships that day.
+      </p>
+      <p>
+        He was not embarrassed about the model. He was embarrassed about the charter. The model did what
+        the tool let it do, and the tool let it drop a table because nobody had told the tool that
+        dropping tables was special. That is the loose end of the dial, and it is the one everybody
+        writes about.
+      </p>
+
+      <h3 class="sub">0.1 · The other end, which is where teams actually live</h3>
+      <p>
+        Picture the strict charter instead. One broad rule, and a prompt on every tool call. The agent
+        works and every fifteen seconds a dialog interrupts. Over an afternoon the engineer spends as
+        much time answering prompts as the agent spends writing code, and the team blames the agent.
+        The agent did what the charter asked. The charter asked too often.
+      </p>
+      <p>
+        Then somebody finds the bypass mode, and the strictness converts to zero enforcement in one
+        keystroke. This is the part worth saying plainly: <strong>a list too strict to work inside does
+        not produce caution. It produces a session with no checks at all.</strong> The failure mode of
+        over-restriction is under-restriction, arriving later and unlogged.
+      </p>
+
+      <div class="callout">
+        <span class="label">The mode that has exactly one legitimate home</span>
+        <p>
+          The bypass posture belongs in a disposable sandbox where the engineer is training trust with
+          a new agent and intends to throw the work away. In a production-adjacent repository, with
+          secrets, deploy access and migration scripts, it is the charter saying <em>I have given up on
+          this discipline</em>. If you cannot get through an afternoon without it, the list is the
+          problem and <a class="xref" href="#s-4">section 4</a> is the repair.
+        </p>
+      </div>
+
+      <h3 class="sub">0.2 · The postures, and what each one is for</h3>
+      <p>
+        Modern harnesses ship more than one dial position, and knowing the ends is not enough. These
+        are Claude Code's, and the shape generalizes: one posture per level of human attention.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>permission modes, by how much attention a human is paying<span class="tag warn">pick the mode, then size the list for it</span></caption>
+          <thead>
+            <tr><th>Mode</th><th>What it does</th><th>The human is</th><th>Right when</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn"><td class="k">default · manual</td><td>prompts on first use of each tool</td><td>watching every step</td><td>a new repository, a new agent, or work you do not trust yet</td></tr>
+            <tr data-signal="pass"><td class="k">plan</td><td>reads and runs read-only commands, edits nothing</td><td>waiting for a proposal</td><td>you want the approach before anything moves</td></tr>
+            <tr data-signal="pass"><td class="k">acceptEdits</td><td>auto-accepts edits and common filesystem commands in the working directories</td><td>watching the room</td><td>the loop is edit-heavy and the diff is your review surface</td></tr>
+            <tr data-signal="warn"><td class="k">auto</td><td>auto-approves with background safety checks against your request</td><td>reading outcomes, not calls</td><td>the work is routine and the floor underneath is real</td></tr>
+            <tr data-signal="block"><td class="k">dontAsk</td><td>auto-<em>denies</em> anything not pre-approved. No prompts at all</td><td>absent, on purpose</td><td>unattended runs. This is the posture the whole page is built for</td></tr>
+            <tr data-signal="block"><td class="k">bypassPermissions</td><td>skips prompts</td><td>gone, and so are the checks</td><td>a throwaway container. Lock it off everywhere else</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Read the <code>dontAsk</code> row twice, because it is the one that changes how you write a
+        list. A posture that denies anything unlisted and never prompts is only usable if the list is
+        complete. Completeness is impossible while the project can be run eleven ways, and
+        straightforward when it can be run one way. That is the whole argument of Part II, arrived at
+        from the strict end rather than the loose one.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The reframe this page runs on</span>
+        <p>
+          Stop asking <em>how permissive should this list be</em>. Ask <em>what work do I mean to
+          permit</em>. The first question has no stable answer and gets renegotiated every week. The
+          second has a finite answer that a person can write down, and once it is written down the list
+          becomes a transcription of it rather than a negotiation.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="What a rule is">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">What a rule is</span>
+      </div>
+      <div>
+        <h2>Three lists, one order, and a deny that cannot carry an exception</h2>
+        <p class="thesis">
+          A permission rule is <code>Tool</code> or <code>Tool(specifier)</code>. There are three
+          lists, they are evaluated in a fixed order, and the first match decides. Specificity does
+          not enter into it. Almost every confused permission setup I have read is a person expecting
+          the narrow rule to win.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>deny</b> first</span>
+          <span class="chip kind-rule"><b>ask</b> second</span>
+          <span class="chip kind-make"><b>allow</b> last</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>the three lists, in evaluation order<span class="tag block">first match wins, and specificity is not consulted</span></caption>
+          <thead>
+            <tr><th>List</th><th>Effect</th><th>The consequence people miss</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">deny</td><td>refuses the call</td><td>a broad deny cannot hold an exception. <code>Bash(aws *)</code> in deny blocks <code>Bash(aws s3 ls)</code> in allow</td></tr>
+            <tr data-signal="warn"><td class="k">ask</td><td>prompts every time</td><td>it beats a narrower allow. A matching ask prompts even when an exact allow also matches</td></tr>
+            <tr data-signal="pass"><td class="k">allow</td><td>runs without a prompt</td><td>it is a capability grant, so in project settings it waits for the workspace-trust dialog. Deny and ask do not</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The same order runs across settings scopes. A deny anywhere beats an allow anywhere: user
+        settings, project settings, local settings, command-line flags. Managed settings sit above all
+        of it and cannot be overridden even from the command line. So the deny list is the one place a
+        platform team can write something a project cannot argue with, and the allow list is the place
+        a project describes its own work.
+      </p>
+
+      <h3 class="sub">1.1 · Two ways to say no, and they are not the same tool</h3>
+      <p>
+        A deny rule that names a bare tool removes that tool from the model's context. It does not
+        exist; nothing is refused, because nothing is attempted. A deny rule with a specifier leaves the
+        tool in place and refuses the matching calls when the agent tries them.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>bare name versus scoped pattern<span class="tag warn">choose by whether you want the agent to learn</span></caption>
+          <thead>
+            <tr><th>Rule</th><th>What happens</th><th>Use it when</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">deny <code>Bash</code></td><td>the tool is gone from context. The agent cannot want it</td><td>the capability has no place in this repository at all</td></tr>
+            <tr data-signal="warn"><td class="k">deny <code>Bash(php *)</code></td><td>the tool stays. The call is refused and the refusal comes back as the result</td><td>the command is wrong <em>here</em> and there is a right one to learn instead</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The second row is the one that teaches. A refusal returned as the result of the call is
+        readable: the agent sees that <code>php artisan test</code> was denied, reads the rule that says
+        what to run instead, and runs that. A capability quietly absent from context produces no
+        learning and no confusion either. Both are fine. Confusing them produces a charter that
+        explains a rule the agent has no way to encounter.
+      </p>
+
+      <div class="callout">
+        <span class="label">The line the book keeps drawing</span>
+        <p>
+          Permission rules are enforced by the harness, not by the model. <code>CLAUDE.md</code> shapes
+          what the agent <em>tries</em>; the rules decide what <em>runs</em>. A bound that lives only in
+          prose is a suggestion, and the model is free to misread it, be talked out of it, or forget it
+          thirty tool calls deep. That is why the charter states the intent and the config does the
+          refusing, and why <a href="/guardrails/">Five Guardrails</a> pairs them in every example.
+        </p>
+      </div>
+
+      <h3 class="sub">1.2 · The specifier forms worth knowing</h3>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>one rule shape per surface<span class="tag pass">the shapes differ, and mixing them silently fails</span></caption>
+          <thead>
+            <tr><th>Surface</th><th>Form</th><th>Note</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="k">shell</td><td><code>Bash(make test)</code> · <code>Bash(make *)</code></td><td>matches the whole command text. <code>*</code> stands in for any text</td></tr>
+            <tr><td class="k">files, read</td><td><code>Read(./.env)</code> · <code>Read(~/.ssh/**)</code></td><td>gitignore syntax. A read deny also blocks edits and writes to the path</td></tr>
+            <tr><td class="k">files, write</td><td><code>Edit(/src/**)</code></td><td>use <code>Edit</code> for every writing tool. A <code>Write(...)</code> path rule is accepted and never consulted</td></tr>
+            <tr><td class="k">network</td><td><code>WebFetch(domain:example.com)</code></td><td>hostname match. <code>*.example.com</code> covers subdomains, not the apex</td></tr>
+            <tr><td class="k">servers</td><td><code>mcp__github</code> · <code>mcp__github__get_*</code></td><td>an allow glob must sit after a literal server prefix</td></tr>
+            <tr><td class="k">sub-agents</td><td><code>Agent(Explore)</code></td><td>deny to switch one off. See <a class="xref" href="/capability-ladder/#s-10">grants, in the ladder</a></td></tr>
+            <tr data-signal="warn"><td class="k">parameters</td><td><code>Agent(model:opus)</code> · <code>Bash(run_in_background:true)</code></td><td>deny and ask only, one parameter per rule, and never the tool's main content field</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The last row has a reason worth carrying into <a class="xref" href="#s-2">section 2</a>. You
+        cannot write <code>Bash(command:rm *)</code>, and the harness ignores it with a warning, because
+        a rule that matched only the <code>command</code> parameter would be defeated by a compound
+        command. The surface that decides has to be the surface the shell will actually execute.
+      </p>
+    </div>
+  </section>
+
+   <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Where rules bite">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Where rules bite</span>
+      </div>
+      <div>
+        <h2>Six places the syntax does something other than what you meant</h2>
+        <p class="thesis">
+          The rule language is small and it is not intuitive. Wildcard position changes the blast
+          radius. A missing space changes which programs match. Some wrappers are stripped and some
+          run arbitrary commands. Every one of these has cost somebody a wider grant than they
+          thought they were writing, including me.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>position</b> of the star</span>
+          <span class="chip kind-rule"><b>spaces</b> are part of the rule</span>
+          <span class="chip kind-hook"><b>runners</b> are not stripped</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">2.1 · The star, and everything before it</h3>
+      <p>
+        Everything before the first <code>*</code> matches as written, so the words in front of the
+        star are the entire constraint. Put the star after the subcommand, because the subcommand is the
+        word that decides what the program does.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>what each rule shape actually matches<span class="tag block">row three is the one that surprises people</span></caption>
+          <thead>
+            <tr><th>You write</th><th>It matches</th><th>It does not match</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="k"><code>Bash(npm run build)</code></td><td><code>npm run build</code>, exactly</td><td><code>npm run build --watch</code></td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(npm run *)</code></td><td><code>npm run build</code>, <code>npm run test --watch</code>, and bare <code>npm run</code></td><td><code>npm install</code></td></tr>
+            <tr data-signal="block"><td class="k"><code>Bash(git * main)</code></td><td><code>git merge main</code>, <code>git push origin main</code>, and <code>git -c core.fsmonitor=&lt;script&gt; diff main</code></td><td><code>git log</code></td></tr>
+            <tr data-signal="block"><td class="k"><code>Bash(ls*)</code></td><td><code>ls -la</code> and <code>lsof</code></td><td><em>the space is part of the rule, and it is missing</em></td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(ls *)</code></td><td><code>ls -la</code>, <code>ls</code></td><td><code>lsof</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Row three is not a curiosity. <code>git -c</code> makes git run a program you name, so any rule
+        whose star sits before the git subcommand is a general execution grant with a git-shaped label
+        on it. The harness warns at startup about an allow rule with a star before the subcommand. Read
+        the warning.
+      </p>
+      <p>
+        The <code>:*</code> suffix is the same thing as a trailing space-star, and only at the end.
+        <code>Bash(ls:*)</code> and <code>Bash(ls *)</code> are one rule written two ways. In the middle
+        of a pattern the colon is a literal character, so <code>Bash(git:* push)</code> matches nothing
+        you intended.
+      </p>
+
+      <h3 class="sub">2.2 · Compound commands, which the harness handles</h3>
+      <p>
+        This one is good news, and it is worth knowing so you stop writing defensive rules against it.
+        The harness understands shell separators. A rule must match each subcommand independently, so an
+        allow of <code>Bash(safe-cmd *)</code> does not authorize <code>safe-cmd &amp;&amp; other-cmd</code>.
+        Deny and ask rules go the other way: they fire if <em>any</em> subcommand matches, including one
+        nested in a subshell, a command substitution, or a loop body.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">allow side</span>
+          <span class="what">Every subcommand needs its own match. The recognized separators are <code>&amp;&amp;</code>, <code>||</code>, <code>;</code>, <code>|</code>, <code>|&amp;</code>, <code>&amp;</code> and newlines.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">deny side</span>
+          <span class="what">One matching subcommand anywhere is enough. <code>echo "$(git clean -f)"</code> trips a <code>Bash(git clean *)</code> rule.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">unparseable</span>
+          <span class="what">A dangling operator such as <code>npm test &amp;&amp;</code> is not split at all, and allow rules do not approve it. It prompts.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">2.3 · Wrappers: some are stripped, and the dangerous ones are not</h3>
+      <p>
+        Before matching, a fixed set of wrappers comes off, so <code>Bash(npm test *)</code> also covers
+        <code>timeout 30 npm test</code>. The stripped set is <code>timeout</code>, <code>time</code>,
+        <code>nice</code>, <code>nohup</code>, <code>stdbuf</code>, the builtins <code>command</code> and
+        <code>builtin</code>, zsh's <code>noglob</code>, a leading assignment of certain known-safe
+        environment variables, and bare <code>xargs</code>.
+      </p>
+      <p>
+        The list is built in and it is not configurable, which means the runners are not on it. This is
+        the single most important sentence on this page for anybody about to write
+        <code>Bash(docker compose exec *)</code>:
+      </p>
+
+      <div class="callout">
+        <span class="label">An environment runner in an allow rule is an execution grant</span>
+        <p>
+          <code>docker exec</code>, <code>npx</code>, <code>devbox run</code>, <code>mise exec</code> and
+          <code>direnv exec</code> execute whatever follows them, and they are not stripped. So
+          <code>Bash(devbox run *)</code> matches <code>devbox run rm -rf .</code>, and
+          <code>Bash(docker compose exec *)</code> matches <code>docker compose exec web sh -c
+          'anything at all'</code>. To approve work inside a runner, name the runner <em>and</em> the
+          inner command: <code>Bash(devbox run npm test)</code>, one rule per inner command. The charter
+          in <a class="xref" href="#s-3">section 3</a> gets this wrong, in the line directly above its
+          own deny list, and it is mine.
+        </p>
+      </div>
+
+      <p>
+        Two smaller relatives. Exec wrappers such as <code>watch</code>, <code>setsid</code>,
+        <code>ionice</code> and <code>flock</code> cannot be prefix-approved at all, so in manual mode
+        they always prompt. And <code>find</code> with <code>-exec</code> or <code>-delete</code> is not
+        covered by <code>Bash(find *)</code>; those forms need an exact-match rule for the whole command
+        string.
+      </p>
+
+      <h3 class="sub">2.4 · Rules that constrain arguments are fragile</h3>
+      <p>
+        A rule like <code>Bash(curl http://github.com/ *)</code> looks like a domain restriction and is
+        not one. Options before the URL miss it. A different protocol misses it. A redirect through a
+        shortener defeats it. <code>URL=http://github.com &amp;&amp; curl $URL</code> defeats it. Two
+        spaces instead of one defeats it.
+      </p>
+      <p>
+        The working shape is to deny the network tools in the shell, allow the fetch tool with an
+        explicit domain list, and put anything more specific in a hook. The general rule underneath:
+        <strong>constrain the program, not its arguments.</strong> Argument shapes are an unbounded
+        space and a permission pattern is a finite guess at it.
+      </p>
+      <p>
+        Which is the moment to say what all six of these traps have in common, because it is the
+        argument of the rest of the page. Every one of them is the gap between what the rule
+        <em>matches</em> and what the author <em>meant</em>. Nobody writing <code>Bash(git *)</code>
+        meant <em>may execute arbitrary programs</em>; they meant <em>may do the git work this project
+        involves</em>. The pattern language cannot say the second thing, so it says the first thing and
+        the difference is a grant nobody reviewed. Part II is about closing that gap by changing what
+        the list points at.
+      </p>
+
+      <h3 class="sub">2.5 · Path rules, and the single-slash trap</h3>
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>four path forms, and only one of them is absolute<span class="tag block">a single leading slash is not the filesystem root</span></caption>
+          <thead>
+            <tr><th>Pattern</th><th>Anchored at</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k"><code>//path</code></td><td>the filesystem root</td><td><code>Read(//Users/alice/secrets/**)</code></td></tr>
+            <tr data-signal="pass"><td class="k"><code>~/path</code></td><td>the home directory</td><td><code>Read(~/.ssh/**)</code></td></tr>
+            <tr data-signal="block"><td class="k"><code>/path</code></td><td><em>the settings source</em>, not the root</td><td><code>Edit(/src/**)</code> in project settings means the working directory's <code>src</code></td></tr>
+            <tr><td class="k"><code>path</code> or <code>./path</code></td><td>the current directory</td><td><code>Read(./.env)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The third row bites in user settings, where <code>Read(/secrets/**)</code> resolves under
+        <code>~/.claude/</code> rather than into any project. If you want a rule in user settings to
+        apply inside every project, write it absolute or home-relative.
+      </p>
+
+      <h3 class="sub">2.6 · The read-only set you are already getting for free</h3>
+      <p>
+        A built-in set of shell commands is treated as read-only and runs without a prompt in every
+        mode: <code>ls</code>, <code>cat</code>, <code>echo</code>, <code>pwd</code>, <code>head</code>,
+        <code>tail</code>, <code>grep</code>, <code>find</code>, <code>wc</code>, <code>which</code>,
+        <code>diff</code>, <code>stat</code>, <code>du</code>, <code>cd</code>, and the read-only forms
+        of <code>git</code>. Redirection changes that, because the target of a <code>&gt;</code> is
+        checked against your <code>Edit</code> rules as if the agent had written the file directly.
+      </p>
+      <p>
+        Which means a large fraction of the entries in a typical allowlist are doing nothing at all.
+        <a class="xref" href="#s-7">Section 7</a> counts them in my own repositories.
+      </p>
+    </div>
+  </section>
+
+  <div class="part-rule">
+    <span class="kicker">Part II</span>
+    <h2>The collapse</h2>
+    <p>
+      Why a list grows on its own, and the move that makes it small: one entry point into the project,
+      a container holding the toolchain, and a rule that names the entry point. Five sections, one of
+      them a worked refusal from a real charter.
+    </p>
+  </div>
+
+   <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="The gap, in one real file">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The gap, in one real file</span>
+      </div>
+      <div>
+        <h2>Twenty-four entries, seven of which grant more than the person writing them meant</h2>
+        <p class="thesis">
+          Below is the allow list from a production charter of mine, verbatim. It is one of the better
+          charters I have: forty rules, a locked rule that says drive everything through
+          <code>make</code>, hooks on four events, seventy-eight targets. The rule layer models the
+          intent correctly. The permission layer does not, and it cannot, because it is written in a
+          language that has no word for intent.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>intent</b> what you meant to permit</span>
+          <span class="chip kind-config"><b>pattern</b> what the rule matches</span>
+          <span class="chip kind-gate"><b>gap</b> everything in between</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption>.claude/settings.json · a real allow list, unedited<span class="tag block">read it as twenty-four attempts to say something the language cannot say</span></figcaption>
+<pre><code>"allow": [
+  <span class="c-pass">"Bash(make *)"</span>,
+  <span class="c-block">"Bash(git *)"</span>, <span class="c-block">"Bash(gh *)"</span>, <span class="c-block">"Bash(jira *)"</span>,
+  <span class="c-warn">"Bash(ls *)"</span>, <span class="c-warn">"Bash(wc *)"</span>, <span class="c-warn">"Bash(find *)"</span>, <span class="c-warn">"Bash(grep *)"</span>, <span class="c-warn">"Bash(echo *)"</span>,
+  <span class="c-block">"Bash(docker compose exec *)"</span>,
+  <span class="c-block">"Bash(curl *)"</span>, <span class="c-block">"Bash(xargs *)"</span>, <span class="c-block">"Bash(tee *)"</span>,
+  <span class="c-pass">"mcp__puppeteer__puppeteer_navigate"</span>,
+  <span class="c-pass">"mcp__puppeteer__puppeteer_screenshot"</span>,
+  <span class="c-pass">"mcp__puppeteer__puppeteer_fill"</span>,
+  <span class="c-pass">"mcp__puppeteer__puppeteer_click"</span>,
+  <span class="c-pass">"mcp__puppeteer__puppeteer_evaluate"</span>,
+  <span class="c-pass">"mcp__puppeteer__puppeteer_hover"</span>,
+  <span class="c-pass">"mcp__puppeteer__puppeteer_select"</span>,
+  <span class="c-pass">"mcp__…__createJiraIssue"</span>, <span class="c-pass">"mcp__…__editJiraIssue"</span>, <span class="c-pass">"mcp__…__createIssueLink"</span>,
+  <span class="c-block">"Skill(update-config)"</span>
+],
+"deny": [
+  "Bash(php *)", "Bash(php artisan *)", "Bash(npm *)",
+  "Bash(npx *)", "Bash(composer *)", "Bash(./vendor/bin/*)"
+]
+</code></pre>
+      </figure>
+
+      <p>
+        The bottom half of that file is the toolchain deny list from
+        <a class="xref" href="#s-6">section 6</a>, and it works. The top half is where the intent gap
+        lives. Read the next table one row at a time: the middle column is what somebody was trying to
+        say, and the right column is what the rule says instead.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>the same twenty-four entries, as intents<span class="tag block">the right column is what a reviewer is actually approving</span></caption>
+          <thead>
+            <tr><th>Entry</th><th>The intent behind it</th><th>What it permits</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass">
+              <td class="k"><code>Bash(make *)</code></td>
+              <td>run this project's tasks</td>
+              <td>the seventy-eight named targets. An <em>enumerated</em> set, in a reviewed file</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Bash(git *)</code></td>
+              <td>commit, branch, read history</td>
+              <td>any program on the machine. <code>git -c core.fsmonitor=&lt;script&gt;</code> executes what you name</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Bash(gh *)</code></td>
+              <td>open and read pull requests</td>
+              <td>every subcommand, including arbitrary authenticated API calls, secrets, and workflow runs</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Bash(jira *)</code></td>
+              <td>move the ticket I am working on</td>
+              <td>every mutation the tracker credential can perform, on any project</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Bash(docker compose exec *)</code></td>
+              <td>run one thing inside the container</td>
+              <td>every program in the container. It reopens all six deny entries below it</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Bash(curl *)</code></td>
+              <td>hit the local API while developing</td>
+              <td>arbitrary egress, unboundable by pattern. <a class="xref" href="#s-2">Section 2.4</a></td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Bash(xargs *)</code></td>
+              <td>feed a file list into a command</td>
+              <td><code>xargs sh -c</code>, which is arbitrary execution, and with flags it is not stripped</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Bash(tee *)</code></td>
+              <td>capture output while still seeing it</td>
+              <td>a write to any path, through a program the file rules do not recognize as a file command</td>
+            </tr>
+            <tr data-signal="warn">
+              <td class="k"><code>ls</code> <code>wc</code> <code>find</code> <code>grep</code> <code>echo</code></td>
+              <td>let the agent look around without prompting</td>
+              <td>nothing. All five are in the read-only set already. <a class="xref" href="#s-2">Section 2.6</a></td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Skill(update-config)</code></td>
+              <td>let it fix a hook when I ask it to</td>
+              <td>edits to the settings file that contains this list. The grant can rewrite the grant</td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k">the ten MCP tools</td>
+              <td>drive a browser; file and link tickets</td>
+              <td>exactly those ten operations. One entry, one intent, ten times over</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">3.1 · The two rows that are already right</h3>
+      <p>
+        Look at the first and last rows before the eight in the middle, because they are the answer and
+        they are already in the file. The MCP entries name one operation each: navigate, screenshot,
+        fill, click. Nobody wrote <code>mcp__puppeteer__*</code>, because the tools have names and
+        naming them was easy. And <code>Bash(make *)</code> is one line standing in for seventy-eight
+        named tasks, which is the same trick performed on the shell.
+      </p>
+      <p>
+        Both are cases where the thing being permitted <em>had a name</em>. That is the whole
+        difference. Where the unit of permission has a name, the list enumerates intents and reads
+        correctly. Where it does not, the author reaches for the program name and a wildcard, and grants
+        the program's entire surface because that is the only thing the language lets them say.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>five kinds of junk, and what each one is a symptom of<span class="tag warn">every row is the same missing thing</span></caption>
+          <thead>
+            <tr><th>Kind</th><th>In this file</th><th>Symptom of</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">the program grant</td><td><code>git *</code>, <code>gh *</code>, <code>jira *</code></td><td>the intent had no name, so the program's name was used instead</td></tr>
+            <tr data-signal="block"><td class="k">the runner</td><td><code>docker compose exec *</code>, <code>xargs *</code></td><td>a general execution grant wearing a specific label. <a class="xref" href="#s-2">Section 2.3</a></td></tr>
+            <tr data-signal="block"><td class="k">the reopener</td><td><code>docker compose exec *</code> above a deny list for <code>php</code> and <code>npm</code></td><td>two layers written at different times by the same person, and never read together</td></tr>
+            <tr data-signal="warn"><td class="k">the dead entry</td><td>five read-only commands</td><td>a default nobody rechecks. It costs nothing and it hides the real entries</td></tr>
+            <tr data-signal="block"><td class="k">the self-grant</td><td><code>Skill(update-config)</code></td><td>the enforcement sitting inside its own blast radius. <a class="xref" href="#s-8">Section 8</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The diagnosis, and it is structural rather than personal</span>
+        <p>
+          That file was not written carelessly. The charter it belongs to has a rule marked
+          <code>locked</code> that says drive everything through <code>make</code>, a hook on every
+          write, and a target for every task. The <em>rule</em> models the intent exactly right. The
+          allowlist still drifted, because a rule speaks about work and an allowlist speaks about
+          strings, and nothing keeps the two in agreement. The next section is what happens when you
+          make them the same artifact.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="The target is the intent">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The target is the intent</span>
+      </div>
+      <div>
+        <h2>Restrict the permissions to the allowable set of intents, and give every intent a name</h2>
+        <p class="thesis">
+          This is the whole move. A <code>make</code> target is a unit of intent: a name a person chose,
+          for work the project has decided it does, in a file that gets reviewed. Point the permission
+          list at targets and it stops being an approximation of what you meant. It becomes an
+          enumeration of it, and the surface area falls out of that rather than being the goal.
+        </p>
+        <div class="chips">
+          <span class="chip kind-make"><b>one target</b> one intent</span>
+          <span class="chip kind-rule"><b>ARGS=</b> the variation, not a wider grant</span>
+          <span class="chip kind-config"><b>one entry</b> pointing at the set</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A target carries four things a command pattern cannot. A <strong>name</strong>, chosen by a
+        person, in the vocabulary of the work rather than the vocabulary of the tool. A
+        <strong>recipe</strong>, which says exactly what the intent expands to. A <strong>place</strong>
+        in a tracked file, so adding one is a diff and a reviewer. And a <strong>help line</strong>, so
+        the permitted set is discoverable instead of guessable. That is the smallest artifact I know of
+        that carries <em>we decided the project does this</em>.
+      </p>
+      <p>
+        So the principle, stated once: <strong>permit the allowable set of intents, and nothing
+        else.</strong> Every entry in the allow list names one intent, or names a file that enumerates
+        them. An entry that grants a program's whole surface is not a stricter or looser version of that
+        principle. It is a different thing, standing in for an intent that was never written down.
+      </p>
+
+      <h3 class="sub">4.1 · The seven accidental grants, resolved</h3>
+      <p>
+        Each row takes one entry from <a class="xref" href="#s-3">section 3</a> and names the intent it
+        was standing in for. The right column is what replaces it, and in five of the seven the varying
+        part becomes an argument rather than a wider pattern.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>from program grant to named intent<span class="tag pass">the middle column is the sentence somebody should have written down</span></caption>
+          <thead>
+            <tr><th>Was</th><th>The intent, named</th><th>Becomes</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass">
+              <td class="k"><code>Bash(git *)</code></td>
+              <td>commit the current work; start a branch for a ticket</td>
+              <td><code>make commit MSG="…"</code> and <code>make branch NAME=…</code>, or two narrow git entries and no wildcard</td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k"><code>Bash(gh *)</code></td>
+              <td>open a pull request; read the one under review</td>
+              <td><code>make pr ARGS=…</code>, <code>make pr-view ARGS=…</code></td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k"><code>Bash(jira *)</code></td>
+              <td>file, edit and link a ticket</td>
+              <td>the three tracker tools already in the list, named one at a time</td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k"><code>Bash(docker compose exec *)</code></td>
+              <td>run an artisan command; open a console; get a shell</td>
+              <td><code>make artisan ARGS=…</code>, <code>make tinker ARGS=…</code>, <code>make shell</code></td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k"><code>Bash(curl *)</code></td>
+              <td>call this app's own API while developing</td>
+              <td><code>make api ARGS=…</code> against the container, plus <code>WebFetch(domain:…)</code> for the real web</td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k"><code>Bash(xargs *)</code> · <code>Bash(tee *)</code></td>
+              <td>run a check over a file list; keep the output</td>
+              <td>the target takes the file list (<code>FILES="a.php b.php"</code>) and writes its own report</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Skill(update-config)</code></td>
+              <td>fix a hook when I ask</td>
+              <td>a human edit, enforced from a scope the agent cannot write. Removing the entry is not enough, and <a class="xref" href="#s-8">section 8.3</a> is why</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The <code>FILES=</code> row is not hypothetical: that charter already has
+        <code>make psalm-files FILES="a.php b.php"</code>, written because a full analysis run was too
+        slow, and it is the exact shape the argument needs. The parameterized target was already there.
+        The allowlist just never caught up with it.
+      </p>
+
+      <h3 class="sub">4.2 · Arguments are what keep a parameterized intent a single intent</h3>
+      <p>
+        This is the part that makes the strict posture livable, and it is why the answer is not simply
+        <em>write narrower patterns</em>. Work varies. You want style fixed in one directory today and
+        another tomorrow; a migration rolled back one step, then three. A pattern-shaped list handles
+        variation by widening until it covers the family, which is how
+        <code>Bash(./vendor/bin/*)</code> gets written. A target handles it by taking an argument, and
+        the permitted set does not move.
+      </p>
+
+      <figure class="code">
+        <figcaption>one intent, four invocations, no new permission entries<span class="tag pass">the grant did not widen; the argument did the varying</span></figcaption>
+<pre><code>make pint-fix
+make pint-fix ARGS=app/Services/Billing
+make migrate-rollback ARGS=--step=1
+make psalm-files FILES="app/Actions/Approve.php app/Http/Api.php"
+
+<span class="c-dim"># Every one of these is Bash(make *). The list is unchanged.</span>
+<span class="c-dim"># A pattern-shaped list would have grown a rule for each shape,</span>
+<span class="c-dim"># then one wildcard that swallowed all four.</span>
+</code></pre>
+      </figure>
+
+      <p>
+        There is a bill for this and <a class="xref" href="#s-8">section 8</a> is where it comes due: an
+        argument interpolated into a shell recipe can carry shell. The charter above interpolates
+        <code>$(ARGS)</code> unquoted in about a dozen recipes, including <code>make tinker
+        ARGS=--execute='…'</code>, which is arbitrary code execution by documented design. Arguments are
+        the right mechanism and they are the part of the door that needs a lock.
+      </p>
+
+      <h3 class="sub">4.3 · Why one entry for seventy-eight intents is not cheating</h3>
+      <p>
+        <code>Bash(make *)</code> is one rule standing in for a large set, which looks like exactly the
+        move the eight bad rows made. The difference is where the set is written down. A program grant
+        stands in for a set nobody has ever listed: the union of everything <code>git</code> or
+        <code>gh</code> can do, discovered at the moment it matters. A door stands in for a set that
+        exists as text, in the repository, with a name and a recipe per member, in front of a reviewer.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>two ways to permit the same work<span class="tag pass">the difference is whether the set is written down anywhere</span></caption>
+          <thead>
+            <tr><th></th><th>A pattern per command</th><th>One entry, and a target per intent</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">the permitted set is</td><td>implied by the patterns, and nobody has listed it</td><td>the target list. <code>make help</code> prints it</td></tr>
+            <tr data-signal="pass"><td class="k">entries to write</td><td>one per invocation shape, forever</td><td>one: <code>Bash(make *)</code></td></tr>
+            <tr data-signal="pass"><td class="k">adding a capability is</td><td>a click on a prompt, in an untracked file</td><td>a target, in a diff, with a reviewer</td></tr>
+            <tr data-signal="pass"><td class="k">when the toolchain changes</td><td>every entry churns</td><td><code>make test</code> keeps its name; the recipe changes</td></tr>
+            <tr data-signal="pass"><td class="k">how the agent discovers it</td><td>trial, refusal, retry</td><td><code>make help</code>, and one always-on rule pointing at it</td></tr>
+            <tr data-signal="warn"><td class="k">the residual grant is</td><td>whatever nobody noticed in a program's surface</td><td>the recipes, plus the flags that redirect <code>make</code>. <a class="xref" href="#s-8">Section 8</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">4.4 · A name beats a command, for a second reason</h3>
+      <p>
+        <code>make test</code> is a stable name for an unstable thing. Underneath it may be
+        <code>pest</code>, then <code>phpunit</code>, then two tiers run concurrently by
+        <code>paratest</code> inside a container. Each of those rewrites a command-shaped allowlist and
+        none of them touch a target-shaped one. The charter's instruction to the agent (<em>run
+        <code>make test</code>, run <code>make lint</code></em>) also stops going stale, which is the
+        same benefit arriving in the prose layer.
+      </p>
+      <p>
+        And a target records a decision, where an allowlist entry records a click. A command in an
+        allowlist means a prompt fired and a human said yes once. A target means a person decided this
+        is a thing the project does, wrote it down, and named it. Those are different artifacts with
+        different review paths, and only one of them is legible six months later.
+      </p>
+
+      <h3 class="sub">4.5 · Three artifacts pointing the same direction</h3>
+      <p>
+        A rule states the intent, the config makes it non-negotiable, and the <code>Makefile</code>
+        makes compliance the easy path. <a href="/guardrails/">Five Guardrails</a> works this trio in one
+        screen as the cheapest guardrail there is; here it is as the shape:
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">the rule</span>
+          <span class="what">Always-on prose: use <code>make</code> targets, never the raw tool, and here is what to do when no target fits. This is the part that teaches, and it enforces nothing. In the charter above it is marked <code>locked</code>, with a <code>why</code> field recording the incident that produced it.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">the config</span>
+          <span class="what">A deny list for the raw tools and an allow for the door. This is the part that refuses, and it explains nothing.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">the Makefile</span>
+          <span class="what">The enumeration of intents, self-documenting, so the permitted set is discoverable rather than guessable. This is the part that makes the other two survivable.</span>
+        </li>
+      </ol>
+
+      <p>
+        Miss the third and you have built the strict charter from
+        <a class="xref" href="#s-0">section 0</a>: a wall with no gate, which lasts until somebody finds
+        the bypass flag. The escape hatch in the rule text matters as much as the wall does, and the real
+        one says it in two lines: <em>no appropriate target exists, add one to the Makefile and document
+        it</em>; <em>an existing target is not flexible enough, add <code>ARGS=</code> support rather
+        than reaching for the raw tool.</em>
+      </p>
+
+      <figure class="code">
+        <figcaption>make help · the intent catalog, printed<span class="tag pass">a reviewer reads the permitted surface in ten seconds</span></figcaption>
+<pre><code>test                 <span class="c-pass">## both PHP test tiers concurrently — the pre-commit gate</span>
+test-parallel        <span class="c-pass">## use-case tier via paratest, no database</span>
+test-adapter         <span class="c-pass">## adapter tier against an in-memory database</span>
+pint-fix             <span class="c-pass">## fix PHP code style (ARGS= for extra flags)</span>
+psalm-files          <span class="c-pass">## analyse a specific file set: FILES="a.php b.php"</span>
+migrate-rollback     <span class="c-pass">## roll back the last batch (ARGS=--step=1)</span>
+tinker               <span class="c-pass">## a Laravel console (ARGS=--execute='…')</span>
+shell                <span class="c-pass">## bash in the app container</span>
+
+<span class="c-dim"># Seventy-eight of these. Two — tinker and shell — are general</span>
+<span class="c-dim"># execution, which means they are not intents at all. Section 8.1</span>
+<span class="c-dim"># is what to do about that, and it is not "decide carefully".</span>
+</code></pre>
+      </figure>
+    </div>
+  </section>
+
+   <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Docker is the floor">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Docker is the floor</span>
+      </div>
+      <div>
+        <h2>The allowlist decides what may run. The container decides what it can touch</h2>
+        <p class="thesis">
+          Two gates, deliberately, because a single line of defense is a single point of failure. The
+          permission rule is a check the harness performs on a string. The container is the operating
+          system refusing. They fail differently, which is the only reason to have both, and together
+          they produce the property the whole stack is for: the wrong command is not merely refused, it
+          could not have worked.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>gate one</b> may this run</span>
+          <span class="chip kind-hook"><b>gate two</b> what can it reach</span>
+          <span class="chip kind-make"><b>result</b> no host toolchain to reach for</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Here is the sentence from the guardrails page that this whole stack exists to produce. A project
+        runs entirely inside Docker. An agent that types <code>php artisan migrate</code> runs it on the
+        host, which has no PHP extension set and no database. Then, being helpful, the agent invents a
+        workaround. <strong>The failure is not the wrong command. It is that the wrong command was
+        available.</strong>
+      </p>
+      <p>
+        Move the toolchain into the container and that availability goes away as a matter of fact rather
+        than policy. There is no host <code>php</code> to run. The deny rule is then a courtesy that
+        returns a readable refusal instead of a confusing environment error, and the courtesy is worth
+        having, but it is no longer the thing holding the line.
+      </p>
+
+      <figure class="code diagram">
+        <figcaption>the stack, and what each layer can still get wrong<span class="tag block">brick is the layer that holds when the layer above is wrong</span></figcaption>
+<pre class="mermaid">
+flowchart TD
+  A["the agent proposes a command"] --> R{"permission rules · deny, ask, allow"}
+  R -->|"not make"| X["refused, with a readable reason"]
+  R -->|"make target"| M["make · the only door"]
+  M --> C["docker compose · the container"]
+  C --> T["the toolchain, which exists only here"]
+  C --> B["filesystem bound · no host credentials · ephemeral"]
+  X --> L["the agent reads the rule and runs make instead"]
+  class A dim
+  class R warn
+  class X warn
+  class L dim
+  class M pass
+  class C pass
+  class T pass
+  class B block
+</pre>
+      </figure>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>what each layer decides, and what it cannot<span class="tag warn">neither row is sufficient alone</span></caption>
+          <thead>
+            <tr><th>Layer</th><th>Decides</th><th>Cannot</th><th>Fails when</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn"><td class="k">permission rules</td><td>whether a command string may run at all</td><td>see what the command <em>does</em>; a target, a script or an exec runs whatever it likes</td><td>the pattern is wider than you read it as. <a class="xref" href="#s-2">Section 2</a></td></tr>
+            <tr data-signal="pass"><td class="k">make</td><td>which named tasks exist</td><td>stop <code>make -f</code>, <code>make -C</code>, or a hostile <code>ARGS=</code></td><td>the <code>Makefile</code> is not reviewed, or the escape hatches are open. <a class="xref" href="#s-8">Section 8</a></td></tr>
+            <tr data-signal="block"><td class="k">the container</td><td>what any of it can touch: files, network, processes</td><td>protect what you mounted, or a secret you put inside it</td><td>the repository is bind-mounted with a <code>.env</code> in it, which is the normal case</td></tr>
+            <tr data-signal="block"><td class="k">the missing credential</td><td>what is reachable at all, from anywhere</td><td>be undone by any config mistake, which is its whole appeal</td><td>somebody puts a production credential in the dev environment</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Read the last row as the strongest control on the page. The cheapest way to bound exposure to
+        production is to have none: no write access, no read access, and no credential on the machine
+        that could become either. Production deploys, production data and production migrations sit
+        behind a human. That is not least privilege applied carefully; it is a line drawn before the
+        privilege question is asked, and it is the one grant I do not make.
+      </p>
+
+      <h3 class="sub">5.1 · The harness has a sandbox too, and it is not the same boundary</h3>
+      <p>
+        Claude Code can enforce filesystem and network bounds at the OS level for Bash commands and
+        their children, and it merges those bounds with your <code>Read</code> and <code>Edit</code>
+        deny rules and your <code>WebFetch</code> domain rules. That is a real floor and it is worth
+        turning on. It is also not your container: it bounds the shell the agent runs, while the
+        container bounds the environment your project runs in.
+      </p>
+      <p>
+        Two honest notes about the overlap. Path deny rules cover the built-in file tools and the file
+        commands the harness recognizes in Bash, and they do <em>not</em> cover an arbitrary subprocess
+        that opens files itself, which a test suite does constantly: for that you need OS-level
+        enforcement, container or sandbox. And a container with your repository bind-mounted does not
+        protect a secret that lives in the repository. Both layers leave a gap the other one covers, so
+        run both and know which one you are relying on for what.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The division, in one line each</span>
+        <p>
+          <code>make</code> is the interface: it decides what the project can be asked to do. Docker is
+          the floor: it decides what any of that can reach. The permission list is neither, and once the
+          first two are in place it becomes what it should have been all along, which is a short, boring
+          file naming one door and a handful of things that were never going through it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="One refusal, end to end">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">One refusal, end to end</span>
+      </div>
+      <div>
+        <h2><code>php artisan test</code> is refused, <code>make test</code> is not, and the agent works it out unaided</h2>
+        <p class="thesis">
+          One command, three artifacts, six steps. The interesting part is not the refusal. It is that
+          the refusal is readable, the sanctioned path is discoverable, and the agent recovers inside the
+          same turn without a human being interrupted. A guardrail that costs nobody an interruption is
+          a guardrail that is still there next month.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>denied</b> php artisan test</span>
+          <span class="chip kind-make"><b>permitted</b> make test</span>
+          <span class="chip kind-rule"><b>explained</b> in always-on prose</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption>.claude/rules/toolchain.md · the always-on rule<span class="tag warn">it teaches, and it enforces nothing</span></figcaption>
+<pre><code><span class="c-warn">**Always use `make` targets.**</span> Never run `npm`, `npx`, `php`,
+`php artisan`, `composer`, `vite`, or similar tools directly — they
+execute on the host, not in the container, and bypass the project's
+environment.
+
+- No appropriate target exists → <span class="c-pass">add one to the `Makefile`</span> and
+  document it in `.claude/features/common-commands.md`.
+- An existing target is not flexible enough → <span class="c-pass">add `ARGS=` support</span>
+  rather than reaching for the raw tool.
+- Coreutils (`ls`, `grep`, `tail`, `git`, etc.) are fine to run directly.
+</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>.claude/settings.json · the enforcement<span class="tag block">deny is evaluated first, from any scope</span></figcaption>
+<pre><code>"permissions": {
+  "allow": [
+    <span class="c-pass">"Bash(make *)"</span>,
+    "Bash(git diff *)", "Bash(git commit *)",
+    "Bash(gh pr *)"
+  ],
+  "ask": [
+    <span class="c-warn">"Bash(git push *)"</span>
+  ],
+  "deny": [
+    <span class="c-block">"Bash(php *)"</span>, <span class="c-block">"Bash(composer *)"</span>, <span class="c-block">"Bash(npm *)"</span>,
+    <span class="c-block">"Bash(npx *)"</span>, <span class="c-block">"Bash(./vendor/bin/*)"</span>,
+    "Bash(git push --force *)", "Bash(git push -f *)",
+    "Read(./.env)", "Read(~/.aws/**)", "Read(~/.ssh/**)"
+  ]
+}
+</code></pre>
+      </figure>
+
+      <figure class="code diagram">
+        <figcaption>the six steps, and the one that does the teaching<span class="tag pass">no human is interrupted anywhere in this sequence</span></figcaption>
+<pre class="mermaid">
+sequenceDiagram
+  participant A as the agent
+  participant P as the permission gate
+  participant M as make
+  participant D as the container
+  A->>P: php artisan test
+  P-->>A: denied by Bash(php *)
+  Note over A: the refusal is the result of the call, so the agent reads it
+  A->>A: re-reads the always-on rule: use a make target
+  A->>P: make test
+  P-->>M: allowed by Bash(make *)
+  M->>D: docker compose exec app pest
+  D-->>A: 214 passed, 2 failed, with file and line
+</pre>
+      </figure>
+
+      <h3 class="sub">6.1 · The consequence of deny-first, which changes how you write the escape</h3>
+      <p>
+        Somebody will want <code>php artisan tinker</code> next week. You cannot get it by adding an
+        allow rule, because <code>Bash(php *)</code> in deny is evaluated first and a deny cannot carry
+        an exception. That constraint is a feature, and it leaves exactly three moves:
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>three ways to permit one exception<span class="tag pass">the first one is the only one that leaves the list short</span></caption>
+          <thead>
+            <tr><th>Move</th><th>What it costs</th><th>What it produces</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">add a target</td><td>a line in the <code>Makefile</code> and a review</td><td><code>make tinker</code>. The list does not change at all, and the capability is now documented</td></tr>
+            <tr data-signal="warn"><td class="k">move the family to ask</td><td>a prompt every time, for every <code>php</code> call</td><td>a human decides per call. Honest, and it does not scale to unattended runs</td></tr>
+            <tr data-signal="block"><td class="k">narrow the deny</td><td>one deny per dangerous subcommand, forever</td><td>the sprawl from <a class="xref" href="#s-3">section 3</a>, rebuilt on the deny side</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The first move is the one that compounds, and notice what it does to the argument. A request to
+        widen the agent's capability has become a pull request against a file, with a name, a recipe and
+        a reviewer. That is the same shape as every other change to how the project is built, which is
+        the point: permission decisions stop being a private settings file and start being engineering.
+      </p>
+
+      <h3 class="sub">6.2 · And when the work varies</h3>
+      <p>
+        The next request will not be <code>make test</code>. It will be the test suite over one
+        directory, or style fixed in one module, or a rollback of exactly one migration batch. That is
+        the same intent with a parameter, and <a class="xref" href="#s-4">section 4.2</a> is where it
+        goes: into <code>ARGS=</code> or a named variable, not into a wider entry. The allowlist stays
+        one line, and <a class="xref" href="#s-8">section 8</a> is the bill for interpolating a variable
+        into a shell recipe.
+      </p>
+    </div>
+  </section>
+
+   <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="What you delete">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">What you delete</span>
+      </div>
+      <div>
+        <h2>Thirteen of those twenty-four entries should not be in the file</h2>
+        <p class="thesis">
+          Five were free all along, seven were standing in for an intent nobody had named, and one could
+          rewrite the file itself. What remains falls into three groups: the entries a target replaces,
+          the entries that were never doing anything, and the entries that stay because they were never
+          going through <code>make</code> in the first place. Only the third group needs judgment.
+        </p>
+        <div class="chips">
+          <span class="chip kind-make"><b>replaced</b> by a target</span>
+          <span class="chip kind-config"><b>dead</b> already free</span>
+          <span class="chip kind-rule"><b>kept</b> and narrowed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">7.1 · Replaced by the door</h3>
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>toolchain entries the door removes<span class="tag pass">each becomes a target, and moves to the deny side</span></caption>
+          <thead>
+            <tr><th>Delete</th><th>Because</th><th>Now</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k"><code>Bash(php *)</code> · <code>Bash(php artisan *)</code></td><td>there is no PHP on the host to run</td><td><code>make test</code>, <code>make migrate</code>, and a deny for the raw tool</td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(composer *)</code> · <code>Bash(./vendor/bin/*)</code></td><td>same, and the second one is a directory of arbitrary programs</td><td><code>make install</code>, <code>make lint</code></td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(npm *)</code> · <code>Bash(npx *)</code> · <code>Bash(vite *)</code></td><td>same. <code>npx</code> is also an unstripped runner, so it was an execution grant</td><td><code>make build</code>, <code>make dev</code></td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(bundle *)</code> · <code>Bash(rails *)</code> · <code>Bash(rake *)</code></td><td>the Ruby version of the same list, one framework over</td><td><code>make test</code>, <code>make console</code></td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(python3 *)</code> · <code>Bash(pytest *)</code></td><td>a general interpreter grant, which is every capability at once</td><td>a target, or a bundled script the skill runs by name</td></tr>
+            <tr data-signal="block"><td class="k"><code>Bash(docker compose exec *)</code></td><td>an unstripped runner: <code>exec web sh -c '…'</code> is arbitrary code</td><td>targets. Keep <code>Bash(docker compose logs *)</code> and <code>ps</code> if you want them</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">7.2 · Dead on arrival</h3>
+      <p>
+        These were never doing anything, because the read-only set runs without a prompt in every mode.
+        Five of the twenty-four entries in <a class="xref" href="#s-3">section 3</a> are in this
+        category, which is how you know the pattern is not a beginner's mistake but a default nobody
+        rechecks.
+      </p>
+      <figure class="code">
+        <figcaption>the five free entries, and the four that are not<span class="tag block">two thirds of this block can go, and one line of it is the whole machine</span></figcaption>
+<pre><code>"allow": [
+  <span class="c-warn">"Bash(ls *)"</span>,     <span class="c-dim">// already free</span>
+  <span class="c-warn">"Bash(wc *)"</span>,     <span class="c-dim">// already free</span>
+  <span class="c-warn">"Bash(find *)"</span>,   <span class="c-dim">// already free, and -exec was never covered anyway</span>
+  <span class="c-warn">"Bash(grep *)"</span>,   <span class="c-dim">// already free</span>
+  <span class="c-warn">"Bash(echo *)"</span>,   <span class="c-dim">// already free</span>
+  <span class="c-block">"Bash(git *)"</span>,    <span class="c-dim">// git -c core.fsmonitor=&lt;script&gt; runs anything</span>
+  <span class="c-block">"Bash(xargs *)"</span>,  <span class="c-dim">// xargs sh -c runs anything</span>
+  <span class="c-block">"Bash(tee *)"</span>,    <span class="c-dim">// writes any path, unseen by the file rules</span>
+  <span class="c-block">"Bash(curl *)"</span>    <span class="c-dim">// unbounded egress</span>
+]
+</code></pre>
+      </figure>
+      <p>
+        <code>Bash(git *)</code> is the one to look at twice, because it is the most reasonable-looking
+        line in the file. It reads as a convenience and it is a general execution grant, since
+        <code>git -c</code> runs a program you name. The read-only git forms are already free, so the
+        honest version of this entry is two rules for the writing subcommands, or a
+        <code>make commit</code> target, and no wildcard at all.
+      </p>
+
+      <h3 class="sub">7.3 · Kept, and narrowed</h3>
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>what stays after the collapse<span class="tag warn">these are the entries that deserve the argument</span></caption>
+          <thead>
+            <tr><th>Keep</th><th>Why it is not a target</th><th>Narrow it to</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k"><code>make</code></td><td>it is the door</td><td><code>Bash(make *)</code>, with the <a class="xref" href="#s-8">section 8</a> denies beside it</td></tr>
+            <tr data-signal="warn"><td class="k">git, the writing half</td><td>the agent's work <em>is</em> commits and branches</td><td><code>Bash(git commit *)</code>, <code>Bash(git checkout -b *)</code>. Never <code>Bash(git *)</code></td></tr>
+            <tr data-signal="warn"><td class="k">the code host CLI</td><td>it reaches a system outside the container by design</td><td><code>Bash(gh pr view *)</code>, <code>Bash(gh pr create *)</code>, by subcommand</td></tr>
+            <tr data-signal="warn"><td class="k">the tracker CLI</td><td>same, and it holds a credential</td><td>one entry per subcommand you actually use</td></tr>
+            <tr data-signal="pass"><td class="k">fetching</td><td>the network is not a task runner</td><td><code>WebFetch(domain:…)</code> per host, plus a deny for <code>curl</code> and <code>wget</code></td></tr>
+            <tr data-signal="pass"><td class="k">servers</td><td>MCP tools are not shell at all</td><td><code>mcp__server__tool</code>, per tool. <a class="xref" href="/capability-ladder/#s-4">the ladder, §4</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="takeaway">
+        <span class="label">The arithmetic, on the real charter this page is drawn from</span>
+        <p>
+          Before: twenty-four allow entries. Five were free, seven granted more than they named, one
+          could rewrite the file itself, and eleven were already right. After: the door, two narrow git
+          entries, three code-host entries, the ten MCP tools by name, and a deny list that <em>grew</em>,
+          because it is now where the interesting decisions live. The reviewable surface stopped being a
+          file nobody read and became a <code>Makefile</code> that somebody does.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="part-rule">
+    <span class="kicker">Part III</span>
+    <h2>The residue</h2>
+    <p>
+      One door is not one lock. Three sections on what the collapse leaves open: the holes
+      <code>make</code> itself brings, what a deny list is and is not for, and the point where a list
+      cannot express the rule and code has to.
+    </p>
+  </div>
+
+   <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="The holes make leaves">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">The holes make leaves</span>
+      </div>
+      <div>
+        <h2>A door is only as narrow as the file behind it, and the agent can edit that file</h2>
+        <p class="thesis">
+          <code>Bash(make *)</code> is a runner grant. It differs from
+          <code>Bash(docker compose exec *)</code> in one way that matters: what it runs is enumerated in
+          a reviewed file rather than supplied per call. That difference collapses the moment the file
+          stops being reviewed, or the flags that redirect <code>make</code> at another file stay open,
+          or the agent can write the file itself.
+        </p>
+        <div class="chips">
+          <span class="chip kind-gate"><b>-f and -C</b> another makefile</span>
+          <span class="chip kind-hook"><b>ARGS=</b> a shell string</span>
+          <span class="chip kind-rule"><b>Edit(Makefile)</b> the door writes itself</span>
+          <span class="chip kind-cmd"><b>make shell</b> a target that means anything</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>six holes, and the narrower rule for each<span class="tag block">the last row is the one that undoes everything above it</span></caption>
+          <thead>
+            <tr><th>The hole</th><th>What it gives back</th><th>The rule</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block">
+              <td class="k"><code>make -f /tmp/x.mk</code></td>
+              <td>a makefile the agent wrote, run through the door</td>
+              <td>deny <code>Bash(make -f *)</code> and <code>Bash(make --file *)</code></td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>make -C ../other</code></td>
+              <td>another project's targets, outside this repository's review</td>
+              <td>deny <code>Bash(make -C *)</code> and <code>Bash(make --directory *)</code></td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>make test ARGS='; curl …'</code></td>
+              <td>arbitrary shell, if the recipe interpolates the variable unquoted</td>
+              <td>quote it in the recipe, validate it, or accept only an enumerated set</td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>make test PHP=/tmp/evil</code></td>
+              <td>a substituted program name, if a recipe takes its interpreter from a variable</td>
+              <td>never name a program with an overridable variable, or mark it <code>override</code></td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>make shell</code> · <code>make tinker ARGS=--execute='…'</code></td>
+              <td>everything the container can do. A target whose intent is <em>run what I say</em> is not an intent</td>
+              <td>deny them by name, and enumerate the operations people reached for them with. <a class="xref" href="#s-8">Below</a></td>
+            </tr>
+            <tr data-signal="block">
+              <td class="k"><code>Edit(Makefile)</code></td>
+              <td>everything. The agent adds a target, then runs it through the allowed door</td>
+              <td>deny <code>Edit(/Makefile)</code> and <code>Edit(/.claude/**)</code> — <em>from a scope the agent cannot write</em>. <a class="xref" href="#s-8">Below</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The last row is the load-bearing one, and it is the same lesson the measured work on rule
+        placement produced: <strong>never let the thing that enforces a rule sit inside the thing it
+        enforces against.</strong> A <code>Makefile</code> the agent can edit is not a permission
+        boundary. It is a suggestion with extra steps, because the path from <em>I need a capability</em>
+        to <em>I have it</em> is two tool calls and no human.
+      </p>
+
+      <figure class="code">
+        <figcaption>the denies that keep the door a door<span class="tag block">without these, Bash(make *) is Bash(*)</span></figcaption>
+<pre><code>"deny": [
+  <span class="c-block">"Bash(make -f *)"</span>, <span class="c-block">"Bash(make --file *)"</span>,
+  <span class="c-block">"Bash(make -C *)"</span>, <span class="c-block">"Bash(make --directory *)"</span>,
+  <span class="c-block">"Edit(/Makefile)"</span>,
+  <span class="c-block">"Edit(/.claude/**)"</span>
+]
+<span class="c-dim"># Changing what the project can do is now a human's edit and a</span>
+<span class="c-dim"># reviewer's read. That is the whole security property of the stack.</span>
+</code></pre>
+      </figure>
+
+      <h3 class="sub">8.1 · The target that means &ldquo;anything&rdquo;</h3>
+      <p>
+        Two targets in that catalog are general execution: <code>make shell</code> opens a shell in the
+        container, and <code>make tinker ARGS=--execute='…'</code> evaluates whatever you hand it. Both
+        are useful. Both are also the exact thing the door was built to prevent, and having them inside
+        the door is worse than having them outside it, because they are now covered by the one entry
+        that looks safe.
+      </p>
+      <p>
+        Say it in the vocabulary of <a class="xref" href="#s-4">section 4</a> and the problem is obvious.
+        The permitted set is supposed to be the allowable set of intents. An intent of <em>run arbitrary
+        code in the app container</em> is not a member of that set; it is the set. One such target
+        collapses seventy-eight named intents back down to <code>Bash(*)</code>, and the allowlist still
+        reads like one tidy line.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>what a general target is actually granting<span class="tag block">these are the rows that make the door decorative</span></caption>
+          <thead>
+            <tr><th>Target</th><th>What somebody uses it for</th><th>What it grants</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k"><code>make shell</code></td><td>poking at a failing test, reading a log, checking a file in the container</td><td>every binary in the image, the mounted repository, and whatever the container can reach on the network</td></tr>
+            <tr data-signal="block"><td class="k"><code>make tinker ARGS=--execute='…'</code></td><td>inspecting a record, clearing a cache, retrying a job</td><td>arbitrary code inside the application, with its database credentials and its full object graph</td></tr>
+            <tr data-signal="block"><td class="k"><code>make artisan ARGS=…</code></td><td>a migration, a queue command, a cache flush</td><td>every framework command, including the destructive ones and any package's own</td></tr>
+            <tr data-signal="warn"><td class="k">any target with free-form <code>ARGS=</code></td><td>scoping a check to one path</td><td>whatever the flag surface of the underlying tool allows, plus shell if the variable is unquoted</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">8.2 · Restrict the targets by operation instead</h3>
+      <p>
+        The repair is the same move applied one level down. The reason those targets exist is that people
+        had specific operations to perform and no named target for them, so they reached for the general
+        one. Name the operations. Then the general targets are not load-bearing and can be refused.
+      </p>
+
+      <figure class="code">
+        <figcaption>Makefile · one target per operation, with typed parameters<span class="tag pass">each recipe quotes its variable and accepts one kind of value</span></figcaption>
+<pre><code><span class="c-dim"># instead of: make tinker ARGS=--execute='User::where(...)->first()'</span>
+user-show:      <span class="c-pass">## one user record as JSON. EMAIL=</span>
+	@$(EXEC_T) php artisan app:user-show <span class="c-warn">"$(EMAIL)"</span>
+
+queue-retry:    <span class="c-pass">## retry one failed job. ID=</span>
+	@$(EXEC_T) php artisan queue:retry <span class="c-warn">"$(ID)"</span>
+
+cache-clear:    <span class="c-pass">## clear application cache. No parameters</span>
+	@$(EXEC_T) php artisan cache:clear
+
+migrate-rollback: <span class="c-pass">## roll back one batch. STEP= (an integer)</span>
+	@test "$(STEP)" -gt 0 2>/dev/null || { echo "STEP must be a positive integer"; exit 2; }
+	@$(EXEC_T) php artisan migrate:rollback --step=<span class="c-warn">"$(STEP)"</span>
+
+<span class="c-dim"># instead of: make shell</span>
+logs:           <span class="c-pass">## tail container logs. SERVICE= (app|queue|db)</span>
+db-console:     <span class="c-pass">## a read-only psql session against the dev database</span>
+</code></pre>
+      </figure>
+
+      <p>
+        Three properties changed there and each one matters. The parameter is <strong>named for what it
+        is</strong>, so <code>EMAIL=</code> cannot carry a flag and <code>STEP=</code> is checked to be
+        an integer before anything runs. The variable is <strong>quoted</strong>, so it cannot carry
+        shell. And the operation is <strong>one operation</strong>, so the help line is an honest
+        description of what the agent is permitted to do rather than a category.
+      </p>
+
+      <figure class="code">
+        <figcaption>the denies that carve the general targets out of the door<span class="tag block">deny is evaluated first, so a narrow deny beats the broad allow</span></figcaption>
+<pre><code>"allow": [ <span class="c-pass">"Bash(make *)"</span> ],
+"deny": [
+  <span class="c-block">"Bash(make shell*)"</span>,        <span class="c-dim">// interactive container shell</span>
+  <span class="c-block">"Bash(make tinker*)"</span>,       <span class="c-dim">// arbitrary application code</span>
+  <span class="c-block">"Bash(make artisan*)"</span>,      <span class="c-dim">// the whole framework CLI</span>
+  <span class="c-block">"Bash(make -f *)"</span>, <span class="c-block">"Bash(make --file *)"</span>,
+  <span class="c-block">"Bash(make -C *)"</span>, <span class="c-block">"Bash(make --directory *)"</span>
+]
+</code></pre>
+      </figure>
+
+      <p>
+        This is the one place on the page where the precedence rule from
+        <a class="xref" href="#s-1">section 1</a> pays for itself. Deny is evaluated before allow and
+        specificity is not consulted, so a narrow deny reliably carves a hole out of a broad allow. The
+        general targets stay in the <code>Makefile</code> for the humans who type them in their own
+        terminal, where no permission rule applies, and they are unavailable to the agent. One artifact,
+        two audiences, and the difference expressed in the config rather than in a comment.
+      </p>
+      <p>
+        Note what the deny list looks like now: five or six entries about <code>make</code> itself. That
+        is the right shape. Once the allow side names one door, the deny side is where the interesting
+        decisions live, and each one reads as a sentence about intent — <em>the agent does not get an
+        interactive shell</em>, <em>the agent does not evaluate arbitrary application code</em>.
+      </p>
+
+      <div class="callout">
+        <span class="label">Three of these are live in the charter from section 3</span>
+        <p>
+          <code>Bash(docker compose exec *)</code> sits directly above a deny list refusing
+          <code>php</code>, <code>npm</code>, <code>composer</code> and <code>./vendor/bin/*</code>, and
+          reopens every one of them, because that runner is not stripped. About a dozen recipes
+          interpolate <code>$(ARGS)</code> unquoted, and one of them is <code>make tinker
+          ARGS=--execute='…'</code>, which is arbitrary code execution as the documented usage. And
+          <code>Skill(update-config)</code> grants edits to the settings file that holds the grant.
+          Three holes, in the file whose rule layer gets all of this right, and I wrote all three.
+        </p>
+      </div>
+
+      <p>
+        Two of the three have ordinary fixes and one does not. The runner entry becomes three targets.
+        The unquoted variables get quotes, or a validating hook, and the two deliberately-general
+        targets (<code>tinker</code>, <code>shell</code>) stay in the catalog and out of unattended
+        profiles. The self-editing grant has no safe narrow form: a capability that can rewrite the
+        permission file is the permission file. It comes out, and a human edits config.
+      </p>
+
+      <h3 class="sub">8.3 · Why removing <code>Skill(update-config)</code> does not fix it</h3>
+      <p>
+        I said earlier that the self-editing grant comes out and a human edits config. That is the right
+        instinct and it does not work, and the reason it does not work is worth more than the fix,
+        because the same shape defeats several other repairs on this page.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">the skill was never the capability</span>
+          <span class="what">It is a wrapper over the <code>Edit</code> tool on a path. Deny the skill and the agent edits <code>.claude/settings.json</code> directly, with the tool it already has for editing files in the repository.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">so deny the path</span>
+          <span class="what"><code>Edit(/.claude/**)</code>. Now the door is the way in: a new <code>Makefile</code> target whose recipe runs <code>sed</code> or a script over the settings file. Path rules cover the built-in file tools and the file commands the harness recognizes in a shell command. They do not cover a subprocess that opens a file itself.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">so deny that too</span>
+          <span class="what"><code>Edit(/Makefile)</code>. Both denies now live in <code>.claude/settings.json</code>, which is the file they protect. The rule guarding the file is inside the file, so any path to writing that file is also a path to deleting the rule.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">and the config is bigger than the file</span>
+          <span class="what">A project skill can carry its own <code>allowed-tools</code> frontmatter, which pre-approves tools for that skill, and workspace trust never gates it. So <code>.claude/skills/</code> is a permission surface too, and an agent that can write files under <code>.claude/</code> can grant itself tools without touching <code>settings.json</code> at all.</span>
+        </li>
+      </ol>
+
+      <p>
+        That is the circularity, and it is the reason the measured work on rule placement puts it as a
+        law rather than a tip: <strong>never let the rung that enforces a rule sit inside the rung it
+        enforces against.</strong> A deny rule protecting its own file is an enforcer inside its own
+        blast radius. It stops an incurious agent, which is worth something, and it stops nothing that
+        is actually trying.
+      </p>
+
+      <h3 class="sub">8.4 · Where the rule has to live instead</h3>
+      <p>
+        Deny rules from any scope beat allow rules from any scope, and managed settings cannot be
+        overridden even from the command line. So move the self-protection <em>up</em>, out of the
+        workspace the agent works in, and back it with the one control that is not a runtime check at
+        all.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>four places to put the rule, and what each one survives<span class="tag pass">the bottom two are the only ones outside the agent's write path</span></caption>
+          <thead>
+            <tr><th>Where</th><th>Written as</th><th>Survives</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block">
+              <td class="k">project settings</td>
+              <td><code>Edit(/.claude/**)</code></td>
+              <td>nothing. The agent can edit the file that holds it</td>
+            </tr>
+            <tr data-signal="warn">
+              <td class="k">user settings</td>
+              <td><code>Edit(//**/.claude/**)</code>, <code>Edit(//**/Makefile)</code></td>
+              <td>anything the agent does inside a repository. Note the <code>//</code>: a single-slash <code>/.claude/**</code> in user settings resolves under <code>~/.claude/</code> and protects nothing. <a class="xref" href="#s-2">Section 2.5</a></td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k">managed settings</td>
+              <td>the same rules, plus <code>disableBypassPermissionsMode</code></td>
+              <td>every other scope, including command-line flags. The correct home in an organization</td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k">the review path</td>
+              <td>code owners on <code>.claude/**</code> and the <code>Makefile</code>, and a branch that cannot be pushed to directly</td>
+              <td>everything, because it is not a runtime check. A change to the permitted set becomes a human's approval</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The last row is the one that actually closes it, and it closes it for the
+        <code>Makefile</code> at the same time. Every control in this article can be edited by whoever
+        can write the repository; the question is only whether writing it requires a person. Runtime
+        rules make the agent's path expensive. Code owners on those two paths make the agent's path go
+        through a reviewer. Use both, and stop expecting a config file to defend itself.
+      </p>
+
+      <div class="callout">
+        <span class="label">One honest exception</span>
+        <p>
+          <code>settings.local.json</code> is written by the harness itself when a human clicks
+          <em>do not ask again</em>. That write does not go through the <code>Edit</code> tool, so a
+          path deny does not block it, and it should not: it is a human decision being recorded. It is
+          also why <a class="xref" href="#s-11">section 11</a> treats that file as a queue rather than
+          as config. The agent cannot write it. It can, however, benefit from what a tired human clicked
+          into it, which is a slower version of the same loop.
+        </p>
+      </div>
+
+      <h3 class="sub">8.5 · What the door still buys, honestly stated</h3>
+      <p>
+        With those denies in place, <code>Bash(make *)</code> grants exactly the set of targets in a
+        reviewed file, plus whatever a recipe's own escape hatches allow. That is a real and checkable
+        bound, and it is weaker than a per-command allowlist would be in theory. In practice it is
+        stronger, for one reason: it is short enough that somebody reads it. A forty-line allowlist
+        nobody reviews grants whatever nobody noticed.
+      </p>
+      <p>
+        So the claim is not that a door is airtight. It is that a door moves the enumeration from a file
+        written by clicking into a file written by deciding, and puts it in front of a reviewer. Then
+        <a class="xref" href="#s-5">section 5</a>'s container catches what the review misses, and
+        <a class="xref" href="#s-9">section 9</a> is about what to do with the layer underneath that.
+      </p>
+    </div>
+  </section>
+
+   <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="What deny is not">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">What deny is not</span>
+      </div>
+      <div>
+        <h2>A deny list stops an accident and teaches a habit. It does not stop an adversary</h2>
+        <p class="thesis">
+          Permission rules are enforced by the harness against a command string it can parse. That is
+          enough to stop a confused agent, which is the failure mode you actually have. It is not enough
+          to stop content that is trying to get out, and a team that believes otherwise has bought one
+          layer and stopped building.
+        </p>
+        <div class="chips">
+          <span class="chip kind-rule"><b>accident</b> what deny is for</span>
+          <span class="chip kind-gate"><b>adversary</b> what the sandbox is for</span>
+          <span class="chip kind-config"><b>absence</b> what the missing credential is for</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Two facts bound what a rule can do. Path denies cover the built-in file tools and the file
+        commands the harness recognizes in a shell command; they do not cover a subprocess that opens
+        files itself, which is what every test suite and every script does. And the read side of the
+        boundary is not the interesting one anyway: a secret that reaches the model's context can leave
+        it, in a PR description, in a quoted error, in a sub-agent's report.
+      </p>
+      <p>
+        So the deny list is a short list of things it is worth being categorical about, and the floor
+        under it is somewhere else.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>what belongs in deny, and what each entry is actually protecting against<span class="tag warn">if a row's real answer is the sandbox, put it there too</span></caption>
+          <thead>
+            <tr><th>Entry</th><th>Protects against</th><th>Real floor</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k"><code>Read(./.env)</code>, <code>Read(~/.aws/**)</code>, <code>Read(~/.ssh/**)</code></td><td>a curious agent reading a credential into context</td><td>the credential not being on the machine, and OS-level path enforcement</td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(git push --force *)</code></td><td>a rewrite of shared history during a helpful cleanup</td><td>branch protection on the remote, which does not depend on your laptop</td></tr>
+            <tr data-signal="pass"><td class="k"><code>Bash(rm -rf *)</code></td><td>the overnight run that reads a stale TODO literally</td><td>a fresh clone per run, and a container that owns nothing you need</td></tr>
+            <tr data-signal="pass"><td class="k"><code>Edit(/Makefile)</code>, <code>Edit(/.claude/**)</code></td><td>the agent widening its own grant. <a class="xref" href="#s-8">Section 8</a></td><td>review. There is no runtime substitute for a human reading the diff</td></tr>
+            <tr data-signal="warn"><td class="k"><code>Bash(curl *)</code>, <code>Bash(wget *)</code></td><td>exfiltration by the most convenient tool, and argument patterns that cannot bound a URL</td><td>network isolation in the sandbox or the container, plus a fetch allowlist</td></tr>
+            <tr data-signal="block"><td class="k">anything production-shaped</td><td>the unbounded, irreversible mistake</td><td>no credential, no route, and a human at the last step</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">9.1 · The injection case, where deny earns more than its keep</h3>
+      <p>
+        There is one place a deny list does real security work rather than habit work. Untrusted content
+        that reaches the context can ask the agent to run something, and the agent has no reliable way to
+        tell that request from yours. A deny rule refuses it without the agent's cooperation, and deny
+        rules fire on any subcommand, including one hidden in a command substitution or a loop body. So
+        the list is exactly the layer that turns <em>the model was persuaded</em> into <em>the call did
+        not run</em>.
+      </p>
+      <p>
+        That is the argument <a href="/prompt-injection/">Prompt Injection</a> develops properly, and
+        the short version here is that the entries that matter for it are the egress ones. Deny the shell
+        network tools, allowlist fetch by host, and treat everything that comes back through either as
+        data rather than instruction.
+      </p>
+
+      <div class="callout">
+        <span class="label">Two settings to lock, not to argue about</span>
+        <p>
+          Set <code>disableBypassPermissionsMode</code> so the strict posture cannot be discarded by a
+          keystroke, and keep the protected paths protected: bypass mode skips prompts even for writes
+          to <code>.git</code> and <code>.claude</code>. Both work from any settings scope, so you can
+          lock yourself out of your own escape hatch, which is the correct use of the feature. In an
+          organization they belong in managed settings, where a project cannot override them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 10 ============ -->
+  <section class="rung" id="s-10">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">10</span>
+        <div class="meter" role="img" aria-label="When a list cannot say it">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">When a list cannot say it</span>
+      </div>
+      <div>
+        <h2>Some rules are not patterns, and a hook is where they go</h2>
+        <p class="thesis">
+          A permission list matches strings. Plenty of real rules are conditional on something a string
+          does not carry: which branch you are on, what the argument resolves to, whether the target is
+          inside the high-risk module, whether a human is watching. Those compile into a hook, which is
+          code the model cannot reach and cannot talk out of it.
+        </p>
+        <div class="chips">
+          <span class="chip kind-hook"><b>PreToolUse</b> runs before the prompt</span>
+          <span class="chip kind-gate"><b>exit 2</b> blocks before rules</span>
+          <span class="chip kind-rule"><b>deny still wins</b> over an allowing hook</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A <code>PreToolUse</code> hook runs before the permission prompt for every tool call, and its
+        output can deny the call, force a prompt, or skip the prompt. The precedence is worth memorizing
+        because it is not symmetric. A hook that returns <em>allow</em> does not defeat a deny or ask
+        rule: those are evaluated regardless. A hook that exits with code 2 stops the call before the
+        rules are consulted, so a block beats an allow rule. Refusal composes; permission does not.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>four rules a list cannot express<span class="tag pass">each one is a few lines of shell in a hook</span></caption>
+          <thead>
+            <tr><th>The rule</th><th>Why a pattern cannot say it</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn"><td class="k">no <code>make deploy</code> from a branch that is not <code>main</code></td><td>the branch is not in the command string</td></tr>
+            <tr data-signal="warn"><td class="k"><code>ARGS=</code> must be a path inside the repository</td><td>the pattern cannot resolve a path or reject shell metacharacters</td></tr>
+            <tr data-signal="warn"><td class="k">edits to the billing module need a human, everything else does not</td><td>a path pattern can say it, but not the <em>why</em>, and the refusal should name the reason</td></tr>
+            <tr data-signal="warn"><td class="k">everything is allowed except these six commands</td><td>allow-all plus exceptions is exactly what precedence forbids, so the exceptions go in a hook</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        That last row is a legitimate and underused posture: put the whole tool in the allow list and
+        register a hook that rejects the specific commands you care about. It inverts the default, which
+        is usually wrong, and is occasionally exactly right for a sandboxed throwaway environment where
+        you want speed with a handful of absolute stops.
+      </p>
+      <p>
+        <a href="/guardrails/">Five Guardrails</a> works the whole ascent, from a rule and a deny entry
+        up to a hook that compiles the same rule into a sensor and returns a refusal the agent can act
+        on. The relevant design decision from it, restated for this page: <strong>a refusal should name
+        the rule, the reason, and the sanctioned path.</strong> A hook can do that in a sentence. A deny
+        rule can only say no, which is why the always-on prose from
+        <a class="xref" href="#s-6">section 6</a> has to carry the rest.
+      </p>
+    </div>
+  </section>
+
+  <div class="part-rule">
+    <span class="kicker">Part IV</span>
+    <h2>The practice</h2>
+    <p>
+      Two sections. How to audit a list you already have and keep it at a reviewable size, and the
+      artifact: a complete pair of files, then the conformance checklist and the rule I fail.
+    </p>
+  </div>
+
+   <!-- ============ 11 ============ -->
+  <section class="rung" id="s-11">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">11</span>
+        <div class="meter" role="img" aria-label="Sizing and auditing">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Sizing and auditing</span>
+      </div>
+      <div>
+        <h2>Five passes over a list you already have, and a rule about where entries live</h2>
+        <p class="thesis">
+          You do not need to design a permission list. You need to audit the one that accumulated. Four
+          passes, in this order, remove most of it, and each pass is mechanical enough to hand to
+          somebody who did not write the file.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>one screen</b> the target size</span>
+          <span class="chip kind-rule"><b>one reason</b> per entry, sayable out loud</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">pass 1 · free</span>
+          <span class="what">Delete every entry for a command in the read-only set: <code>ls</code>, <code>cat</code>, <code>grep</code>, <code>find</code>, <code>wc</code>, <code>head</code>, <code>tail</code>, <code>which</code>, <code>diff</code>, <code>stat</code>, <code>du</code>, <code>echo</code>, <code>pwd</code>, <code>cd</code>, and the read-only git forms. They ran without a prompt anyway.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">pass 2 · shadowed</span>
+          <span class="what">Sort the list and look for a broad entry above narrow ones. <code>Bash(python3 *)</code> makes every specific python entry dead. Delete the narrow ones, then decide whether you actually meant the broad one. Usually you meant a target.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">pass 3 · runners</span>
+          <span class="what">Find every entry whose program executes its arguments: <code>docker exec</code>, <code>npx</code>, <code>devbox run</code>, <code>mise exec</code>, <code>direnv exec</code>, <code>python3 -c</code>, <code>sh -c</code>, <code>git *</code>, <code>find *</code> with <code>-exec</code>. Each one is an execution grant wearing a specific label. Replace with a target, or name the runner <em>and</em> the inner command.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">pass 4 · frozen</span>
+          <span class="what">Every remaining entry: say out loud why it is there. An entry whose reason is <em>a prompt fired once in July</em> is not a decision. Delete it and let the prompt fire again, once, with a person present to make the call properly.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">pass 5 · intent</span>
+          <span class="what">For each survivor, name the <b>one intent</b> it permits, in the vocabulary of the work rather than the tool. If the sentence needs an <em>and</em>, the entry is standing in for several intents and at least one of them is not the one you wanted. Give that intent a target and point the entry at the door instead. This is the pass that shortens the list permanently; the four above it only tidy.</span>
+        </li>
+      </ol>
+
+      <figure class="code">
+        <figcaption>the two commands the audit actually needs<span class="tag pass">one reads the resolved state, one reads the file</span></figcaption>
+<pre><code><span class="c-dim"># In session: every rule, and which settings file it came from.</span>
+<span class="c-dim"># This is the resolved view, across user, project and local scope.</span>
+<span class="c-pass">/permissions</span>
+
+<span class="c-dim"># On disk: the allow list of every project, longest first. The ones</span>
+<span class="c-dim"># at the top of this output are the ones to read this afternoon.</span>
+for f in */.claude/settings*.json; do
+  printf '%3d  %s\n' \
+    "$(python3 -c "import json,sys;print(len(json.load(open('$f')).get('permissions',{}).get('allow',[])))")" \
+    "$f"
+done | sort -rn
+</code></pre>
+      </figure>
+
+      <h3 class="sub">11.1 · Where an entry lives is a statement about who decided it</h3>
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>three files, three meanings<span class="tag warn">the middle row is where junk accumulates, by design</span></caption>
+          <thead>
+            <tr><th>File</th><th>What an entry there means</th><th>Treat it as</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k"><code>.claude/settings.json</code></td><td>the team decided this is how the project is run</td><td>config. Reviewed in a pull request like any other file</td></tr>
+            <tr data-signal="warn"><td class="k"><code>.claude/settings.local.json</code></td><td>somebody clicked <em>do not ask again</em></td><td>a queue of pending decisions, not configuration. Drain it weekly</td></tr>
+            <tr data-signal="warn"><td class="k"><code>~/.claude/settings.json</code></td><td>this is true of me in every project I open</td><td>rare. Almost nothing is actually true across all your repositories</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The local file is the one that matters for hygiene, because its whole purpose is to absorb clicks.
+        Reading it once a week is the cheapest audit in this article: each entry either becomes a target
+        in the <code>Makefile</code>, gets promoted into the tracked settings file with a reason, or goes
+        away. An entry that survives three of those reviews without becoming either is telling you the
+        toolchain has a door you have not built yet.
+      </p>
+      <p>
+        Two mechanics worth knowing while you move entries around. Allow rules in a project's settings
+        are capability grants, so they apply only after you accept the workspace-trust dialog for that
+        folder; deny and ask rules are not gated that way, because they only restrict. And a
+        <code>settings.local.json</code> that is tracked in git is treated as repository-supplied rather
+        than yours, and waits for the same trust step. If you check the local file in, you have made it
+        project config with a misleading name.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The size test</span>
+        <p>
+          The allow list fits on one screen and every entry has a reason a colleague would accept. If it
+          does not fit, the question is not which entries to cut. It is which door you have not built,
+          because a list that long is a description of a project with many entrances.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 12 ============ -->
+  <section class="rung" id="s-12">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">12</span>
+        <div class="meter" role="img" aria-label="The artifact">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The artifact</span>
+      </div>
+      <div>
+        <h2>The pair of files, fifteen rules, and where a live charter fails them</h2>
+        <p class="thesis">
+          Copy the pair, delete what your project does not have, and add a target rather than an entry
+          the first time something is refused. The checklist below is checkable by reading two
+          files, which is the property I care about most: an intent catalog, and the entry that points
+          at it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <figure class="code">
+        <figcaption>.claude/settings.json · the whole permission surface<span class="tag pass">one door, and a deny list that is now where the decisions are</span></figcaption>
+<pre><code>{
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      <span class="c-pass">"Bash(make *)"</span>,
+      "Bash(git commit *)", "Bash(git checkout -b *)",
+      "Bash(gh pr view *)", "Bash(gh pr create *)", "Bash(gh pr diff *)",
+      "WebFetch(domain:docs.internal.example.com)"
+    ],
+    "ask": [
+      <span class="c-warn">"Bash(git push *)"</span>
+    ],
+    "deny": [
+      <span class="c-dim">// the toolchain: it lives in the container, not on the host</span>
+      <span class="c-block">"Bash(php *)"</span>, <span class="c-block">"Bash(composer *)"</span>, <span class="c-block">"Bash(npm *)"</span>, <span class="c-block">"Bash(npx *)"</span>,
+      <span class="c-block">"Bash(./vendor/bin/*)"</span>, <span class="c-block">"Bash(docker compose exec *)"</span>,
+      <span class="c-dim">// the door stays a door: no redirecting it at another file</span>
+      <span class="c-block">"Bash(make -f *)"</span>, <span class="c-block">"Bash(make --file *)"</span>,
+      <span class="c-block">"Bash(make -C *)"</span>, <span class="c-block">"Bash(make --directory *)"</span>,
+      <span class="c-dim">// the targets that are not intents: general execution</span>
+      <span class="c-block">"Bash(make shell*)"</span>, <span class="c-block">"Bash(make tinker*)"</span>, <span class="c-block">"Bash(make artisan*)"</span>,
+      <span class="c-dim">// the irreversible and the secret</span>
+      <span class="c-block">"Bash(git push --force *)"</span>, <span class="c-block">"Bash(git push -f *)"</span>,
+      <span class="c-block">"Bash(rm -rf *)"</span>, <span class="c-block">"Bash(curl *)"</span>, <span class="c-block">"Bash(wget *)"</span>,
+      <span class="c-block">"Read(./.env)"</span>, <span class="c-block">"Read(~/.aws/**)"</span>, <span class="c-block">"Read(~/.ssh/**)"</span>
+    ],
+    "disableBypassPermissionsMode": "disable"
+  }
+}
+</code></pre>
+      </figure>
+
+      <figure class="code">
+        <figcaption>~/.claude/settings.json · or managed settings, in an organization<span class="tag block">the self-protection cannot live in the file it protects</span></figcaption>
+<pre><code>{
+  "permissions": {
+    "deny": [
+      <span class="c-dim">// note the double slash: a single slash in user settings</span>
+      <span class="c-dim">// resolves under ~/.claude/ and protects nothing. §2.5</span>
+      <span class="c-block">"Edit(//**/.claude/**)"</span>,
+      <span class="c-block">"Edit(//**/Makefile)"</span>
+    ],
+    "disableBypassPermissionsMode": "disable"
+  }
+}
+<span class="c-dim"># Plus code owners on those two paths, because a runtime rule makes</span>
+<span class="c-dim"># the agent's route expensive and review is what makes it human.</span>
+</code></pre>
+      </figure>
+
+      <p>
+        Three notes on reading those files. The comments are for you, not for the parser: strip them
+        before you use them, because the settings format is JSON. The <code>Edit</code> denies sit in the
+        second file rather than the first, for the reason <a class="xref" href="#s-8">section 8.3</a>
+        works through. And the <code>docker compose exec</code> entry in the deny list is not a
+        contradiction of the <code>Makefile</code> below, which runs that exact command. Permission rules match what the <em>agent</em> asks the shell to run. What a permitted
+        program then spawns is invisible to them, which is the mechanism the whole door depends on: the
+        agent cannot type <code>docker compose exec</code>, and <code>make test</code> can.
+      </p>
+
+      <figure class="code">
+        <figcaption>Makefile · the enumeration the allowlist points at<span class="tag pass">docker underneath, one name per task, help for free</span></figcaption>
+<pre><code>.PHONY: help test lint lint-fix migrate build dev shell
+
+COMPOSE := docker compose
+EXEC    := $(COMPOSE) exec -T app
+
+help:          <span class="c-pass">## this list</span>
+	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) \
+	  | sed 's/:.*## /\t/' | expand -t22
+
+test:          <span class="c-pass">## the whole suite, in the container</span>
+	@$(EXEC) ./vendor/bin/pest
+
+lint:          <span class="c-pass">## static analysis and style, check only</span>
+	@$(EXEC) ./vendor/bin/pint --test
+	@$(EXEC) ./vendor/bin/phpstan analyse
+
+lint-fix:      <span class="c-pass">## fix style. ARGS=path to scope it</span>
+	@$(EXEC) ./vendor/bin/pint <span class="c-warn">"$(ARGS)"</span>   <span class="c-dim"># quoted, on purpose</span>
+
+migrate:       <span class="c-pass">## migrations, dev database only</span>
+	@$(EXEC) php artisan migrate
+
+shell:         <span class="c-pass">## interactive shell in the container. A deliberate grant</span>
+	@$(COMPOSE) exec app bash
+</code></pre>
+      </figure>
+
+      <h3 class="sub">12.1 · Fifteen rules</h3>
+
+      <ol class="standard">
+        <li><span class="t">Every allow entry names <b>one intent</b>, in the vocabulary of the work. An entry standing in for a program's whole surface is a bug, however convenient.</span><span class="ref">§3 · §4</span></li>
+        <li><span class="t">The project has <b>one entry point</b> for work, and the allow list names it. The intents are enumerated behind it, as targets.</span><span class="ref">§4</span></li>
+        <li><span class="t">Work that <b>varies</b> takes an argument. Widening a pattern to cover a family is the failure this replaces.</span><span class="ref">§4.2</span></li>
+        <li><span class="t">No target grants the agent <b>general execution</b>. A shell, a language console and the framework CLI are denied by name, and the operations people reached for them with are named targets with typed parameters.</span><span class="ref">§8.1 · §8.2</span></li>
+        <li><span class="t">The toolchain lives in a container. There is <b>no host copy</b> of it to reach for.</span><span class="ref">§5</span></li>
+        <li><span class="t">Adding a capability is a <b>target and a review</b>, never a settings entry and a click.</span><span class="ref">§6</span></li>
+        <li><span class="t">The door's own files are <b>not writable</b> by the agent — the <code>Makefile</code> and the whole settings directory — and the rule that says so lives in a <b>scope the agent cannot write</b>, backed by code owners on both paths.</span><span class="ref">§8.3 · §8.4</span></li>
+        <li><span class="t">Redirecting flags are denied: <code>make -f</code>, <code>make -C</code>, and their long forms.</span><span class="ref">§8</span></li>
+        <li><span class="t">Every variable a recipe interpolates is <b>named for its value, quoted, and validated</b>, and no recipe takes a program name from an overridable variable.</span><span class="ref">§8.2</span></li>
+        <li><span class="t">No entry names a program that <b>executes its arguments</b> unless the inner command is named too.</span><span class="ref">§2 · §11</span></li>
+        <li><span class="t">No allow entry duplicates the <b>read-only set</b>, and no allow entry is shadowed by a broader one.</span><span class="ref">§11</span></li>
+        <li><span class="t">Wildcards sit <b>after the subcommand</b>, and the startup warnings about rule shape are read, not dismissed.</span><span class="ref">§2</span></li>
+        <li><span class="t">The shell's network tools are denied and fetching is <b>allowlisted by host</b>.</span><span class="ref">§9</span></li>
+        <li><span class="t">The bypass posture is <b>locked off</b>, and production has no credential on the machine.</span><span class="ref">§9</span></li>
+        <li><span class="t">The local settings file is <b>drained weekly</b>: every entry becomes a target, a reviewed entry, or nothing.</span><span class="ref">§11</span></li>
+      </ol>
+
+      <h3 class="sub">12.2 · Three levels</h3>
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>conformance levels<span class="tag warn">level 2 is where unattended runs become reasonable</span></caption>
+          <thead>
+            <tr><th>Level</th><th>Rules</th><th>What it gets you</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn"><td class="k">1 · one door</td><td>1, 2, 5, 6, 11, 12</td><td>every entry names an intent, and a reviewer can read the whole permitted surface</td></tr>
+            <tr data-signal="pass"><td class="k">2 · the door holds</td><td>level 1, plus 3, 4, 7, 8, 9, 10</td><td>the catalog and the list cannot drift apart, and the agent can edit neither. Unattended runs stop being reckless</td></tr>
+            <tr data-signal="pass"><td class="k">3 · the floor holds</td><td>level 2, plus 13, 14, 15</td><td>a list that stays short, egress that is bounded, and no credential that could become an incident</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">12.3 · Where I fail it</h3>
+      <p>
+        The charter in <a class="xref" href="#s-3">section 3</a> is mine and it is running. It fails rule
+        1 seven times over, rule 4 three times (<code>make shell</code>, <code>make tinker</code>,
+        <code>make artisan</code> are all reachable through the door), rule 7 through
+        <code>Skill(update-config)</code> and a self-protecting deny that would sit in the file it
+        protects, rule 9 in about a dozen recipes that interpolate <code>$(ARGS)</code> unquoted, rule 10
+        twice, and rule 13 outright: it allows <code>Bash(curl *)</code>. What it gets right is the part that took the longest to learn,
+        which is the rule layer: a locked always-on rule, a <code>why</code> field recording the incident
+        that produced it, seventy-eight named targets, and hooks on four events.
+      </p>
+      <p>
+        That split is the honest lesson of the page, and it is why the intent framing is worth the
+        trouble. I modeled the intent correctly in prose and then encoded it in a language that cannot
+        hold it, and the encoding drifted for a year without anybody noticing, because nothing compares
+        the two. Level 2 below is the level at which they stop drifting apart.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The one paragraph to keep</span>
+        <p>
+          A permission list is not a security posture you tune. It is a description of how many ways your
+          project can be run, and it will be exactly as long as that number. Give the project one door,
+          put the toolchain in a container behind it, deny the flags that redirect the door and the edits
+          that rewrite it, and the list becomes short enough that somebody reads it. Everything else on
+          this page is what happens after somebody does.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>The Narrow Door</strong>, a design standard for tool permissions. CC BY 4.0.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>Drawn from a Laravel and TypeScript charter of mine, and from the Makefiles of two projects where
+      <code>make</code> is the whole operator surface.</div>
+    <div>Reads alongside · <a href="/guardrails/">Five Guardrails</a> (the same example in one screen, then four rungs above it) ·
+      <a href="/capability-ladder/">The Capability Ladder</a> (grants, per rung) ·
+      <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> (what a grant costs) ·
+      <a href="/constraint-engineering/">Constraint Engineering</a> (where a constraint belongs) ·
+      <a href="/prompt-injection/">Prompt Injection</a> (why egress is the entry that matters)</div>
+    <div>Color is semantic:
+      <span style="color:var(--brick)">brick blocks</span> ·
+      <span style="color:var(--gold-ink)">gold warns</span> ·
+      <span style="color:var(--forest)">forest passes</span>.</div>
+  </footer>
+
+</div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+  const nodes = [...document.querySelectorAll("pre.mermaid")];
+  const source = new Map(nodes.map(el => [el, el.textContent]));
+  const token = name => getComputedStyle(document.documentElement)
+    .getPropertyValue(name).trim();
+
+  /* The palette is read from the page's own tokens, so one definition serves
+     light and dark, prefers-color-scheme and the explicit toggle. Every
+     background stays transparent so the paper shows through. */
+  const themeVariables = () => ({
+    background: "transparent",
+    mainBkg: token("--surface-2"),
+    primaryColor: token("--surface-2"),
+    primaryTextColor: token("--ink"),
+    primaryBorderColor: token("--rule"),
+    nodeBorder: token("--rule"),
+    lineColor: token("--ink-3"),
+    textColor: token("--ink-2"),
+    clusterBkg: "transparent",
+    clusterBorder: token("--rule"),
+    edgeLabelBackground: token("--ground"),
+    /* sequence notes default to mermaid's lemon, which is a second palette */
+    noteBkgColor: token("--surface-2"),
+    noteTextColor: token("--ink"),
+    noteBorderColor: token("--rule"),
+    fontFamily: token("--mono"),
+    fontSize: "13px"
+  });
+
+  /* Same four signal colors the prose uses: brick blocks, gold warns,
+     forest passes, and dim is structure rather than a step. */
+  const signals = () => [
+    `classDef block fill:${token("--brick-wash")},stroke:${token("--brick")},color:${token("--ink")}`,
+    `classDef warn fill:${token("--gold-wash")},stroke:${token("--gold")},color:${token("--ink")}`,
+    `classDef pass fill:${token("--forest-wash")},stroke:${token("--forest")},color:${token("--ink")}`,
+    `classDef dim fill:transparent,stroke:${token("--rule")},color:${token("--ink-3")}`
+  ].join("\n");
+
+  async function render() {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: themeVariables(),
+      flowchart: { htmlLabels: false, curve: "basis", rankSpacing: 38,
+                   nodeSpacing: 28, padding: 8, useMaxWidth: true,
+                   wrappingWidth: 240 },
+      sequence: { useMaxWidth: true, mirrorActors: false }
+    });
+    for (const el of nodes) {
+      el.removeAttribute("data-processed");
+      /* classDef is flowchart grammar; a sequenceDiagram fails to parse with
+         the signal block appended, so it renders without one. */
+      const src = source.get(el);
+      el.textContent = /^\s*(flowchart|graph)\b/m.test(src)
+        ? `${src}\n${signals()}` : src;
+    }
+    await mermaid.run({ nodes });
+  }
+
+  render();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>
