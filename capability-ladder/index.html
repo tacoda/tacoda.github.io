@@ -1,0 +1,2644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+  <meta name="voice-register" content="argument">
+  <meta name="voice-english" content="ste">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Capability Ladder · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="The other half of the charter, in mechanics. A command, a skill, a sub-agent and an MCP server are one ladder from open to hidden. What each one is, when a CLI or a plain API beats a server, what a plugin commits you to, what makes a good one at every rung, and how to get a capability found once you have written it. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/capability-ladder/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Capability Ladder">
+<meta property="og:description" content="Commands, skills, sub-agents, MCP servers and plugins: four rungs from open to hidden, and the mechanics of writing a good one at each.">
+<meta property="og:url" content="https://www.tacoda.dev/capability-ladder/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Capability Ladder">
+<meta name="twitter:description" content="Half a charter says what the agent may not do. This is the half that says what it can do at all.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-ink:         #785810;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #6B6157;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-ink:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #9A8E80;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-ink:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #9A8E80;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-ink:       #785810;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #6B6157;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal .swatch.dim    { background: var(--ink-3); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.85rem 1rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a:first-child { padding-left: 0; }
+.railnav li.part {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem 0 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  white-space: nowrap;
+  border-left: 1px solid var(--rule);
+  margin-left: 0.6rem;
+}
+.railnav li.part:first-child { border-left: 0; margin-left: 0; padding-left: 0; }
+
+/* ---------- part divider ---------- */
+.part-rule {
+  padding: clamp(2.5rem, 6vw, 4rem) 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.part-rule .kicker {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  font-weight: 700;
+}
+.part-rule h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.part-rule p {
+  font-size: 0.98rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+}
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 4rem;
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold-ink); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold-ink); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold-ink); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold-ink); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold-ink); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- diagrams ---------- */
+/* Mermaid source lives in the page and renders in the browser. The figure
+   body is transparent so the paper shows through the diagram; until the
+   script runs, the source is visible as text. */
+.code.diagram { background: none; }
+.code.diagram .mermaid {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink-3);
+  text-align: center;
+}
+.code.diagram .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+table.wide { min-width: 720px; }
+table.xwide { min-width: 880px; }
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+caption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+caption .tag.block { color: var(--brick); }
+caption .tag.warn  { color: var(--gold-ink); }
+caption .tag.pass  { color: var(--forest); }
+th, td {
+  padding: 0.45rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+  line-height: 1.5;
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  vertical-align: bottom;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.k { font-weight: 700; color: var(--ink); white-space: nowrap; }
+td em { font-style: normal; color: var(--ink-3); }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr[data-signal] td:first-child { border-left: 3px solid var(--rule); }
+tbody tr[data-signal="block"] td:first-child { border-left-color: var(--brick); }
+tbody tr[data-signal="warn"]  td:first-child { border-left-color: var(--gold); }
+tbody tr[data-signal="pass"]  td:first-child { border-left-color: var(--forest); }
+tbody tr.group td {
+  background: var(--surface-2);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule);
+}
+/* coverage marks: full, partial, none */
+td.cov { text-align: center; font-size: 0.9rem; line-height: 1.2; }
+td.cov.y { color: var(--forest); }
+td.cov.p { color: var(--gold-ink); }
+td.cov.n { color: var(--rule); }
+
+/* ---------- matrix ---------- */
+.matrix {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0,1fr) minmax(0,1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--mono);
+  overflow: hidden;
+}
+@media (max-width: 620px) { .matrix { grid-template-columns: minmax(0,1fr); } }
+.matrix > * { background: var(--surface); padding: 0.75rem 0.85rem; }
+.matrix .hd, .matrix .rowhd {
+  background: var(--surface-2);
+  font-size: 0.6rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.matrix .rowhd { display: flex; align-items: center; }
+.matrix .cell .pos {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+.matrix .cell.block .pos { color: var(--brick); }
+.matrix .cell.warn  .pos { color: var(--gold-ink); }
+.matrix .cell.pass  .pos { color: var(--forest); }
+.matrix .cell .m { display: block; font-size: 0.78rem; color: var(--ink); }
+.matrix .cell .n { display: block; font-size: 0.68rem; color: var(--ink-3); margin-top: 0.2rem; }
+
+/* ---------- the standard ---------- */
+.standard {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  counter-reset: std;
+  overflow: hidden;
+}
+.standard li {
+  background: var(--surface);
+  padding: 0.7rem 0.95rem;
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0,1fr) auto;
+  gap: 0.2rem 0.85rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .standard li { grid-template-columns: 1.8rem minmax(0,1fr); }
+  .standard .ref { grid-column: 2; }
+}
+.standard li::before {
+  counter-increment: std;
+  content: counter(std);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.standard .t { font-size: 0.95rem; line-height: 1.45; }
+.standard .t b { font-weight: 600; }
+.standard .ref {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.nongoals { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.8; }
+a.xref { color: var(--brick); text-decoration: none;
+  border-bottom: 1px dotted var(--brick-soft); }
+a.xref:hover, a.xref:focus-visible { border-bottom-style: solid; }
+td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
+.nongoals b { color: var(--ink-2); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.62rem; }
+</style>
+<style>
+/* ---------- capability-page additions ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+
+/* the four rungs get their own chip colors: open to hidden */
+.chip.kind-mcp    { border-left: 3px solid var(--forest); }
+.chip.kind-mcp b  { color: var(--forest); }
+.chip.kind-ctx    { border-left: 3px solid var(--gold);   }
+.chip.kind-ctx b  { color: var(--gold-ink); }
+.chip.kind-cost   { border-left: 3px solid var(--brick);  }
+.chip.kind-cost b { color: var(--brick); }
+
+/* price rail: the two costs, side by side, under a rung heading */
+.price {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--mono);
+  overflow: hidden;
+}
+.price > div { background: var(--surface); padding: 0.7rem 0.85rem; }
+.price dt {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.price dd { margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--ink); line-height: 1.5; }
+.price dd em { font-style: normal; color: var(--ink-3); }
+.price div.standing { border-left: 3px solid var(--brick); }
+.price div.invoked  { border-left: 3px solid var(--gold); }
+.price div.returns  { border-left: 3px solid var(--forest); }
+.price div.hides    { border-left: 3px solid var(--ink-3); }
+
+/* prose lists and cross-references, same as the sibling pages */
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.nongoals { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.8; }
+.nongoals b { color: var(--ink-2); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.62rem; }
+a.xref { color: var(--brick); text-decoration: none; border-bottom: 1px dotted var(--brick-soft); }
+a.xref:hover, a.xref:focus-visible { border-bottom-style: solid; }
+td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>The Capability Ladder</span>
+      <span class="sep">/</span>
+      <span>the primitives</span>
+    </div>
+    <h1>Four rungs, from a macro to a <em>process</em>.</h1>
+    <p class="standfirst">
+      Half a charter says what the agent may not do. The other half says what it can do at all, and
+      that half is four primitives deep: a command, a skill, a sub-agent, an MCP server. They form one
+      ladder, from a macro the model reads every word of to a process it can only call. This page is
+      the mechanics of each rung, what makes a good one, and how to get a capability found once you
+      have written it.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      the argument · four primitives, one axis. How much of this can the model reinterpret<br>
+      the other half · <a href="/constraint-engineering/">Constraint Engineering</a> models what an agent may not do. This page models what it can<br>
+      the sequel · <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> covers the second job: what each capability costs on every turn, how to make one deterministic, and how to tell whether it ever fires<br>
+      what it is not · a features tour. The primitives are stable and the placement rule is the part that travels<br>
+      what is honest · I have measured constraint placement to a standard I trust and have not measured capability placement the same way. The sequel says what I would run<br>
+      reads alongside · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="/factory/">The Factory</a> · <a href="/prompt-injection/">Prompt Injection</a><br>
+      license · CC BY 4.0. Take the ladder, not the vocabulary
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch block"></span>
+        <div>
+          <dt>Trigger</dt>
+          <dd>Who invokes it, and how they find it. The attribute a constraint never needs, because a constraint fires on its own.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Rung</dt>
+          <dd>What carries it, and how much of it the model can read and reinterpret. None, convention, context, or process.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Grant</dt>
+          <dd>What it may touch while it runs. Declared in a file, or inherited by accident.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch dim"></span>
+        <div>
+          <dt>Return</dt>
+          <dd>What crosses back to the caller, and what stays behind. The half of the interface people forget to design.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Sections">
+    <ol>
+      <li class="part">I · the family</li>
+      <li><a href="#s-0"><span class="n">0</span> The family test</a></li>
+      <li class="part">II · the four rungs</li>
+      <li><a href="#s-1"><span class="n">1</span> Command</a></li>
+      <li><a href="#s-2"><span class="n">2</span> Skill</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Sub-agent</a></li>
+      <li><a href="#s-4"><span class="n">4</span> MCP server</a></li>
+      <li><a href="#s-5"><span class="n">5</span> Server, CLI or API</a></li>
+      <li class="part">III · packaging</li>
+      <li><a href="#s-6"><span class="n">6</span> Plugins</a></li>
+      <li><a href="#s-7"><span class="n">7</span> Choosing a rung</a></li>
+      <li class="part">IV · quality</li>
+      <li><a href="#s-8"><span class="n">8</span> A good one</a></li>
+      <li><a href="#s-9"><span class="n">9</span> Discovery</a></li>
+      <li><a href="#s-10"><span class="n">10</span> Grants</a></li>
+      <li><a href="#s-11"><span class="n">11</span> The catalog</a></li>
+      <li><a href="#s-12"><span class="n">12</span> Anti-patterns</a></li>
+    </ol>
+  </nav>
+
+  <div class="part-rule">
+    <span class="kicker">Part I</span>
+    <h2>The family</h2>
+    <p>
+      What a capability is, the four attributes every one of them carries, and the two words this page
+      prices everything in. One section, because the ladder starts in Part II.
+    </p>
+  </div>
+   <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The family test">
+          <i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The family test</span>
+      </div>
+      <div>
+        <h2>Run the family test backwards and you have found a capability</h2>
+        <p class="thesis">
+          A charter is easy to read as a list of prohibitions. Most of a working charter is not.
+          It is the set of things the agent can do at all, and teams install those without designing
+          them, because installing feels free. It is not free. A capability has the same four
+          attributes a constraint has, and one more that constraints never need.
+        </p>
+        <div class="chips">
+          <span class="chip kind-cmd"><b>trigger</b> who invokes it</span>
+          <span class="chip kind-skill"><b>rung</b> what carries it</span>
+          <span class="chip kind-agent"><b>grant</b> what it may touch</span>
+          <span class="chip kind-mcp"><b>return</b> what crosses back</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <a href="/constraint-engineering/">Constraint Engineering</a> ends its section on component
+        families with a ten-second test. Remove the component and ask what changed. Run that test and
+        keep only the answers that point one way.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>the family test, and the one answer this page follows<span class="tag pass">remove it, then look</span></caption>
+          <thead>
+            <tr><th>Remove it, and</th><th>You removed a</th><th>Where it is designed</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">the agent can do less</td><td>capability</td><td>this page</td></tr>
+            <tr><td class="k">the agent can do more</td><td>constraint</td><td><a class="xref" href="/constraint-engineering/">Constraint Engineering</a></td></tr>
+            <tr><td class="k">a number moved</td><td>setting</td><td>the charter's config block</td></tr>
+            <tr><td class="k">you know less about the run</td><td>evidence</td><td><a class="xref" href="/audit-trail/">The Audit Trail</a></td></tr>
+            <tr><td class="k">the agent forgot something</td><td>state</td><td>memory, and it needs an expiry</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The five answers are exclusive in practice and not in theory. A skill that says
+        <em>always run the formatter</em> reads like a capability and behaves like a rule. Removing it
+        lets the agent do more, so it is a constraint, and it belongs in the charter at the rung the
+        charter chose. That single misfiling is the most common one I see, and
+        <a class="xref" href="#s-12">section 12</a> lists it as an anti-pattern rather than a style preference.
+      </p>
+
+      <h3 class="sub">0.1 · Four attributes, and the fourth is the new one</h3>
+      <p>
+        A constraint carries a layer, a rung, a policy and a verdict. A capability carries four of its
+        own. Three of them have obvious counterparts. The fourth does not exist on the constraint side
+        at all, because a constraint does not need to be found.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>the four attributes of one capability<span class="tag warn">collapse any two and section 12 has a name for it</span></caption>
+          <thead>
+            <tr><th>Attribute</th><th>The question it answers</th><th>Constraint counterpart</th><th>Designed in</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn"><td class="k">trigger</td><td>Who invokes this, and how do they find it?</td><td><em>none. A constraint fires on its own</em></td><td><a class="xref" href="#s-9">section 9</a></td></tr>
+            <tr><td class="k">rung</td><td>What carries it, and how much of it can the model reinterpret?</td><td>rung: reach and authority</td><td><a class="xref" href="#s-1">sections 1–5</a></td></tr>
+            <tr><td class="k">grant</td><td>What may it touch while it runs?</td><td>layer: whose rule it is</td><td><a class="xref" href="#s-10">section 10</a></td></tr>
+            <tr><td class="k">return</td><td>What crosses back to the caller, and what stays behind?</td><td>policy: what happens when it fires</td><td><a class="xref" href="/keeping-capabilities-honest/#s-0">the ledger, in the sequel</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The missing counterpart is the whole reason these two pages exist. A hook runs because an event
+        happened. A gate runs because the pipeline reached it. Neither one waits to be noticed. Every
+        capability on the ladder below waits to be noticed, and three of the four wait to be noticed
+        by a model reading a one-line description.
+      </p>
+
+      <h3 class="sub">0.2 · Two prices, named once</h3>
+      <p>
+        Every rung below is priced twice on this page, so the two words are worth pinning here. The
+        <b>standing cost</b> is what the capability puts in the context window on every turn, whether
+        it fires or not: a name, a description, a schema. The <b>invoked cost</b> is what it puts there
+        when it does fire: a body, a file, a result. One is paid thousands of times a week and the
+        other is paid when the work needs it.
+      </p>
+      <p>
+        That is the whole reason the ladder has four rungs rather than one file format, and the
+        accounting behind it belongs to the sequel rather than to this page.
+        <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> measures both prices,
+        and the rest of this page just states them per rung and moves on.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The definition, so the rest of the page can be short</span>
+        <p>
+          A <strong>capability</strong> is a component whose removal means the agent can do less. It
+          is described by a trigger, a rung, a grant and a return. It charges context on every turn
+          and pays out only when its trigger matches. Design all four attributes or you have installed
+          a file and called it a design.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <div class="part-rule">
+    <span class="kicker">Part II</span>
+    <h2>The four rungs</h2>
+    <p>
+      One ladder, from open to hidden. A command hides nothing and the model reads every word. A
+      server hides everything but a schema. Each section states what the rung is, what it costs, what
+      it buys, and the signal that you are standing on the wrong one. Section 5 handles the case where
+      the answer is not a rung at all.</p>
+  </div>
+   <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Command">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Command</span>
+      </div>
+      <div>
+        <h2>A command is a macro, and its discovery problem belongs to a human</h2>
+        <p class="thesis">
+          A command is a file of prompt text with a name. Somebody types the name and the text becomes
+          the turn. Nothing is hidden, nothing is decided, and nothing fires unless a person makes it
+          fire. That last property is the rung's whole advantage and its whole ceiling.
+        </p>
+        <div class="chips">
+          <span class="chip kind-cmd"><b>rung 0</b> open</span>
+          <span class="chip kind-ctx"><b>trigger</b> a human types it</span>
+          <span class="chip kind-agent"><b>boundary</b> none</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <dl class="price">
+        <div class="standing">
+          <dt>Standing cost</dt>
+          <dd>A name and one line. <em>Zero when you turn model invocation off.</em></dd>
+        </div>
+        <div class="invoked">
+          <dt>Invoked cost</dt>
+          <dd>The whole body, expanded in place, plus whatever it injects.</dd>
+        </div>
+        <div class="returns">
+          <dt>What returns</dt>
+          <dd>Nothing. The command <em>is</em> the turn.</dd>
+        </div>
+        <div class="hides">
+          <dt>Boundary</dt>
+          <dd>None. Every word is in the window and the model may rewrite the plan.</dd>
+        </div>
+      </dl>
+
+      <h3 class="sub">1.1 · What it actually is</h3>
+      <p>
+        A markdown file, in the project at <code>.claude/commands/</code> or in the account at
+        <code>~/.claude/commands/</code>, with a subdirectory for a namespace. The frontmatter is
+        small and every field is a lever on the ledger.
+      </p>
+
+      <figure class="code">
+        <figcaption>.claude/commands/charter-check.md<span class="tag warn">a rehearsed prompt with the context stapled to it</span></figcaption>
+<pre><code><span class="c-dim">---</span>
+<span class="c-warn">description</span>: Check the current diff against the charter's rung-1 rules
+<span class="c-warn">argument-hint</span>: [base-branch]
+<span class="c-warn">allowed-tools</span>: Bash(git diff:*)
+<span class="c-warn">disable-model-invocation</span>: true
+<span class="c-dim">---</span>
+
+The diff under review, against <span class="c-pass">$1</span>:
+
+<span class="c-pass">!`git diff $1...HEAD --unified=0`</span>
+
+Read <span class="c-pass">@docs/charter.md</span>. Check the diff against the rung-1 section only.
+Report one line per violation, and nothing else. Do not fix anything.
+</code></pre>
+      </figure>
+
+      <p>
+        Three of those lines are the interesting ones. <code>$1</code> and <code>$ARGUMENTS</code>
+        make the file a function rather than a note. The <code>!</code> prefix runs a shell command
+        when the command expands and drops the output in, which means the prompt arrives already
+        holding its evidence. <code>disable-model-invocation</code> takes the description out of the
+        standing bill, which is the right default for anything a human always initiates.
+      </p>
+
+      <h3 class="sub">1.2 · What the rung buys</h3>
+      <ul>
+        <li><b>Rehearsal.</b> A prompt you got right once, replayed exactly. This is worth more than it sounds, because most bad agent turns start with a badly stated ask.</li>
+        <li><b>Evidence at the front.</b> The <code>!</code> injection collects the diff, the log, the failing test before the model starts. It cannot forget to look.</li>
+        <li><b>Near-zero standing cost.</b> With model invocation off, a hundred commands cost you almost nothing on a turn that does not use them.</li>
+        <li><b>A human in the loop by construction.</b> Somebody chose to run this. For anything irreversible that is a feature, and <a href="/factory/">The Factory</a> treats it as one of the places a human gets asked.</li>
+      </ul>
+
+      <h3 class="sub">1.3 · The ceiling</h3>
+      <p>
+        A command cannot fire when the model needs it. It fires when a person remembers it. So the
+        moment the value of the capability depends on it running at the right time rather than at a
+        chosen time, this rung is wrong, and it is wrong in two different directions.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>the two ways a command is the wrong rung<span class="tag block">both are common</span></caption>
+          <thead>
+            <tr><th>What you notice</th><th>What it means</th><th>Where it goes</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">it must run every time, and someone forgot</td><td>this is not a capability. It is a rule with a typing requirement</td><td>a hook, or a gate. <a class="xref" href="/constraint-engineering/">Constraint Engineering</a></td></tr>
+            <tr data-signal="warn"><td class="k">the model should have known to do this</td><td>the trigger belongs to the model, not to you</td><td>a skill. <a class="xref" href="#s-2">Section 2</a></td></tr>
+            <tr><td class="k">you type it constantly with the same arguments</td><td>it is a default, not a capability</td><td>the charter, or a setting</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="label">The mistake worth naming once</span>
+        <p>
+          A command that guards something that matters is a guardrail made of human memory. If the
+          consequence of skipping it is a bad merge rather than a worse paragraph, it was never a
+          capability. Promote it to a mechanism that fires on its own and keep the command as the
+          convenient path, not as the enforcement.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Skill">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Skill</span>
+      </div>
+      <div>
+        <h2>A skill is a module, and its description is the only part that is always there</h2>
+        <p class="thesis">
+          A skill is knowledge and procedure the model loads when it decides the job needs them. It is
+          the first rung where the trigger belongs to the model, which makes one line of frontmatter
+          the highest-leverage text in the whole capability. Everything else about the design follows
+          from keeping the standing cost at that one line.
+        </p>
+        <div class="chips">
+          <span class="chip kind-skill"><b>rung 1</b> loaded on demand</span>
+          <span class="chip kind-ctx"><b>trigger</b> the model, from a description</span>
+          <span class="chip kind-cost"><b>boundary</b> convention</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <dl class="price">
+        <div class="standing">
+          <dt>Standing cost</dt>
+          <dd>A name and one line, on every turn.</dd>
+        </div>
+        <div class="invoked">
+          <dt>Invoked cost</dt>
+          <dd>The body when it triggers, then bundled files only if something reads them.</dd>
+        </div>
+        <div class="returns">
+          <dt>What returns</dt>
+          <dd>Every word, into this same window. <em>Nothing is summarized.</em></dd>
+        </div>
+        <div class="hides">
+          <dt>Boundary</dt>
+          <dd>Convention. The model can read the file, argue with it, or ignore it.</dd>
+        </div>
+      </dl>
+
+      <h3 class="sub">2.1 · Three levels, and the design work is deciding what lives where</h3>
+      <p>
+        A skill is a directory with a <code>SKILL.md</code> and whatever it needs beside it. The
+        three levels are not a packaging detail. They are the two prices of
+        <a class="xref" href="#s-0">section 0</a>, expressed as a file layout.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>the three levels of a skill<span class="tag pass">move weight downward</span></caption>
+          <thead>
+            <tr><th>Level</th><th>What it holds</th><th>When it is paid for</th><th>Budget</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">description</td><td>when to use this, in the words a user would use</td><td>every turn</td><td>one or two sentences. Treat it as expensive</td></tr>
+            <tr data-signal="warn"><td class="k">SKILL.md body</td><td>the procedure. The steps, the order, the refusals</td><td>on trigger</td><td>short enough to read in one pass</td></tr>
+            <tr data-signal="pass"><td class="k">bundled files</td><td>reference tables, schemas, examples, scripts</td><td>only if something reads or runs them</td><td>as large as the job needs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="code">
+        <figcaption>.claude/skills/migration-writer/<span class="tag pass">procedure in the body, reference in the files</span></figcaption>
+<pre><code>migration-writer/
+├── <span class="c-warn">SKILL.md</span>          <span class="c-dim">the procedure. Around a page</span>
+├── references/
+│   ├── <span class="c-pass">column-types.md</span>   <span class="c-dim">the table nobody memorizes</span>
+│   └── <span class="c-pass">rollback.md</span>       <span class="c-dim">read only when a rollback is asked for</span>
+└── scripts/
+    └── <span class="c-pass">check_reversible.py</span>  <span class="c-dim">deterministic. Run, do not read</span>
+
+<span class="c-dim">--- SKILL.md ---</span>
+<span class="c-dim">---</span>
+<span class="c-warn">name</span>: migration-writer
+<span class="c-warn">description</span>: Write, review or roll back a database migration in this
+  repository. Use when the user mentions a migration, a schema change, adding
+  or dropping a column, an index, or a backfill. Covers the reversibility
+  check this repository requires before a migration can merge.
+<span class="c-warn">allowed-tools</span>: Read, Write, Edit, Bash(python scripts/check_reversible.py:*)
+<span class="c-dim">---</span>
+
+1. Read the existing migrations in db/migrate to match the local style.
+2. Write the migration. Every one is reversible or it does not merge.
+3. Run scripts/check_reversible.py against the new file. Do not
+   reimplement the check by reading the file yourself.
+4. For column types, read references/column-types.md. Do not guess.
+</code></pre>
+      </figure>
+
+      <p>
+        The script in that layout is the part people skip, and it is the cheapest determinism on the
+        page. A bundled script has no standing cost, no schema, no process to run, and no
+        configuration. It answers the same way every time. Reach for an MCP server after you have
+        established that a script cannot do it, not before.
+      </p>
+
+      <h3 class="sub">2.2 · What the rung buys</h3>
+      <ul>
+        <li><b>Knowledge that arrives when relevant.</b> This is the whole product. A reference library that costs one line until the moment it is needed.</li>
+        <li><b>Procedure with an order.</b> A skill can say <em>do this before that</em> in a way a note in the charter cannot, because it arrives with the job rather than with the session.</li>
+        <li><b>Bundled determinism.</b> Scripts beside the procedure, invoked by name, with a grant that permits exactly them.</li>
+        <li><b>A shared unit.</b> Team-owned in the repository, account-owned for personal habits, or packaged in a plugin for distribution.</li>
+      </ul>
+
+      <h3 class="sub">2.3 · The ceiling</h3>
+      <p>
+        Two limits, and they are different in kind. The first is that the boundary is politeness. The
+        model can read the skill file, disagree with it and proceed. A skill cannot refuse anything,
+        so a rule you need obeyed does not become obeyed by being written in a skill. It becomes
+        obeyed by a hook or a gate, and the skill is where the accompanying knowledge goes.
+      </p>
+      <p>
+        The second is that everything it loads lands in this window. A skill whose body dumps a
+        reference manual on trigger has moved cost from the standing column to the invoked column and
+        then blown the invoked column. That is what the bundled files are for, and it is the most
+        common repair I make to a skill somebody else wrote.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The two tells that a skill is on the wrong rung</span>
+        <p>
+          If its body is mostly reading and the model then works from what it read, it wanted to be a
+          sub-agent, and <a class="xref" href="#s-3">section 3</a> explains why the window pays for that
+          mistake. If the model keeps declining to follow it, it wanted to be a constraint, and no
+          amount of stronger wording changes the rung it is on.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Sub-agent">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Sub-agent</span>
+      </div>
+      <div>
+        <h2>A sub-agent is an object, and the summary it returns is the interface</h2>
+        <p class="thesis">
+          A sub-agent runs the work in a window the parent never sees and hands back a report. It is
+          the only rung that gives context back rather than taking it, and the price of that is a
+          lossy, one-shot return. Design the return first. Everything else about a sub-agent is easier
+          than that part and matters less.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>rung 2</b> a context wall</span>
+          <span class="chip kind-ctx"><b>trigger</b> the parent turn</span>
+          <span class="chip kind-mcp"><b>grant</b> declared, not inherited</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <dl class="price">
+        <div class="standing">
+          <dt>Standing cost</dt>
+          <dd>A name and one line, on every turn.</dd>
+        </div>
+        <div class="invoked">
+          <dt>Invoked cost</dt>
+          <dd>A task prompt out. The reading, the searching and the false starts happen elsewhere.</dd>
+        </div>
+        <div class="returns">
+          <dt>What returns</dt>
+          <dd>A summary. <em>Often a net saving, which no other rung can offer.</em></dd>
+        </div>
+        <div class="hides">
+          <dt>Boundary</dt>
+          <dd>Context. Its own window, its own grant, its own model if you want one.</dd>
+        </div>
+      </dl>
+
+      <h3 class="sub">3.1 · What it actually is</h3>
+      <p>
+        A markdown file in <code>.claude/agents/</code>. The frontmatter names it, describes when to
+        use it, and declares the tools it may hold. The body is its system prompt, so the file is a
+        job description rather than a procedure.
+      </p>
+
+      <figure class="code">
+        <figcaption>.claude/agents/charter-auditor.md<span class="tag pass">a narrow grant and a stated return shape</span></figcaption>
+<pre><code><span class="c-dim">---</span>
+<span class="c-warn">name</span>: charter-auditor
+<span class="c-warn">description</span>: Audit a branch against the charter and report violations with
+  file and line. Use when asked whether a change conforms, before opening a
+  pull request, or when a reviewer disputes a rule.
+<span class="c-warn">tools</span>: Read, Grep, Glob, Bash(git log:*), Bash(git diff:*)
+<span class="c-warn">model</span>: sonnet
+<span class="c-dim">---</span>
+
+You audit changes against docs/charter.md. You do not fix anything and you
+do not write files.
+
+<span class="c-pass">Return exactly this shape, and nothing else:</span>
+<span class="c-pass">  one line per violation: path:line · rule id · what it violates</span>
+<span class="c-pass">  then a final line: N violations across M files</span>
+<span class="c-pass">If there are none, return exactly: no violations.</span>
+</code></pre>
+      </figure>
+
+      <p>
+        Two lines in that file do most of the work. The <code>tools</code> line is a grant, and a
+        grant left off is a grant inherited by accident, which
+        <a class="xref" href="#s-10">section 10</a> treats as a real defect rather than an untidiness.
+        The return block is the interface. A sub-agent whose return shape is unstated returns prose,
+        and prose is exactly what you were trying to keep out of the parent window.
+      </p>
+
+      <h3 class="sub">3.2 · What the rung buys</h3>
+      <ul>
+        <li><b>Context back.</b> Twenty file reads happen somewhere else and eight lines come home. This is the only rung with that property and it is the main reason to use it.</li>
+        <li><b>Parallelism.</b> Several sub-agents at once, on independent work, and the wall-clock is the slowest one rather than the sum.</li>
+        <li><b>A narrower grant than the parent.</b> A reviewer that cannot write. An auditor that cannot push. The grant is the security property, and it is declared in a file rather than hoped for in a prompt.</li>
+        <li><b>A different model or effort.</b> Cheap and fast for mechanical fan-out, expensive and careful for the one judgment that matters.</li>
+        <li><b>Isolation when work collides.</b> Parallel agents that mutate files need separate worktrees, and that is a flag rather than a design.</li>
+      </ul>
+
+      <h3 class="sub">3.3 · The ceiling, which is the return value</h3>
+      <p>
+        The parent cannot see what the sub-agent saw. That is the point and it is also the whole cost.
+        Three consequences follow, and the first two are avoidable.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">lossy</span>
+          <span class="what">Anything the report leaves out is gone. The parent re-derives it and you have paid for the same reading twice. Fix it by stating the return shape, including the fields you will need later, such as file and line.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">one shot</span>
+          <span class="what">The sub-agent cannot ask you what you meant halfway through. An ambiguous task becomes a confident wrong answer. Fix it by putting the disambiguation in the task prompt, not in the agent file.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">two models</span>
+          <span class="what">You now have two places to be wrong, and the parent has no way to check the child's work. This one does not have a fix. It has a price, and the four numbers in <a class="xref" href="/keeping-capabilities-honest/#s-8">Keeping Capabilities Honest</a> are how you find out what it is.</span>
+        </li>
+      </ol>
+
+      <figure class="code diagram">
+        <figcaption>what crosses the wall, and what does not<span class="tag warn">read the dashed edge as the thing you cannot recover</span></figcaption>
+<pre class="mermaid">
+flowchart LR
+  P["the parent turn"] -->|"task prompt, plus a grant"| A["the sub-agent"]
+  A --> R1["forty file reads"]
+  A --> R2["three wrong guesses"]
+  A --> R3["the finding"]
+  R3 -->|"the report, in the stated shape"| P
+  R1 -.->|"never crosses"| P
+  R2 -.->|"never crosses"| P
+  class P dim
+  class A pass
+  class R1 block
+  class R2 block
+  class R3 warn
+</pre>
+      </figure>
+
+      <h3 class="sub">3.4 · When it is the wrong rung</h3>
+      <p>
+        A sub-agent for a job that needs three lines of knowledge is a context wall around nothing.
+        You paid a task prompt, a fresh system prompt and a round trip to avoid loading a paragraph.
+        The rule I use: if the work does not involve reading or searching more than the parent wants
+        to hold, it is a skill.
+      </p>
+      <p>
+        The other direction is subtler. If the parent keeps asking follow-up questions about what the
+        child found, the wall is in the wrong place. Either the return shape is too narrow, or that
+        work belonged in the parent's own window all along.
+      </p>
+    </div>
+  </section>
+
+   <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="MCP server">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">MCP server</span>
+      </div>
+      <div>
+        <h2>An MCP server is an interface with the implementation somewhere else</h2>
+        <p class="thesis">
+          At this rung the capability stops being text the model reads and becomes a process the model
+          calls. Another language, another machine, credentials it never sees. You buy determinism and
+          a real trust boundary. You pay the largest standing bill on the ladder, and you pay it for
+          every tool the server declares rather than for the ones you use.
+        </p>
+        <div class="chips">
+          <span class="chip kind-mcp"><b>rung 3</b> a process wall</span>
+          <span class="chip kind-ctx"><b>trigger</b> the model, by schema</span>
+          <span class="chip kind-cost"><b>standing</b> every schema, every turn</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <dl class="price">
+        <div class="standing">
+          <dt>Standing cost</dt>
+          <dd>Every declared tool's full schema, on every turn. Plus any instructions the server injects.</dd>
+        </div>
+        <div class="invoked">
+          <dt>Invoked cost</dt>
+          <dd>Arguments out, and whatever the server chose to return.</dd>
+        </div>
+        <div class="returns">
+          <dt>What returns</dt>
+          <dd>A result, and no implementation. <em>Its size is the server author's decision, not yours.</em></dd>
+        </div>
+        <div class="hides">
+          <dt>Boundary</dt>
+          <dd>Process. The model cannot read the code, so it cannot work around a bad schema.</dd>
+        </div>
+      </dl>
+
+      <h3 class="sub">4.1 · What it actually is</h3>
+      <p>
+        A server speaking the Model Context Protocol, connected over stdio to a local process, or over
+        HTTP or server-sent events to a remote one. Where you declare it decides who gets it, and that
+        is a layer decision in the sense <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> uses:
+        whoever owns the file owns the capability.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>where a server is declared, and what that commits you to<span class="tag warn">project scope is a team decision</span></caption>
+          <thead>
+            <tr><th>Scope</th><th>Who gets it</th><th>Use it when</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">project · <code>.mcp.json</code></td><td>everyone who checks out the repository</td><td>the server is part of how this codebase is worked on</td></tr>
+            <tr><td class="k">user</td><td>you, in every project</td><td>a personal tool, and you accept the standing cost everywhere</td></tr>
+            <tr data-signal="warn"><td class="k">local</td><td>you, in this project</td><td>trying it out, or holding credentials that must not be shared</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <figure class="code">
+        <figcaption>.mcp.json<span class="tag warn">checked in, so it is a commitment to the team's context budget</span></figcaption>
+<pre><code>{
+  <span class="c-warn">"mcpServers"</span>: {
+    <span class="c-pass">"incidents"</span>: {
+      "type": "http",
+      "url": "https://incidents.internal/mcp",
+      <span class="c-dim">// auth happens out of band. The model never holds the token</span>
+    },
+    <span class="c-pass">"repo-graph"</span>: {
+      "command": "uvx",
+      "args": ["repo-graph-mcp", "--root", "."]
+    }
+  }
+}
+</code></pre>
+      </figure>
+
+      <h3 class="sub">4.2 · Three primitives, and only one of them is priced per turn</h3>
+      <p>
+        Most teams use MCP as a tool bus and never touch the other two. That is a budget mistake as
+        much as a design one, because tools are the expensive primitive and resources are the cheap
+        one.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>what a server can offer<span class="tag block">tools are the priced primitive</span></caption>
+          <thead>
+            <tr><th>Primitive</th><th>Who pulls it</th><th>Standing cost</th><th>Good for</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">tools</td><td>the model, when a schema matches</td><td>the full schema of every declared tool, every turn</td><td>actions, and lookups the model must decide to make</td></tr>
+            <tr data-signal="pass"><td class="k">resources</td><td>a human or the model, by reference</td><td>none per item. They are fetched, not advertised</td><td>documents, records, dashboards. Anything addressable</td></tr>
+            <tr data-signal="warn"><td class="k">prompts</td><td>a human, by name</td><td>a name and a line</td><td>server-side commands. Rung 0, shipped by whoever runs the server</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        A server's instructions are the fourth thing it can put in your window, and they arrive
+        without being asked for. Read them before you enable the server in project scope. They are
+        prose at rung 0 of the constraint chain, written by somebody who has never seen your charter,
+        and the model cannot tell them apart from yours.
+      </p>
+
+      <h3 class="sub">4.3 · What the rung buys</h3>
+      <ul>
+        <li><b>Determinism, though not exclusively.</b> The same call returns the same answer. A bundled script promises that too, for nothing, which is why <a class="xref" href="#s-5">section 5</a> keeps repeatability off the list of reasons to build one.</li>
+        <li><b>Credentials the model never holds.</b> The server authenticates. The model gets results. That is a genuine trust boundary rather than an instruction not to look.</li>
+        <li><b>Another machine.</b> The capability can be the thing your platform team already runs, where they run it. Another <em>language</em> is not on the list, because a bundled script can be written in any language you like.</li>
+        <li><b>One implementation, many clients.</b> A schema serves every agent and every editor you point at it. This is the reason to build a server rather than four skills.</li>
+        <li><b>A versionable contract.</b> The schema is the interface. You can change what is behind it without touching a single charter.</li>
+      </ul>
+
+      <h3 class="sub">4.4 · The bill, and the four ways to cut it</h3>
+      <p>
+        A server with twenty tools stands in your window twenty times, in full, on every turn, with
+        every parameter description. The tools you never call are indistinguishable from the ones you
+        do. Four cuts, in the order I would make them.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">first</span>
+          <span class="what">Turn off the servers this project does not need. Scope is the cheapest fix and the one nobody does, because enabling a server is a decision you make once and pay for daily.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">second</span>
+          <span class="what">Use deferred schemas where the client offers them, so a tool's full definition loads when it is searched for rather than standing in every turn. This turns rung 3's standing cost into something closer to a skill's.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">third</span>
+          <span class="what">Cut the tool count. Tools should be shaped like the task, not like the upstream API. Five task-shaped tools beat thirty endpoint-shaped ones on cost and on selection accuracy at the same time.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">fourth</span>
+          <span class="what">Cut the returns. A tool that answers a question should return the answer, not the payload it came in. Pages of JSON are an invoked cost the caller cannot refuse.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">4.5 · The ceiling, and it is not the cost</h3>
+      <p>
+        The process wall runs both ways. You cannot see in, and the model cannot see in either. So a
+        tool whose description is vague is a capability you cannot repair from the outside. On the
+        skill rung a confused model can read the file and work it out. Here it can only call the thing
+        and hope. The schema description <em>is</em> the capability as far as selection is concerned,
+        which puts the craft of <a class="xref" href="#s-9">section 9</a> in someone else's repository
+        when the server is not yours.
+      </p>
+      <p>
+        The second limit is a security property rather than a cost. What comes back through the wall
+        is text, and it lands in the window next to your instructions. A server that returns a
+        third party's content is returning an untrusted string into a context that treats strings as
+        instructions.
+      </p>
+
+      <figure class="code diagram">
+        <figcaption>the wall runs both ways, and the return is untrusted<span class="tag block">brick is the part to treat as data, never as instruction</span></figcaption>
+<pre class="mermaid">
+flowchart LR
+  M["the model"] -->|"a call that matches the schema"| S["the server, another process"]
+  S -->|"credentials the model never sees"| U["the upstream system"]
+  U -->|"content written by other people"| S
+  S -->|"a result, as text, into your window"| M
+  X["your charter, in the same window"] --- M
+  class M dim
+  class S pass
+  class U block
+  class X warn
+</pre>
+      </figure>
+
+      <p>
+        <a href="/prompt-injection/">Prompt Injection</a> covers that path properly. The
+        capability-side rule is short: a tool that reaches content other people write needs its
+        return treated as data, and the constraint that enforces it does not live in the server. It
+        lives in your harness, where you can see it.
+      </p>
+
+      <div class="callout">
+        <span class="label">The server that should have been a script</span>
+        <p>
+          One tool, your language, no credentials, no network, no other client. That is a script in a
+          skill, and a skill costs one line where the server costs a schema on every turn. I have
+          written this server twice and deleted it twice. The four questions in
+          <a class="xref" href="#s-7">section 7</a> exist to stop me writing it a third time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+   <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Server, CLI or API">
+          <i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Server, CLI or API</span>
+      </div>
+      <div>
+        <h2>A CLI is a tool server whose schema you are not paying for</h2>
+        <p class="thesis">
+          Three things can reach an external system: a command-line tool the agent already has, a
+          script that calls the API, or an MCP server. All three put a process between the model and
+          the system. They differ in where the interface description lives, and that is what you are
+          choosing between. Most teams reach for the third and needed the first.
+        </p>
+        <div class="chips">
+          <span class="chip kind-cmd"><b>cli</b> schema in the model's head</span>
+          <span class="chip kind-skill"><b>script</b> schema in your file</span>
+          <span class="chip kind-mcp"><b>server</b> schema in your window</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Think about what a schema actually does. It tells the model what calls exist, what arguments
+        they take, and what comes back. A CLI has all of that too. Its schema is the tool's own help
+        text and the model's prior knowledge of it, and neither of those stands in your context window
+        on every turn. That is the trade in one sentence, and the rest of this section is the cases
+        where it goes the other way.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>three ways to reach one external system<span class="tag warn">the difference is where the interface lives</span></caption>
+          <thead>
+            <tr><th></th><th>A CLI, run with Bash</th><th>A script calling the API</th><th>An MCP server</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">interface lives</td><td>in the tool's help, and in what the model already knows</td><td>in your file, which you wrote</td><td>in your window, on every turn</td></tr>
+            <tr data-signal="pass"><td class="k">standing cost</td><td>none</td><td>none</td><td>a full schema per declared tool</td></tr>
+            <tr><td class="k">discovery</td><td>the model guesses flags. Sometimes wrongly</td><td>none to guess. The script is the interface</td><td>typed and advertised. The strongest of the three</td></tr>
+            <tr><td class="k">auth</td><td>the tool's own credential store. The model never sees a token</td><td>an environment variable the script reads</td><td>the server's, including interactive sign-in flows</td></tr>
+            <tr><td class="k">grant precision</td><td>excellent. <code>Bash(gh pr view:*)</code> is one subcommand</td><td>excellent. One script, granted by name</td><td>per tool, and only for the tools it declares</td></tr>
+            <tr><td class="k">output shape</td><td>whatever it prints. Yours to pipe and trim</td><td>exactly what you return</td><td>whatever the server author chose</td></tr>
+            <tr><td class="k">other clients</td><td>anyone with a shell</td><td>nobody. It is yours</td><td>every client that speaks the protocol</td></tr>
+            <tr data-signal="block"><td class="k">fails by</td><td>a wrong flag, retried. Turns spent guessing</td><td>going stale when the API moves</td><td>standing cost, and a schema you cannot repair</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">5.1 · The order to try them in</h3>
+
+      <ol class="sequence">
+        <li data-signal="pass">
+          <span class="when">first · a CLI</span>
+          <span class="what">Is there a maintained command-line tool, already installed and already authenticated on this machine? Then use it, grant the exact subcommands, and write a skill that names the two or three invocations you actually want. The skill removes the guessing, which is the CLI's only real weakness.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">second · a script</span>
+          <span class="what">No CLI, or the CLI prints the wrong shape? A script in a skill directory calls the API and returns the field. You own the request, the retries and the output. No standing cost, and the determinism half of <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> is mostly about this option.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">third · a server</span>
+          <span class="what">Reach for MCP when one of five things is true, and not otherwise: several clients or agents need the same access, sign-in is an interactive flow the model must not handle, the surface is broad enough that typed discovery is worth paying for, a vendor already ships a server you would otherwise reimplement, or you need a versioned contract other teams build against.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">then check</span>
+          <span class="what">Count the tools the server declares and multiply by turns per week. If you are enabling twenty schemas to call one of them, go back to the first row.</span>
+        </li>
+      </ol>
+
+      <figure class="code">
+        <figcaption>the same lookup, three ways<span class="tag pass">the first two cost nothing until they run</span></figcaption>
+<pre><code><span class="c-dim"># a CLI, pinned in a skill so nothing is guessed</span>
+<span class="c-warn">allowed-tools</span>: Bash(gh pr view:*), Bash(gh pr diff:*)
+
+2. Read the pull request with:
+     <span class="c-pass">gh pr view $NUMBER --json title,body,files</span>
+   Do not use other gh subcommands for this step.
+
+<span class="c-dim"># a script, when the CLI's output is the wrong shape</span>
+scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim"># prints five lines, not five pages</span>
+
+<span class="c-dim"># a server, when four other agents need the same access</span>
+<span class="c-warn">mcp__reviews__get_pull_request</span>   <span class="c-dim"># a schema, standing, every turn</span>
+</code></pre>
+      </figure>
+
+      <h3 class="sub">5.2 · The honest case for the server</h3>
+      <p>
+        The CLI route has a cost that does not appear in the ledger. The model guesses a flag, the
+        command fails, it reads the help text, it tries again. Three turns for a lookup. A typed schema
+        makes that failure rare, and a broad surface makes it common, so the wider the tool you are
+        reaching for, the better the server looks. A skill that pins the exact invocations closes most
+        of the gap for a few commands and none of it for forty.
+      </p>
+      <p>
+        The second honest case is authentication. A CLI works because someone signed in on that
+        machine. A server can own the sign-in flow, refresh the token, and keep the credential in a
+        process the model cannot read. When the alternative is a token pasted into an environment
+        variable in a script, the server is buying a real security property and not just tidiness.
+      </p>
+
+      <div class="callout">
+        <span class="label">The wrapper</span>
+        <p>
+          Wrapping a CLI you already have in an MCP server is the most expensive way to gain nothing.
+          You pay a schema on every turn for a capability <code>Bash</code> already provided, you lose
+          the ability to pipe and trim the output, and you add a process to keep alive. If the reason
+          is that the model keeps getting the flags wrong, the fix is a skill with the invocations
+          written down.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="part-rule">
+    <span class="kicker">Part III</span>
+    <h2>Packaging and placement</h2>
+    <p>
+      Who owns a capability, and which rung it belongs on. Two sections. The first is the question
+      that decides who may change the words, and the second is the question everyone asks first and
+      should ask second.</p>
+  </div>
+
+   <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="Plugins">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Plugins</span>
+      </div>
+      <div>
+        <h2>A plugin is not a rung. It is who owns the rungs</h2>
+        <p class="thesis">
+          A plugin ships commands, skills, sub-agents, hooks and server declarations under one name,
+          from one repository, with one owner. It changes nothing about how any of them work and
+          everything about who decides what they say. That makes it the packaging question and the
+          layer question at the same time, and it is a dependency in the ordinary sense: it changes
+          under you.
+        </p>
+        <div class="chips">
+          <span class="chip kind-config"><b>packaging</b> not a rung</span>
+          <span class="chip kind-cost"><b>standing</b> the sum of what it ships</span>
+          <span class="chip kind-hook"><b>ships constraints too</b> read those first</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Before plugins there were two places a capability could live: your account, or this repository.
+        Both answers are about you. A plugin adds a third, and the third one is about somebody else,
+        which is why it is worth a section of its own rather than a line in the catalog.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>the four places a capability can live<span class="tag warn">the last row is the only one that changes without you</span></caption>
+          <thead>
+            <tr><th>Lives in</th><th>Who owns the words</th><th>Who gets it</th><th>Updates</th><th>Right when</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="pass"><td class="k">user scope</td><td>you</td><td>you, in every project</td><td>when you edit it</td><td>personal habits, and nothing a teammate depends on</td></tr>
+            <tr data-signal="pass"><td class="k">project scope</td><td>whoever reviews the repository</td><td>everyone with a checkout</td><td>through review, like code</td><td>this codebase's practices. The default, and it should stay the default</td></tr>
+            <tr data-signal="warn"><td class="k">a plugin you publish</td><td>your team</td><td>every project that enables it</td><td>when you release</td><td>three or more repositories need the same capability</td></tr>
+            <tr data-signal="block"><td class="k">a plugin you install</td><td>somebody else</td><td>every project that enables it</td><td>when they release. Read the diff</td><td>a vendor or a community already solved it well</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">6.1 · What is in the box, and why all five parts matter</h3>
+      <p>
+        A plugin can carry more than capabilities, and the parts that are not capabilities are the
+        ones to read first. Enabling a plugin can enforce rules, grant tool access, and put prose in
+        your window on every turn, none of which is visible from its name.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>what a plugin can ship<span class="tag block">two of these five are constraints, not capabilities</span></caption>
+          <thead>
+            <tr><th>Part</th><th>Family</th><th>What enabling it means</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="k">commands</td><td>capability, rung 0</td><td>new names a human can type. Cheap and visible</td></tr>
+            <tr><td class="k">skills</td><td>capability, rung 1</td><td>new standing lines, and new competitors for every trigger you own</td></tr>
+            <tr><td class="k">sub-agents</td><td>capability, rung 2</td><td>new standing lines, and grants written by somebody else</td></tr>
+            <tr data-signal="block"><td class="k">hooks</td><td><b>constraint</b></td><td>code that runs on your events. Read every one before enabling</td></tr>
+            <tr data-signal="block"><td class="k">server declarations</td><td>capability, rung 3, plus a trust boundary</td><td>schemas standing in every turn, and a process holding credentials</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">6.2 · The two costs a plugin adds that a local file does not</h3>
+      <p>
+        The first is arithmetic. A plugin's standing cost is the sum of everything it ships, not the
+        part you wanted. Enable it for one skill and you are paying for its other six, plus any server
+        it declares. That is the same bill as before and now somebody else decides its size.
+      </p>
+      <p>
+        The second has no equivalent locally. A plugin author has never seen your catalog, so their
+        descriptions cannot avoid colliding with yours. The sibling test from
+        <a class="xref" href="#s-9">section 9</a> now has to run across a boundary you do not control,
+        and the loser of a collision fails silently, which means an update can quietly disable a skill
+        of your own that used to fire.
+      </p>
+
+      <ol class="sequence">
+        <li data-signal="warn">
+          <span class="when">on install</span>
+          <span class="what">Read the descriptions, not the README. Descriptions decide triggers, and they are the part that competes with your own capabilities.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">on install</span>
+          <span class="what">Read every hook and every server declaration. These two can enforce and can hold credentials, and neither is what most people think they are enabling.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">on install</span>
+          <span class="what">Count the standing lines it adds and say the number out loud. If the plugin does not document it, count it yourself with <code>/context</code> before and after.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">on update</span>
+          <span class="what">Diff the descriptions. A body change is a behavior change you will notice. A description change is a trigger change you will not.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">quarterly</span>
+          <span class="what">Ask which of its capabilities actually fired. A plugin is the easiest place for dead weight to hide, because nobody feels responsible for pruning somebody else's package.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">6.3 · When to publish one</h3>
+      <p>
+        Three repositories is my threshold. Below that, project scope is simpler, reviewable in the
+        normal way, and impossible to forget you have. Above it, copying the same skill by hand starts
+        producing four versions that drift, which is the failure a package exists to prevent.
+      </p>
+      <p>
+        The other good reason is handing someone a working setup rather than instructions. A team that
+        owns a domain, its practices, its checkers and its access can ship all of that as one thing.
+        That is the strongest form of the layer idea in
+        <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a>: the people who own the practice own
+        the file that carries it, and consumers get the next version without being told.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">What makes a good plugin</span>
+        <p>
+          One theme, so a consumer can say what enabling it means. A documented standing cost, in
+          lines and in schemas. Names specific enough not to collide with a local catalog it has never
+          seen. Hooks and server declarations kept separable from the skills, so someone can take the
+          knowledge without the enforcement. And a changelog that treats a description edit as a
+          breaking change, because for triggers it is one.
+        </p>
+      </div>
+    </div>
+  </section>
+   <!-- ============ 7 ============ -->
+  <section class="rung" id="s-7">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">7</span>
+        <div class="meter" role="img" aria-label="Choosing a rung">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Choosing a rung</span>
+      </div>
+      <div>
+        <h2>Four questions, in order, and the default answer is a skill</h2>
+        <p class="thesis">
+          Placement on this ladder is not a judgment about how important the capability is. It is four
+          facts about the work: who notices the need, whether the work should stay out of this window,
+          whether it needs a process wall, and how often it fires. Answer them in order and stop at
+          the first one that decides.
+        </p>
+        <div class="chips">
+          <span class="chip kind-cmd"><b>1</b> who notices</span>
+          <span class="chip kind-agent"><b>2</b> which window pays</span>
+          <span class="chip kind-mcp"><b>3</b> process wall</span>
+          <span class="chip kind-cost"><b>4</b> how often</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">7.1 · The procedure</h3>
+
+      <ol class="sequence">
+        <li data-signal="block">
+          <span class="when">before all four</span>
+          <span class="what">Run the family test. If removing the thing lets the agent do <em>more</em>, you are placing a constraint and this is the wrong ladder. Wanting it obeyed is not a reason to write it as a capability, and writing it as a capability is how it stops being obeyed.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">question 1</span>
+          <span class="what"><b>Who notices the need?</b> A human, at a moment of their choosing, means a <b>command</b>. Turn model invocation off and the standing cost goes to zero. If the answer is that it must happen every time, go back to the line above.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">question 2</span>
+          <span class="what"><b>Does the work belong in another window?</b> Bulk reading, wide search, exploration with dead ends, anything whose byproduct is bigger than its answer, means a <b>sub-agent</b>. This is the only rung that hands context back, so spend it where the byproduct is the problem.</span>
+        </li>
+        <li data-signal="pass">
+          <span class="when">question 3</span>
+          <span class="what"><b>Does it need a process wall?</b> One of the five reasons in <a class="xref" href="#s-5">section 5</a> means an <b>MCP server</b>: several clients need the same access, sign-in is an interactive flow, the surface is broad enough that typed discovery pays for itself, a vendor already ships it, or other teams need a versioned contract. Repeatability is not on that list, because a script already gives you that.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">question 4</span>
+          <span class="what"><b>Otherwise it is a skill.</b> Then ask how often it fires. Weekly or more earns its standing line. Monthly is a skill whose description you should sharpen or a bundled file on a skill you already have.</span>
+        </li>
+      </ol>
+
+      <figure class="code diagram">
+        <figcaption>the decision, as asked<span class="tag pass">stop at the first question that decides</span></figcaption>
+<pre class="mermaid">
+flowchart TD
+  Q0{"remove it: can the agent do more"} -->|"yes"| CON["a constraint. Wrong ladder"]
+  Q0 -->|"no"| Q1{"who notices the need"}
+  Q1 -->|"a human, when they choose"| CMD["command"]
+  Q1 -->|"the model, mid-task"| Q2{"is the byproduct bigger than the answer"}
+  Q2 -->|"yes"| AG["sub-agent"]
+  Q2 -->|"no"| Q3{"credentials, several clients, a broad surface, a vendor server, or a versioned contract"}
+  Q3 -->|"yes"| MCP["MCP server"]
+  Q3 -->|"no"| SK["skill"]
+  class Q0 dim
+  class Q1 dim
+  class Q2 dim
+  class Q3 dim
+  class CON block
+  class CMD warn
+  class SK warn
+  class AG pass
+  class MCP pass
+</pre>
+      </figure>
+
+      <h3 class="sub">7.2 · One job, four rungs</h3>
+      <p>
+        Take the job from <a class="xref" href="#s-1">section 1</a>: check a branch against the
+        charter. All four rungs can carry it. They carry it at four prices, and they fail four
+        different ways.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>the same capability at every rung<span class="tag warn">the failure column is the one to choose on</span></caption>
+          <thead>
+            <tr><th>As a</th><th>What it costs</th><th>What it buys</th><th>How it fails</th><th>Right when</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn">
+              <td class="k">command</td>
+              <td>nothing standing. The charter and the diff on invocation</td>
+              <td>a rehearsed prompt, run when a person decides</td>
+              <td>nobody types it before the pull request</td>
+              <td>the check is advisory and the author is the reader</td>
+            </tr>
+            <tr data-signal="warn">
+              <td class="k">skill</td>
+              <td>one line standing. The procedure plus the charter on trigger</td>
+              <td>the model checks without being asked</td>
+              <td>the charter is long, and now it is in your window on every conforming change too</td>
+              <td>the charter is short and the check is part of doing the work</td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k">sub-agent</td>
+              <td>one line standing. A task out, a violation list back</td>
+              <td>the charter and the whole diff read elsewhere. Eight lines come home</td>
+              <td>the report omits the line numbers you needed</td>
+              <td>the charter is long or the diff is wide. My default for this job</td>
+            </tr>
+            <tr data-signal="pass">
+              <td class="k">MCP server</td>
+              <td>a schema standing, on every turn, forever</td>
+              <td>the same verdict every time, and every client gets it</td>
+              <td>you have built a linter with extra steps</td>
+              <td>the rules are decidable. Then it is a gate, and the ladder changes</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        The last row is the useful one. When a capability at rung 3 turns out to be fully decidable,
+        it has stopped being a capability. It is a check, and checks belong on the constraint chain
+        where they can refuse things. Noticing that transition early saves you an MCP server and gets
+        you a gate that actually blocks.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Where placement stops being a mechanics question</span>
+        <p>
+          These four questions settle the first placement. They do not tell you when to move a
+          capability that is already running, and they do not price the standing line it holds.
+          <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> carries both: the two prices in
+          full, the signals that promote or demote a capability, and the numbers that tell you whether
+          the one you installed ever fires.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="part-rule">
+    <span class="kicker">Part IV</span>
+    <h2>Quality</h2>
+    <p>
+      A capability placed correctly still fails if nobody finds it, if it may touch the wrong things,
+      or if what comes back is not usable. Five sections, and four of them are about one line of
+      frontmatter and one paragraph about the return.</p>
+  </div>
+
+   <!-- ============ 8 ============ -->
+  <section class="rung" id="s-8">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">8</span>
+        <div class="meter" role="img" aria-label="A good one">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">A good one</span>
+      </div>
+      <div>
+        <h2>What a good one looks like, one rung at a time</h2>
+        <p class="thesis">
+          Placement is the first decision and it is not the one that decides whether the capability
+          works. These are the checklists I run before committing a capability, and the tell at the
+          end of each is the symptom I look for when somebody says theirs does not work. Four rungs,
+          four lists, and one property runs through all of them: say what comes back.
+        </p>
+        <div class="chips">
+          <span class="chip kind-cmd"><b>one job</b> per capability</span>
+          <span class="chip kind-skill"><b>one trigger</b> stated in the caller's words</span>
+          <span class="chip kind-agent"><b>one return</b> shaped on purpose</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">8.1 · A good command</h3>
+
+      <ol class="standard">
+        <li><span class="t">Does <b>one job</b>, and its name is a verb doing it. <code>charter-check</code>, not <code>helpers</code>.</span><span class="ref">§1</span></li>
+        <li><span class="t">Declares <code>argument-hint</code>, so the person typing it knows what it wants without opening the file.</span><span class="ref">§1</span></li>
+        <li><span class="t">Brings its own evidence. The <code>!</code> injection collects the diff, the log or the failing test so the prompt arrives complete.</span><span class="ref">§1</span></li>
+        <li><span class="t">Says what <b>not</b> to do. <em>Report, do not fix</em> is the difference between a review and a surprise commit.</span><span class="ref">§1</span></li>
+        <li><span class="t">Narrows <code>allowed-tools</code> to the exact commands it injects, because it is running a shell for you.</span><span class="ref">§10</span></li>
+        <li><span class="t">Turns off model invocation unless you want the description standing in every turn.</span><span class="ref">§1</span></li>
+        <li><span class="t">Short. A page of policy in a command file is a skill wearing the wrong frontmatter.</span><span class="ref">§2</span></li>
+      </ol>
+      <p>
+        <b>The tell of a bad one:</b> it opens with a request for help and ends with the model asking
+        which files you meant. A command that has to ask questions was a note, not a capability.
+      </p>
+
+      <h3 class="sub">8.2 · A good skill</h3>
+
+      <ol class="standard">
+        <li><span class="t">Its description says <b>what, when, and when not</b>, in the words a caller would use rather than the words your code uses.</span><span class="ref">§9</span></li>
+        <li><span class="t">Names the sibling it is not. The negative trigger is what resolves a collision, and the loser of a collision fails silently.</span><span class="ref">§9</span></li>
+        <li><span class="t">The body is a <b>numbered procedure</b>, not an essay. Steps in order, with the refusals stated where they apply.</span><span class="ref">§2</span></li>
+        <li><span class="t">Reference material lives in bundled files. A table in the body is paid for on every trigger, whether the job needed it or not.</span><span class="ref">§2</span></li>
+        <li><span class="t">Bundles a script for anything decidable, and says <em>run it, do not reimplement it</em>.</span><span class="ref">§2</span></li>
+        <li><span class="t">Does one job. If the name needs an <em>and</em>, it is two skills and the description will match neither cleanly.</span><span class="ref">§9</span></li>
+        <li><span class="t">Scopes <code>allowed-tools</code> to its own scripts, so the grant is the narrow one rather than the session's.</span><span class="ref">§10</span></li>
+        <li><span class="t">Ships six test requests: three that should fire it, three near misses that should not.</span><span class="ref">§9</span></li>
+      </ol>
+      <p>
+        <b>The tell of a bad one:</b> you cannot say in one sentence when it should fire. If you cannot,
+        the model is inferring it from the same words you just failed to summarize.
+      </p>
+
+      <h3 class="sub">8.3 · A good sub-agent</h3>
+
+      <ol class="standard">
+        <li><span class="t">States its <b>return shape</b> literally, including the fields the parent will need later. File and line, not <em>a summary of findings</em>.</span><span class="ref">§3</span></li>
+        <li><span class="t">Declares <code>tools</code>. An omitted grant is the widest one, and the widest one is never what the file meant.</span><span class="ref">§10</span></li>
+        <li><span class="t">Holds the <b>narrowest</b> grant that does the job. An auditor that cannot write is a different component from one that can.</span><span class="ref">§10</span></li>
+        <li><span class="t">Says what it must not do: not fix, not push, not ask. It cannot ask, so the prompt has to have decided.</span><span class="ref">§3</span></li>
+        <li><span class="t">Produces <b>one deliverable</b>. A sub-agent is not a conversation, and anything it discovers outside the deliverable is lost.</span><span class="ref">§3</span></li>
+        <li><span class="t">Chooses its model and effort deliberately. Cheap and fast for mechanical fan-out, careful for the judgment that matters.</span><span class="ref">§3</span></li>
+        <li><span class="t">Runs the checker rather than forming an opinion, wherever the question is decidable.</span><span class="ref">§2</span></li>
+        <li><span class="t">Gets a worktree when several of them mutate files at once, and does not when they do not.</span><span class="ref">§3</span></li>
+      </ol>
+      <p>
+        <b>The tell of a bad one:</b> the parent asks a follow-up question every single time. The wall
+        is in the wrong place, or the report shape was never designed.
+      </p>
+
+      <h3 class="sub">8.4 · A good server, and a good reason to have one</h3>
+
+      <ol class="standard">
+        <li><span class="t">Declares <b>few tools</b>, shaped like the task rather than like the upstream endpoints.</span><span class="ref">§4</span></li>
+        <li><span class="t">Returns the <b>answer</b>, not the payload the answer arrived in. The caller cannot refuse what you send.</span><span class="ref">§4</span></li>
+        <li><span class="t">Writes each schema description as an interface, because from the outside it is the only part of the capability anyone can read.</span><span class="ref">§9</span></li>
+        <li><span class="t">Is declared in the <b>narrowest scope</b> that needs it. Project scope charges the whole team on every turn.</span><span class="ref">§4</span></li>
+        <li><span class="t">Keeps read tools separable from write tools, so a permission rule can grant one without the other.</span><span class="ref">§10</span></li>
+        <li><span class="t">Exists for one of five reasons: several clients, an interactive sign-in, a broad surface worth typing, a vendor implementation, or a contract other teams build against.</span><span class="ref">§5</span></li>
+      </ol>
+      <p>
+        <b>The tell of a bad one:</b> it wraps a CLI you already had. You are paying a schema on every
+        turn for something <code>Bash</code> did for free, and you have lost the ability to trim the
+        output.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The property all four share</span>
+        <p>
+          Every list above has a line about what comes back. A command says what not to do, a skill
+          says which file to read, a sub-agent states its report shape, a server returns a field rather
+          than a payload. Capability work is interface work, and the return half of the interface is
+          the half that gets left to chance.
+        </p>
+      </div>
+    </div>
+  </section>
+   <!-- ============ 9 ============ -->
+  <section class="rung" id="s-9">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">9</span>
+        <div class="meter" role="img" aria-label="Discovery">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Discovery</span>
+      </div>
+      <div>
+        <h2>The description is an interface, and you are writing it for a reader who has one line</h2>
+        <p class="thesis">
+          Three of the four rungs are selected by a model reading a description. That description has
+          two jobs and they pull against each other. It has to be short, because it stands in every
+          turn. It has to be specific, because a vague one never matches. Almost every dead capability
+          I have looked at died in that sentence.
+        </p>
+        <div class="chips">
+          <span class="chip kind-ctx"><b>short</b> it is a standing cost</span>
+          <span class="chip kind-skill"><b>specific</b> it is the trigger</span>
+          <span class="chip kind-cost"><b>distinct</b> siblings compete</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        Write the description in the words the work arrives in, not the words the implementation uses.
+        A skill named after your internal abstraction, described in terms of your internal
+        abstraction, matches a request nobody makes.
+      </p>
+
+      <figure class="code">
+        <figcaption>the same capability, described twice<span class="tag block">the first one never fires</span></figcaption>
+<pre><code><span class="c-block"># never matches</span>
+<span class="c-warn">description</span>: Helpers for working with the persistence layer.
+
+<span class="c-dim"># It says what the author built. A user says "add a column",
+# "the migration failed", "can we drop this index". None of those
+# words appear, so nothing matches.</span>
+
+<span class="c-pass"># matches</span>
+<span class="c-warn">description</span>: Write, review or roll back a database migration in this
+  repository. Use when the user mentions a migration, a schema change,
+  adding or dropping a column, an index, or a backfill. Not for query
+  performance work, which belongs to the query-tuning skill.
+</code></pre>
+      </figure>
+
+      <h3 class="sub">9.1 · Three parts, and the third one is the one people leave off</h3>
+
+      <ol class="sequence">
+        <li data-signal="none">
+          <span class="when">what it does</span>
+          <span class="what">One clause, active voice, the verbs the job actually involves. <code>Write, review or roll back</code> rather than <code>handles</code>.</span>
+        </li>
+        <li data-signal="warn">
+          <span class="when">when to use it</span>
+          <span class="what">The trigger surface. Concrete nouns and verbs a person would type. This is the part that does the matching, and it is worth more words than the first part.</span>
+        </li>
+        <li data-signal="block">
+          <span class="when">when not to</span>
+          <span class="what">The negative trigger, naming the sibling that owns the neighboring job. This is what resolves a collision, and it is the part almost nobody writes.</span>
+        </li>
+      </ol>
+
+      <h3 class="sub">9.2 · The sibling test</h3>
+      <p>
+        Take every pair of capabilities in scope and say the sentence that tells them apart. If you
+        cannot say it in one sentence, the model cannot infer it from two descriptions. You then have
+        two choices and both are fine: merge them, or add the negative trigger to each. Leaving the
+        overlap is the option that is not fine, because the loser of a collision fails silently and
+        you will conclude that it does not work.
+      </p>
+
+      <div class="tablewrap">
+        <table class="wide">
+          <caption>collisions, and the shape of the repair<span class="tag warn">the general capability wins by default</span></caption>
+          <thead>
+            <tr><th>The collision</th><th>What happens</th><th>Repair</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">a general skill and a specific one</td><td>the general one wins, and the specific rules never apply</td><td>narrow the general description, and name the specific one in it</td></tr>
+            <tr data-signal="block"><td class="k">two skills with the same nouns</td><td>selection becomes a coin flip you cannot see</td><td>merge, or split along the verbs instead of the nouns</td></tr>
+            <tr data-signal="warn"><td class="k">a skill and a sub-agent for one job</td><td>either could fire, and they cost very different amounts</td><td>keep the sub-agent for the reading, and let the skill call it</td></tr>
+            <tr data-signal="warn"><td class="k">an MCP tool and a bundled script</td><td>the tool wins, because a schema is more visible than a step in a file</td><td>pick one. Two implementations of one job is a maintenance bug as well</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">9.3 · Test the description, because it is the part that runs most often</h3>
+      <p>
+        A description is testable and almost nobody tests it. Write down three requests that should
+        fire the capability and three near misses that should not. Start a fresh session for each and
+        see what happens. Six runs tell you more about whether a skill works than reading its body
+        ever will.
+      </p>
+      <p>
+        This is the smallest useful eval on the capability side, and it has the property that
+        <a href="/eval-loop/">The Eval Loop</a> asks for: a golden set, a distribution rather than one
+        green run, and a number that moves when you edit the description. Keep the six cases in the
+        skill directory. They are the only regression test a trigger can have.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Naming, briefly</span>
+        <p>
+          Name a capability for the job, in the caller's language, with a verb in it where a verb
+          fits. <code>migration-writer</code>, <code>charter-auditor</code>,
+          <code>incident-lookup</code>. Never <code>utils</code>, <code>helper</code>,
+          <code>manager</code> or the name of your internal module. The name is read as part of the
+          trigger, so a name that says nothing wastes the cheapest tokens you have.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 10 ============ -->
+  <section class="rung" id="s-10">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">10</span>
+        <div class="meter" role="img" aria-label="Grants">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Grants</span>
+      </div>
+      <div>
+        <h2>The grant is where the two ladders touch, and an omitted grant is the widest one</h2>
+        <p class="thesis">
+          Every capability runs holding some set of tools. That set is the one attribute that is a
+          capability property and a constraint rung at the same time: on the constraint chain a tool
+          grant sits just above prose, because it makes a whole class of action unrepresentable rather
+          than discouraged. Leave the line out and you have written the widest grant available,
+          silently.
+        </p>
+        <div class="chips">
+          <span class="chip kind-agent"><b>declare it</b> in the file</span>
+          <span class="chip kind-gate"><b>omitted</b> means inherited</span>
+          <span class="chip kind-mcp"><b>narrow</b> beats instructed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        A sub-agent told not to write files is a sub-agent that may write files. A sub-agent granted
+        <code>Read, Grep, Glob</code> cannot write one. The difference is the difference between prose
+        and a mechanism, and it costs one line of frontmatter, which is why
+        <a href="/constraint-engineering/">Constraint Engineering</a> puts the tool grant on the
+        constraint chain rather than in the settings.
+      </p>
+
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>where each rung declares its grant<span class="tag pass">all four have a place for it</span></caption>
+          <thead>
+            <tr><th>Rung</th><th>Declared as</th><th>If you omit it</th><th>Worth narrowing when</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="warn"><td class="k">command</td><td><code>allowed-tools</code> in frontmatter</td><td>the session's own permissions apply</td><td>the command injects shell output. Then narrow to the exact commands</td></tr>
+            <tr data-signal="warn"><td class="k">skill</td><td><code>allowed-tools</code> in frontmatter</td><td>the session's own permissions apply</td><td>the skill bundles scripts. Grant those scripts and nothing else</td></tr>
+            <tr data-signal="block"><td class="k">sub-agent</td><td><code>tools</code> in frontmatter</td><td>it inherits, which is almost never what you meant</td><td>always. A reviewer that cannot write is a different component</td></tr>
+            <tr data-signal="pass"><td class="k">MCP server</td><td>permission rules per tool, and the scope you declared it in</td><td>every declared tool is callable</td><td>the server has write or destructive tools beside its read ones</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">10.1 · Composition, and the one thing that does not cross</h3>
+      <p>
+        Capabilities call capabilities. A command can name a skill. A skill can tell the model to
+        dispatch a sub-agent. A sub-agent can hold MCP tools and load skills of its own. What does not
+        cross is knowledge of what happened: the parent gets the report and nothing else, which is the
+        property you bought and also the one that bites.
+      </p>
+
+      <figure class="code diagram">
+        <figcaption>a capability graph, with the grants marked<span class="tag block">brick edges are the ones to declare rather than inherit</span></figcaption>
+<pre class="mermaid">
+flowchart TD
+  H["a human types a command"] --> C["command · a rehearsed prompt"]
+  C --> M["the parent turn"]
+  M -->|"description matched"| S["skill · procedure plus references"]
+  S --> SC["a bundled script · deterministic, no standing cost"]
+  M -->|"dispatch, with a declared grant"| A["sub-agent · its own window"]
+  A --> T["MCP tools, if granted"]
+  A -->|"a report in the stated shape"| M
+  T -->|"untrusted content"| A
+  class H dim
+  class C warn
+  class M dim
+  class S warn
+  class SC pass
+  class A pass
+  class T block
+</pre>
+      </figure>
+
+      <p>
+        Two rules keep that graph from turning into a maze. First, a capability may compose downward
+        and never sideways: a skill dispatching a sub-agent is fine, and two skills that call each
+        other are one skill with a naming problem. Second, the grant travels with the callee, not
+        with the call. If a sub-agent needs a write tool for one task and not for another, that is two
+        sub-agents, and the second one is the safe default.
+      </p>
+
+      <div class="callout">
+        <span class="label">The grant leak</span>
+        <p>
+          A sub-agent file with no <code>tools</code> line is the most common real defect on this
+          page. It reads as tidy and it means <em>everything the parent had</em>. The auditor can
+          write. The researcher can push. Nothing goes wrong until the day something does, and the
+          transcript then shows a component doing exactly what you never granted it and never
+          forbade.
+        </p>
+      </div>
+    </div>
+  </section>
+
+   <!-- ============ 11 ============ -->
+  <section class="rung" id="s-11">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">11</span>
+        <div class="meter" role="img" aria-label="The catalog">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">The catalog</span>
+      </div>
+      <div>
+        <h2>Every capability primitive, and the neighbors that get mistaken for one</h2>
+        <p class="thesis">
+          Eleven primitives carry capability. Three more package them. Six things sit next to them and
+          belong to other families, and knowing which is which is most of what keeps a charter
+          readable. The standing column is the one to read down.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>the catalog, by rung then family<span class="tag block">read the standing column down</span></caption>
+          <thead>
+            <tr><th>Primitive</th><th>Rung</th><th>Invoked by</th><th>Lives in</th><th>Standing cost</th><th>Boundary</th></tr>
+          </thead>
+          <tbody>
+            <tr class="group"><td colspan="6">the four rungs</td></tr>
+            <tr data-signal="warn"><td class="k">command</td><td>0</td><td>a human, by name</td><td><code>.claude/commands/</code></td><td>a line, or none</td><td>none</td></tr>
+            <tr data-signal="warn"><td class="k">namespaced command</td><td>0</td><td>a human, by path</td><td><code>.claude/commands/&lt;group&gt;/</code></td><td>a line, or none</td><td>none</td></tr>
+            <tr data-signal="warn"><td class="k">MCP prompt</td><td>0</td><td>a human, by name</td><td>the server</td><td>a line</td><td>none. Someone else's rung 0</td></tr>
+            <tr data-signal="warn"><td class="k">skill · project</td><td>1</td><td>the model, or a human</td><td><code>.claude/skills/</code></td><td>a line</td><td>convention</td></tr>
+            <tr data-signal="warn"><td class="k">skill · personal</td><td>1</td><td>the model, or a human</td><td><code>~/.claude/skills/</code></td><td>a line, in every project</td><td>convention</td></tr>
+            <tr><td class="k">bundled reference</td><td>1</td><td>the model, when the body says to</td><td>a skill directory</td><td>none</td><td>none. It is a file</td></tr>
+            <tr data-signal="pass"><td class="k">bundled script</td><td>1</td><td>the model, by running it</td><td>a skill directory</td><td>none</td><td>process, for free</td></tr>
+            <tr data-signal="pass"><td class="k">sub-agent</td><td>2</td><td>the parent turn</td><td><code>.claude/agents/</code></td><td>a line</td><td>context</td></tr>
+            <tr data-signal="pass"><td class="k">MCP tool</td><td>3</td><td>the model, by schema</td><td>the server</td><td>a full schema, every turn</td><td>process</td></tr>
+            <tr data-signal="pass"><td class="k">MCP resource</td><td>3</td><td>a human or the model, by reference</td><td>the server</td><td>none per item</td><td>process</td></tr>
+            <tr data-signal="pass"><td class="k">server instructions</td><td>3</td><td>nobody. It arrives</td><td>the server</td><td>whatever the author wrote</td><td>none, and that is the problem</td></tr>
+            <tr class="group"><td colspan="6">packaging · not capability, but it decides who has one</td></tr>
+            <tr><td class="k">plugin</td><td>—</td><td>enabled per project</td><td>a marketplace or a repository</td><td>the sum of what it ships</td><td>—</td></tr>
+            <tr><td class="k">project scope</td><td>—</td><td>everyone with the checkout</td><td><code>.claude/</code>, <code>.mcp.json</code></td><td>charged to the whole team</td><td>—</td></tr>
+            <tr><td class="k">user scope</td><td>—</td><td>you, everywhere</td><td><code>~/.claude/</code></td><td>charged in every project</td><td>—</td></tr>
+            <tr class="group"><td colspan="6">adjacent · reaches for the same file and belongs to another family</td></tr>
+            <tr><td class="k">hook</td><td>—</td><td>an event</td><td>settings</td><td>none in the window</td><td>constraint. <a class="xref" href="/constraint-engineering/">See the other page</a></td></tr>
+            <tr><td class="k">permission rule</td><td>—</td><td>a tool call</td><td>settings</td><td>none in the window</td><td>constraint, and the cheapest one</td></tr>
+            <tr><td class="k">memory · <code>CLAUDE.md</code></td><td>—</td><td>nobody. It is always there</td><td>the repository, or the account</td><td>the whole file, every turn</td><td>state. It needs an expiry</td></tr>
+            <tr><td class="k">output style</td><td>—</td><td>a session setting</td><td>settings</td><td>small</td><td>setting</td></tr>
+            <tr><td class="k">model and effort</td><td>—</td><td>a session or a callee</td><td>settings, or frontmatter</td><td>none</td><td>setting</td></tr>
+            <tr><td class="k">scheduled and background work</td><td>—</td><td>a clock, or a parent job</td><td>the factory</td><td>none in this window</td><td>factory. <a class="xref" href="/factory/">See The Factory</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Two rows in the adjacent group deserve their reputation for causing trouble. Server
+        instructions are prose you did not write, standing in your window, indistinguishable from your
+        charter. A memory file is state with no layer, no scope and no expiry, and it governs work it
+        has never seen. Both are the cheapest ways to end up with a rule nobody agreed to.
+      </p>
+    </div>
+  </section>
+
+   <!-- ============ 12 ============ -->
+  <section class="rung" id="s-12">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">12</span>
+        <div class="meter" role="img" aria-label="Anti-patterns">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Anti-patterns</span>
+      </div>
+      <div>
+        <h2>Twelve anti-patterns, and every one is a symptom of a missing attribute</h2>
+        <p class="thesis">
+          None of these are failures of effort. Each one is what you get when a capability was
+          installed with three of its four attributes designed. Read the symptom column as a
+          diagnosis: it names which of trigger, rung, grant or return was left to chance.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tablewrap">
+        <table class="xwide">
+          <caption>twelve anti-patterns<span class="tag block">the symptom column is the diagnosis</span></caption>
+          <thead>
+            <tr><th>Name</th><th>What it looks like</th><th>Symptom of</th><th>Repair</th></tr>
+          </thead>
+          <tbody>
+            <tr data-signal="block"><td class="k">the unread skill</td><td>installed, described in the author's vocabulary, never fires on its own</td><td>no trigger design</td><td>rewrite the description in the caller's words. Then test it six times</td></tr>
+            <tr data-signal="block"><td class="k">the kitchen sink</td><td>one skill for six unrelated jobs, so it matches everything and helps with nothing</td><td>no trigger design</td><td>split along the verbs. One job, one description</td></tr>
+            <tr data-signal="block"><td class="k">the twin</td><td>two capabilities whose descriptions overlap. The general one always wins</td><td>no trigger design</td><td>negative triggers in both, or merge them</td></tr>
+            <tr data-signal="block"><td class="k">the rule in a skill's clothing</td><td>a skill that only says <em>always do X</em>, and gets ignored on the turns that matter</td><td>wrong ladder</td><td>put the rule on the constraint chain. Keep the knowledge in the skill</td></tr>
+            <tr data-signal="warn"><td class="k">the context bomb</td><td>a skill body that loads a reference manual on trigger</td><td>wrong rung for the weight</td><td>procedure in the body, tables in bundled files</td></tr>
+            <tr data-signal="warn"><td class="k">the standing tax</td><td>a server enabled in every project for a tool used monthly</td><td>no cost accounting</td><td>narrow the scope, or defer the schemas</td></tr>
+            <tr data-signal="warn"><td class="k">the API mirror</td><td>thirty tools shaped like upstream endpoints, so the model must assemble the task itself</td><td>no return design</td><td>five task-shaped tools. Let the server do the assembling</td></tr>
+            <tr data-signal="warn"><td class="k">the chatty return</td><td>a tool that answers a question with the payload the answer arrived in</td><td>no return design</td><td>return the field. The caller cannot refuse what you send</td></tr>
+            <tr data-signal="block"><td class="k">the blind parent</td><td>a sub-agent report that omits what the parent needed, so the parent reads it all again</td><td>no return design</td><td>state the return shape in the agent file, fields included</td></tr>
+            <tr data-signal="block"><td class="k">the grant leak</td><td>a sub-agent file with no tools line, holding everything the parent held</td><td>no grant design</td><td>declare the grant. A reviewer that cannot write is a different component</td></tr>
+            <tr data-signal="warn"><td class="k">the server that should be a script</td><td>one stdio server, one tool, your language, no credentials, no other client</td><td>rung inflation</td><td>a bundled script. No standing cost, same determinism</td></tr>
+            <tr data-signal="block"><td class="k">the undeletable capability</td><td>nobody knows whether it fires, so nobody dares remove it. The catalog only grows</td><td>no evidence</td><td>count invocations, then hold a deletion day</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Count the symptom column and the distribution is the point. Four are trigger failures, three
+        are return failures, and only two are about the mechanism at all. Capability work is mostly
+        interface work, done in one line of frontmatter and one paragraph about what comes back.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Where this page stops</span>
+        <p>
+          Everything above is what a capability is and how to write a good one. None of it tells you
+          what the set of them costs you next quarter, whether the ones you wrote still fire, or how to
+          get a repeatable answer without buying a rung to hold it.
+          <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> is that half: two
+          prices, five kinds of rot, determinism bought at the cheap end, and the four numbers that
+          make a silent failure audible.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <footer>
+    <div><strong>The Capability Ladder</strong>, the primitives. CC BY 4.0.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>The mechanics. <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> is the
+      second half: what these cost, how to make them deterministic, and how to tell whether they fire.</div>
+    <div>Reads alongside · <a href="/constraint-engineering/">Constraint Engineering</a> (the other half of the charter) ·
+      <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> (what goes in the charter) ·
+      <a href="/factory/">The Factory</a> (capability across turns) ·
+      <a href="/prompt-injection/">Prompt Injection</a> (what comes back through the wall)</div>
+    <div>Color is semantic:
+      <span style="color:var(--brick)">brick blocks</span> ·
+      <span style="color:var(--gold-ink)">gold warns</span> ·
+      <span style="color:var(--forest)">forest passes</span>.</div>
+  </footer>
+
+</div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+  const nodes = [...document.querySelectorAll("pre.mermaid")];
+  const source = new Map(nodes.map(el => [el, el.textContent]));
+  const token = name => getComputedStyle(document.documentElement)
+    .getPropertyValue(name).trim();
+
+  /* The palette is read from the page's own tokens, so one definition serves
+     light and dark, prefers-color-scheme and the explicit toggle. Every
+     background stays transparent so the paper shows through. */
+  const themeVariables = () => ({
+    background: "transparent",
+    mainBkg: token("--surface-2"),
+    primaryColor: token("--surface-2"),
+    primaryTextColor: token("--ink"),
+    primaryBorderColor: token("--rule"),
+    nodeBorder: token("--rule"),
+    lineColor: token("--ink-3"),
+    textColor: token("--ink-2"),
+    clusterBkg: "transparent",
+    clusterBorder: token("--rule"),
+    edgeLabelBackground: token("--ground"),
+    /* sequence notes default to mermaid's lemon, which is a second palette */
+    noteBkgColor: token("--surface-2"),
+    noteTextColor: token("--ink"),
+    noteBorderColor: token("--rule"),
+    fontFamily: token("--mono"),
+    fontSize: "13px"
+  });
+
+  /* Same four signal colors the prose uses: brick blocks, gold warns,
+     forest passes, and dim is structure rather than a step. */
+  const signals = () => [
+    `classDef block fill:${token("--brick-wash")},stroke:${token("--brick")},color:${token("--ink")}`,
+    `classDef warn fill:${token("--gold-wash")},stroke:${token("--gold")},color:${token("--ink")}`,
+    `classDef pass fill:${token("--forest-wash")},stroke:${token("--forest")},color:${token("--ink")}`,
+    `classDef dim fill:transparent,stroke:${token("--rule")},color:${token("--ink-3")}`
+  ].join("\n");
+
+  async function render() {
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: themeVariables(),
+      flowchart: { htmlLabels: false, curve: "basis", rankSpacing: 38,
+                   nodeSpacing: 28, padding: 8, useMaxWidth: true,
+                   wrappingWidth: 240 },
+      sequence: { useMaxWidth: true, mirrorActors: false }
+    });
+    for (const el of nodes) {
+      el.removeAttribute("data-processed");
+      /* classDef is flowchart grammar; a sequenceDiagram fails to parse with
+         the signal block appended, so it renders without one. */
+      const src = source.get(el);
+      el.textContent = /^\s*(flowchart|graph)\b/m.test(src)
+        ? `${src}\n${signals()}` : src;
+    }
+    await mermaid.run({ nodes });
+  }
+
+  render();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+  new MutationObserver(render).observe(document.documentElement,
+    { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+</body>
+</html>

@@ -840,6 +840,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       what it runs against · three repositories, one of them itself, on a stock agent SDK<br>
       what is honest · the band has no published number, including from me. <a class="xref" href="#s-0">Section 0</a> says why that is still worth naming<br>
       reads alongside · <a href="/layers-and-promotion/">Layers and Promotion</a> (the measured version) · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> · <a href="/guardrails/">Five Guardrails</a> · <a href="/factory/">The Factory</a><br>
+      the capability chain in full · <a href="/capability-ladder/">The Capability Ladder</a> and <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a>, which take <a class="xref" href="#s-5">section 5</a> apart at length<br>
       license · CC BY 4.0. Take the model, not the vocabulary
     </div>
 
@@ -1531,6 +1532,14 @@ flowchart TD
       </p>
 
       <h3 class="sub">The capability chain</h3>
+      <p>
+        Two pages take this chain apart at the length it deserves.
+        <a href="/capability-ladder/">The Capability Ladder</a> covers the mechanics of each rung, when
+        a CLI or a plain script beats a server, what a plugin commits you to, and what makes a good one.
+        <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> covers what each rung
+        costs on every turn, how to buy determinism without buying a rung, and how to tell whether a
+        capability ever fires.
+      </p>
       <p>
         The four rungs below run from open to hidden. A command hides nothing, and the model
         sees every word of it. A tool server hides everything except a schema, because it is a separate
@@ -4152,7 +4161,9 @@ flowchart LR
     <div><strong>Constraint Engineering</strong>, a design standard. CC BY 4.0.
       <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
     <div>Domain design, drawn from wipp, a private factory running against three repositories.</div>
-    <div>Reads alongside · <a href="/layers-and-promotion/">Layers and Promotion</a> (the measured version) ·
+    <div>Reads alongside · <a href="/capability-ladder/">The Capability Ladder</a> (the capability chain in full) ·
+      <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> (what a capability costs, and whether it fires) ·
+      <a href="/layers-and-promotion/">Layers and Promotion</a> (the measured version) ·
       <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> (what goes in the charter) ·
       <a href="/harness/">Promotion to the Harness</a> (one rule's climb) ·
       <a href="/guardrails/">Five Guardrails</a> (the altitudes) ·
