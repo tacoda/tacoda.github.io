@@ -672,12 +672,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Half of OTP does not port. It <em>dissolves</em>.</h1>
     <p class="standfirst">
-      If you have written Elixir, you carry a supervision tree in your head: processes hold state,
+      If you have written Elixir, you carry a supervision tree in your head. Processes hold state,
       die, and get restarted. But a durable-queue system models the same territory differently.
-      State outlives the thing computing it, so failure belongs to a message rather than to a
+      There, state outlives the thing computing it, so failure belongs to a message and not to a
       process. Most of OTP survives that translation as pure configuration. The parts that do not
-      survive are more interesting, because they answered a question the other architecture never
-      asks.
+      are more interesting, because they answered a question the other architecture never asks.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -705,7 +704,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>Dissolves</dt>
-          <dd>The concept has no referent here. Not a missing feature: the problem it solved does not arise.</dd>
+          <dd>The concept has no referent here. No feature is missing, because the problem it solved does not arise.</dd>
         </div>
       </div>
       <div class="signal">
@@ -787,7 +786,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           This is not a scoreboard where one column wins. BEAM gives you ordering and exactly-once
           local delivery, and those are real guarantees you will miss. The queue gives you
           back-pressure and durable history, and OTP practitioners have hand-rolled both more than
-          once. The trade is legible, which is the most you can ask of an architectural choice.
+          once. So the trade is legible, and that is the most you can ask of an architectural choice.
         </p>
       </div>
     </div>
@@ -806,7 +805,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Three declarations, no source file</h2>
         <p class="thesis">
-          Building a GenServer this way is not the surprise. The callback module is the surprise: the thing you would assume has to be code turns out to be data.
+          Building a GenServer this way raises no eyebrows. The callback module does: the thing you would assume has to be code turns out to be data.
         </p>
       </div>
     </div>
@@ -887,7 +886,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The whole mapping, with the honest column</h2>
         <p class="thesis">
-          Most rows are unremarkable. Read the last six.
+          Most rows are unremarkable, so focus on the last six.
         </p>
       </div>
     </div>
@@ -930,10 +929,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        Note the row that says <em>free</em>. OTP is famous for making hot code upgrade possible and
-        notorious for making it painful: <code>code_change/3</code>, appups, relups. Here the
-        callback is a list of operations in a config entry, and config hot-reloads. You get the
-        capability by accident, because you gave up expressing the callback as code.
+        OTP is famous for making hot code upgrade possible and notorious for making it painful:
+        <code>code_change/3</code>, appups, relups. Here the callback is a list of operations in a
+        config entry, and config hot-reloads, which is the capability the table marks
+        <em>free</em>. You get it by accident, because you gave up expressing the callback as code.
       </p>
     </div>
   </section>
@@ -981,8 +980,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </p>
 
       <p>
-        The demo runs the shared workflow with one injected provider failure. The supervisor does
-        its job:
+        The demo runs the shared workflow with one injected provider failure, and the supervisor
+        does its job:
       </p>
 
       <figure class="code">
@@ -1002,12 +1001,12 @@ final state per child:
       <p>
         Every process is healthy, and the cascade was correct. Still, the run produced nothing,
         because the restart cleared the mailbox for <code>score</code>. That mailbox held the
-        message that caused the crash, so the message went with it.
-        <strong>Supervision restores the process, never the message.</strong>
+        message that caused the crash, so <strong>the restart restored the process and discarded
+        the message</strong>.
       </p>
 
       <div class="callout">
-        <span class="label">This is not a bug in the implementation. It is OTP.</span>
+        <span class="label">This behavior is OTP, not a bug</span>
         <p>
           In BEAM the answer is that the sender retries. That sender is usually another supervised
           process a microsecond away, so nobody notices the cost. With an agentic stage, the sender
@@ -1040,7 +1039,7 @@ final state per child:
 
     <div class="rung-body">
       <p>
-        The fact is this: <strong>state lives in volatile memory inside something that can
+        <strong>State lives in volatile memory inside something that can
         die.</strong> Supervision exists to restart that thing, and restart intensity exists to
         stop supervision from looping forever. Links exist to stop collaborators from acting on
         state that died with its owner. The registry exists for one more reason: pids are ephemeral
@@ -1087,12 +1086,12 @@ flowchart LR
       </ul>
 
       <div class="callout">
-        <span class="label">The reframe worth keeping</span>
+        <span class="label">Change the question instead</span>
         <p>
-          It is tempting to score this as "iii is missing supervision." That reading is backwards.
-          Supervision is a solution, and solutions only look like requirements until you change the
-          problem. The right question for any substrate is not <em>whether it has a supervisor</em>.
-          Ask what it does with state, and what follows from that answer.
+          It is tempting to score this as "iii is missing supervision," but that reading is
+          backwards. Supervision is a solution, not a requirement, and solutions stop looking
+          necessary once you change the problem. So ask what a substrate does with state, and what
+          follows from that answer.
         </p>
       </div>
     </div>
@@ -1149,7 +1148,7 @@ sequenceDiagram
       <p>
         No configuration closes that gap. Handlers have to be order-independent, or carry sequence
         numbers and park what arrives early. If your domain has genuine causal chains, that
-        constraint shapes your design. It is also the strongest argument for staying on BEAM.
+        constraint shapes your design, and it is also the strongest argument for staying on BEAM.
       </p>
 
       <p>
@@ -1205,8 +1204,8 @@ sequenceDiagram
         </p>
         <p>
           <strong>The mailbox is what you lose.</strong> Going in, the interesting gap looked like
-          supervision, and supervision dissolves. The property worth mourning is strict FIFO between
-          two endpoints. The durable-queue translation cannot give it back, because its own retry
+          supervision, and supervision dissolves. What you actually lose is strict FIFO between two
+          endpoints. The durable-queue translation cannot give it back, because its own retry
           mechanism breaks the order.
         </p>
         <p>

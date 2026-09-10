@@ -645,10 +645,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Grading a review is a different skill from <em>doing</em> one.</h1>
     <p class="standfirst">
-      Reverse-review documents what the junior does and gives the senior ten minutes of facilitation
-      advice. That advice is enough for week one. It runs out around week five, when the questions get
-      harder: what makes a planted defect worth missing, and why two mentors score one card two points
-      apart. Hardest of all: what it means when someone earns the same three rubric points for eight
+      Reverse-review documents what the junior does and gives the senior ten minutes of advice on running the room. That advice is enough for week one. It runs out around week five, when the questions get
+      harder. What makes a planted defect worth missing? Why do two mentors score one card two points
+      apart? Hardest of all: what it means when someone earns the same three rubric points for eight
       weeks running. This is the other half.
     </p>
     <p class="byline">
@@ -669,7 +668,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch pass"></span>
         <div>
           <dt>The job</dt>
-          <dd>Calibrating somebody else's confidence. Not finding defects: you already can, and that is not what is being transferred.</dd>
+          <dd>Calibrating somebody else's confidence. Not finding defects: you already can, and you are not transferring that.</dd>
         </div>
       </div>
       <div class="signal">
@@ -717,7 +716,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>You are not grading correctness</h2>
         <p class="thesis">
-          You already know whether the diff is wrong. The exercise measures whether their confidence
+          You already know whether the diff is wrong. But the exercise measures whether their confidence
           tracked the evidence, and that is a separate question with a separate answer.
         </p>
       </div>
@@ -733,8 +732,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         What you are watching is the relationship between two things: how sure they said they
         were, and how much they had. A confident catch backed by a red test and a confident catch
-        backed by a feeling look identical on the card and are opposite results. Most of the technique
-        on this page exists to pull those two apart.
+        backed by a feeling look identical on the card. But they are opposite results. That is why most
+        of the technique on this page exists to pull those two apart.
       </p>
 
       <figure class="code">
@@ -752,9 +751,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        The top-right cell is the one that matters, and a correctness-focused mentor never sees it, because when the verdict is right there is nothing to correct. Press it anyway. A
-        junior who is right for no reason will be wrong for no reason next month, with the same
-        delivery.
+        The top-right cell is the one that matters. It stays invisible to a correctness-focused mentor, because a right verdict leaves them nothing to correct. Press it anyway. A junior who is right for no reason will be wrong for no reason next month, with the same delivery.
       </p>
     </div>
   </section>
@@ -804,16 +801,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="pass">
           <span class="when">Near</span>
-          <span class="what">The correct version should be a line or two different. The reviewer's near-miss (right line, wrong class) is the most useful thing the exercise produces, and it only happens when correct and incorrect are close together.</span>
+          <span class="what">The correct version should be a line or two different. The reviewer's near-miss (right line, wrong class) is the most useful thing the exercise produces. It only happens when correct and incorrect sit close together.</span>
         </li>
       </ol>
 
       <h3 class="sub">Seeds that waste a week</h3>
       <ul>
         <li><strong>The trick question.</strong> An off-by-one buried inside an unfamiliar API. It measures exposure to that API, which is not on the rubric and never will be.</li>
-        <li><strong>The two-defect diff.</strong> Usually authored when the first defect felt too easy. Split it into two weeks instead.</li>
-        <li><strong>The language edge case.</strong> Mutable default arguments, integer caching, truthiness of an empty collection. Fun, memorable, and almost never the shape real agent defects take.</li>
-        <li><strong>The one you find clever.</strong> Cleverness in a seed correlates with unteachability. If explaining the answer takes you four minutes, it was the wrong seed.</li>
+        <li><strong>The two-defect diff.</strong> You usually write this one when the first defect felt too easy. So split it into two weeks instead.</li>
+        <li><strong>The language edge case.</strong> Mutable default arguments, integer caching, truthiness of an empty collection. Such defects are fun, memorable, and almost never the shape real agent defects take.</li>
+        <li><strong>The one you find clever.</strong> Cleverness in a seed correlates with unteachability. So if explaining the answer takes you four minutes, it was the wrong seed.</li>
       </ul>
 
       <div class="takeaway">
@@ -840,7 +837,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Two mentors, one card, two scores</h2>
         <p class="thesis">
-          If two seniors score the same review differently, the rubric is measuring the mentor. Find
+          If two seniors score the same review differently, the rubric is measuring the mentor. So find
           out once a quarter, in twenty minutes.
         </p>
       </div>
@@ -849,8 +846,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         Any team with more than one mentor has this problem and almost none of them measure it. The
-        junior experiences it as arbitrary: the same quality of work scores three one week and one the
-        next, depending on who was in the room. Nothing convinces somebody faster that the whole exercise is theatre.
+        junior experiences it as arbitrary: the same quality of work scores three one week and one the next.
+        That difference comes down to who was in the room. And nothing convinces somebody faster that the
+        whole exercise is theatre.
       </p>
 
       <h3 class="sub">The drill</h3>
@@ -877,15 +875,15 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">It is almost always "durable fix"</span>
         <p>
           One mentor accepts a regression test as a durable fix; another demands a lint rule or a gate.
-          Both are defensible and the reviewer cannot read minds. The resolution is not to argue it in
-          the abstract but to write down your team's altitude rule. Which classes of defect earn a sentence in
+          Both are defensible, and the reviewer cannot read minds. So do not argue it in the abstract.
+          Write down your team's altitude rule instead. Which classes of defect earn a sentence in
           the charter, which earn a check, and which earn a gate that refuses? That
           document is useful far beyond this exercise.
         </p>
       </div>
 
       <p>
-        Second most common is "proved", where the disagreement is whether a specific input plus its
+        Second most common is "proved". The disagreement there is whether a specific input plus its
         wrong output counts, or whether only a committed failing test does. Pick one, write it down,
         and stop relitigating it weekly.
       </p>
@@ -905,7 +903,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Reading twelve weeks of scores</h2>
         <p class="thesis">
-          One card tells you almost nothing. Twelve tell you which of six quite different coaching
+          One card tells you almost nothing. But twelve tell you which of six quite different coaching
           problems you have.
         </p>
       </div>
@@ -915,7 +913,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Keep a four-column sheet, one row per week: found, proved, classified, durable fix. Do not
         total it. The total is the least informative number on the page, and writing it down invites
-        everyone to optimise it. What you want is which column is flat.
+        everyone to optimise it. So what you want is which column is flat.
       </p>
 
       <div class="tablewrap">
@@ -947,7 +945,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
             </tr>
             <tr class="flag">
               <td>Found rising, false positives rising</td>
-              <td>Trained to produce findings. Your clean-diff ratio is too low.</td>
+              <td>They have learned to produce findings. Your clean-diff ratio is too low.</td>
               <td>Go to one clean diff in three and say nothing about it.</td>
             </tr>
             <tr class="flag">
@@ -960,9 +958,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        The two flagged rows are the ones that get misread as effort problems. The mentor usually
-        produces both. The first comes from a diff pool that is always defective, the second from
-        material too hard, too easy, or too samey to generate any signal.
+        Mentors misread the two flagged rows as effort problems. The mentor usually produces both. The
+        first comes from a diff pool that is always defective. The second comes from material too hard,
+        too easy, or too samey to generate any signal.
       </p>
     </div>
   </section>
@@ -978,10 +976,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="meter-label">Gaming</span>
       </div>
       <div>
-        <h2>Four ways a rubric gets played</h2>
+        <h2>Four ways a reviewer plays the rubric</h2>
         <p class="thesis">
-          Not cheating. Ordinary, mostly unconscious optimisation toward the thing the rubric measures,
-          and the reason it needs naming is that it is invisible in the score.
+          This is not cheating. It is ordinary, mostly unconscious optimisation toward the thing the
+          rubric measures. It needs naming because it is invisible in the score.
         </p>
       </div>
     </div>
@@ -990,11 +988,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Class-stuffing</span>
-          <span class="what">A class gets named for every finding, because naming one is worth a point. Each class is more decorative than the last. <strong>Counter:</strong> require the class to predict a second place in this repo where the same class could occur. Memorised vocabulary cannot do that; understood vocabulary can.</span>
+          <span class="what">They name a class for every finding, because naming one is worth a point. Each class is more decorative than the last. <strong>Counter:</strong> require the class to predict a second place in this repo where the same class could occur. Memorised vocabulary cannot do that; understood vocabulary can.</span>
         </li>
         <li data-signal="block">
           <span class="when">The hedge</span>
-          <span class="what">"Possibly a policy inversion, or maybe invariant drift." Covering the space so that something lands. <strong>Counter:</strong> one class per finding, committed in writing before the defend phase opens. A hedge after commitment is fine and honest. A hedge instead of commitment is the game.</span>
+          <span class="what">"Possibly a policy inversion, or maybe invariant drift." Covering the space so that something lands. <strong>Counter:</strong> require one class per finding, in writing, before the defend phase opens. A hedge after commitment is fine and honest. A hedge instead of commitment is the game.</span>
         </li>
         <li data-signal="block">
           <span class="when">Test theatre</span>
@@ -1010,7 +1008,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">Do not punish any of these</span>
         <p>
           All four are evidence that the reviewer takes the rubric seriously, which is better than the
-          alternative. Name the game, apply the counter, move on. A mentor who treats optimisation as
+          alternative. Name the game, apply the counter, move on. But a mentor who treats optimisation as
           dishonesty gets a reviewer who optimises more carefully and stops telling you things.
         </p>
       </div>
@@ -1030,7 +1028,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The pushback drill, run safely</h2>
         <p class="thesis">
-          Arguing the wrong side on purpose is how you find out whether a correct finding survives disagreement. It is also the quickest way to damage the whole exercise if run badly.
+          Arguing the wrong side on purpose is how you find out whether a correct finding survives disagreement. But run it badly, and it becomes the quickest way to damage the whole exercise.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>never</b> before week 8</span>
@@ -1043,8 +1041,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         Roughly one review in three, push back on a finding you know is correct. Calmly, with a
-        plausible reason, no tell. What you are measuring is whether their position is attached to
-        evidence or to your face.
+        plausible reason, no tell. So what you are measuring is whether their position rests on
+        evidence or on your face.
       </p>
 
       <h3 class="sub">Rules for the mentor</h3>
@@ -1077,10 +1075,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        The target failure mode is worth stating, because it is what justifies the risk. An
-        engineer who cannot find defects is early in their career. An engineer who finds them and
-        abandons them whenever a confident person disagrees will still be doing that at eight years
-        in. And by then nobody is checking whether they were right.
+        Name the target failure mode, because it justifies the risk. An engineer who cannot find
+        defects is early in their career. But an engineer who finds them and abandons them whenever a
+        confident person disagrees will still do that at eight years in. By then nobody checks
+        whether they were right.
       </p>
     </div>
   </section>
@@ -1098,7 +1096,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Four juniors, one senior, forty-five minutes</h2>
         <p class="thesis">
-          The answer to "we have six early-career engineers and one person with time." Cost per
+          The answer to "we have six early-career engineers and one person with time." So cost per
           reviewer drops to about eleven minutes.
         </p>
       </div>
@@ -1132,7 +1130,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         The group format beats the one-to-one version in one specific way. Hearing three peers reach
         three different verdicts on the same lines argues for humility better than anything a senior
         says. It is worse in one way too, which is that quiet people can
-        hide. Rotate who presents their card first, and read the written cards rather than trusting
+        hide. So rotate who presents their card first, and read the written cards rather than trusting
         the discussion.
       </p>
 
@@ -1140,7 +1138,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">Scaling honestly</span>
         <p>
           Four is the working maximum. At six, the compare phase stops converging and the mentor
-          reverts to lecturing to save time. Two groups of four beats one group of eight, even when
+          reverts to lecturing to save time. So two groups of four beats one group of eight, even when
           the mentor is the same person on the same afternoon.
         </p>
       </div>
@@ -1160,7 +1158,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Three exits, including the good one</h2>
         <p class="thesis">
-          The exercise is supposed to end. A weekly ritual that runs forever has become furniture.
+          The exercise is supposed to end. But a weekly ritual that runs forever has become furniture.
         </p>
       </div>
     </div>
@@ -1203,7 +1201,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Twelve weeks, no movement</h2>
         <p class="thesis">
-          Audit your own inputs before you conclude anything about the person. Three of the four common
+          Audit your own inputs before you conclude anything about the person. And three of the four common
           causes are on the mentor's side of the table.
         </p>
       </div>
@@ -1234,18 +1232,19 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">Say the specific thing</span>
         <p>
           "You are not improving" is unusable and lands as a verdict on character. Try instead: "You
-          have lost 'proved' eleven weeks running, we tried writing the test first and it did not
+          have lost 'proved' eleven weeks running. We tried writing the test first and it did not
           move, and I do not have another idea yet". That version is usable, honest about your own
           uncertainty, and gives them something to push against.
         </p>
       </div>
 
       <p>
-        Then distinguish three cases, because they need different responses. <strong>Not yet</strong>
-        is the most common and deserves more time and a different approach. <strong>Cannot</strong> is
-        rare, hard to establish, and should never be concluded from one exercise in isolation.
-        <strong>Will not</strong> is not a mentoring problem at all. It is a management conversation
-        about whether the person wants this job, and more reps will not surface it faster.
+        Then distinguish three cases, because they need different responses. The first is
+        <strong>not yet</strong>: the most common, and it deserves more time and a different approach.
+        <strong>Cannot</strong> is rare, hard to establish, and you should never conclude it from one
+        exercise in isolation. <strong>Will not</strong> is not a mentoring problem at all. It is a
+        management conversation about whether the person wants this job, and more reps will not surface
+        it faster.
       </p>
     </div>
   </section>
@@ -1273,7 +1272,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">Grading the diff</span>
-          <span class="what">Your feedback is mostly about the code. Reverse-review §5 warns about this for a single session; the trend version is worse, because it is invisible week to week and total by week ten.</span>
+          <span class="what">Your feedback is mostly about the code. But Reverse-review §5 warns about this for a single session. The trend version is worse, because it is invisible week to week and total by week ten.</span>
         </li>
         <li data-signal="block">
           <span class="when">Never losing</span>
@@ -1285,7 +1284,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Unarticulated taste</span>
-          <span class="what">You cannot say why you distrusted a diff, only that you did. Fine as an instinct, useless as instruction, and it is the single most valuable thing you own. Getting it into words is what turns it into a charter rule.</span>
+          <span class="what">You cannot say why you distrusted a diff, only that you did. Fine as an instinct, useless as instruction, and it is the single most valuable thing you own. So getting it into words is what turns it into a charter rule.</span>
         </li>
         <li data-signal="block">
           <span class="when">Skipped weeks</span>

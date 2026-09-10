@@ -877,10 +877,10 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     </div>
     <h1>Four rungs, from a macro to a <em>process</em>.</h1>
     <p class="standfirst">
-      Half a charter says what the agent may not do. The other half says what it can do at all, and
-      that half is four primitives deep: a command, a skill, a sub-agent, an MCP server. They form one
-      ladder, from a macro the model reads every word of to a process it can only call. This page is
-      the mechanics of each rung, what makes a good one, and how to get a capability found once you
+      Half a charter says what the agent may not do. The other half says what it can do at all. That
+      half holds four primitives: a command, a skill, a sub-agent and an MCP server. So one ladder
+      runs from a macro the model reads every word of to a process it can only call. This page covers
+      the mechanics of each rung, what makes one good, and how to get a capability found once you
       have written it.
     </p>
     <p class="byline">
@@ -976,7 +976,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <p class="thesis">
           A charter is easy to read as a list of prohibitions. Most of a working charter is not.
           It is the set of things the agent can do at all, and teams install those without designing
-          them, because installing feels free. It is not free. A capability has the same four
+          them, because installing feels free. It is not free. A capability carries the same four
           attributes a constraint has, and one more that constraints never need.
         </p>
         <div class="chips">
@@ -1012,11 +1012,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       </div>
 
       <p>
-        The five answers are exclusive in practice and not in theory. A skill that says
-        <em>always run the formatter</em> reads like a capability and behaves like a rule. Removing it
-        lets the agent do more, so it is a constraint, and it belongs in the charter at the rung the
-        charter chose. That single misfiling is the most common one I see, and
-        <a class="xref" href="#s-12">section 12</a> lists it as an anti-pattern rather than a style preference.
+        The five answers are exclusive in practice, not in theory. A skill that says
+        <em>always run the formatter</em> reads like a capability and behaves like a rule. Remove it
+        and the agent can do more, so it is a constraint, and it belongs in the charter at the rung
+        the charter chose. That misfiling is the most common one I see.
+        <a class="xref" href="#s-12">Section 12</a> lists it as an anti-pattern rather than a style preference.
       </p>
 
       <h3 class="sub">0.1 · Four attributes, and the fourth is the new one</h3>
@@ -1043,24 +1043,24 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 
       <p>
         The missing counterpart is the whole reason these two pages exist. A hook runs because an event
-        happened. A gate runs because the pipeline reached it. Neither one waits to be noticed. Every
-        capability on the ladder below waits to be noticed, and three of the four wait to be noticed
-        by a model reading a one-line description.
+        happened, and a gate runs because the pipeline reached it. Neither one waits to be noticed.
+        Every capability below waits instead, and three of the four wait on a model reading a one-line
+        description.
       </p>
 
       <h3 class="sub">0.2 · Two prices, named once</h3>
       <p>
-        Every rung below is priced twice on this page, so the two words are worth pinning here. The
+        Every rung below carries two prices, so the two words are worth pinning here. The
         <b>standing cost</b> is what the capability puts in the context window on every turn, whether
-        it fires or not: a name, a description, a schema. The <b>invoked cost</b> is what it puts there
-        when it does fire: a body, a file, a result. One is paid thousands of times a week and the
-        other is paid when the work needs it.
+        it fires or not. That is a name, a description, a schema. The <b>invoked cost</b> is what it adds
+        when it does fire: a body, a file, a result. You pay the first thousands of times a week, and
+        the second only when the work needs it.
       </p>
       <p>
-        That is the whole reason the ladder has four rungs rather than one file format, and the
+        That is the whole reason the ladder has four rungs rather than one file format. The
         accounting behind it belongs to the sequel rather than to this page.
         <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> measures both prices,
-        and the rest of this page just states them per rung and moves on.
+        and the rest of this page states them per rung and moves on.
       </p>
 
       <div class="takeaway">
@@ -1156,11 +1156,11 @@ Report one line per violation, and nothing else. Do not fix anything.
       </figure>
 
       <p>
-        Three of those lines are the interesting ones. <code>$1</code> and <code>$ARGUMENTS</code>
+        Three of those lines matter most. <code>$1</code> and <code>$ARGUMENTS</code>
         make the file a function rather than a note. The <code>!</code> prefix runs a shell command
-        when the command expands and drops the output in, which means the prompt arrives already
-        holding its evidence. <code>disable-model-invocation</code> takes the description out of the
-        standing bill, which is the right default for anything a human always initiates.
+        when the command expands, then drops the output in, so the prompt arrives already
+        holding its evidence. And <code>disable-model-invocation</code> takes the description out of
+        the standing bill, which is the right default for anything a human always initiates.
       </p>
 
       <h3 class="sub">1.2 · What the rung buys</h3>
@@ -1173,9 +1173,9 @@ Report one line per violation, and nothing else. Do not fix anything.
 
       <h3 class="sub">1.3 · The ceiling</h3>
       <p>
-        A command cannot fire when the model needs it. It fires when a person remembers it. So the
-        moment the value of the capability depends on it running at the right time rather than at a
-        chosen time, this rung is wrong, and it is wrong in two different directions.
+        A command cannot fire when the model needs it. It fires only when a person remembers it. So
+        the moment a capability's value depends on running at the right time rather than a chosen
+        time, this rung is wrong. And it is wrong in two directions.
       </p>
 
       <div class="tablewrap">
@@ -1217,10 +1217,10 @@ Report one line per violation, and nothing else. Do not fix anything.
       <div>
         <h2>A skill is a module, and its description is the only part that is always there</h2>
         <p class="thesis">
-          A skill is knowledge and procedure the model loads when it decides the job needs them. It is
-          the first rung where the trigger belongs to the model, which makes one line of frontmatter
-          the highest-leverage text in the whole capability. Everything else about the design follows
-          from keeping the standing cost at that one line.
+          A skill is knowledge and procedure the model loads when it decides the job needs them. Here
+          the trigger belongs to the model for the first time, which makes one line of frontmatter the
+          most powerful text in the capability. Everything else in the design follows from keeping the
+          standing cost at that one line.
         </p>
         <div class="chips">
           <span class="chip kind-skill"><b>rung 1</b> loaded on demand</span>
@@ -1309,32 +1309,32 @@ Report one line per violation, and nothing else. Do not fix anything.
       <h3 class="sub">2.2 · What the rung buys</h3>
       <ul>
         <li><b>Knowledge that arrives when relevant.</b> This is the whole product. A reference library that costs one line until the moment it is needed.</li>
-        <li><b>Procedure with an order.</b> A skill can say <em>do this before that</em> in a way a note in the charter cannot, because it arrives with the job rather than with the session.</li>
+        <li><b>Procedure with an order.</b> A skill can say <em>do this before that</em> in a way a note in the charter cannot. It arrives with the job rather than with the session.</li>
         <li><b>Bundled determinism.</b> Scripts beside the procedure, invoked by name, with a grant that permits exactly them.</li>
         <li><b>A shared unit.</b> Team-owned in the repository, account-owned for personal habits, or packaged in a plugin for distribution.</li>
       </ul>
 
       <h3 class="sub">2.3 · The ceiling</h3>
       <p>
-        Two limits, and they are different in kind. The first is that the boundary is politeness. The
-        model can read the skill file, disagree with it and proceed. A skill cannot refuse anything,
-        so a rule you need obeyed does not become obeyed by being written in a skill. It becomes
-        obeyed by a hook or a gate, and the skill is where the accompanying knowledge goes.
+        Two limits stand here, and they differ in kind. The first is that the boundary is politeness.
+        The model can read the skill file, disagree, and proceed. So a skill cannot refuse anything,
+        and a rule that must be obeyed will not become obeyed by being written in a skill. Instead it
+        becomes obeyed by a hook or a gate, and the skill is where the accompanying knowledge goes.
       </p>
       <p>
-        The second is that everything it loads lands in this window. A skill whose body dumps a
-        reference manual on trigger has moved cost from the standing column to the invoked column and
-        then blown the invoked column. That is what the bundled files are for, and it is the most
-        common repair I make to a skill somebody else wrote.
+        The second is that everything a skill loads lands in this window. A body that dumps a
+        reference manual on trigger moves cost from the standing column into the invoked column, then
+        blows that column. Bundled files exist for exactly this, and it is the most common repair I
+        make to a skill somebody else wrote.
       </p>
 
       <div class="takeaway">
         <span class="label">The two tells that a skill is on the wrong rung</span>
         <p>
-          If its body is mostly reading and the model then works from what it read, it wanted to be a
-          sub-agent, and <a class="xref" href="#s-3">section 3</a> explains why the window pays for that
-          mistake. If the model keeps declining to follow it, it wanted to be a constraint, and no
-          amount of stronger wording changes the rung it is on.
+          If its body is mostly reading, and the model then works from what it read, the skill wanted to
+          be a sub-agent. <a class="xref" href="#s-3">Section 3</a> explains why the window pays for that
+          mistake. If the model keeps declining to follow it, the skill wanted to be a constraint, and
+          no stronger wording changes the rung it sits on.
         </p>
       </div>
     </div>
@@ -1415,7 +1415,7 @@ do not write files.
       </figure>
 
       <p>
-        Two lines in that file do most of the work. The <code>tools</code> line is a grant, and a
+        Two lines in that file do most of the work. The <code>tools</code> line is a grant. A
         grant left off is a grant inherited by accident, which
         <a class="xref" href="#s-10">section 10</a> treats as a real defect rather than an untidiness.
         The return block is the interface. A sub-agent whose return shape is unstated returns prose,
@@ -1433,8 +1433,8 @@ do not write files.
 
       <h3 class="sub">3.3 · The ceiling, which is the return value</h3>
       <p>
-        The parent cannot see what the sub-agent saw. That is the point and it is also the whole cost.
-        Three consequences follow, and the first two are avoidable.
+        The parent cannot see what the sub-agent saw. That blindness is the whole point, and it is also
+        the whole cost. Three consequences follow from it, and you can avoid the first two.
       </p>
 
       <ol class="sequence">
@@ -1453,7 +1453,7 @@ do not write files.
       </ol>
 
       <figure class="code diagram">
-        <figcaption>what crosses the wall, and what does not<span class="tag warn">read the dashed edge as the thing you cannot recover</span></figcaption>
+        <figcaption>what crosses the wall, and what does not<span class="tag warn">a dashed edge never crosses back</span></figcaption>
 <pre class="mermaid">
 flowchart LR
   P["the parent turn"] -->|"task prompt, plus a grant"| A["the sub-agent"]
@@ -1475,8 +1475,8 @@ flowchart LR
       <p>
         A sub-agent for a job that needs three lines of knowledge is a context wall around nothing.
         You paid a task prompt, a fresh system prompt and a round trip to avoid loading a paragraph.
-        The rule I use: if the work does not involve reading or searching more than the parent wants
-        to hold, it is a skill.
+        The rule I use: if the work does not make the parent read or search more than it wants to
+        hold, it is a skill.
       </p>
       <p>
         The other direction is subtler. If the parent keeps asking follow-up questions about what the
@@ -1501,8 +1501,8 @@ flowchart LR
         <p class="thesis">
           At this rung the capability stops being text the model reads and becomes a process the model
           calls. Another language, another machine, credentials it never sees. You buy determinism and
-          a real trust boundary. You pay the largest standing bill on the ladder, and you pay it for
-          every tool the server declares rather than for the ones you use.
+          a real trust boundary. But you pay the largest standing bill on the ladder, and you pay it for
+          every tool the server declares, not the ones you use.
         </p>
         <div class="chips">
           <span class="chip kind-mcp"><b>rung 3</b> a process wall</span>
@@ -1534,10 +1534,10 @@ flowchart LR
 
       <h3 class="sub">4.1 · What it actually is</h3>
       <p>
-        A server speaking the Model Context Protocol, connected over stdio to a local process, or over
-        HTTP or server-sent events to a remote one. Where you declare it decides who gets it, and that
-        is a layer decision in the sense <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> uses:
-        whoever owns the file owns the capability.
+        A server speaks the Model Context Protocol, over stdio to a local process or over HTTP to a
+        remote one. Where you declare it decides who gets it. That is the layer decision
+        <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> describes: whoever owns the file owns
+        the capability.
       </p>
 
       <div class="tablewrap">
@@ -1596,8 +1596,8 @@ flowchart LR
       <p>
         A server's instructions are the fourth thing it can put in your window, and they arrive
         without being asked for. Read them before you enable the server in project scope. They are
-        prose at rung 0 of the constraint chain, written by somebody who has never seen your charter,
-        and the model cannot tell them apart from yours.
+        prose at rung 0 of the constraint chain, written by someone who has never seen your charter.
+        The model cannot tell them apart from yours.
       </p>
 
       <h3 class="sub">4.3 · What the rung buys</h3>
@@ -1623,7 +1623,7 @@ flowchart LR
         </li>
         <li data-signal="pass">
           <span class="when">second</span>
-          <span class="what">Use deferred schemas where the client offers them, so a tool's full definition loads when it is searched for rather than standing in every turn. This turns rung 3's standing cost into something closer to a skill's.</span>
+          <span class="what">Use deferred schemas where the client offers them. Then a tool's full definition loads only when it is searched for, instead of standing in every turn. This turns rung 3's standing cost into something closer to a skill's.</span>
         </li>
         <li data-signal="warn">
           <span class="when">third</span>
@@ -1637,12 +1637,12 @@ flowchart LR
 
       <h3 class="sub">4.5 · The ceiling, and it is not the cost</h3>
       <p>
-        The process wall runs both ways. You cannot see in, and the model cannot see in either. So a
-        tool whose description is vague is a capability you cannot repair from the outside. On the
-        skill rung a confused model can read the file and work it out. Here it can only call the thing
-        and hope. The schema description <em>is</em> the capability as far as selection is concerned,
-        which puts the craft of <a class="xref" href="#s-9">section 9</a> in someone else's repository
-        when the server is not yours.
+        The process wall runs both ways. You cannot see in, and neither can the model. So a tool whose
+        description is vague is a capability you cannot repair from the outside. On the skill rung a
+        confused model can read the file and work it out. Here it can only call the thing and hope. As
+        far as selection goes, the schema description <em>is</em> the capability itself. That puts the
+        craft of <a class="xref" href="#s-9">section 9</a> in someone else's repository when the server
+        is not yours.
       </p>
       <p>
         The second limit is a security property rather than a cost. What comes back through the wall
@@ -1670,7 +1670,7 @@ flowchart LR
       <p>
         <a href="/prompt-injection/">Prompt Injection</a> covers that path properly. The
         capability-side rule is short: a tool that reaches content other people write needs its
-        return treated as data, and the constraint that enforces it does not live in the server. It
+        return treated as data. The constraint that enforces it does not live in the server. It
         lives in your harness, where you can see it.
       </p>
 
@@ -1717,9 +1717,9 @@ flowchart LR
       <p>
         Think about what a schema actually does. It tells the model what calls exist, what arguments
         they take, and what comes back. A CLI has all of that too. Its schema is the tool's own help
-        text and the model's prior knowledge of it, and neither of those stands in your context window
-        on every turn. That is the trade in one sentence, and the rest of this section is the cases
-        where it goes the other way.
+        text plus the model's prior knowledge of it, and neither stands in your context window on
+        every turn. That is the trade in one sentence. The rest of this section covers the cases where
+        it goes the other way.
       </p>
 
       <div class="tablewrap">
@@ -1754,7 +1754,7 @@ flowchart LR
         </li>
         <li data-signal="warn">
           <span class="when">third · a server</span>
-          <span class="what">Reach for MCP when one of five things is true, and not otherwise: several clients or agents need the same access, sign-in is an interactive flow the model must not handle, the surface is broad enough that typed discovery is worth paying for, a vendor already ships a server you would otherwise reimplement, or you need a versioned contract other teams build against.</span>
+          <span class="what">Reach for MCP only when one of five things is true. Several clients or agents need the same access. Sign-in is an interactive flow the model must not handle. The surface is broad enough that typed discovery pays for itself. A vendor already ships a server you would otherwise reimplement. Or other teams need a versioned contract to build against.</span>
         </li>
         <li data-signal="block">
           <span class="when">then check</span>
@@ -1781,27 +1781,26 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
 
       <h3 class="sub">5.2 · The honest case for the server</h3>
       <p>
-        The CLI route has a cost that does not appear in the ledger. The model guesses a flag, the
-        command fails, it reads the help text, it tries again. Three turns for a lookup. A typed schema
-        makes that failure rare, and a broad surface makes it common, so the wider the tool you are
-        reaching for, the better the server looks. A skill that pins the exact invocations closes most
-        of the gap for a few commands and none of it for forty.
+        The CLI route has a cost the ledger does not show. The model guesses a flag, the command
+        fails, it reads the help text, and it tries again. That is three turns for a lookup. A typed
+        schema makes that failure rare, and a broad surface makes it common. So the wider the tool you
+        reach for, the better the server looks. A skill that pins the exact invocations closes most of
+        the gap for a few commands, and none of it for forty.
       </p>
       <p>
         The second honest case is authentication. A CLI works because someone signed in on that
         machine. A server can own the sign-in flow, refresh the token, and keep the credential in a
         process the model cannot read. When the alternative is a token pasted into an environment
-        variable in a script, the server is buying a real security property and not just tidiness.
+        variable, the server buys a real security property, not just tidiness.
       </p>
 
       <div class="callout">
         <span class="label">The wrapper</span>
         <p>
           Wrapping a CLI you already have in an MCP server is the most expensive way to gain nothing.
-          You pay a schema on every turn for a capability <code>Bash</code> already provided, you lose
-          the ability to pipe and trim the output, and you add a process to keep alive. If the reason
-          is that the model keeps getting the flags wrong, the fix is a skill with the invocations
-          written down.
+          You pay a schema on every turn for a capability <code>Bash</code> already provided. You also
+          lose the ability to pipe and trim the output, and you add a process to keep alive. If the
+          model keeps getting the flags wrong, the fix is a skill with the invocations written down.
         </p>
       </div>
     </div>
@@ -1811,9 +1810,8 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
     <span class="kicker">Part III</span>
     <h2>Packaging and placement</h2>
     <p>
-      Who owns a capability, and which rung it belongs on. Two sections. The first is the question
-      that decides who may change the words, and the second is the question everyone asks first and
-      should ask second.</p>
+      Who owns a capability, and which rung it belongs on. Two sections. The first decides who may
+      change the words. The second is the question everyone asks first and should ask second.</p>
   </div>
 
    <!-- ============ 6 ============ -->
@@ -1830,10 +1828,9 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
         <h2>A plugin is not a rung. It is who owns the rungs</h2>
         <p class="thesis">
           A plugin ships commands, skills, sub-agents, hooks and server declarations under one name,
-          from one repository, with one owner. It changes nothing about how any of them work and
-          everything about who decides what they say. That makes it the packaging question and the
-          layer question at the same time, and it is a dependency in the ordinary sense: it changes
-          under you.
+          from one repository, with one owner. It changes nothing about how any of them work, and
+          everything about who decides what they say. So it is the packaging question and the layer
+          question at once. And it is a dependency in the ordinary sense: it changes under you.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>packaging</b> not a rung</span>
@@ -1845,9 +1842,9 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
 
     <div class="rung-body">
       <p>
-        Before plugins there were two places a capability could live: your account, or this repository.
-        Both answers are about you. A plugin adds a third, and the third one is about somebody else,
-        which is why it is worth a section of its own rather than a line in the catalog.
+        Before plugins, a capability could live in two places: your account or this repository. Both
+        answers are about you. A plugin adds a third, and that third one is about somebody else. It
+        earns a section of its own rather than a line in the catalog.
       </p>
 
       <div class="tablewrap">
@@ -1869,7 +1866,7 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
       <p>
         A plugin can carry more than capabilities, and the parts that are not capabilities are the
         ones to read first. Enabling a plugin can enforce rules, grant tool access, and put prose in
-        your window on every turn, none of which is visible from its name.
+        your window on every turn. None of that is visible from its name.
       </p>
 
       <div class="tablewrap">
@@ -1895,11 +1892,11 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
         it declares. That is the same bill as before and now somebody else decides its size.
       </p>
       <p>
-        The second has no equivalent locally. A plugin author has never seen your catalog, so their
+        The second has no local equivalent. A plugin author has never seen your catalog, so their
         descriptions cannot avoid colliding with yours. The sibling test from
-        <a class="xref" href="#s-9">section 9</a> now has to run across a boundary you do not control,
-        and the loser of a collision fails silently, which means an update can quietly disable a skill
-        of your own that used to fire.
+        <a class="xref" href="#s-9">section 9</a> now runs across a boundary you do not control, and
+        the loser of a collision fails silently. So an update can quietly disable a skill of your own
+        that used to fire.
       </p>
 
       <ol class="sequence">
@@ -1928,14 +1925,14 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
       <h3 class="sub">6.3 · When to publish one</h3>
       <p>
         Three repositories is my threshold. Below that, project scope is simpler, reviewable in the
-        normal way, and impossible to forget you have. Above it, copying the same skill by hand starts
-        producing four versions that drift, which is the failure a package exists to prevent.
+        normal way, and impossible to forget you have. Above it, copying the same skill by hand
+        produces four versions that drift. That drift is the failure a package exists to prevent.
       </p>
       <p>
         The other good reason is handing someone a working setup rather than instructions. A team that
         owns a domain, its practices, its checkers and its access can ship all of that as one thing.
         That is the strongest form of the layer idea in
-        <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a>: the people who own the practice own
+        <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a>. The people who own the practice own
         the file that carries it, and consumers get the next version without being told.
       </p>
 
@@ -1964,10 +1961,10 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
       <div>
         <h2>Four questions, in order, and the default answer is a skill</h2>
         <p class="thesis">
-          Placement on this ladder is not a judgment about how important the capability is. It is four
-          facts about the work: who notices the need, whether the work should stay out of this window,
-          whether it needs a process wall, and how often it fires. Answer them in order and stop at
-          the first one that decides.
+          Placement on this ladder is not a judgment about how important the capability is. It rests on
+          four facts about the work. First, who notices the need, and whether the work should stay out
+          of this window. Then whether it needs a process wall, and how often it fires. Answer them in
+          order and stop at the first one that decides.
         </p>
         <div class="chips">
           <span class="chip kind-cmd"><b>1</b> who notices</span>
@@ -1996,7 +1993,7 @@ scripts/pr_summary.py <span class="c-pass">$NUMBER</span>   <span class="c-dim">
         </li>
         <li data-signal="pass">
           <span class="when">question 3</span>
-          <span class="what"><b>Does it need a process wall?</b> One of the five reasons in <a class="xref" href="#s-5">section 5</a> means an <b>MCP server</b>: several clients need the same access, sign-in is an interactive flow, the surface is broad enough that typed discovery pays for itself, a vendor already ships it, or other teams need a versioned contract. Repeatability is not on that list, because a script already gives you that.</span>
+          <span class="what"><b>Does it need a process wall?</b> This means an <b>MCP server</b> when one of the five reasons in <a class="xref" href="#s-5">section 5</a> holds. Several clients need the same access. Sign-in is an interactive flow. The surface is broad enough that typed discovery pays for itself. A vendor already ships it. Or other teams need a versioned contract. Repeatability is not on that list, because a script already gives you that.</span>
         </li>
         <li data-signal="warn">
           <span class="when">question 4</span>
@@ -2086,9 +2083,9 @@ flowchart TD
         <p>
           These four questions settle the first placement. They do not tell you when to move a
           capability that is already running, and they do not price the standing line it holds.
-          <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> carries both: the two prices in
-          full, the signals that promote or demote a capability, and the numbers that tell you whether
-          the one you installed ever fires.
+          <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> carries both. It gives the
+          two prices in full, the signals that promote or demote a capability. It also gives the numbers that
+          tell you whether the one you installed ever fires.
         </p>
       </div>
     </div>
@@ -2116,10 +2113,10 @@ flowchart TD
       <div>
         <h2>What a good one looks like, one rung at a time</h2>
         <p class="thesis">
-          Placement is the first decision and it is not the one that decides whether the capability
-          works. These are the checklists I run before committing a capability, and the tell at the
-          end of each is the symptom I look for when somebody says theirs does not work. Four rungs,
-          four lists, and one property runs through all of them: say what comes back.
+          Placement is the first decision, and it is not the one that decides whether the capability
+          works. These are the checklists I run before committing a capability. The tell at the end of
+          each one is the symptom I look for when somebody says theirs does not work. Four rungs, four
+          lists, and one property runs through all of them: say what comes back.
         </p>
         <div class="chips">
           <span class="chip kind-cmd"><b>one job</b> per capability</span>
@@ -2188,7 +2185,7 @@ flowchart TD
         <li><span class="t">Writes each schema description as an interface, because from the outside it is the only part of the capability anyone can read.</span><span class="ref">§9</span></li>
         <li><span class="t">Is declared in the <b>narrowest scope</b> that needs it. Project scope charges the whole team on every turn.</span><span class="ref">§4</span></li>
         <li><span class="t">Keeps read tools separable from write tools, so a permission rule can grant one without the other.</span><span class="ref">§10</span></li>
-        <li><span class="t">Exists for one of five reasons: several clients, an interactive sign-in, a broad surface worth typing, a vendor implementation, or a contract other teams build against.</span><span class="ref">§5</span></li>
+        <li><span class="t">Exists for one of five reasons. Several clients, an interactive sign-in, a broad surface worth typing, a vendor implementation, or a contract other teams build against.</span><span class="ref">§5</span></li>
       </ol>
       <p>
         <b>The tell of a bad one:</b> it wraps a CLI you already had. You are paying a schema on every
@@ -2199,8 +2196,8 @@ flowchart TD
       <div class="takeaway">
         <span class="label">The property all four share</span>
         <p>
-          Every list above has a line about what comes back. A command says what not to do, a skill
-          says which file to read, a sub-agent states its report shape, a server returns a field rather
+          Every list above has a line about what comes back. A command says what not to do, and a skill
+          says which file to read. A sub-agent states its report shape, and a server returns a field rather
           than a payload. Capability work is interface work, and the return half of the interface is
           the half that gets left to chance.
         </p>
@@ -2236,8 +2233,8 @@ flowchart TD
     <div class="rung-body">
       <p>
         Write the description in the words the work arrives in, not the words the implementation uses.
-        A skill named after your internal abstraction, described in terms of your internal
-        abstraction, matches a request nobody makes.
+        A skill named after your internal abstraction, and described in its own vocabulary, matches a
+        request nobody makes.
       </p>
 
       <figure class="code">
@@ -2278,9 +2275,9 @@ flowchart TD
       <p>
         Take every pair of capabilities in scope and say the sentence that tells them apart. If you
         cannot say it in one sentence, the model cannot infer it from two descriptions. You then have
-        two choices and both are fine: merge them, or add the negative trigger to each. Leaving the
-        overlap is the option that is not fine, because the loser of a collision fails silently and
-        you will conclude that it does not work.
+        two fine choices: merge them, or add the negative trigger to each. Leaving the overlap is the
+        option that is not fine. The loser of a collision fails silently, and you will conclude the
+        skill does not work.
       </p>
 
       <div class="tablewrap">
@@ -2306,10 +2303,10 @@ flowchart TD
         ever will.
       </p>
       <p>
-        This is the smallest useful eval on the capability side, and it has the property that
-        <a href="/eval-loop/">The Eval Loop</a> asks for: a golden set, a distribution rather than one
-        green run, and a number that moves when you edit the description. Keep the six cases in the
-        skill directory. They are the only regression test a trigger can have.
+        This is the smallest useful eval on the capability side, and it has the property
+        <a href="/eval-loop/">The Eval Loop</a> asks for. A golden set. A distribution rather than one
+        green run. A number that moves when you edit the description. Keep the six cases in the skill
+        directory, because they are the only regression test a trigger can have.
       </p>
 
       <div class="takeaway">
@@ -2339,9 +2336,9 @@ flowchart TD
         <h2>The grant is where the two ladders touch, and an omitted grant is the widest one</h2>
         <p class="thesis">
           Every capability runs holding some set of tools. That set is the one attribute that is a
-          capability property and a constraint rung at the same time: on the constraint chain a tool
+          capability property and a constraint rung at the same time. On the constraint chain a tool
           grant sits just above prose, because it makes a whole class of action unrepresentable rather
-          than discouraged. Leave the line out and you have written the widest grant available,
+          than discouraged. Leave the line out, and you have written the widest grant available,
           silently.
         </p>
         <div class="chips">
@@ -2356,7 +2353,7 @@ flowchart TD
       <p>
         A sub-agent told not to write files is a sub-agent that may write files. A sub-agent granted
         <code>Read, Grep, Glob</code> cannot write one. The difference is the difference between prose
-        and a mechanism, and it costs one line of frontmatter, which is why
+        and a mechanism, and it costs one line of frontmatter. That is why
         <a href="/constraint-engineering/">Constraint Engineering</a> puts the tool grant on the
         constraint chain rather than in the settings.
       </p>
@@ -2380,8 +2377,8 @@ flowchart TD
       <p>
         Capabilities call capabilities. A command can name a skill. A skill can tell the model to
         dispatch a sub-agent. A sub-agent can hold MCP tools and load skills of its own. What does not
-        cross is knowledge of what happened: the parent gets the report and nothing else, which is the
-        property you bought and also the one that bites.
+        cross is knowledge of what happened: the parent gets the report and nothing else. That is the
+        property you bought, and it is also the one that bites.
       </p>
 
       <figure class="code diagram">
@@ -2408,9 +2405,9 @@ flowchart TD
 
       <p>
         Two rules keep that graph from turning into a maze. First, a capability may compose downward
-        and never sideways: a skill dispatching a sub-agent is fine, and two skills that call each
+        and never sideways. A skill dispatching a sub-agent is fine, and two skills that call each
         other are one skill with a naming problem. Second, the grant travels with the callee, not
-        with the call. If a sub-agent needs a write tool for one task and not for another, that is two
+        with the call. If a sub-agent needs a write tool for one task and not another, that is two
         sub-agents, and the second one is the safe default.
       </p>
 
@@ -2545,11 +2542,11 @@ flowchart TD
         <span class="label">Where this page stops</span>
         <p>
           Everything above is what a capability is and how to write a good one. None of it tells you
-          what the set of them costs you next quarter, whether the ones you wrote still fire, or how to
+          what the set of them costs you next quarter, or whether the ones you wrote still fire. Nor does it tell you how to
           get a repeatable answer without buying a rung to hold it.
-          <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> is that half: two
-          prices, five kinds of rot, determinism bought at the cheap end, and the four numbers that
-          make a silent failure audible.
+          <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> is that other half. It
+          gives two prices, five kinds of rot, determinism bought at the cheap end, and the four
+          numbers that make a silent failure audible.
         </p>
       </div>
     </div>

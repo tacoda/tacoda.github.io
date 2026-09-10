@@ -666,11 +666,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>The junior reviews the agent. The senior reviews <em>the review</em>.</h1>
     <p class="standfirst">
-      Code review assumed a world where a human wrote the code and the scarce thing was
-      correctness. The agent writes the code now, and the scarce thing is judgment. So point the
-      review the other way: the junior reviews the agent's diff, then defends that review, and the
-      senior grades the review rather than the code. It costs a senior fifteen minutes instead of an
-      hour, and the fifteen minutes land on the only thing that actually transfers.
+      Code review assumed a human wrote the code, and correctness was scarce. Now the agent writes
+      it, and judgment is scarce. So point the review the other way. The junior reviews the
+      agent's diff, then defends that review. Meanwhile the senior grades the review, not the code.
+      That costs a senior fifteen minutes instead of an hour, and those fifteen minutes land on what
+      transfers.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -697,7 +697,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch block"></span>
         <div>
           <dt>The catch</dt>
-          <dd>A defect named, classified, and located. A named class transfers to the next diff. A hunch does not.</dd>
+          <dd>A defect named, classified, and located. Only a named class transfers to the next diff; a hunch does not.</dd>
         </div>
       </div>
       <div class="signal">
@@ -776,19 +776,18 @@ flowchart LR
       </p>
 
       <p>
-        There is a second effect worth naming, because it is most of why this works in practice.
-        The junior is not defending their own code, so nothing about the exercise threatens them.
-        Being wrong about a diff the agent wrote is cheap and unembarrassing, and people look harder
-        when looking harder cannot backfire. Normal review has the opposite property, which is why
-        so much of it turns into negotiation.
+        Most of why this works is that the junior is not defending their own code, so the exercise
+        threatens nothing. That makes being wrong about the agent's diff cheap and unembarrassing,
+        and people look harder when looking harder cannot backfire. Normal review has the opposite
+        property, which is why so much of it turns into negotiation.
       </p>
 
       <div class="takeaway">
         <span class="label">The trade</span>
         <p>
-          You give up some line-by-line senior scrutiny of the code. You get a junior who can supply
-          that scrutiny themselves within a couple of quarters. On any timescale longer than a
-          sprint, that is a good trade.
+          You give up some line-by-line senior scrutiny of the code. In return, you get a junior who
+          can supply that scrutiny themselves within a couple of quarters. On any timescale longer
+          than a sprint, that is a good trade.
         </p>
       </div>
     </div>
@@ -807,8 +806,8 @@ flowchart LR
       <div>
         <h2>Thirty minutes, three roles</h2>
         <p class="thesis">
-          Thirty minutes is the whole budget, and the timeboxes are not decorative. An exercise that
-          quietly grows to an hour is an exercise that gets cancelled in week five.
+          Thirty minutes is the whole budget, and the timeboxes are not decorative. That matters,
+          because an exercise that quietly grows to an hour is one that gets cancelled in week five.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>dealer</b> picks the diff</span>
@@ -822,11 +821,11 @@ flowchart LR
       <ol class="sequence">
         <li data-signal="none">
           <span class="when">Before</span>
-          <span class="what"><strong>The dealer picks a diff.</strong> Either real agent output from this week's work, or a seeded diff from section 8. Under about 60 lines. The dealer does not say what is wrong with it, or whether anything is.</span>
+          <span class="what"><strong>The dealer picks a diff.</strong> It is either real agent output from this week's work or a seeded diff from section 8, and it stays under about 60 lines. The dealer does not say what is wrong with it, or whether anything is.</span>
         </li>
         <li data-signal="warn">
           <span class="when">0:00 → 0:05</span>
-          <span class="what"><strong>Read cold.</strong> No agent, no ticket summary, no running the tests. Just the diff and the surrounding code. Five minutes is deliberately not enough time to be thorough, which is the same condition a real review happens under.</span>
+          <span class="what"><strong>Read cold.</strong> No agent, no ticket summary, no running the tests. Just the diff and the surrounding code. So five minutes is deliberately too short to be thorough, which is the same condition a real review happens under.</span>
         </li>
         <li data-signal="warn">
           <span class="when">0:05 → 0:20</span>
@@ -834,17 +833,17 @@ flowchart LR
         </li>
         <li data-signal="block">
           <span class="when">0:20 → 0:30</span>
-          <span class="what"><strong>Defend.</strong> The junior states the verdict first, in one sentence. The senior asks questions, does not lecture, and finishes by scoring the review against the rubric (section 4) and naming one thing to do differently next week.</span>
+          <span class="what"><strong>Defend.</strong> The junior states the verdict first, in one sentence. The senior asks questions and does not lecture. Then the senior scores the review against the rubric (section 4) and names one thing to do differently next week.</span>
         </li>
       </ol>
 
       <div class="callout">
         <span class="label">Pens down means pens down</span>
         <p>
-          A review that ran out of clock is a legitimate outcome, worth saying out loud. "I did
+          A review that ran out of clock is a legitimate outcome, so say so out loud. "I did
           not get to the migration, so I am not confident about the data path" is a senior-shaped
-          sentence. Knowing the edge of what you checked is a large part of the skill,
-          and an exercise with an unlimited clock never teaches it.
+          sentence. That sentence also shows the skill at work. But knowing the edge of what you
+          checked is a large part of it, and an exercise with an unlimited clock never teaches it.
         </p>
       </div>
     </div>
@@ -863,7 +862,7 @@ flowchart LR
       <div>
         <h2>The review card</h2>
         <p class="thesis">
-          One page, filled by hand, kept afterward. The top half is the comprehension block from the
+          One page, filled by hand, kept afterward. Its top half is the comprehension block from the
           standard. The bottom half is what makes it a review instead of a summary.
         </p>
       </div>
@@ -894,19 +893,19 @@ flowchart LR
       <ol class="sequence">
         <li data-signal="warn">
           <span class="when">prediction</span>
-          <span class="what">Written first, before the tests run, before you consult the agent. Being wrong on paper is free, and it is how you find out whether your instincts are calibrated. A reviewer who never predicts never learns that they are consistently wrong about the same class of thing.</span>
+          <span class="what">Write it first, before the tests run, before you consult the agent. Being wrong on paper is free, and it is how you find out whether your instincts are calibrated. So a reviewer who never predicts never learns whether they are consistently wrong about the same class of thing.</span>
         </li>
         <li data-signal="none">
           <span class="when">verdict</span>
-          <span class="what">Committed before the discussion, in one sentence. A verdict you can revise mid-conversation is not a verdict, it is agreement with whoever spoke last.</span>
+          <span class="what">Commit it before the discussion, in one sentence. A verdict you can revise mid-conversation is not a verdict; it is agreement with whoever spoke last.</span>
         </li>
         <li data-signal="block">
           <span class="when">defect class</span>
-          <span class="what">Named from the taxonomy in section 3. The class is what carries to the next diff. "There is a bug on line 40" teaches you about line 40; "this is a policy inversion" teaches you where to look forever.</span>
+          <span class="what">Name it from the taxonomy in section 3. The class is what carries to the next diff. "There is a bug on line 40" teaches you about line 40; "this is a policy inversion" teaches you where to look forever.</span>
         </li>
         <li data-signal="pass">
           <span class="when">proof</span>
-          <span class="what">A test that goes red, or a concrete input and the wrong output it produces. Anything less goes down honestly as <em>unproved suspicion</em>, which is a respectable thing to hand a senior. It is not a catch.</span>
+          <span class="what">A test that goes red, or a concrete input and the wrong output it produces. So anything less goes down honestly as <em>unproved suspicion</em>, which is a respectable thing to hand a senior. It is not a catch.</span>
         </li>
         <li data-signal="none">
           <span class="when">durable fix</span>
@@ -945,7 +944,7 @@ flowchart LR
           <tbody>
             <tr>
               <td><strong>1 · Policy inversion</strong></td>
-              <td>Textbook-correct behavior that is not <em>this business's</em> behavior. Rounds to the nearest nickel when the policy is round down, retries when the policy is fail fast.</td>
+              <td>Textbook-correct behavior that is not <em>this business's</em> behavior. It rounds to the nearest nickel when the policy is round down, and retries when the policy is fail fast.</td>
               <td>Ask what the business rule is, not what the algorithm is. If nothing in the repo answers, you have found a charter gap, which is its own valuable result.</td>
             </tr>
             <tr>
@@ -955,7 +954,7 @@ flowchart LR
             </tr>
             <tr>
               <td><strong>3 · A test that cannot fail</strong></td>
-              <td>The assertion re-derives the implementation, or asserts against a mock the test itself configured. Reads like coverage, proves nothing.</td>
+              <td>The assertion re-derives the implementation, or asserts against a mock the test itself configured. It reads like coverage but proves nothing.</td>
               <td>Break the implementation on purpose. If the test stays green, it was never a test.</td>
             </tr>
             <tr>
@@ -996,8 +995,7 @@ flowchart LR
       <p>
         Seven is not a complete list, so do not treat it as one. It is a starting vocabulary.
         When your team catches something that does not fit, name it, write the row, and add it to
-        your fork. A team with its own eighth and ninth class is a team that has been paying
-        attention.
+        your fork.
       </p>
     </div>
   </section>
@@ -1064,10 +1062,10 @@ flowchart LR
         <span class="label">Deal clean diffs, and do not announce it</span>
         <p>
           If every diff in the exercise contains a planted defect, you are not training reviewers.
-          You are training a false-positive machine that finds a bug in anything, because it has
-          learned that finding one is how you pass. Roughly one in four should be genuinely clean.
-          Correctly accepting a clean diff, with reasons, is a full four points, so praise it as
-          loudly as a catch.
+          Instead, you are training a false-positive machine that finds a bug in anything, because
+          it has learned that finding one is how you pass. So roughly one in four should be
+          genuinely clean. That means correctly accepting a clean diff, with reasons, counts as a
+          full four points, so praise it as loudly as a catch.
         </p>
       </div>
     </div>
@@ -1081,13 +1079,13 @@ flowchart LR
         <div class="meter" role="img" aria-label="Facilitation">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
-        <span class="meter-label">Facilitation</span>
+        <span class="meter-label">Moderation</span>
       </div>
       <div>
         <h2>The senior's run sheet</h2>
         <p class="thesis">
-          Ten minutes of talking, and most of the skill is in what you do not say. The failure mode
-          is a well-meaning senior turning the defend phase into a lecture about the diff.
+          Ten minutes of talking, and most of the skill is in what you do not say. But the failure
+          mode is a well-meaning senior turning the defend phase into a lecture about the diff.
         </p>
       </div>
     </div>
@@ -1108,7 +1106,7 @@ flowchart LR
         </li>
         <li data-signal="pass">
           <span class="when">Do</span>
-          <span class="what"><strong>Say what you distrusted, and why, after the verdict.</strong> Seniors flinch at certain diffs before they can articulate the reason. Articulating it afterward is the single most valuable thing you have to give, and it is what never comes up in normal review.</span>
+          <span class="what"><strong>Say what you distrusted, and why, after the verdict.</strong> Seniors flinch at certain diffs before they can articulate the reason. So articulating it afterward is the single most valuable thing you have to give, and it is what never comes up in normal review.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Do</span>
@@ -1116,7 +1114,7 @@ flowchart LR
         </li>
         <li data-signal="pass">
           <span class="when">Do</span>
-          <span class="what"><strong>End with one sentence.</strong> Which rubric point they lost and what to do differently next week. One. A list of five improvements is a list nobody acts on.</span>
+          <span class="what"><strong>End with one sentence.</strong> Name which rubric point they lost and what to do differently next week. One, not five, because a list of five improvements is a list nobody acts on.</span>
         </li>
       </ol>
 
@@ -1145,8 +1143,8 @@ flowchart LR
         <h2>Running it without a senior</h2>
         <p class="thesis">
           The senior is the scarce input, and plenty of teams do not have one with time to spare.
-          Here are the substitutes, in descending order of how well they work, and what none of them
-          replace.
+          The substitutes below run in descending order of how well they work, and none of them
+          replace the senior.
         </p>
       </div>
     </div>
@@ -1159,7 +1157,7 @@ flowchart LR
         </li>
         <li data-signal="warn">
           <span class="when">Workable</span>
-          <span class="what"><strong>Seeded diffs with a written key.</strong> Grade yourself against section 8. Weaker, because you know in advance that a defect exists, which is the single biggest thing the exercise is supposed to withhold. It still teaches the taxonomy, which is worth a lot on its own.</span>
+          <span class="what"><strong>Seeded diffs with a written key.</strong> Grade yourself against section 8. It is weaker, because you know in advance that a defect exists, which is the single biggest thing the exercise is supposed to withhold. It still teaches the taxonomy, which is worth a lot on its own.</span>
         </li>
         <li data-signal="warn">
           <span class="when">Workable</span>
@@ -1167,15 +1165,15 @@ flowchart LR
         </li>
         <li data-signal="block">
           <span class="when">Not a substitute</span>
-          <span class="what"><strong>Someone who knows what correct means here.</strong> Policy inversion (class 1) is undetectable without knowing the business rule. That knowledge is local, undocumented more often than not, and lives in a person. No model has it, and no exercise manufactures it.</span>
+          <span class="what"><strong>Someone who knows what correct means here.</strong> Policy inversion (class 1) is undetectable without knowing the business rule. That knowledge is local, undocumented more often than not, and lives in a person. So no model has it, and no exercise manufactures it.</span>
         </li>
       </ol>
 
       <p>
-        Which is worth saying plainly, because it is the honest limit of this page: reverse-review
-        makes a senior's time go about four times further. It does not create one out of nothing. If
-        your team has nobody who can say what the business rule actually is, that is a much larger
-        problem than your review process. An exercise will not solve it.
+        This is the honest limit of the page: reverse-review makes a senior's time go about four
+        times further. It does not create one out of nothing. If your team has nobody who can say
+        what the business rule actually is, that is a much larger problem than your review process.
+        No exercise will solve it.
       </p>
     </div>
   </section>
@@ -1201,9 +1199,9 @@ flowchart LR
 
     <div class="rung-body">
       <p>
-        A <strong>catch</strong> is a named class plus a proof. Not a comment, not a suspicion, not a
-        style objection. Counting catches instead of tickets changes what people optimize for, which
-        is the only reason to count anything.
+        A <strong>catch</strong> is a named class plus a proof, not a comment, not a suspicion, not a
+        style objection. So counting catches instead of tickets changes what people optimize for,
+        which is the only reason to count anything.
       </p>
 
       <ol class="sequence">
@@ -1223,15 +1221,15 @@ flowchart LR
 
       <p>
         Those timelines are what this has looked like in practice on small teams. They are not a
-        measured curve, and someone doing one card a week in a codebase they know well will move
-        faster than the numbers suggest. Treat them as a shape, not a schedule.
+        measured curve. Someone doing one card a week in a codebase they know well will move faster
+        than the numbers suggest. Treat them as a shape, not a schedule.
       </p>
 
       <div class="takeaway">
         <span class="label">The habit is the deliverable</span>
         <p>
           No single catch matters. What matters is that thirty minutes a week goes to the one skill
-          the agent cannot supply, for long enough that it becomes how somebody reads code.
+          the agent cannot supply. Do that for long enough and it becomes how somebody reads code.
         </p>
       </div>
     </div>
@@ -1293,9 +1291,9 @@ git apply -R ../../fulcorum-reverse-review/diffs/03-test-that-cannot-fail.diff</
       <div class="takeaway">
         <span class="label">Better than the seed: your own repo</span>
         <p>
-          Seeded diffs teach the taxonomy. Your own codebase teaches the thing that matters,
-          because class 1 and class 7 only exist relative to a real policy and a real prevailing
-          pattern. Once the vocabulary is in place, switch to reviewing actual agent output from last
+          Seeded diffs teach the taxonomy, but your own codebase teaches the thing that matters.
+          Class 1 and class 7 exist only relative to a real policy and a real prevailing pattern.
+          So once the vocabulary is in place, switch to reviewing actual agent output from last
           week's work and never go back.
         </p>
       </div>

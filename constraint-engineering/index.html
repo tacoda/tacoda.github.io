@@ -819,7 +819,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     <h1>Model the constraint first, then <em>pick the machinery</em>.</h1>
     <p class="standfirst">
       Agent reliability work looks like infrastructure. It is domain modeling, and the object it
-      models is a constraint. One constraint carries four independent attributes: whose rule it is,
+      models is a constraint. One constraint carries four independent attributes. They are whose rule it is,
       what mechanism carries it, what happens when it fires, and whether a model or a machine decides.
       Collapse any two and your harness stops traveling. I have no number for how much variance to
       accept. This page is the apparatus for holding one you pick yourself.
@@ -1534,10 +1534,10 @@ flowchart TD
       <h3 class="sub">The capability chain</h3>
       <p>
         Two pages take this chain apart at the length it deserves.
-        <a href="/capability-ladder/">The Capability Ladder</a> covers the mechanics of each rung, when
+        <a href="/capability-ladder/">The Capability Ladder</a> covers the mechanics of each rung. It also covers when
         a CLI or a plain script beats a server, what a plugin commits you to, and what makes a good one.
         <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> covers what each rung
-        costs on every turn, how to buy determinism without buying a rung, and how to tell whether a
+        costs on every turn. It also covers how to buy determinism without buying a rung, and how to tell whether a
         capability ever fires.
       </p>
       <p>
@@ -2472,8 +2472,7 @@ sequenceDiagram
 
       <h3 class="sub">The recursive version, which is the one to worry about</h3>
       <p>
-        <a class="xref" href="#s-5">Section 5</a> called a skill's boundary a convention rather than a wall. Here is what that
-        convention costs. If an agent can write to its own charter, its own skill files or its own
+        <a class="xref" href="#s-5">Section 5</a> called a skill's boundary a convention rather than a wall, and that convention has a cost. If an agent can write to its own charter, its own skill files or its own
         rubric, then it can author rung 0. An attacker who reaches any of those files has not bypassed
         your rules. They have written new ones.
       </p>
@@ -2986,7 +2985,7 @@ flowchart TB
       </div>
 
       <p>
-        The first row is the one worth designing carefully, because it is where a human is cheapest
+        Design the first row carefully, because it is where a human is cheapest
         and rarest. An agent that guesses on a contradiction produces confident work against a
         requirement nobody meant. An agent that asks about naming has turned a hatch into a habit, and
         you will stop reading the questions.
@@ -3743,7 +3742,7 @@ flowchart LR
       </div>
 
       <p>
-        I cannot tell you where that last crossover sits, and the reason is worth stating plainly. It
+        I cannot tell you where that last crossover sits. It
         depends on the width of your band, and <a class="xref" href="#s-0">section 0</a> already admitted that nobody has a number for
         the band. So the crossover is a judgment. Anyone handing you a threshold for it is guessing
         with more confidence than I have.
@@ -4108,7 +4107,7 @@ flowchart LR
             </tr>
             <tr data-signal="pass">
               <td class="k">2 · enforced</td>
-              <td>the model is carried by mechanisms, and it fails honestly</td>
+              <td>mechanisms carry the model, and it fails honestly</td>
               <td>1 to 15 · 23 to 26</td>
               <td>one predicate with more than one mount · a rung outside the harness and the factory · a broken gate that let work through and got counted · a recorded collision</td>
             </tr>

@@ -647,9 +647,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <p class="standfirst">
       An agent can produce more correct-looking code in a day than a team can understand in a week.
       Nothing stops that except a rule about what you may merge. Every team says it wants
-      to understand its own code. A standard is what turns that sentiment into something you can
-      adopt, cite in a policy, check in a pull request, and argue about when it gets inconvenient.
-      This is that document, and it is deliberately short.
+      to understand its own code. Then a standard turns that wish into something you can
+      adopt, cite in a policy, and check in a pull request. It also gives you something
+      to argue about when it gets inconvenient. This is that document, and it is deliberately short.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -669,7 +669,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="swatch warn"></span>
         <div>
           <dt>The claim</dt>
-          <dd>What the person merging asserts about the change. Four fields, written by a human, in a pull request.</dd>
+          <dd>What the person merging asserts about the change. A human writes four fields in a pull request.</dd>
         </div>
       </div>
       <div class="signal">
@@ -717,7 +717,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <h2>Adopt it in an afternoon</h2>
         <p class="thesis">
           The whole standard is one law, one block of four fields, and a bar for when it's enforced.
-          Three moves put it into a repo. Read the rest of the page afterward if you want the
+          Three moves put it into a repo, and you can read the rest of the page afterward for the
           reasoning.
         </p>
         <div class="chips">
@@ -752,8 +752,8 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         <span class="label">The honest cost</span>
         <p>
           Wiring this up takes an afternoon. Meaning it takes longer, because the first week it will
-          block a change somebody wants merged, and the standard is only worth anything if it holds
-          that week. A gate the team waves through is worse than no gate: it teaches
+          block a change somebody wants merged. So the standard is only worth anything if it holds
+          that week. A gate the team waves through is worse than no gate, because it teaches
           people that written rules here are decorative.
         </p>
       </div>
@@ -828,8 +828,8 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div>
         <h2>Four claims, made in the pull request</h2>
         <p class="thesis">
-          "I understand it" is unfalsifiable. Four short fields are not. This block goes in the
-          pull request body, written by the person asking for the merge.
+          "I understand it" is unfalsifiable. Four short fields are not. The person asking for the
+          merge writes this block in the pull request body.
         </p>
       </div>
     </div>
@@ -852,7 +852,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="none">
           <span class="when">seam</span>
-          <span class="what"><strong>Entry and exit.</strong> Where does data reach this code, and where does the effect land: a response, a row, a file, a charge. This field catches the author who read the function but not its callers, which is the most common way a change looks understood and is not.</span>
+          <span class="what"><strong>Entry and exit.</strong> Where does data reach this code, and where does the effect land: a response, a row, a file, a charge. This field catches the author who read the function but not its callers. That is the most common way a change looks understood and is not.</span>
         </li>
         <li data-signal="warn">
           <span class="when">policy</span>
@@ -867,15 +867,15 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <p>
         Four fields, well under a minute when you actually understand the change, and genuinely hard
         when you don't. That asymmetry is the entire mechanism. The block is not paperwork about the
-        work, it is the shortest test that the work was understood.
+        work. It is the shortest test that the work was understood.
       </p>
 
       <div class="callout">
         <span class="label">Don't let the agent fill this in</span>
         <p>
           Asking the agent to write your comprehension block produces four fluent, plausible, often
-          correct sentences and teaches you nothing, which inverts the point of the exercise. Write
-          it first, in your own words. Then, if you like, ask the agent to argue with it: getting
+          correct sentences. It also teaches you nothing, which inverts the whole exercise. Write
+          it first, in your own words. Then, if you like, ask the agent to argue with it. Getting
           corrected after you have committed to an answer is how the judgment actually forms.
         </p>
       </div>
@@ -895,7 +895,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div>
         <h2>Four levels of comprehension</h2>
         <p class="thesis">
-          Understanding is not binary, so the standard grades it, and each level rests on evidence
+          Understanding is not binary, so the standard grades it. Each level rests on evidence
           somebody else can check, not on how confident the author feels.
         </p>
       </div>
@@ -927,7 +927,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
             <tr>
               <td><strong>L3</strong> Defense</td>
               <td>"I can say why this way and not the other way."</td>
-              <td>L2, plus the author names the alternative not taken and why this one is the choice the codebase's policy requires. Survives a reviewer arguing the alternative.</td>
+              <td>L2, plus the author names the alternative not taken and why this one is the choice the codebase's policy requires. The change survives a reviewer who argues the alternative.</td>
             </tr>
           </tbody>
         </table>
@@ -1007,9 +1007,9 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div class="callout">
         <span class="label">The failure mode to watch</span>
         <p>
-          The bar does not erode because somebody argued it down; it erodes by exemption creep: one
+          The bar does not erode because somebody argued it down. It erodes by exemption creep: one
           urgent change waved through, then the next one citing the first as precedent. If you skip the
-          bar, record that you skipped it and why, in the PR, in the same block. A logged exception
+          bar, record that skip and its reason in the PR, in the same block. A logged exception
           is a decision. An unlogged one is a new default.
         </p>
       </div>
@@ -1029,7 +1029,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div>
         <h2>What it means to conform</h2>
         <p class="thesis">
-          Conformance is a property of a team's process: there is no auditor, no badge, and no way
+          Conformance is a property of a team's process. There is no auditor, no badge, and no way
           to fail it other than by not doing it.
         </p>
       </div>
@@ -1045,7 +1045,7 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
         </li>
         <li data-signal="warn">
           <span class="when">2 · The claim</span>
-          <span class="what">Every merged pull request carries a filled comprehension block, written by the person requesting the merge.</span>
+          <span class="what">Every merged pull request carries a filled comprehension block. The person requesting the merge writes it.</span>
         </li>
         <li data-signal="block">
           <span class="when">3 · The bar</span>
@@ -1086,8 +1086,8 @@ cat fulcorum-comprehension-standard/LAW.md &gt;&gt; CLAUDE.md</code></pre>
       <div>
         <h2>Reference implementation</h2>
         <p class="thesis">
-          A template that asks for the claim, and a gate that refuses a pull request without one,
-          both short enough to read in full, which is deliberate.
+          A template asks for the claim. A gate refuses a pull request without one. Both are short
+          enough to read in full, which is deliberate.
         </p>
         <div class="chips">
           <span class="chip kind-config"><b>template</b> .github/pull_request_template.md</span>
@@ -1165,8 +1165,8 @@ if __name__ == "__main__":
         <span class="label">What this gate cannot do</span>
         <p>
           It checks that four fields exist and are not placeholders. It has no opinion about whether
-          they are true, so a confident, articulate, entirely wrong block passes cleanly, and any
-          honest description of this standard has to say so. The gate buys one thing: nobody
+          they are true. So a confident, articulate, entirely wrong block passes cleanly, and any
+          honest description of this standard must say so. The gate buys one thing: nobody
           merges without <em>making</em> the claim, and a claim on the record invites dispute.
           Disputing it is human work.
           <a href="/reverse-review/">Reverse-review</a> is how a team gets good at that work.
@@ -1253,7 +1253,7 @@ if __name__ == "__main__":
       <ul>
         <li>Field names that survived contact with teams that did not write them.</li>
         <li>An exemption list that stopped needing constant patching, which is the signal it finally describes reality.</li>
-        <li>Actual evidence about faking: how often blocks are filled fluently and wrongly, and whether reviewers catch it, because that number decides whether this standard does anything at all.</li>
+        <li>Actual evidence about faking: how often blocks are filled fluently and wrongly, and whether reviewers catch it. That number decides whether this standard does anything at all.</li>
       </ul>
 
       <div class="takeaway">

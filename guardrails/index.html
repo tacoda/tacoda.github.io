@@ -643,13 +643,13 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>Five guardrails, from <em>one line of config</em> to a closed loop</h1>
     <p class="standfirst">
       Every example below is running code in a production charter. It covers a Laravel API with a
-      TypeScript/React front end, Docker for local development, Jira and GitHub for state.
-      Nothing here depends on that stack. Swap Laravel for Rails or Django, <code>make</code> for
+      TypeScript/React front end, Docker for local development, Jira and GitHub for state. Nothing
+      here depends on that stack. Swap Laravel for Rails or Django, <code>make</code> for
       <code>just</code> or <code>npm run</code>, Jira for Linear. These patterns are about
-      <em>where a constraint is enforced</em>, not what enforces it. They ascend deliberately:
-      rung&nbsp;1 is a rule and a deny-list entry. Rung&nbsp;5 is an orchestrator that measures
-      its own cost and writes new rules into the charter it runs under. Each rung closes a gap
-      the one below it leaves open.
+      <em>where a constraint is enforced</em>, not what enforces it. They ascend deliberately. Rung
+      1 is a rule and a deny-list entry. Rung 5 is an orchestrator that measures its own cost and
+      writes new rules into the charter it runs under. Each rung closes a gap the one below it leaves
+      open.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -770,10 +770,10 @@ migrate:        <span class="c-dim">## Run database migrations (ARGS= for extra 
       </figure>
 
       <p style="max-width:var(--measure);margin-top:1.4rem">
-        <a href="/narrow-door/">The Narrow Door</a> takes this rung apart at length: why the allow list is
-        long in the first place, the six places the rule syntax does something other than what you meant,
-        and the holes <code>make</code> leaves open — including the entry that quietly reopens the deny
-        list, and the targets that grant more than a target should.
+        <a href="/narrow-door/">The Narrow Door</a> takes this rung apart at length. It covers why the
+        allow list is long, the six places the rule syntax does something other than what you meant,
+        and the holes <code>make</code> leaves open. One entry quietly reopens the deny list. Two
+        targets grant more than a target should.
       </p>
 
       <h3 class="sub">How it fires</h3>

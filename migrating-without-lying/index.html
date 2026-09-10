@@ -818,11 +818,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </ol>
 
       <p>
-        The split is not filing preference, because the two files get read on different schedules.
+        The split is not a filing preference: the agent reads the two files on different schedules.
         The charter enters context on every turn, so its budget is tight and every line competes.
-        The feature doc gets read when the task touches that feature, which is when the detail is
-        worth its tokens. So the charter carries the pointer, and the doc carries the ledger and the
-        rule the moved units answer to.
+        Then the feature doc enters only when a task touches that feature, which is when the detail
+        is worth its tokens. So the charter carries the pointer, and the doc carries the ledger and
+        the rule the moved units answer to.
       </p>
       <p>
         <code>.claude/features/</code> is the natural home for the doc, next to whatever else the
@@ -882,10 +882,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         same behavior for new code. It also keeps the charter true about the other fourteen files.
       </p>
       <p>
-        Falsity has a specific cost here. A charter you can check against the code is a charter a
-        reviewer can enforce and an agent can trust. Once one line is aspirational, every line is
-        suspect, and the next person to hit friction argues that this rule is also just a plan. That
-        argument is hard to answer, because it is partly correct.
+        A charter you can check against the code is a charter a reviewer can enforce and an agent
+        can trust. Once one line is aspirational, every line is suspect, and the next person to hit
+        friction argues that this rule is also just a plan. That argument is hard to answer, because
+        it is partly correct.
       </p>
 
       <h3 class="sub">The three facts, and where each one lives</h3>
@@ -967,11 +967,10 @@ being asked, and say in the PR which side the change landed on.
       </figure>
 
       <p>
-        Three things in that block are doing work. The old truth stays first and stays unqualified,
-        because it is still how fourteen of twenty-three controllers behave. That notice sits
-        in this section rather than a global list, so an agent reading about controllers cannot miss
-        it. The unprompted instruction is there because "read the doc if relevant" reads as
-        optional. A criterion nobody applies is a criterion you do not have.
+        The old truth stays first and stays unqualified, because it is still how fourteen of
+        twenty-three controllers behave. That notice sits in this section rather than a global list,
+        so an agent reading about controllers cannot miss it. The instruction is unprompted because
+        "read the doc if relevant" reads as optional, and an optional criterion gets skipped.
       </p>
 
       <div class="takeaway">
@@ -1079,16 +1078,15 @@ deleted, and this file moves to `.claude/features/done/`.</code></pre>
         where people who need convincing will look for it.
       </p>
       <p>
-        Notice what the target section is doing. It carries a rule, an altitude, a scope, and a
-        date, in the same format the charter uses. So the charter's pointer hands over authority for
-        one side of the migration, and it does not merely describe a plan. An agent on a
-        <code>new</code> unit reads the doc and finds law there. That is the only reason the charter
-        can stay silent about the target.
+        That target section carries a rule, an altitude, a scope, and a date, in the same format the
+        charter uses. So the charter's pointer hands over authority for one side of the migration,
+        and it does not merely describe a plan. An agent on a <code>new</code> unit reads the doc
+        and finds law there. That is the only reason the charter can stay silent about the target.
       </p>
       <p>
         I keep the plan and the position in one file, not a rule per directory. Two places to look
-        for one answer is the failure this method removes. The escape hatch is the other deliberate
-        choice: a sanctioned exception with a date beats an unsanctioned one. So I set the alarm at
+        for one answer is the failure this method removes. I also keep one deliberate escape hatch,
+        because a sanctioned exception with a date beats an unsanctioned one. So I set the alarm at
         two notes rather than one, and a single awkward file cannot stall the whole migration.
       </p>
 
@@ -1322,12 +1320,12 @@ holds no branching on domain state and no writes.
       </figure>
 
       <p>
-        Look at what moved and what did not. The target rule was a gate throughout, scoped to the
-        units the ledger marked <code>new</code>. A charter-wide gate would have refused fourteen
-        controllers a day, and the team would have learned to bypass it. That scope is what keeps a
-        gate honest before the migration finishes. Now it covers the directory, and the
-        ledger has nothing left to decide. The <code>migration.side</code> check is the rule that
-        goes away, because every change lands on the only side there is.
+        The target rule was a gate throughout, scoped to the units the ledger marked <code>new</code>.
+        A charter-wide gate would have refused fourteen controllers a day, and the team would have
+        learned to bypass it. That scope is what keeps a gate honest before the migration finishes.
+        Now it covers the directory, and the ledger has nothing left to decide. The
+        <code>migration.side</code> check is the rule that goes away, because every change lands on
+        the only side there is.
       </p>
       <p>
         So the migration hands you a promotion, in the sense that
@@ -1398,10 +1396,10 @@ holds no branching on domain state and no writes.
       </ol>
 
       <p>
-        The fourth case is the one worth watching for. An open migration with an unsettled target
-        is how a codebase ends up in three patterns. The criterion still routes changes, so work
-        keeps landing on a "new side" whose shape is moving underneath it. Two notes on a ledger row
-        is the alarm for that, and §4 says to stop when it fires.
+        The fourth case deserves the closest watch, because an open migration with an unsettled
+        target is how a codebase ends up in three patterns. That criterion still routes changes, so
+        work keeps landing on a "new side" whose shape is moving underneath it. Two notes on one
+        ledger row are the alarm, and §4 says to stop when they appear.
       </p>
       <p>
         I would rather write the doc slightly too early than slightly too late. A migration that

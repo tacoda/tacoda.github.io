@@ -762,12 +762,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Greenfield is the easy case. <em>Yours has users.</em></h1>
     <p class="standfirst">
-      Coding agents on new projects are well-covered ground, and the advice mostly transfers to a
-      young codebase you already understand. A legacy application with real users is a different
-      problem. Behavior you never documented is load-bearing, and you cannot take an outage to clean
-      it up. A regression here is not a red test, it is a person's workflow breaking. This is the
-      procedure I used on one: pin the behavior first, make every standard machine-checkable, then
-      hand over larger changes as the checks earn it.
+      Coding agents work well on new projects, and the advice mostly transfers to a young codebase
+      you already understand. But a legacy application with real users is a different problem. So
+      behavior you never documented is load-bearing, and you cannot take an outage to clean it up. A
+      regression here breaks a person's workflow, not a test. This is the procedure I used on one.
+      Pin the behavior first, make every standard machine-checkable, then hand over larger changes as
+      the checks earn it.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -839,7 +839,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <h2 id="h-0">Why legacy is the hard case</h2>
       <p class="thesis">
         On a fresh codebase you can point an agent at the work and mostly get away with it. That
-        permission does not transfer, and the reason is your users.
+        permission does not transfer to a system with users.
       </p>
     </div>
 
@@ -887,9 +887,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         greenfield advice takes for granted.
       </p>
       <p>
-        You do not know what the current behavior is. Nobody designed some of it, and someone depends on
-        it anyway. It might be a null a downstream report parses, or an order of side effects a
-        webhook consumer notices. Nobody wrote any of it down.
+        You do not know what the current behavior is. Yet someone depends on parts nobody designed. It
+        might be a null a downstream report parses, or an order of side effects a webhook consumer
+        notices. None of it is written down.
       </p>
       <p>
         You cannot pause. The system serves people during the whole cleanup, so every step has to be
@@ -910,7 +910,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="warn">
           <span class="when">at review</span>
-          <span class="what">The diff reads better than the code it replaces. A cleaner diff is not a preserved one, and that gap is where the risk lives.</span>
+          <span class="what">The diff reads better than the code it replaces. A cleaner diff is not the same as a preserved one. That gap is where the risk lives.</span>
         </li>
         <li data-signal="block">
           <span class="when">at merge</span>
@@ -938,12 +938,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <h3 class="sub">The counter-argument</h3>
       <p>
         Skipping the floor is rational on a short horizon, because the work ships nothing and no user
-        benefits from a pre-commit hook. An agent can produce a working feature today on a codebase
-        with zero tests, and the first few will look fine.
+        benefits from a pre-commit hook. Still, an agent can produce a working feature today on a
+        codebase with zero tests, and the first few will look fine.
       </p>
       <p>
         They look fine because you are reading every line. You are the check. That holds until the
-        volume rises, and volume is the reason you wanted the agent.
+        volume rises, which is why you wanted the agent.
       </p>
 
       <div class="callout">
@@ -951,8 +951,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           You pay for the floor now, in tedious work that ships nothing, or later, in production bugs
           and debugging time. I believe the second bill is much larger, because I watched one
-          codebase get cheaper to change as the checks accumulated. I have not measured the ratio and
-          I will not quote one.
+          codebase get cheaper to change as its checks accumulated. Yet I have not measured the ratio,
+          and I will not quote one.
         </p>
       </div>
 
@@ -979,28 +979,26 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <h3 class="sub">The amplification thesis</h3>
       <p>
         An agent multiplies the discipline it finds. I have argued this at length in
-        <a href="/harness-reliable-governable/">the talk</a>, and it is the reason readiness is not a
-        warm-up for the real work. Readiness is the variable.
+        <a href="/harness-reliable-governable/">the talk</a>, which is why readiness is not a warm-up
+        for the real work. Readiness is the variable.
       </p>
       <blockquote class="said">
         <p>If your code doesn't meet the bar, AI will make it worse.</p>
         <p>The agent doesn't raise your standards, it enforces them. The lower standards you have, the more enforcement you get.</p>
       </blockquote>
       <p>
-        Here is what that means mechanically. The agent reads your code far more than it reads your
-        documentation. It copies the pattern it sees most often. So a low bar does not stay a local
-        problem. The agent applies that bar consistently, across every file it touches, at the speed
-        it works.
+        The agent reads your code far more than it reads your documentation. It copies the pattern it
+        sees most often. So a low bar does not stay a local problem. It applies that bar
+        consistently, across every file it touches, at the speed it works.
       </p>
       <p>
-        Legacy code is where this bites hardest, because the bar is usually unstated. Three spellings
-        of the same role check. Two ways to authorize a request. The agent picks one, then another,
-        then another, and you get a polite version of the worst code in the repository smeared across
-        every new feature.
+        Legacy code is where this bites hardest, because the bar is usually unstated. It might carry
+        three spellings of the same role check, or two ways to authorize a request. The agent picks
+        one, then another, then another. So you get a polite version of the worst code in the
+        repository, smeared across every new feature.
       </p>
       <p>
-        Code must be "at least this tall" to get on the AI agent ride. Here is the bar, in literal
-        terms.
+        Code must be "at least this tall" to get on the AI agent ride.
       </p>
 
       <h3 class="sub">The seven signals</h3>
@@ -1054,7 +1052,7 @@ flowchart TD
           <span class="tag warn">assess</span>
         </figcaption>
         <div class="frame"><svg id="dg1" class="mmd" role="img" aria-labelledby="dg1-t" viewBox="0 0 669 939" width="669" height="939" xmlns="http://www.w3.org/2000/svg"><title id="dg1-t">Readiness gate: a decision flow</title><g><marker id="dg1_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0"/></marker><marker id="dg1_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5"/></marker><marker id="dg1_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M202.263,57L202.263,77L202.263,93" id="dg1-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MjAyLjI2MzI4Mjc3NTg3ODksInkiOjU3fSx7IngiOjIwMi4yNjMyODI3NzU4Nzg5LCJ5Ijo3N30seyJ4IjoyMDIuMjYzMjgyNzc1ODc4OSwieSI6OTd9XQ==" data-look="classic" marker-end="url(#dg1_flowchart-v2-pointEnd)"/><path d="M156.011,253.873L90.992,331.625L90.992,440.175" id="dg1-L_B_N1_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_B_N1_0" data-points="W3sieCI6MTU2LjAxMTA2NTE4Mjk3NTA3LCJ5IjoyNTMuODcyNzgyNDA3MDk2MTd9LHsieCI6OTAuOTkyMTg3NSwieSI6MzMxLjYyNX0seyJ4Ijo5MC45OTIxODc1LCJ5Ijo0NDQuMTc1MDAzMDUxNzU3OH1d" data-look="classic" marker-end="url(#dg1_flowchart-v2-pointEnd)"/><path d="M248.516,253.873L313.534,331.625L313.534,359.125" id="dg1-L_B_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_B_D_0" data-points="W3sieCI6MjQ4LjUxNTUwMDM2ODc4Mjc0LCJ5IjoyNTMuODcyNzgyNDA3MDk2MTd9LHsieCI6MzEzLjUzNDM3ODA1MTc1NzgsInkiOjMzMS42MjV9LHsieCI6MzEzLjUzNDM3ODA1MTc1NzgsInkiOjM2My4xMjV9XQ==" data-look="classic" marker-end="url(#dg1_flowchart-v2-pointEnd)"/><path d="M264.063,524.753L192.63,605.725L192.63,699.822" id="dg1-L_D_N2_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_D_N2_0" data-points="W3sieCI6MjY0LjA2MjcxOTM1OTgyNzU1LCJ5Ijo1MjQuNzUzMzQ3NDExNTg1M30seyJ4IjoxOTIuNjMwNDcwMjc1ODc4OSwieSI6NjA1LjcyNTAwNjEwMzUxNTZ9LHsieCI6MTkyLjYzMDQ3MDI3NTg3ODksInkiOjcwMy44MjE4ODQxNTUyNzM0fV0=" data-look="classic" marker-end="url(#dg1_flowchart-v2-pointEnd)"/><path d="M363.006,524.753L434.438,605.725L434.438,633.225" id="dg1-L_D_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_D_F_0" data-points="W3sieCI6MzYzLjAwNjAzNjc0MzY4ODEsInkiOjUyNC43NTMzNDc0MTE1ODUzfSx7IngiOjQzNC40MzgyODU4Mjc2MzY3LCJ5Ijo2MDUuNzI1MDA2MTAzNTE1Nn0seyJ4Ijo0MzQuNDM4Mjg1ODI3NjM2NywieSI6NjM3LjIyNTAwNjEwMzUxNTV9XQ==" data-look="classic" marker-end="url(#dg1_flowchart-v2-pointEnd)"/><path d="M389.519,774.5L315.184,850.919L315.184,878.419" id="dg1-L_F_N3_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_F_N3_0" data-points="W3sieCI6Mzg5LjUxOTQzODA5MTc2NDI0LCJ5Ijo3NzQuNDk5OTE0NDcxMTU4N30seyJ4IjozMTUuMTg0Mzc5NTc3NjM2NywieSI6ODUwLjkxODc2MjIwNzAzMTJ9LHsieCI6MzE1LjE4NDM3OTU3NzYzNjcsInkiOjg4Mi40MTg3NjIyMDcwMzEyfV0=" data-look="classic" marker-end="url(#dg1_flowchart-v2-pointEnd)"/><path d="M479.357,774.5L553.692,850.919L553.692,878.419" id="dg1-L_F_G_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_F_G_0" data-points="W3sieCI6NDc5LjM1NzEzMzU2MzUwOTI1LCJ5Ijo3NzQuNDk5OTE0NDcxMTU4N30seyJ4Ijo1NTMuNjkyMTkyMDc3NjM2NywieSI6ODUwLjkxODc2MjIwNzAzMTJ9LHsieCI6NTUzLjY5MjE5MjA3NzYzNjcsInkiOjg4Mi40MTg3NjIyMDcwMzEyfV0=" data-look="classic" marker-end="url(#dg1_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_A_B_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" /></g><g class="edgeLabel" transform="translate(90.9921875, 331.625)"><g class="label" data-id="L_B_N1_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-11.6328125" y="-1" width="23.265625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(313.5343780517578, 331.625)"><g class="label" data-id="L_B_D_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-16.453125" y="-1" width="32.90625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">yes</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(192.6304702758789, 605.7250061035156)"><g class="label" data-id="L_D_N2_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-11.6328125" y="-1" width="23.265625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(434.4382858276367, 605.7250061035156)"><g class="label" data-id="L_D_F_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-16.453125" y="-1" width="32.90625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">yes</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(315.1843795776367, 850.9187622070312)"><g class="label" data-id="L_F_N3_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-11.6328125" y="-1" width="23.265625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">no</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(553.6921920776367, 850.9187622070312)"><g class="label" data-id="L_F_G_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-16.453125" y="-1" width="32.90625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">yes</tspan></tspan></text></g></g></g></g><g class="nodes"><g class="node default" id="dg1-flowchart-A-0" data-look="classic" transform="translate(202.2632827758789, 32.5)"><rect class="basic label-container"  x="-126.3359375" y="-24.5" width="252.671875" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Pick</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> target</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> area</tspan></tspan></text></g></g></g><g class="node default" id="dg1-flowchart-B-1" data-look="classic" transform="translate(202.2632827758789, 198.5625)"><polygon points="101.5625,0 203.125,-101.5625 101.5625,-203.125 0,-101.5625" class="label-container" transform="translate(-101.0625, 101.5625)"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Behavior</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> pinned?</tspan></tspan></text></g></g></g><g class="node default stop" id="dg1-flowchart-N1-3" data-look="classic" transform="translate(90.9921875, 468.6750030517578)"><rect class="basic label-container"  x="-82.9921875" y="-24.5" width="165.984375" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Not</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> yet.</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> §2</tspan></tspan></text></g></g></g><g class="node default" id="dg1-flowchart-D-5" data-look="classic" transform="translate(313.5343780517578, 468.6750030517578)"><polygon points="105.54999923706055,0 211.0999984741211,-105.54999923706055 105.54999923706055,-211.0999984741211 0,-105.54999923706055" class="label-container" transform="translate(-105.04999923706055, 105.54999923706055)"/><g class="label"  transform="translate(0, -18.299999237060547)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Checks</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> that</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> can</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">fail</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> build?</tspan></tspan></text></g></g></g><g class="node default stop" id="dg1-flowchart-N2-7" data-look="classic" transform="translate(192.6304702758789, 728.3218841552734)"><rect class="basic label-container"  x="-116.7109375" y="-24.5" width="233.421875" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Not</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> yet.</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> §3</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> and</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> §4</tspan></tspan></text></g></g></g><g class="node default" id="dg1-flowchart-F-9" data-look="classic" transform="translate(434.4382858276367, 728.3218841552734)"><polygon points="91.09687423706055,0 182.1937484741211,-91.09687423706055 91.09687423706055,-182.1937484741211 0,-91.09687423706055" class="label-container" transform="translate(-90.59687423706055, 91.09687423706055)"/><g class="label"  transform="translate(0, -18.299999237060547)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Boundary</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> you</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">can</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> name?</tspan></tspan></text></g></g></g><g class="node default stop" id="dg1-flowchart-N3-11" data-look="classic" transform="translate(315.1843795776367, 906.9187622070312)"><rect class="basic label-container"  x="-97.4375" y="-24.5" width="194.875" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Cut</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> a</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> seam.</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> §5</tspan></tspan></text></g></g></g><g class="node default go" id="dg1-flowchart-G-13" data-look="classic" transform="translate(553.6921920776367, 906.9187622070312)"><rect class="basic label-container"  x="-107.0703125" y="-24.5" width="214.140625" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Hand</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> it</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> over.</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> §8</tspan></tspan></text></g></g></g></g></g></g><defs></defs><defs></defs></svg></div>
-        <p class="note">What to look at: the three exits on the left. Working down, the gate asks whether tests pin the behavior of the area you intend to change, and a no sends you to §2, which is days of work. A yes moves to the next gate: do you have checks that can fail the build? A no there sends you to §3 and §4, which is an afternoon. The last gate asks whether you can name the unit you are changing and its boundary, and a no sends you to §5, about a day per seam. Only a yes at all three reaches the final box, which is handing the change over in §8. Three of the four outcomes are "not yet", and that is the honest shape of the check.</p>
+        <p class="note">What to look at: the three exits on the left. Working down, the first gate asks whether tests pin the behavior of the area you intend to change. If not, it sends you to §2, which is days of work. A yes moves to the next gate: do you have checks that can fail the build? If not, that sends you to §3 and §4, which is an afternoon. The last gate asks whether you can name the unit you are changing and its boundary. A no here sends you to §5, about a day per seam. Only a yes at all three reaches the final box, which is handing the change over in §8. So three of the four outcomes are "not yet", and that is the honest shape of the check.</p>
       </figure>
 
       <h3 class="sub">What disqualifies you, for now</h3>
@@ -1064,16 +1062,16 @@ flowchart TD
       </p>
       <ul>
         <li><b>The target area has no tests.</b> The agent has nothing to fail against, and neither do you.</li>
-        <li><b>Tests run on a substitute engine.</b> My first suite ran on SQLite while production ran MySQL. I switched the suite to the real engine and several tests broke. Those were the tests that had been lying to me.</li>
+        <li><b>Tests run on a substitute engine.</b> My first suite ran on SQLite while production ran MySQL. So I switched the suite to the real engine, and several tests broke. Those tests had been lying to me.</li>
         <li><b>No command can fail.</b> A style guide in prose is a suggestion, and an agent treats it as one.</li>
         <li><b>Authorization checks sit inline, scattered.</b> Every new file is then a fresh chance to get one wrong. §5 has the fix and the incident that taught me to want it.</li>
       </ul>
 
       <h3 class="sub">What the floor costs</h3>
       <p>
-        Say the price before the payoff. A formatter and a linter take an afternoon, and
+        Say the price before the payoff. A formatter and a linter take an afternoon. Then
         characterization tests on the highest-risk paths took days rather than hours, even with the
-        agent drafting them. The six seam extractions in §5 took about a day each, and about two
+        agent drafting them. Those six seam extractions in §5 took about a day each, and about two
         weeks in total.
       </p>
       <p>
@@ -1154,7 +1152,7 @@ flowchart TD
     assert response.body == { orders: [], total: 0 }</code></pre>
         <p class="note">
           What to look at: the comment and the second assertion. It pins a response that
-          looks like a bug, so an agent that "cleans this up" into a 404 turns the suite red
+          looks like a bug. So an agent that "cleans this up" into a 404 turns the suite red
           instead of shipping. Delete the pin later, on purpose, and fix the callers in the
           same change.
         </p>
@@ -1168,7 +1166,7 @@ flowchart TD
       </p>
       <p>
         The agent is genuinely good at this part, and it is the first place I let mine work. I
-        pointed it at a controller, described the endpoint, and had it draft the assertions. I
+        pointed it at a controller, described the endpoint, and had it draft the assertions. Then I
         reviewed and corrected every one. That turned roughly a week of manual work into a couple of
         days, on the most tedious task in the whole project.
       </p>
@@ -1183,7 +1181,7 @@ flowchart TD
         In the Laravel codebase that meant a test factory reached through one facade, so a test read
         <code>UserFactory::admin()->create()</code> rather than a paragraph of setup. Any stack has
         an equivalent: FactoryBot traits, factory_boy subfactories, a builder function.
-        Design your test setup for the dumbest correct user, because that is how an agent uses it.
+        So design your test setup for the dumbest correct user, because that is how an agent uses it.
       </p>
 
       <h3 class="sub">How you know it worked</h3>
@@ -1204,9 +1202,9 @@ flowchart TD
 
       <h3 class="sub">When it does not work</h3>
       <p>
-        Two failures are common. Your test asserts an implementation detail rather than a behavior,
-        so it goes red on every refactor including the correct ones, and the team learns to ignore
-        it. Rewrite it against the public entry point.
+        Two failures are common. Your test asserts an implementation detail rather than a behavior.
+        It then goes red on every refactor, including the correct ones, and the team learns to ignore
+        it. So rewrite it against the public entry point.
       </p>
       <p>
         Or your test passes on a substitute engine and fails on the real one. Foreign keys, date
@@ -1251,8 +1249,8 @@ flowchart TD
       <p>
         "Follow our coding conventions" is a suggestion. An agent may follow it, and you will spend
         review time on formatting instead of logic. A command that exits non-zero is a fact. The
-        agent runs it, reads the failure, fixes the code, and runs it again. No judgment is involved,
-        so no human is needed.
+        agent runs it, reads the failure, fixes the code, and runs it again. So no judgment is
+        involved, and no human is needed.
       </p>
       <p>
         Each tool removes a category of wrong output. Without any, the agent can be wrong in an
@@ -1341,8 +1339,8 @@ test:
       <p>
         A slow check gets skipped. Keep it under a minute, or split it: a fast subset for the hook,
         the full run in CI. A linter reporting 400 pre-existing violations gets ignored, which is the
-        normal opening position on legacy code. Baseline the existing violations, fail the build on
-        new ones only, and burn the baseline down as you touch files.
+        normal opening position on legacy code. So baseline the existing violations, fail the build
+        on new ones only, and burn the baseline down as you touch files.
       </p>
 
     </div>
@@ -1451,7 +1449,7 @@ flowchart TD
           <span class="tag block">loop</span>
         </figcaption>
         <div class="frame"><svg id="dg2" class="mmd" role="img" aria-labelledby="dg2-t" viewBox="0 0 818 1192" width="818" height="1192" xmlns="http://www.w3.org/2000/svg"><title id="dg2-t">The safe-change loop, including its failure branches</title><g><marker id="dg2_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0"/></marker><marker id="dg2_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5"/></marker><marker id="dg2_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M692.813,57L692.813,77L692.813,93" id="dg2-L_P_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_P_A_0" data-points="W3sieCI6NjkyLjgxMjUsInkiOjU3fSx7IngiOjY5Mi44MTI1LCJ5Ijo3N30seyJ4Ijo2OTIuODEyNSwieSI6OTd9XQ==" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M576.109,141.614L434.621,166L434.621,182" id="dg2-L_A_L_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_A_L_0" data-points="W3sieCI6NTc2LjEwOTM3NSwieSI6MTQxLjYxNDEwNTAyNzQ1OTYzfSx7IngiOjQzNC42MjEwOTM3NSwieSI6MTY2fSx7IngiOjQzNC42MjEwOTM3NSwieSI6MTg2fV0=" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M380.255,267.337L34.086,353.203L34.086,452.555L34.086,551.906L34.086,689.797L34.086,827.688L34.086,965.578L34.086,1103.469L134.246,1133.809" id="dg2-L_L_LF_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_L_LF_0" data-points="W3sieCI6MzgwLjI1NDkwNDAzNDY1NDMsInkiOjI2Ny4zMzY5MzUyODQ2NTQzfSx7IngiOjM0LjA4NTkzNzUsInkiOjM1My4yMDMxMjV9LHsieCI6MzQuMDg1OTM3NSwieSI6NDUyLjU1NDY4NzV9LHsieCI6MzQuMDg1OTM3NSwieSI6NTUxLjkwNjI1fSx7IngiOjM0LjA4NTkzNzUsInkiOjY4OS43OTY4NzV9LHsieCI6MzQuMDg1OTM3NSwieSI6ODI3LjY4NzV9LHsieCI6MzQuMDg1OTM3NSwieSI6OTY1LjU3ODEyNX0seyJ4IjozNC4wODU5Mzc1LCJ5IjoxMTAzLjQ2ODc1fSx7IngiOjEzOC4wNzM3MzA0Njg3NSwieSI6MTEzNC45Njg3NX1d" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M330.836,1146.588L705.371,1103.469L705.371,965.578L705.371,827.688L705.371,689.797L705.371,551.906L705.371,452.555L705.371,353.203L488.013,273.444" id="dg2-L_LF_L_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_LF_L_0" data-points="W3sieCI6MzMwLjgzNTkzNzUsInkiOjExNDYuNTg3OTgwOTg1NDQwNX0seyJ4Ijo3MDUuMzcxMDkzNzUsInkiOjExMDMuNDY4NzV9LHsieCI6NzA1LjM3MTA5Mzc1LCJ5Ijo5NjUuNTc4MTI1fSx7IngiOjcwNS4zNzEwOTM3NSwieSI6ODI3LjY4NzV9LHsieCI6NzA1LjM3MTA5Mzc1LCJ5Ijo2ODkuNzk2ODc1fSx7IngiOjcwNS4zNzEwOTM3NSwieSI6NTUxLjkwNjI1fSx7IngiOjcwNS4zNzEwOTM3NSwieSI6NDUyLjU1NDY4NzV9LHsieCI6NzA1LjM3MTA5Mzc1LCJ5IjozNTMuMjAzMTI1fSx7IngiOjQ4NC4yNTgzMDc5ODU5NTcyLCJ5IjoyNzIuMDY1OTEwNzY0MDQyOH1d" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M412.697,299.779L387.195,353.203L387.195,380.703" id="dg2-L_L_T_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_L_T_0" data-points="W3sieCI6NDEyLjY5NzMxOTQyMzY1MjcsInkiOjI5OS43NzkzNTA2NzM2NTI3fSx7IngiOjM4Ny4xOTUzMTI1LCJ5IjozNTMuMjAzMTI1fSx7IngiOjM4Ny4xOTUzMTI1LCJ5IjozODQuNzAzMTI1fV0=" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M366.002,499.213L342.066,551.906L505.536,654.372" id="dg2-L_T_TF_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_T_TF_0" data-points="W3sieCI6MzY2LjAwMTY3NDE1MjQwNDksInkiOjQ5OS4yMTI2MTE2NTI0MDQ5fSx7IngiOjM0Mi4wNjY0MDYyNSwieSI6NTUxLjkwNjI1fSx7IngiOjUwOC45MjU0OTA2ODI0NTYwMywieSI6NjU2LjQ5Njg3NTc2MjkzOTV9XQ==" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M610.53,656.497L762.797,551.906L762.797,452.555L762.797,353.203L762.797,253.852L762.797,166L734.719,148.146" id="dg2-L_TF_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_TF_A_0" data-points="W3sieCI6NjEwLjUzMDEwODc1MTE4MzUsInkiOjY1Ni40OTY4NzU3NjI5Mzk1fSx7IngiOjc2Mi43OTY4NzUsInkiOjU1MS45MDYyNX0seyJ4Ijo3NjIuNzk2ODc1LCJ5Ijo0NTIuNTU0Njg3NX0seyJ4Ijo3NjIuNzk2ODc1LCJ5IjozNTMuMjAzMTI1fSx7IngiOjc2Mi43OTY4NzUsInkiOjI1My44NTE1NjI1fSx7IngiOjc2Mi43OTY4NzUsInkiOjE2Nn0seyJ4Ijo3MzEuMzQzMjIzMzE0NjA2NywieSI6MTQ2fV0=" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M397.313,510.289L404.605,551.906L310.871,636.612" id="dg2-L_T_R_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_T_R_0" data-points="W3sieCI6Mzk3LjMxMjU1MjI3MzI1OTUsInkiOjUxMC4yODkwMTAyMjY3NDA1fSx7IngiOjQwNC42MDU0Njg3NSwieSI6NTUxLjkwNjI1fSx7IngiOjMwNy45MDI3ODY0MTU5NTk1NSwieSI6NjM5LjI5MzQxMTQxNTk1OTZ9XQ==" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M218.806,762.978L189.441,827.688L402.73,939.225" id="dg2-L_R_RF_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_R_RF_0" data-points="W3sieCI6MjE4LjgwNjI1OTYyMTE5Mjk0LCJ5Ijo3NjIuOTc4MTM0NjIxMTkyOX0seyJ4IjoxODkuNDQxNDA2MjUsInkiOjgyNy42ODc1fSx7IngiOjQwNi4yNzQ0NzU5MjA2Nzk5LCJ5Ijo5NDEuMDc4MTI1fV0=" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M511.7,941.078L782.797,827.688L782.797,689.797L782.797,551.906L782.797,452.555L782.797,353.203L782.797,253.852L782.797,166L745.94,147.773" id="dg2-L_RF_A_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_RF_A_0" data-points="W3sieCI6NTExLjcwMDEyNzQ3ODc1MzUzLCJ5Ijo5NDEuMDc4MTI1fSx7IngiOjc4Mi43OTY4NzUsInkiOjgyNy42ODc1fSx7IngiOjc4Mi43OTY4NzUsInkiOjY4OS43OTY4NzV9LHsieCI6NzgyLjc5Njg3NSwieSI6NTUxLjkwNjI1fSx7IngiOjc4Mi43OTY4NzUsInkiOjQ1Mi41NTQ2ODc1fSx7IngiOjc4Mi43OTY4NzUsInkiOjM1My4yMDMxMjV9LHsieCI6NzgyLjc5Njg3NSwieSI6MjUzLjg1MTU2MjV9LHsieCI6NzgyLjc5Njg3NSwieSI6MTY2fSx7IngiOjc0Mi4zNTQ0NTkyNjk2NjI5LCJ5IjoxNDZ9XQ==" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M285.225,762.978L314.59,827.688L255.096,903.001" id="dg2-L_R_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_R_C_0" data-points="W3sieCI6Mjg1LjIyNDk5MDM3ODgwNzEsInkiOjc2Mi45NzgxMzQ2MjExOTI5fSx7IngiOjMxNC41ODk4NDM3NSwieSI6ODI3LjY4NzV9LHsieCI6MjUyLjYxNjcwMjgxMjE3ODUyLCJ5Ijo5MDYuMTQwMTQwMzEyMTc4Nn1d" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M164.606,1030.911L119.008,1103.469L171.737,1133.014" id="dg2-L_C_LF_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_C_LF_0" data-points="W3sieCI6MTY0LjYwNjIwOTQ0NTIzNjk0LCJ5IjoxMDMwLjkxMDg5Njk0NTIzN30seyJ4IjoxMTkuMDA3ODEyNSwieSI6MTEwMy40Njg3NX0seyJ4IjoxNzUuMjI3MDUwNzgxMjUsInkiOjExMzQuOTY4NzV9XQ==" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/><path d="M273.573,1004.059L449.004,1103.469L681.74,1148.295" id="dg2-L_C_M_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link"  data-edge="true" data-et="edge" data-id="L_C_M_0" data-points="W3sieCI6MjczLjU3MzMxOTk4NjI5NTQsInkiOjEwMDQuMDU5NDkyNTEzNzA0Nn0seyJ4Ijo0NDkuMDAzOTA2MjUsInkiOjExMDMuNDY4NzV9LHsieCI6Njg1LjY2Nzk2ODc1LCJ5IjoxMTQ5LjA1MTUxMDEwMzE4MTV9XQ==" data-look="classic" marker-end="url(#dg2_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_P_A_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" /></g><g class="edgeLabel"><g class="label" data-id="L_A_L_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" /></g><g class="edgeLabel" transform="translate(34.0859375, 689.796875)"><g class="label" data-id="L_L_LF_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-26.0859375" y="-1" width="52.171875" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">fails</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_LF_L_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" /></g><g class="edgeLabel" transform="translate(387.1953125, 353.203125)"><g class="label" data-id="L_L_T_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-30.8984375" y="-1" width="61.796875" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">passes</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(342.06640625, 551.90625)"><g class="label" data-id="L_T_TF_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-16.453125" y="-1" width="32.90625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">red</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_TF_A_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" /></g><g class="edgeLabel" transform="translate(404.60546875, 551.90625)"><g class="label" data-id="L_T_R_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-26.0859375" y="-1" width="52.171875" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">green</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(189.44140625, 827.6875)"><g class="label" data-id="L_R_RF_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-64.6171875" y="-1" width="129.234375" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">pattern</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> wrong</tspan></tspan></text></g></g></g><g class="edgeLabel"><g class="label" data-id="L_RF_A_0" transform="translate(0, 0)"><text y="-10.1" text-anchor="middle"><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"/></text></g></g><g><rect class="background" /></g><g class="edgeLabel" transform="translate(314.58984375, 827.6875)"><g class="label" data-id="L_R_C_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-40.53125" y="-1" width="81.0625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">approved</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(119.0078125, 1103.46875)"><g class="label" data-id="L_C_LF_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-16.453125" y="-1" width="32.90625" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">red</tspan></tspan></text></g></g></g><g class="edgeLabel" transform="translate(449.00390625, 1103.46875)"><g class="label" data-id="L_C_M_0" transform="translate(0, -10.5)"><g><rect class="background"  x="-26.0859375" y="-1" width="52.171875" height="23"/><text y="-10.1" text-anchor="middle" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em" text-anchor="middle"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">green</tspan></tspan></text></g></g></g></g><g class="nodes"><g class="node default" id="dg2-flowchart-P-0" data-look="classic" transform="translate(692.8125, 32.5)"><rect class="basic label-container"  x="-102.25" y="-24.5" width="204.5" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Behavior</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> pinned</tspan></tspan></text></g></g></g><g class="node default" id="dg2-flowchart-A-1" data-look="classic" transform="translate(692.8125, 121.5)"><rect class="basic label-container"  x="-116.703125" y="-24.5" width="233.40625" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Agent</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> changes</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> code</tspan></tspan></text></g></g></g><g class="node default" id="dg2-flowchart-L-3" data-look="classic" transform="translate(434.62109375, 253.8515625)"><polygon points="67.8515625,0 135.703125,-67.8515625 67.8515625,-135.703125 0,-67.8515625" class="label-container" transform="translate(-67.3515625, 67.8515625)"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">make</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> lint</tspan></tspan></text></g></g></g><g class="node default warn" id="dg2-flowchart-LF-5" data-look="classic" transform="translate(218.953125, 1159.46875)"><rect class="basic label-container"  x="-111.8828125" y="-24.5" width="223.765625" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Read</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> message,</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> fix</tspan></tspan></text></g></g></g><g class="node default" id="dg2-flowchart-T-9" data-look="classic" transform="translate(387.1953125, 452.5546875)"><polygon points="67.8515625,0 135.703125,-67.8515625 67.8515625,-135.703125 0,-67.8515625" class="label-container" transform="translate(-67.3515625, 67.8515625)"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">make</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> test</tspan></tspan></text></g></g></g><g class="node default warn" id="dg2-flowchart-TF-11" data-look="classic" transform="translate(562.05078125, 689.796875)"><rect class="basic label-container"  x="-102.25" y="-33.29999923706055" width="204.5" height="66.5999984741211"/><g class="label"  transform="translate(0, -18.299999237060547)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Behavior</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> moved.</tspan></tspan><tspan class="text-outer-tspan row" x="0" y="1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Revert</tspan></tspan></text></g></g></g><g class="node default" id="dg2-flowchart-R-15" data-look="classic" transform="translate(252.015625, 689.796875)"><polygon points="106.390625,0 212.78125,-106.390625 106.390625,-212.78125 0,-106.390625" class="label-container" transform="translate(-105.890625, 106.390625)"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">You</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> read</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> diff</tspan></tspan></text></g></g></g><g class="node default warn" id="dg2-flowchart-RF-17" data-look="classic" transform="translate(453.125, 965.578125)"><rect class="basic label-container"  x="-107.0703125" y="-24.5" width="214.140625" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Fix</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> the</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> rule.</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> §9</tspan></tspan></text></g></g></g><g class="node default" id="dg2-flowchart-C-21" data-look="classic" transform="translate(205.6640625, 965.578125)"><polygon points="106.390625,0 212.78125,-106.390625 106.390625,-212.78125 0,-106.390625" class="label-container" transform="translate(-105.890625, 106.390625)"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">CI,</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> same</tspan><tspan font-style="normal" class="text-inner-tspan" font-weight="normal"> commands</tspan></tspan></text></g></g></g><g class="node default go" id="dg2-flowchart-M-25" data-look="classic" transform="translate(739.75390625, 1159.46875)"><rect class="basic label-container"  x="-54.0859375" y="-24.5" width="108.171875" height="49"/><g class="label"  transform="translate(0, -9.5)"><rect/><g><rect class="background" /><text y="-10.1" ><tspan class="text-outer-tspan row" x="0" y="-0.1em" dy="1.1em"><tspan font-style="normal" class="text-inner-tspan" font-weight="normal">Merge</tspan></tspan></text></g></g></g></g></g></g><defs></defs><defs></defs></svg></div>
-        <p class="note">What to look at: every edge that runs backward. Pinned behavior reaches the agent, which changes the code and runs <code>make lint</code>. A lint failure loops straight back to the agent, which reads the message and fixes it with no human involved. Green lint runs <code>make test</code>, and a red suite there means behavior moved, so you revert or re-record the pin on purpose in its own commit. A green suite reaches your diff review instead. If the diff breaks a pattern you update the rule file rather than the code, per §9, and the agent re-attempts under the new rule. An approved diff goes to CI, which runs the same commands, and a red CI rejoins the same fix loop. Only green CI reaches merge, and deploying stays a separate decision. So every box here has an exit that is not forward.</p>
+        <p class="note">What to look at: every edge that runs backward. Pinned behavior reaches the agent, which changes the code and runs <code>make lint</code>. A lint failure loops straight back to the agent, which reads the message and fixes it with no human involved. Green lint runs <code>make test</code>. A red suite there means behavior moved, so you revert or re-record the pin on purpose in its own commit. A green suite reaches your diff review instead. If the diff breaks a pattern you update the rule file rather than the code, per §9, and the agent re-attempts under the new rule. An approved diff goes to CI, which runs the same commands, and a red CI rejoins the same fix loop. Only green CI reaches merge, and deploying stays a separate decision. So every box here has an exit that is not forward.</p>
       </figure>
 
       <h3 class="sub">Block the side door</h3>
@@ -1476,8 +1474,8 @@ flowchart TD
       <h3 class="sub">When it does not work</h3>
       <p>
         A flaky test teaches everyone to re-run the job, and a gate people retry has stopped being a
-        gate. Quarantine a flaky test the day you find it. A ten-minute pipeline gets bypassed under
-        deadline pressure, so split it: fast checks block the merge, slow suites run behind it.
+        gate. So quarantine a flaky test the day you find it. A ten-minute pipeline gets bypassed
+        under deadline pressure, so split it: fast checks block the merge, slow suites run behind it.
       </p>
 
     </div>
@@ -1551,7 +1549,7 @@ class OrderController:
         this.notifier.order_approved(order)</code></pre>
         <p class="note">
           What to look at: the constructor parameter. After the change you can test
-          <code>approve()</code> with a fake notifier and no network, and the message format gets a
+          <code>approve()</code> with a fake notifier and no network. The message format also gets a
           test of its own for the first time. Nothing about the visible behavior moved.
         </p>
       </figure>
@@ -1598,9 +1596,9 @@ class OrderController:
         document scanning, document conversion, a third-party API client, and the domain calculator.
       </p>
       <p>
-        Read past the language and the shape is generic. A trait is one way to share code without a
-        boundary. A mixin, a base class with protected helpers, a module of free functions reaching
-        into globals, and a 900-line utility file are the same problem wearing different syntax. The
+        The shape is generic once you look past the language. A trait is one way to share code
+        without a boundary. A mixin, a base class with protected helpers, a module of free functions reaching
+        into globals, and a 900-line utility file are the same problem. Only the syntax differs. The
         move is identical: name the interface, move the code, migrate callers one at a time.
       </p>
       <p>
@@ -1616,11 +1614,11 @@ class OrderController:
         never reached production and two pull requests closed the instances.
       </p>
       <p>
-        The instances were not the problem. Authorization logic was scattered, so there was no single
-        answer to "who can see what", and every new controller was a fresh chance to get it wrong.
-        Moving the decision into one policy object per model, and every scoped query into one
-        builder, made the class of bug hard to write. That is worth more with an agent than without
-        one, because an agent writes new controllers faster than you can audit them.
+        The instances were not the problem. The team had scattered the authorization logic, so no
+        single answer existed to "who can see what". Every new controller was then a fresh chance to
+        get it wrong. Moving the decision into one policy object per model, and every scoped query
+        into one builder, made the class of bug hard to write. That is worth more with an agent than
+        without one, because an agent writes new controllers faster than you can audit them.
       </p>
 
       <h3 class="sub">How you know it worked</h3>
@@ -1664,14 +1662,14 @@ class OrderController:
       <h3 class="sub">Why the rewrite loses</h3>
       <p>
         A rewrite competes with the running system for months. The old system keeps taking patches
-        because it has users. The two diverge. You finish with two systems that both need work, which
-        is the outcome Joel Spolsky and Fred Brooks each described decades ago and teams keep
-        rediscovering.
+        because it has users, so the two diverge. That leaves you with two systems that both need
+        work. Joel Spolsky and Fred Brooks each described that outcome decades ago, and teams keep
+        rediscovering it.
       </p>
       <p>
         Migrate instead, one route or one screen at a time, with both paths live. Martin Fowler's
-        name for the shape is the strangler fig: the new system grows around the old one and the old
-        one is removed piece by piece.
+        name for the shape is the strangler fig: the new system grows around the old one. Then you
+        remove the old one piece by piece.
       </p>
 
       <h3 class="sub">Four rules that make it survivable</h3>
@@ -1716,7 +1714,7 @@ class OrderController:
       </p>
       <p>
         Over about three months that project ran 258 commits and 145 pull requests, most of them one
-        extraction, one test expansion, or one fix. Small batches also bound the damage: one pull
+        extraction, one test expansion, or one fix. Small batches also bound the damage. One pull
         request per decision means one revert undoes one decision, and reverting 200 lines is a
         different afternoon from reverting 2,000.
       </p>
@@ -1764,7 +1762,7 @@ class OrderController:
       <p>
         One large instruction file loads everywhere. Rules about database migrations then sit in
         context while the agent edits a component, which wastes context and buries the twenty lines
-        that matter. When everything is loaded, nothing is prominent.
+        that matter.
       </p>
       <p>
         Scope the guidance instead. One file per boundary, loaded when the agent touches a matching
@@ -1823,7 +1821,7 @@ Inject the interface. Never inject the implementation.
         The smallest rule file in that project governed the legacy controllers. It read, in full: bug
         fixes only, no new features, no new routes, no new views, and new features go on the new
         path. Those five clauses were enough. When the agent opens a legacy file, it learns in one
-        line that it stands in maintenance territory, which a legacy codebase never tells you by
+        line that it stands in maintenance territory. A legacy codebase never tells you that by
         itself.
       </p>
 
@@ -1873,8 +1871,8 @@ Inject the interface. Never inject the implementation.
       </p>
       <p>
         For the first two months on that project I ran in-the-loop with auto-approve off. I read
-        every line and made inline corrections. The code was good. I was also doing most of the
-        thinking and half the typing, which is the worse kind of pair programming and not what I
+        every line and made inline corrections. The code was good. But I was also doing most of the
+        thinking and half the typing. That is the worse kind of pair programming, and not what I
         wanted from the agent.
       </p>
 
@@ -2005,10 +2003,10 @@ sequenceDiagram
         lives in the repository.
       </p>
       <p>
-        One example. The agent kept calling the chat webhook straight from controllers instead of
-        going through the notification service. I added a line to the services rule file: do not call
-        external APIs directly from controllers, use the appropriate service. It never made that
-        mistake again, in any controller.
+        The agent kept calling the chat webhook straight from controllers instead of going through
+        the notification service. I added a line to the services rule file: do not call external APIs
+        directly from controllers, use the appropriate service. It never made that mistake again, in
+        any controller.
       </p>
 
       <h3 class="sub">What it costs you</h3>
@@ -2088,15 +2086,15 @@ sequenceDiagram
       </p>
       <p>
         Run the real dependencies. A substitute engine hides exactly the class of break that only the
-        production engine catches, which is the mistake I made first and caught by accident.
+        production engine catches. That is the mistake I made first and caught by accident.
       </p>
       <p>
         Break each test on purpose before you trust it. Change one line under it and confirm the
         suite goes red. A test that stays green was never a check.
       </p>
       <p>
-        Read the diff yourself. Automated checks cover the categories you already encoded, so a human
-        reading the change is the only check that can notice a category nobody thought of.
+        Read the diff yourself. Automated checks cover the categories you already encoded.
+        So a human reading the change is the only check that can notice a category nobody thought of.
       </p>
 
       <h3 class="sub">Three moves that make the gap survivable</h3>
@@ -2115,9 +2113,9 @@ sequenceDiagram
 
       <h3 class="sub">The residual</h3>
       <p>
-        Here is what remains after all of it. A refactor can change behavior that nobody recorded, no
-        check encoded, and no reviewer noticed. That will happen to you. The floor in this page does
-        not make it impossible. It makes it rare, detectable when it does happen, and cheap to undo.
+        A refactor can change behavior that nobody recorded, no check encoded, and no reviewer
+        noticed. That will happen to you. The floor in this page does not make it impossible. It
+        makes it rare, detectable when it does happen, and cheap to undo.
       </p>
       <p>
         If you need a stronger claim than that, look elsewhere. I do not have one, and I have not

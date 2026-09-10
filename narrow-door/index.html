@@ -891,7 +891,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 
     <div class="provenance">
       the argument · a permission rule models a command string. You meant to model a piece of work<br>
-      the collapse · a <code>make</code> target <em>is</em> the unit of intent, so pointing the list at targets makes the mechanism and the model the same thing<br>
+      the collapse · a <code>make</code> target <em>is</em> the unit of intent. Point the list at targets and the two become one thing<br>
       the stack · Docker holds the toolchain, <code>make</code> is the only way in, and the allowlist names <code>make</code><br>
       substitutions · <code>make</code> = your task runner, <code>just</code> or <code>npm run</code> if you prefer · <code>docker compose</code> = your isolation<br>
       the worked charter · one production Laravel and React portal of mine: 40 rules, a locked toolchain rule, four hook events, 78 <code>make</code> targets. Its allowlist is quoted verbatim, and audited<br>
@@ -906,7 +906,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <span class="swatch block"></span>
         <div>
           <dt>Deny</dt>
-          <dd>Evaluated first, from any settings scope, and it cannot carry an exception. A refusal returned to the agent as the result of its call.</dd>
+          <dd>The harness evaluates deny first, from any settings scope, and it cannot carry an exception. It returns the refusal to the agent as the result of its call.</dd>
         </div>
       </div>
       <div class="signal">
@@ -959,9 +959,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     <span class="kicker">Part I</span>
     <h2>The dial</h2>
     <p>
-      Three sections before any of my opinions: what goes wrong at each end of the dial, what a
-      permission rule actually is, and the six places the syntax does something other than what the
-      person writing it expected.
+      Three sections before any of my opinions. First, what goes wrong at each end of the dial. Then, what a permission rule actually is. Finally, the six places the syntax does something other than what the writer expected.
     </p>
   </div>
 
@@ -980,9 +978,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <p class="thesis">
           Both ends of the dial fail, and they fail asymmetrically. A loose list fails once, loudly,
           on the day an ambiguous prompt meets a general tool. A tight list fails quietly and
-          continuously, by generating so many prompts that somebody turns the whole thing off. The
-          second failure is the common one and it does not look like a security event. It looks like
-          productivity.
+          continuously, by generating so many prompts that somebody turns the whole thing off. The second failure is the common one, it does not look like a security event, and the team reads it as productivity.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>too loose</b> one bad afternoon</span>
@@ -996,15 +992,10 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <p>
         <em>Harness Engineering</em> tells this the long way in the chapter on bounding tools. A staff
         engineer wires up a server exposing a <code>runSql</code> tool that takes a string and runs it.
-        No allowlist of statement types, no dry run, no confirmation. The task is a schema cleanup, the
-        planning doc has moved, the agent infers intent from stale schema comments and runs
-        <code>DROP TABLE</code> on the wrong table. Staging is restored from the previous night's
-        snapshot and nothing ships that day.
+        No allowlist of statement types, no dry run, no confirmation. The task is a schema cleanup, but the planning doc has moved. The agent infers intent from stale schema comments and runs <code>DROP TABLE</code> on the wrong table. Somebody restores staging from the previous night's snapshot, and nothing ships that day.
       </p>
       <p>
-        He was not embarrassed about the model. He was embarrassed about the charter. The model did what
-        the tool let it do, and the tool let it drop a table because nobody had told the tool that
-        dropping tables was special. That is the loose end of the dial, and it is the one everybody
+        He was not embarrassed about the model. He was embarrassed about the charter. The model did what the tool let it do. The tool let it drop a table because nobody had told it that dropping tables was special. That is the loose end of the dial, and it is the one everybody
         writes about.
       </p>
 
@@ -1016,10 +1007,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         The agent did what the charter asked. The charter asked too often.
       </p>
       <p>
-        Then somebody finds the bypass mode, and the strictness converts to zero enforcement in one
-        keystroke. This is the part worth saying plainly: <strong>a list too strict to work inside does
-        not produce caution. It produces a session with no checks at all.</strong> The failure mode of
-        over-restriction is under-restriction, arriving later and unlogged.
+        Then somebody finds the bypass mode, and the strictness converts to zero enforcement in one keystroke. <strong>A list too strict to work inside does not produce caution. It produces a session with no checks at all.</strong> So the failure mode of over-restriction is under-restriction, arriving later and unlogged.
       </p>
 
       <div class="callout">
@@ -1068,9 +1056,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <span class="label">The reframe this page runs on</span>
         <p>
           Stop asking <em>how permissive should this list be</em>. Ask <em>what work do I mean to
-          permit</em>. The first question has no stable answer and gets renegotiated every week. The
-          second has a finite answer that a person can write down, and once it is written down the list
-          becomes a transcription of it rather than a negotiation.
+          permit</em>. The first question has no stable answer and gets renegotiated every week. The second has a finite answer that a person can write down. Once a person writes it down, the list becomes a transcription of it rather than a negotiation.
         </p>
       </div>
     </div>
@@ -1089,10 +1075,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div>
         <h2>Three lists, one order, and a deny that cannot carry an exception</h2>
         <p class="thesis">
-          A permission rule is <code>Tool</code> or <code>Tool(specifier)</code>. There are three
-          lists, they are evaluated in a fixed order, and the first match decides. Specificity does
-          not enter into it. Almost every confused permission setup I have read is a person expecting
-          the narrow rule to win.
+          A permission rule is <code>Tool</code> or <code>Tool(specifier)</code>. The harness keeps three lists, evaluates them in a fixed order, and lets the first match decide. Specificity does not enter into it. Almost every confused permission setup I have read comes from a person expecting the narrow rule to win.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>deny</b> first</span>
@@ -1121,7 +1104,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         The same order runs across settings scopes. A deny anywhere beats an allow anywhere: user
         settings, project settings, local settings, command-line flags. Managed settings sit above all
         of it and cannot be overridden even from the command line. So the deny list is the one place a
-        platform team can write something a project cannot argue with, and the allow list is the place
+        platform team can write something a project cannot argue with. The allow list is the place
         a project describes its own work.
       </p>
 
@@ -1146,9 +1129,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       </div>
 
       <p>
-        The second row is the one that teaches. A refusal returned as the result of the call is
-        readable: the agent sees that <code>php artisan test</code> was denied, reads the rule that says
-        what to run instead, and runs that. A capability quietly absent from context produces no
+        The second row is the one that teaches. The harness returns that refusal as the result of the call, so the agent can read it. It sees that the rule denied <code>php artisan test</code>, reads what to run instead, and runs that. A capability quietly absent from context produces no
         learning and no confusion either. Both are fine. Confusing them produces a charter that
         explains a rule the agent has no way to encounter.
       </p>
@@ -1156,9 +1137,9 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div class="callout">
         <span class="label">The line the book keeps drawing</span>
         <p>
-          Permission rules are enforced by the harness, not by the model. <code>CLAUDE.md</code> shapes
+          The harness enforces permission rules, not the model. <code>CLAUDE.md</code> shapes
           what the agent <em>tries</em>; the rules decide what <em>runs</em>. A bound that lives only in
-          prose is a suggestion, and the model is free to misread it, be talked out of it, or forget it
+          prose is a suggestion. The model is free to misread it, be talked out of it, or forget it
           thirty tool calls deep. That is why the charter states the intent and the config does the
           refusing, and why <a href="/guardrails/">Five Guardrails</a> pairs them in every example.
         </p>
@@ -1185,10 +1166,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       </div>
 
       <p>
-        The last row has a reason worth carrying into <a class="xref" href="#s-2">section 2</a>. You
-        cannot write <code>Bash(command:rm *)</code>, and the harness ignores it with a warning, because
-        a rule that matched only the <code>command</code> parameter would be defeated by a compound
-        command. The surface that decides has to be the surface the shell will actually execute.
+        The last row has a reason worth carrying into <a class="xref" href="#s-2">section 2</a>. You cannot write <code>Bash(command:rm *)</code>, and the harness ignores it with a warning. A rule matching only the <code>command</code> parameter would be defeated by a compound command. So the surface that decides has to be the surface the shell will actually execute.
       </p>
     </div>
   </section>
@@ -1207,8 +1185,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <h2>Six places the syntax does something other than what you meant</h2>
         <p class="thesis">
           The rule language is small and it is not intuitive. Wildcard position changes the blast
-          radius. A missing space changes which programs match. Some wrappers are stripped and some
-          run arbitrary commands. Every one of these has cost somebody a wider grant than they
+          radius. A missing space changes which programs match. And of the wrappers, the harness strips some and leaves others to run arbitrary commands. Every one of these has cost somebody a wider grant than they
           thought they were writing, including me.
         </p>
         <div class="chips">
@@ -1244,10 +1221,9 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       </div>
 
       <p>
-        Row three is not a curiosity. <code>git -c</code> makes git run a program you name, so any rule
+        Row three is not a curiosity. <code>git -c</code> makes git run a program you name. So any rule
         whose star sits before the git subcommand is a general execution grant with a git-shaped label
-        on it. The harness warns at startup about an allow rule with a star before the subcommand. Read
-        the warning.
+        on it. The harness also warns at startup about an allow rule with a star before the subcommand, and that warning is worth reading.
       </p>
       <p>
         The <code>:*</code> suffix is the same thing as a trailing space-star, and only at the end.
@@ -1261,7 +1237,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         This one is good news, and it is worth knowing so you stop writing defensive rules against it.
         The harness understands shell separators. A rule must match each subcommand independently, so an
         allow of <code>Bash(safe-cmd *)</code> does not authorize <code>safe-cmd &amp;&amp; other-cmd</code>.
-        Deny and ask rules go the other way: they fire if <em>any</em> subcommand matches, including one
+        Deny and ask rules go the other way. They fire if <em>any</em> subcommand matches, including one
         nested in a subshell, a command substitution, or a loop body.
       </p>
 
@@ -1282,26 +1258,20 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 
       <h3 class="sub">2.3 · Wrappers: some are stripped, and the dangerous ones are not</h3>
       <p>
-        Before matching, a fixed set of wrappers comes off, so <code>Bash(npm test *)</code> also covers
-        <code>timeout 30 npm test</code>. The stripped set is <code>timeout</code>, <code>time</code>,
+        Before it matches, the harness strips a fixed set of wrappers, so <code>Bash(npm test *)</code> also covers <code>timeout 30 npm test</code>. The stripped set is <code>timeout</code>, <code>time</code>,
         <code>nice</code>, <code>nohup</code>, <code>stdbuf</code>, the builtins <code>command</code> and
-        <code>builtin</code>, zsh's <code>noglob</code>, a leading assignment of certain known-safe
+        <code>builtin</code>, zsh's <code>noglob</code>. It also includes a leading assignment of certain known-safe
         environment variables, and bare <code>xargs</code>.
       </p>
       <p>
-        The list is built in and it is not configurable, which means the runners are not on it. This is
-        the single most important sentence on this page for anybody about to write
-        <code>Bash(docker compose exec *)</code>:
+        The list is built in and not configurable, so the runners are not on it.
       </p>
 
       <div class="callout">
         <span class="label">An environment runner in an allow rule is an execution grant</span>
         <p>
           <code>docker exec</code>, <code>npx</code>, <code>devbox run</code>, <code>mise exec</code> and
-          <code>direnv exec</code> execute whatever follows them, and they are not stripped. So
-          <code>Bash(devbox run *)</code> matches <code>devbox run rm -rf .</code>, and
-          <code>Bash(docker compose exec *)</code> matches <code>docker compose exec web sh -c
-          'anything at all'</code>. To approve work inside a runner, name the runner <em>and</em> the
+          <code>direnv exec</code> execute whatever follows them, and the harness does not strip them. So <code>Bash(devbox run *)</code> matches <code>devbox run rm -rf .</code>. Likewise, <code>Bash(docker compose exec *)</code> matches <code>docker compose exec web sh -c 'anything at all'</code>. To approve work inside a runner, name the runner <em>and</em> the
           inner command: <code>Bash(devbox run npm test)</code>, one rule per inner command. The charter
           in <a class="xref" href="#s-3">section 3</a> gets this wrong, in the line directly above its
           own deny list, and it is mine.
@@ -1309,11 +1279,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       </div>
 
       <p>
-        Two smaller relatives. Exec wrappers such as <code>watch</code>, <code>setsid</code>,
-        <code>ionice</code> and <code>flock</code> cannot be prefix-approved at all, so in manual mode
-        they always prompt. And <code>find</code> with <code>-exec</code> or <code>-delete</code> is not
-        covered by <code>Bash(find *)</code>; those forms need an exact-match rule for the whole command
-        string.
+        Two smaller relatives. The harness cannot prefix-approve exec wrappers such as <code>watch</code>, <code>setsid</code>, <code>ionice</code> and <code>flock</code>, so in manual mode they always prompt. And <code>Bash(find *)</code> does not cover <code>find</code> with <code>-exec</code> or <code>-delete</code>, so those forms need an exact-match rule for the whole command string.
       </p>
 
       <h3 class="sub">2.4 · Rules that constrain arguments are fragile</h3>
@@ -1324,14 +1290,13 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         spaces instead of one defeats it.
       </p>
       <p>
-        The working shape is to deny the network tools in the shell, allow the fetch tool with an
+        The working shape is to deny the network tools in the shell. Allow the fetch tool with an
         explicit domain list, and put anything more specific in a hook. The general rule underneath:
         <strong>constrain the program, not its arguments.</strong> Argument shapes are an unbounded
         space and a permission pattern is a finite guess at it.
       </p>
       <p>
-        Which is the moment to say what all six of these traps have in common, because it is the
-        argument of the rest of the page. Every one of them is the gap between what the rule
+        All six of these traps share one shape, and it is the argument of the rest of the page. Every one of them is the gap between what the rule
         <em>matches</em> and what the author <em>meant</em>. Nobody writing <code>Bash(git *)</code>
         meant <em>may execute arbitrary programs</em>; they meant <em>may do the git work this project
         involves</em>. The pattern language cannot say the second thing, so it says the first thing and
@@ -1362,12 +1327,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 
       <h3 class="sub">2.6 · The read-only set you are already getting for free</h3>
       <p>
-        A built-in set of shell commands is treated as read-only and runs without a prompt in every
-        mode: <code>ls</code>, <code>cat</code>, <code>echo</code>, <code>pwd</code>, <code>head</code>,
-        <code>tail</code>, <code>grep</code>, <code>find</code>, <code>wc</code>, <code>which</code>,
-        <code>diff</code>, <code>stat</code>, <code>du</code>, <code>cd</code>, and the read-only forms
-        of <code>git</code>. Redirection changes that, because the target of a <code>&gt;</code> is
-        checked against your <code>Edit</code> rules as if the agent had written the file directly.
+        The harness treats a built-in set of shell commands as read-only, and they run without a prompt in every mode. The set holds <code>ls</code>, <code>cat</code>, <code>echo</code>, <code>pwd</code>, <code>head</code>, <code>tail</code> and <code>grep</code>. It also holds <code>find</code>, <code>wc</code>, <code>which</code>, <code>diff</code>, <code>stat</code>, <code>du</code> and <code>cd</code>, plus the read-only forms of <code>git</code>. Redirection changes that, because the harness checks the target of a <code>&gt;</code> against your <code>Edit</code> rules as if the agent had written the file directly.
       </p>
       <p>
         Which means a large fraction of the entries in a typical allowlist are doing nothing at all.
@@ -1380,9 +1340,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     <span class="kicker">Part II</span>
     <h2>The collapse</h2>
     <p>
-      Why a list grows on its own, and the move that makes it small: one entry point into the project,
-      a container holding the toolchain, and a rule that names the entry point. Five sections, one of
-      them a worked refusal from a real charter.
+      Why a list grows on its own, and the move that makes it small. One entry point into the project, a container holding the toolchain, and a rule that names the entry point. Five sections, one of them a worked refusal from a real charter.
     </p>
   </div>
 
@@ -1400,10 +1358,9 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <h2>Twenty-four entries, seven of which grant more than the person writing them meant</h2>
         <p class="thesis">
           Below is the allow list from a production charter of mine, verbatim. It is one of the better
-          charters I have: forty rules, a locked rule that says drive everything through
-          <code>make</code>, hooks on four events, seventy-eight targets. The rule layer models the
-          intent correctly. The permission layer does not, and it cannot, because it is written in a
-          language that has no word for intent.
+          charters I have. It holds forty rules, a locked rule that says drive everything through
+          <code>make</code>, hooks on four events, and seventy-eight targets. The rule layer models the
+          intent correctly. The permission layer does not, and it cannot, because I wrote it in a language that has no word for intent.
         </p>
         <div class="chips">
           <span class="chip kind-rule"><b>intent</b> what you meant to permit</span>
@@ -1442,7 +1399,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <p>
         The bottom half of that file is the toolchain deny list from
         <a class="xref" href="#s-6">section 6</a>, and it works. The top half is where the intent gap
-        lives. Read the next table one row at a time: the middle column is what somebody was trying to
+        lives. Read the next table one row at a time. The middle column is what somebody was trying to
         say, and the right column is what the rule says instead.
       </p>
 
@@ -1521,10 +1478,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         named tasks, which is the same trick performed on the shell.
       </p>
       <p>
-        Both are cases where the thing being permitted <em>had a name</em>. That is the whole
-        difference. Where the unit of permission has a name, the list enumerates intents and reads
-        correctly. Where it does not, the author reaches for the program name and a wildcard, and grants
-        the program's entire surface because that is the only thing the language lets them say.
+        Both are cases where the thing being permitted <em>had a name</em>, and that is the whole difference. Where the unit of permission has a name, the list enumerates intents and reads correctly. Where it does not, the author reaches for the program name and a wildcard. That wildcard grants the program's entire surface, because that is all the language lets them say.
       </p>
 
       <div class="tablewrap">
@@ -1546,8 +1500,8 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div class="takeaway">
         <span class="label">The diagnosis, and it is structural rather than personal</span>
         <p>
-          That file was not written carelessly. The charter it belongs to has a rule marked
-          <code>locked</code> that says drive everything through <code>make</code>, a hook on every
+          I did not write that file carelessly. The charter it belongs to has a rule marked
+          <code>locked</code> that says drive everything through <code>make</code>. It has a hook on every
           write, and a target for every task. The <em>rule</em> models the intent exactly right. The
           allowlist still drifted, because a rule speaks about work and an allowlist speaks about
           strings, and nothing keeps the two in agreement. The next section is what happens when you
@@ -1570,7 +1524,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div>
         <h2>Restrict the permissions to the allowable set of intents, and give every intent a name</h2>
         <p class="thesis">
-          This is the whole move. A <code>make</code> target is a unit of intent: a name a person chose,
+          This is the whole move. A <code>make</code> target is a unit of intent. It is a name a person chose,
           for work the project has decided it does, in a file that gets reviewed. Point the permission
           list at targets and it stops being an approximation of what you meant. It becomes an
           enumeration of it, and the surface area falls out of that rather than being the goal.
@@ -1653,10 +1607,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       </div>
 
       <p>
-        The <code>FILES=</code> row is not hypothetical: that charter already has
-        <code>make psalm-files FILES="a.php b.php"</code>, written because a full analysis run was too
-        slow, and it is the exact shape the argument needs. The parameterized target was already there.
-        The allowlist just never caught up with it.
+        The <code>FILES=</code> row is not hypothetical. That charter already has <code>make psalm-files FILES="a.php b.php"</code>, written because a full analysis run was too slow. It is the exact shape the argument needs. The parameterized target was already there, and the allowlist never caught up with it.
       </p>
 
       <h3 class="sub">4.2 · Arguments are what keep a parameterized intent a single intent</h3>
@@ -1664,8 +1615,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         This is the part that makes the strict posture livable, and it is why the answer is not simply
         <em>write narrower patterns</em>. Work varies. You want style fixed in one directory today and
         another tomorrow; a migration rolled back one step, then three. A pattern-shaped list handles
-        variation by widening until it covers the family, which is how
-        <code>Bash(./vendor/bin/*)</code> gets written. A target handles it by taking an argument, and
+        variation by widening until it covers the family, which is how the author ends up writing <code>Bash(./vendor/bin/*)</code>. A target handles it by taking an argument, and
         the permitted set does not move.
       </p>
 
@@ -1684,9 +1634,7 @@ make psalm-files FILES="app/Actions/Approve.php app/Http/Api.php"
 
       <p>
         There is a bill for this and <a class="xref" href="#s-8">section 8</a> is where it comes due: an
-        argument interpolated into a shell recipe can carry shell. The charter above interpolates
-        <code>$(ARGS)</code> unquoted in about a dozen recipes, including <code>make tinker
-        ARGS=--execute='…'</code>, which is arbitrary code execution by documented design. Arguments are
+        argument interpolated into a shell recipe can carry shell. The charter above interpolates <code>$(ARGS)</code> unquoted in about a dozen recipes. One of them is <code>make tinker ARGS=--execute='…'</code>, which is arbitrary code execution by documented design. Arguments are
         the right mechanism and they are the part of the door that needs a lock.
       </p>
 
@@ -1694,9 +1642,8 @@ make psalm-files FILES="app/Actions/Approve.php app/Http/Api.php"
       <p>
         <code>Bash(make *)</code> is one rule standing in for a large set, which looks like exactly the
         move the eight bad rows made. The difference is where the set is written down. A program grant
-        stands in for a set nobody has ever listed: the union of everything <code>git</code> or
-        <code>gh</code> can do, discovered at the moment it matters. A door stands in for a set that
-        exists as text, in the repository, with a name and a recipe per member, in front of a reviewer.
+        stands in for a set nobody has ever listed. It is the union of everything <code>git</code> or
+        <code>gh</code> can do, discovered at the moment it matters. A door stands in for a set that exists as text, in the repository, with a name and a recipe per member. That set sits in front of a reviewer.
       </p>
 
       <div class="tablewrap">
@@ -1722,7 +1669,7 @@ make psalm-files FILES="app/Actions/Approve.php app/Http/Api.php"
         <code>pest</code>, then <code>phpunit</code>, then two tiers run concurrently by
         <code>paratest</code> inside a container. Each of those rewrites a command-shaped allowlist and
         none of them touch a target-shaped one. The charter's instruction to the agent (<em>run
-        <code>make test</code>, run <code>make lint</code></em>) also stops going stale, which is the
+        <code>make test</code>, run <code>make lint</code></em>) also stops going stale. That is the
         same benefit arriving in the prose layer.
       </p>
       <p>
@@ -1756,11 +1703,8 @@ make psalm-files FILES="app/Actions/Approve.php app/Http/Api.php"
 
       <p>
         Miss the third and you have built the strict charter from
-        <a class="xref" href="#s-0">section 0</a>: a wall with no gate, which lasts until somebody finds
-        the bypass flag. The escape hatch in the rule text matters as much as the wall does, and the real
-        one says it in two lines: <em>no appropriate target exists, add one to the Makefile and document
-        it</em>; <em>an existing target is not flexible enough, add <code>ARGS=</code> support rather
-        than reaching for the raw tool.</em>
+        <a class="xref" href="#s-0">section 0</a>: a wall with no gate. It lasts until somebody finds
+        the bypass flag. The escape hatch in the rule text matters as much as the wall does, and the real one says it in two lines. First, <em>no appropriate target exists, add one to the Makefile and document it</em>. Second, <em>an existing target is not flexible enough, add <code>ARGS=</code> support rather than reaching for the raw tool</em>.
       </p>
 
       <figure class="code">
@@ -1797,7 +1741,7 @@ shell                <span class="c-pass">## bash in the app container</span>
         <p class="thesis">
           Two gates, deliberately, because a single line of defense is a single point of failure. The
           permission rule is a check the harness performs on a string. The container is the operating
-          system refusing. They fail differently, which is the only reason to have both, and together
+          system refusing. They fail differently, which is the only reason to have both. Together
           they produce the property the whole stack is for: the wrong command is not merely refused, it
           could not have worked.
         </p>
@@ -1811,17 +1755,11 @@ shell                <span class="c-pass">## bash in the app container</span>
 
     <div class="rung-body">
       <p>
-        Here is the sentence from the guardrails page that this whole stack exists to produce. A project
-        runs entirely inside Docker. An agent that types <code>php artisan migrate</code> runs it on the
-        host, which has no PHP extension set and no database. Then, being helpful, the agent invents a
-        workaround. <strong>The failure is not the wrong command. It is that the wrong command was
-        available.</strong>
+        A project that runs entirely inside Docker still leaves a trap. An agent that types <code>php artisan migrate</code> runs it on the host, which has no PHP extension set and no database. Then, being helpful, the agent invents a workaround. <strong>The wrong command was available in the first place, and that availability was the real failure.</strong>
       </p>
       <p>
         Move the toolchain into the container and that availability goes away as a matter of fact rather
-        than policy. There is no host <code>php</code> to run. The deny rule is then a courtesy that
-        returns a readable refusal instead of a confusing environment error, and the courtesy is worth
-        having, but it is no longer the thing holding the line.
+        than policy. There is no host <code>php</code> to run. The deny rule is then a courtesy that returns a readable refusal instead of a confusing environment error. That courtesy is worth having, but it is no longer the thing holding the line.
       </p>
 
       <figure class="code diagram">
@@ -1848,7 +1786,7 @@ flowchart TD
 
       <div class="tablewrap">
         <table class="xwide">
-          <caption>what each layer decides, and what it cannot<span class="tag warn">neither row is sufficient alone</span></caption>
+          <caption>what each layer decides, and what it cannot<span class="tag warn">neither row is enough alone</span></caption>
           <thead>
             <tr><th>Layer</th><th>Decides</th><th>Cannot</th><th>Fails when</th></tr>
           </thead>
@@ -1863,25 +1801,22 @@ flowchart TD
 
       <p>
         Read the last row as the strongest control on the page. The cheapest way to bound exposure to
-        production is to have none: no write access, no read access, and no credential on the machine
+        production is to have none. There is no write access, no read access, and no credential on the machine
         that could become either. Production deploys, production data and production migrations sit
-        behind a human. That is not least privilege applied carefully; it is a line drawn before the
+        behind a human. That is not least privilege applied carefully. It is a line drawn before the
         privilege question is asked, and it is the one grant I do not make.
       </p>
 
       <h3 class="sub">5.1 · The harness has a sandbox too, and it is not the same boundary</h3>
       <p>
         Claude Code can enforce filesystem and network bounds at the OS level for Bash commands and
-        their children, and it merges those bounds with your <code>Read</code> and <code>Edit</code>
+        their children. It merges those bounds with your <code>Read</code> and <code>Edit</code>
         deny rules and your <code>WebFetch</code> domain rules. That is a real floor and it is worth
         turning on. It is also not your container: it bounds the shell the agent runs, while the
         container bounds the environment your project runs in.
       </p>
       <p>
-        Two honest notes about the overlap. Path deny rules cover the built-in file tools and the file
-        commands the harness recognizes in Bash, and they do <em>not</em> cover an arbitrary subprocess
-        that opens files itself, which a test suite does constantly: for that you need OS-level
-        enforcement, container or sandbox. And a container with your repository bind-mounted does not
+        Two honest notes about the overlap. Path deny rules cover the built-in file tools and the file commands the harness recognizes in Bash. They do <em>not</em> cover an arbitrary subprocess that opens files itself, which a test suite does constantly. For that you need OS-level enforcement, container or sandbox. And a container with your repository bind-mounted does not
         protect a secret that lives in the repository. Both layers leave a gap the other one covers, so
         run both and know which one you are relying on for what.
       </p>
@@ -1890,9 +1825,7 @@ flowchart TD
         <span class="label">The division, in one line each</span>
         <p>
           <code>make</code> is the interface: it decides what the project can be asked to do. Docker is
-          the floor: it decides what any of that can reach. The permission list is neither, and once the
-          first two are in place it becomes what it should have been all along, which is a short, boring
-          file naming one door and a handful of things that were never going through it.
+          the floor: it decides what any of that can reach. The permission list is neither. Once the first two are in place, it becomes a short, boring file. It names one door and a handful of things that never went through it.
         </p>
       </div>
     </div>
@@ -1911,9 +1844,7 @@ flowchart TD
       <div>
         <h2><code>php artisan test</code> is refused, <code>make test</code> is not, and the agent works it out unaided</h2>
         <p class="thesis">
-          One command, three artifacts, six steps. The interesting part is not the refusal. It is that
-          the refusal is readable, the sanctioned path is discoverable, and the agent recovers inside the
-          same turn without a human being interrupted. A guardrail that costs nobody an interruption is
+          One command, three artifacts, six steps. The refusal is the least interesting part of the sequence. It is readable, the sanctioned path is discoverable, and the agent recovers inside the same turn without interrupting a human. A guardrail that costs nobody an interruption is
           a guardrail that is still there next month.
         </p>
         <div class="chips">
@@ -1983,8 +1914,7 @@ sequenceDiagram
       <h3 class="sub">6.1 · The consequence of deny-first, which changes how you write the escape</h3>
       <p>
         Somebody will want <code>php artisan tinker</code> next week. You cannot get it by adding an
-        allow rule, because <code>Bash(php *)</code> in deny is evaluated first and a deny cannot carry
-        an exception. That constraint is a feature, and it leaves exactly three moves:
+        allow rule, because the harness evaluates <code>Bash(php *)</code> in deny first and that deny cannot carry an exception. That constraint is a feature, and it leaves exactly three moves:
       </p>
 
       <div class="tablewrap">
@@ -2005,7 +1935,7 @@ sequenceDiagram
         The first move is the one that compounds, and notice what it does to the argument. A request to
         widen the agent's capability has become a pull request against a file, with a name, a recipe and
         a reviewer. That is the same shape as every other change to how the project is built, which is
-        the point: permission decisions stop being a private settings file and start being engineering.
+        the point. Permission decisions stop being a private settings file and start being engineering.
       </p>
 
       <h3 class="sub">6.2 · And when the work varies</h3>
@@ -2013,7 +1943,7 @@ sequenceDiagram
         The next request will not be <code>make test</code>. It will be the test suite over one
         directory, or style fixed in one module, or a rollback of exactly one migration batch. That is
         the same intent with a parameter, and <a class="xref" href="#s-4">section 4.2</a> is where it
-        goes: into <code>ARGS=</code> or a named variable, not into a wider entry. The allowlist stays
+        goes. Put it into <code>ARGS=</code> or a named variable, not into a wider entry. The allowlist stays
         one line, and <a class="xref" href="#s-8">section 8</a> is the bill for interpolating a variable
         into a shell recipe.
       </p>
@@ -2035,7 +1965,7 @@ sequenceDiagram
         <p class="thesis">
           Five were free all along, seven were standing in for an intent nobody had named, and one could
           rewrite the file itself. What remains falls into three groups: the entries a target replaces,
-          the entries that were never doing anything, and the entries that stay because they were never
+          the entries that were never doing anything, and the entries that stay. Those stay because they were never
           going through <code>make</code> in the first place. Only the third group needs judgment.
         </p>
         <div class="chips">
@@ -2069,11 +1999,11 @@ sequenceDiagram
       <p>
         These were never doing anything, because the read-only set runs without a prompt in every mode.
         Five of the twenty-four entries in <a class="xref" href="#s-3">section 3</a> are in this
-        category, which is how you know the pattern is not a beginner's mistake but a default nobody
+        category. That is how you know the pattern is not a beginner's mistake but a default nobody
         rechecks.
       </p>
       <figure class="code">
-        <figcaption>the five free entries, and the four that are not<span class="tag block">two thirds of this block can go, and one line of it is the whole machine</span></figcaption>
+        <figcaption>the five free entries, and the four that are not<span class="tag block">two thirds of this block can go, and one line is the whole machine</span></figcaption>
 <pre><code>"allow": [
   <span class="c-warn">"Bash(ls *)"</span>,     <span class="c-dim">// already free</span>
   <span class="c-warn">"Bash(wc *)"</span>,     <span class="c-dim">// already free</span>
@@ -2089,10 +2019,7 @@ sequenceDiagram
       </figure>
       <p>
         <code>Bash(git *)</code> is the one to look at twice, because it is the most reasonable-looking
-        line in the file. It reads as a convenience and it is a general execution grant, since
-        <code>git -c</code> runs a program you name. The read-only git forms are already free, so the
-        honest version of this entry is two rules for the writing subcommands, or a
-        <code>make commit</code> target, and no wildcard at all.
+        line in the file. It reads as a convenience, and it is a general execution grant, since <code>git -c</code> runs a program you name. The read-only git forms are already free. So the honest version of this entry is two rules for the writing subcommands, or a <code>make commit</code> target, and no wildcard at all.
       </p>
 
       <h3 class="sub">7.3 · Kept, and narrowed</h3>
@@ -2118,7 +2045,7 @@ sequenceDiagram
         <p>
           Before: twenty-four allow entries. Five were free, seven granted more than they named, one
           could rewrite the file itself, and eleven were already right. After: the door, two narrow git
-          entries, three code-host entries, the ten MCP tools by name, and a deny list that <em>grew</em>,
+          entries, three code-host entries, the ten MCP tools by name, and a deny list. That deny list <em>grew</em>,
           because it is now where the interesting decisions live. The reviewable surface stopped being a
           file nobody read and became a <code>Makefile</code> that somebody does.
         </p>
@@ -2131,8 +2058,8 @@ sequenceDiagram
     <h2>The residue</h2>
     <p>
       One door is not one lock. Three sections on what the collapse leaves open: the holes
-      <code>make</code> itself brings, what a deny list is and is not for, and the point where a list
-      cannot express the rule and code has to.
+      <code>make</code> itself brings, and what a deny list is and is not for. The last is the point where a list
+      cannot express the rule, and code has to.
     </p>
   </div>
 
@@ -2150,10 +2077,8 @@ sequenceDiagram
         <h2>A door is only as narrow as the file behind it, and the agent can edit that file</h2>
         <p class="thesis">
           <code>Bash(make *)</code> is a runner grant. It differs from
-          <code>Bash(docker compose exec *)</code> in one way that matters: what it runs is enumerated in
-          a reviewed file rather than supplied per call. That difference collapses the moment the file
-          stops being reviewed, or the flags that redirect <code>make</code> at another file stay open,
-          or the agent can write the file itself.
+          <code>Bash(docker compose exec *)</code> in one way that matters. What it runs is enumerated in
+          a reviewed file rather than supplied per call. That difference collapses when the file stops being reviewed. It also collapses when the flags that redirect <code>make</code> at another file stay open, or the agent can write the file itself.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>-f and -C</b> another makefile</span>
@@ -2200,7 +2125,7 @@ sequenceDiagram
             <tr data-signal="block">
               <td class="k"><code>Edit(Makefile)</code></td>
               <td>everything. The agent adds a target, then runs it through the allowed door</td>
-              <td>deny <code>Edit(/Makefile)</code> and <code>Edit(/.claude/**)</code> — <em>from a scope the agent cannot write</em>. <a class="xref" href="#s-8">Below</a></td>
+              <td>deny <code>Edit(/Makefile)</code> and <code>Edit(/.claude/**)</code>, <em>from a scope the agent cannot write</em> <a class="xref" href="#s-8">Below</a></td>
             </tr>
           </tbody>
         </table>
@@ -2208,9 +2133,9 @@ sequenceDiagram
 
       <p>
         The last row is the load-bearing one, and it is the same lesson the measured work on rule
-        placement produced: <strong>never let the thing that enforces a rule sit inside the thing it
+        placement produced. <strong>Never let the thing that enforces a rule sit inside the thing it
         enforces against.</strong> A <code>Makefile</code> the agent can edit is not a permission
-        boundary. It is a suggestion with extra steps, because the path from <em>I need a capability</em>
+        boundary. It is a suggestion with extra steps. The path from <em>I need a capability</em>
         to <em>I have it</em> is two tool calls and no human.
       </p>
 
@@ -2230,15 +2155,11 @@ sequenceDiagram
       <h3 class="sub">8.1 · The target that means &ldquo;anything&rdquo;</h3>
       <p>
         Two targets in that catalog are general execution: <code>make shell</code> opens a shell in the
-        container, and <code>make tinker ARGS=--execute='…'</code> evaluates whatever you hand it. Both
-        are useful. Both are also the exact thing the door was built to prevent, and having them inside
-        the door is worse than having them outside it, because they are now covered by the one entry
-        that looks safe.
+        container, and <code>make tinker ARGS=--execute='…'</code> evaluates whatever you hand it. Both are useful. Both are also the exact thing the door was built to prevent. Having them inside the door is worse than having them outside it, because the one entry that looks safe now covers them.
       </p>
       <p>
         Say it in the vocabulary of <a class="xref" href="#s-4">section 4</a> and the problem is obvious.
-        The permitted set is supposed to be the allowable set of intents. An intent of <em>run arbitrary
-        code in the app container</em> is not a member of that set; it is the set. One such target
+        The permitted set is supposed to be the allowable set of intents. An intent of <em>run arbitrary code in the app container</em> swallows that set whole rather than joining it. One such target
         collapses seventy-eight named intents back down to <code>Bash(*)</code>, and the allowlist still
         reads like one tidy line.
       </p>
@@ -2260,9 +2181,7 @@ sequenceDiagram
 
       <h3 class="sub">8.2 · Restrict the targets by operation instead</h3>
       <p>
-        The repair is the same move applied one level down. The reason those targets exist is that people
-        had specific operations to perform and no named target for them, so they reached for the general
-        one. Name the operations. Then the general targets are not load-bearing and can be refused.
+        The repair is the same move applied one level down. Those targets exist because people had specific operations to perform and no named target for them, so they reached for the general one. Name the operations. Then the general targets are not load-bearing and can be refused.
       </p>
 
       <figure class="code">
@@ -2289,9 +2208,9 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
 
       <p>
         Three properties changed there and each one matters. The parameter is <strong>named for what it
-        is</strong>, so <code>EMAIL=</code> cannot carry a flag and <code>STEP=</code> is checked to be
+        is</strong>. So <code>EMAIL=</code> cannot carry a flag, and <code>STEP=</code> is checked to be
         an integer before anything runs. The variable is <strong>quoted</strong>, so it cannot carry
-        shell. And the operation is <strong>one operation</strong>, so the help line is an honest
+        shell. And the operation is <strong>one operation</strong>. So the help line is an honest
         description of what the agent is permitted to do rather than a category.
       </p>
 
@@ -2310,24 +2229,20 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
 
       <p>
         This is the one place on the page where the precedence rule from
-        <a class="xref" href="#s-1">section 1</a> pays for itself. Deny is evaluated before allow and
-        specificity is not consulted, so a narrow deny reliably carves a hole out of a broad allow. The
+        <a class="xref" href="#s-1">section 1</a> pays for itself. The harness evaluates deny before allow and never consults specificity, so a narrow deny reliably carves a hole out of a broad allow. The
         general targets stay in the <code>Makefile</code> for the humans who type them in their own
-        terminal, where no permission rule applies, and they are unavailable to the agent. One artifact,
+        terminal, where no permission rule applies. They are unavailable to the agent. One artifact,
         two audiences, and the difference expressed in the config rather than in a comment.
       </p>
       <p>
-        Note what the deny list looks like now: five or six entries about <code>make</code> itself. That
-        is the right shape. Once the allow side names one door, the deny side is where the interesting
-        decisions live, and each one reads as a sentence about intent — <em>the agent does not get an
-        interactive shell</em>, <em>the agent does not evaluate arbitrary application code</em>.
+        The deny list now holds five or six entries about <code>make</code> itself, which is the right shape. Once the allow side names one door, the deny side is where the interesting decisions live, and each entry reads as a sentence about intent. One says <em>the agent does not get an interactive shell</em>. Another says <em>the agent does not evaluate arbitrary application code</em>.
       </p>
 
       <div class="callout">
         <span class="label">Three of these are live in the charter from section 3</span>
         <p>
           <code>Bash(docker compose exec *)</code> sits directly above a deny list refusing
-          <code>php</code>, <code>npm</code>, <code>composer</code> and <code>./vendor/bin/*</code>, and
+          <code>php</code>, <code>npm</code>, <code>composer</code> and <code>./vendor/bin/*</code>. It
           reopens every one of them, because that runner is not stripped. About a dozen recipes
           interpolate <code>$(ARGS)</code> unquoted, and one of them is <code>make tinker
           ARGS=--execute='…'</code>, which is arbitrary code execution as the documented usage. And
@@ -2338,7 +2253,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
 
       <p>
         Two of the three have ordinary fixes and one does not. The runner entry becomes three targets.
-        The unquoted variables get quotes, or a validating hook, and the two deliberately-general
+        The unquoted variables get quotes, or a validating hook. The two deliberately-general
         targets (<code>tinker</code>, <code>shell</code>) stay in the catalog and out of unattended
         profiles. The self-editing grant has no safe narrow form: a capability that can rewrite the
         permission file is the permission file. It comes out, and a human edits config.
@@ -2346,9 +2261,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
 
       <h3 class="sub">8.3 · Why removing <code>Skill(update-config)</code> does not fix it</h3>
       <p>
-        I said earlier that the self-editing grant comes out and a human edits config. That is the right
-        instinct and it does not work, and the reason it does not work is worth more than the fix,
-        because the same shape defeats several other repairs on this page.
+        I said earlier that the self-editing grant comes out and a human edits config. That is the right instinct, and it does not work. The reason it does not work is worth more than the fix, because the same shape defeats several other repairs on this page.
       </p>
 
       <ol class="sequence">
@@ -2366,23 +2279,20 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
         </li>
         <li data-signal="block">
           <span class="when">and the config is bigger than the file</span>
-          <span class="what">A project skill can carry its own <code>allowed-tools</code> frontmatter, which pre-approves tools for that skill, and workspace trust never gates it. So <code>.claude/skills/</code> is a permission surface too, and an agent that can write files under <code>.claude/</code> can grant itself tools without touching <code>settings.json</code> at all.</span>
+          <span class="what">A project skill can carry its own <code>allowed-tools</code> frontmatter, which pre-approves tools for that skill, and workspace trust never gates it. So <code>.claude/skills/</code> is a permission surface too. An agent that can write files under <code>.claude/</code> can then grant itself tools without touching <code>settings.json</code>.</span>
         </li>
       </ol>
 
       <p>
-        That is the circularity, and it is the reason the measured work on rule placement puts it as a
-        law rather than a tip: <strong>never let the rung that enforces a rule sit inside the rung it
-        enforces against.</strong> A deny rule protecting its own file is an enforcer inside its own
+        That is the circularity, and it is why the measured work on rule placement treats this as a law rather than a tip. <strong>Never let the rung that enforces a rule sit inside the rung it enforces against.</strong> A deny rule protecting its own file is an enforcer inside its own
         blast radius. It stops an incurious agent, which is worth something, and it stops nothing that
         is actually trying.
       </p>
 
       <h3 class="sub">8.4 · Where the rule has to live instead</h3>
       <p>
-        Deny rules from any scope beat allow rules from any scope, and managed settings cannot be
-        overridden even from the command line. So move the self-protection <em>up</em>, out of the
-        workspace the agent works in, and back it with the one control that is not a runtime check at
+        Deny rules from any scope beat allow rules from any scope, and nothing overrides managed settings, not even the command line. So move the self-protection <em>up</em>, out of the
+        workspace the agent works in. Back it with the one control that is not a runtime check at
         all.
       </p>
 
@@ -2428,9 +2338,8 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
       <div class="callout">
         <span class="label">One honest exception</span>
         <p>
-          <code>settings.local.json</code> is written by the harness itself when a human clicks
-          <em>do not ask again</em>. That write does not go through the <code>Edit</code> tool, so a
-          path deny does not block it, and it should not: it is a human decision being recorded. It is
+          The harness itself writes <code>settings.local.json</code> when a human clicks <em>do not ask again</em>. That write does not go through the <code>Edit</code> tool, so a
+          path deny does not block it. And it should not: it is a human decision being recorded. It is
           also why <a class="xref" href="#s-11">section 11</a> treats that file as a queue rather than
           as config. The agent cannot write it. It can, however, benefit from what a tired human clicked
           into it, which is a slower version of the same loop.
@@ -2446,8 +2355,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
         nobody reviews grants whatever nobody noticed.
       </p>
       <p>
-        So the claim is not that a door is airtight. It is that a door moves the enumeration from a file
-        written by clicking into a file written by deciding, and puts it in front of a reviewer. Then
+        So the claim is not airtightness. A door moves the enumeration from a file written by clicking into a file written by deciding. It puts that file in front of a reviewer. Then
         <a class="xref" href="#s-5">section 5</a>'s container catches what the review misses, and
         <a class="xref" href="#s-9">section 9</a> is about what to do with the layer underneath that.
       </p>
@@ -2467,9 +2375,9 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
       <div>
         <h2>A deny list stops an accident and teaches a habit. It does not stop an adversary</h2>
         <p class="thesis">
-          Permission rules are enforced by the harness against a command string it can parse. That is
+          The harness enforces permission rules against a command string it can parse. That is
           enough to stop a confused agent, which is the failure mode you actually have. It is not enough
-          to stop content that is trying to get out, and a team that believes otherwise has bought one
+          to stop content that is trying to get out. A team that believes otherwise has bought one
           layer and stopped building.
         </p>
         <div class="chips">
@@ -2483,10 +2391,8 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
     <div class="rung-body">
       <p>
         Two facts bound what a rule can do. Path denies cover the built-in file tools and the file
-        commands the harness recognizes in a shell command; they do not cover a subprocess that opens
-        files itself, which is what every test suite and every script does. And the read side of the
-        boundary is not the interesting one anyway: a secret that reaches the model's context can leave
-        it, in a PR description, in a quoted error, in a sub-agent's report.
+        commands the harness recognizes in a shell command. They do not cover a subprocess that opens
+        files itself, which is what every test suite and every script does. And the read side of the boundary is not the interesting one anyway. A secret that reaches the model's context can leave it, in a PR description, in a quoted error, in a sub-agent's report.
       </p>
       <p>
         So the deny list is a short list of things it is worth being categorical about, and the floor
@@ -2513,8 +2419,8 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
       <h3 class="sub">9.1 · The injection case, where deny earns more than its keep</h3>
       <p>
         There is one place a deny list does real security work rather than habit work. Untrusted content
-        that reaches the context can ask the agent to run something, and the agent has no reliable way to
-        tell that request from yours. A deny rule refuses it without the agent's cooperation, and deny
+        that reaches the context can ask the agent to run something. The agent has no reliable way to
+        tell that request from yours. A deny rule refuses it without the agent's cooperation. Deny
         rules fire on any subcommand, including one hidden in a command substitution or a loop body. So
         the list is exactly the layer that turns <em>the model was persuaded</em> into <em>the call did
         not run</em>.
@@ -2530,7 +2436,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
         <span class="label">Two settings to lock, not to argue about</span>
         <p>
           Set <code>disableBypassPermissionsMode</code> so the strict posture cannot be discarded by a
-          keystroke, and keep the protected paths protected: bypass mode skips prompts even for writes
+          keystroke, and keep the protected paths protected. Bypass mode skips prompts even for writes
           to <code>.git</code> and <code>.claude</code>. Both work from any settings scope, so you can
           lock yourself out of your own escape hatch, which is the correct use of the feature. In an
           organization they belong in managed settings, where a project cannot override them.
@@ -2553,7 +2459,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
         <h2>Some rules are not patterns, and a hook is where they go</h2>
         <p class="thesis">
           A permission list matches strings. Plenty of real rules are conditional on something a string
-          does not carry: which branch you are on, what the argument resolves to, whether the target is
+          does not carry. They ask which branch you are on, what the argument resolves to, whether the target is
           inside the high-risk module, whether a human is watching. Those compile into a hook, which is
           code the model cannot reach and cannot talk out of it.
         </p>
@@ -2567,11 +2473,9 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
 
     <div class="rung-body">
       <p>
-        A <code>PreToolUse</code> hook runs before the permission prompt for every tool call, and its
+        A <code>PreToolUse</code> hook runs before the permission prompt for every tool call. Its
         output can deny the call, force a prompt, or skip the prompt. The precedence is worth memorizing
-        because it is not symmetric. A hook that returns <em>allow</em> does not defeat a deny or ask
-        rule: those are evaluated regardless. A hook that exits with code 2 stops the call before the
-        rules are consulted, so a block beats an allow rule. Refusal composes; permission does not.
+        because it is not symmetric. A hook that returns <em>allow</em> does not defeat a deny or ask rule: the harness evaluates those regardless. A hook that exits with code 2 stops the call before the harness consults the rules, so a block beats an allow rule. That is why refusal composes and permission does not.
       </p>
 
       <div class="tablewrap">
@@ -2590,14 +2494,14 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
       </div>
 
       <p>
-        That last row is a legitimate and underused posture: put the whole tool in the allow list and
+        That last row is a legitimate and underused posture. Put the whole tool in the allow list and
         register a hook that rejects the specific commands you care about. It inverts the default, which
-        is usually wrong, and is occasionally exactly right for a sandboxed throwaway environment where
+        is usually wrong. And it is occasionally exactly right for a sandboxed throwaway environment where
         you want speed with a handful of absolute stops.
       </p>
       <p>
         <a href="/guardrails/">Five Guardrails</a> works the whole ascent, from a rule and a deny entry
-        up to a hook that compiles the same rule into a sensor and returns a refusal the agent can act
+        up to a hook. That hook compiles the same rule into a sensor and returns a refusal the agent can act
         on. The relevant design decision from it, restated for this page: <strong>a refusal should name
         the rule, the reason, and the sanctioned path.</strong> A hook can do that in a sentence. A deny
         rule can only say no, which is why the always-on prose from
@@ -2610,7 +2514,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
     <span class="kicker">Part IV</span>
     <h2>The practice</h2>
     <p>
-      Two sections. How to audit a list you already have and keep it at a reviewable size, and the
+      Two sections. How to audit a list you already have and keep it at a reviewable size. And the
       artifact: a complete pair of files, then the conformance checklist and the rule I fail.
     </p>
   </div>
@@ -2643,7 +2547,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">pass 1 · free</span>
-          <span class="what">Delete every entry for a command in the read-only set: <code>ls</code>, <code>cat</code>, <code>grep</code>, <code>find</code>, <code>wc</code>, <code>head</code>, <code>tail</code>, <code>which</code>, <code>diff</code>, <code>stat</code>, <code>du</code>, <code>echo</code>, <code>pwd</code>, <code>cd</code>, and the read-only git forms. They ran without a prompt anyway.</span>
+          <span class="what">Delete every entry for a command the harness already treats as read-only. The set starts with <code>ls</code>, <code>cat</code>, <code>grep</code>, <code>find</code>, <code>wc</code>, <code>head</code> and <code>tail</code>. It continues with <code>which</code>, <code>diff</code>, <code>stat</code>, <code>du</code>, <code>echo</code>, <code>pwd</code> and <code>cd</code>, plus the read-only git forms. They ran without a prompt anyway.</span>
         </li>
         <li data-signal="pass">
           <span class="when">pass 2 · shadowed</span>
@@ -2651,7 +2555,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
         </li>
         <li data-signal="warn">
           <span class="when">pass 3 · runners</span>
-          <span class="what">Find every entry whose program executes its arguments: <code>docker exec</code>, <code>npx</code>, <code>devbox run</code>, <code>mise exec</code>, <code>direnv exec</code>, <code>python3 -c</code>, <code>sh -c</code>, <code>git *</code>, <code>find *</code> with <code>-exec</code>. Each one is an execution grant wearing a specific label. Replace with a target, or name the runner <em>and</em> the inner command.</span>
+          <span class="what">Find every entry whose program executes its arguments. The list includes <code>docker exec</code>, <code>npx</code>, <code>devbox run</code>, <code>mise exec</code> and <code>direnv exec</code>. It also covers <code>python3 -c</code>, <code>sh -c</code>, <code>git *</code> and <code>find *</code> with <code>-exec</code>. Each one is an execution grant wearing a specific label. Replace it with a target, or name the runner <em>and</em> the inner command.</span>
         </li>
         <li data-signal="block">
           <span class="when">pass 4 · frozen</span>
@@ -2659,7 +2563,7 @@ db-console:     <span class="c-pass">## a read-only psql session against the dev
         </li>
         <li data-signal="block">
           <span class="when">pass 5 · intent</span>
-          <span class="what">For each survivor, name the <b>one intent</b> it permits, in the vocabulary of the work rather than the tool. If the sentence needs an <em>and</em>, the entry is standing in for several intents and at least one of them is not the one you wanted. Give that intent a target and point the entry at the door instead. This is the pass that shortens the list permanently; the four above it only tidy.</span>
+          <span class="what">For each survivor, name the <b>one intent</b> it permits, in the vocabulary of the work rather than the tool. If the sentence needs an <em>and</em>, the entry stands in for several intents. At least one of them is not the one you wanted. Give that intent a target and point the entry at the door instead. This is the pass that shortens the list permanently; the four above it only tidy.</span>
         </li>
       </ol>
 
@@ -2696,7 +2600,7 @@ done | sort -rn
 
       <p>
         The local file is the one that matters for hygiene, because its whole purpose is to absorb clicks.
-        Reading it once a week is the cheapest audit in this article: each entry either becomes a target
+        Reading it once a week is the cheapest audit in this article. Each entry either becomes a target
         in the <code>Makefile</code>, gets promoted into the tracked settings file with a reason, or goes
         away. An entry that survives three of those reviews without becoming either is telling you the
         toolchain has a door you have not built yet.
@@ -2704,18 +2608,14 @@ done | sort -rn
       <p>
         Two mechanics worth knowing while you move entries around. Allow rules in a project's settings
         are capability grants, so they apply only after you accept the workspace-trust dialog for that
-        folder; deny and ask rules are not gated that way, because they only restrict. And a
-        <code>settings.local.json</code> that is tracked in git is treated as repository-supplied rather
-        than yours, and waits for the same trust step. If you check the local file in, you have made it
+        folder. Deny and ask rules are not gated that way, because they only restrict. And the harness treats a <code>settings.local.json</code> tracked in git as repository-supplied rather than yours. It waits for the same trust step. If you check the local file in, you have made it
         project config with a misleading name.
       </p>
 
       <div class="takeaway">
         <span class="label">The size test</span>
         <p>
-          The allow list fits on one screen and every entry has a reason a colleague would accept. If it
-          does not fit, the question is not which entries to cut. It is which door you have not built,
-          because a list that long is a description of a project with many entrances.
+          The allow list fits on one screen and every entry has a reason a colleague would accept. If it does not fit, ask which door you have not built. A list that long describes a project with many entrances, so cutting entries treats the symptom.
         </p>
       </div>
     </div>
@@ -2736,7 +2636,7 @@ done | sort -rn
         <p class="thesis">
           Copy the pair, delete what your project does not have, and add a target rather than an entry
           the first time something is refused. The checklist below is checkable by reading two
-          files, which is the property I care about most: an intent catalog, and the entry that points
+          files. That is the property I care about most: an intent catalog, and the entry that points
           at it.
         </p>
       </div>
@@ -2801,7 +2701,7 @@ done | sort -rn
         second file rather than the first, for the reason <a class="xref" href="#s-8">section 8.3</a>
         works through. And the <code>docker compose exec</code> entry in the deny list is not a
         contradiction of the <code>Makefile</code> below, which runs that exact command. Permission rules match what the <em>agent</em> asks the shell to run. What a permitted
-        program then spawns is invisible to them, which is the mechanism the whole door depends on: the
+        program then spawns is invisible to them, which is the mechanism the whole door depends on. The
         agent cannot type <code>docker compose exec</code>, and <code>make test</code> can.
       </p>
 
@@ -2840,10 +2740,10 @@ shell:         <span class="c-pass">## interactive shell in the container. A del
         <li><span class="t">Every allow entry names <b>one intent</b>, in the vocabulary of the work. An entry standing in for a program's whole surface is a bug, however convenient.</span><span class="ref">§3 · §4</span></li>
         <li><span class="t">The project has <b>one entry point</b> for work, and the allow list names it. The intents are enumerated behind it, as targets.</span><span class="ref">§4</span></li>
         <li><span class="t">Work that <b>varies</b> takes an argument. Widening a pattern to cover a family is the failure this replaces.</span><span class="ref">§4.2</span></li>
-        <li><span class="t">No target grants the agent <b>general execution</b>. A shell, a language console and the framework CLI are denied by name, and the operations people reached for them with are named targets with typed parameters.</span><span class="ref">§8.1 · §8.2</span></li>
+        <li><span class="t">No target grants the agent <b>general execution</b>. A shell, a language console and the framework CLI are denied by name. The operations people reached for them with become named targets with typed parameters.</span><span class="ref">§8.1 · §8.2</span></li>
         <li><span class="t">The toolchain lives in a container. There is <b>no host copy</b> of it to reach for.</span><span class="ref">§5</span></li>
         <li><span class="t">Adding a capability is a <b>target and a review</b>, never a settings entry and a click.</span><span class="ref">§6</span></li>
-        <li><span class="t">The door's own files are <b>not writable</b> by the agent — the <code>Makefile</code> and the whole settings directory — and the rule that says so lives in a <b>scope the agent cannot write</b>, backed by code owners on both paths.</span><span class="ref">§8.3 · §8.4</span></li>
+        <li><span class="t">The agent cannot write the door's own files, which are the <code>Makefile</code> and the whole settings directory. The rule saying so lives in a <b>scope the agent cannot write</b>, backed by code owners on both paths.</span><span class="ref">§8.3 · §8.4</span></li>
         <li><span class="t">Redirecting flags are denied: <code>make -f</code>, <code>make -C</code>, and their long forms.</span><span class="ref">§8</span></li>
         <li><span class="t">Every variable a recipe interpolates is <b>named for its value, quoted, and validated</b>, and no recipe takes a program name from an overridable variable.</span><span class="ref">§8.2</span></li>
         <li><span class="t">No entry names a program that <b>executes its arguments</b> unless the inner command is named too.</span><span class="ref">§2 · §11</span></li>
@@ -2871,19 +2771,12 @@ shell:         <span class="c-pass">## interactive shell in the container. A del
 
       <h3 class="sub">12.3 · Where I fail it</h3>
       <p>
-        The charter in <a class="xref" href="#s-3">section 3</a> is mine and it is running. It fails rule
-        1 seven times over, rule 4 three times (<code>make shell</code>, <code>make tinker</code>,
-        <code>make artisan</code> are all reachable through the door), rule 7 through
-        <code>Skill(update-config)</code> and a self-protecting deny that would sit in the file it
-        protects, rule 9 in about a dozen recipes that interpolate <code>$(ARGS)</code> unquoted, rule 10
-        twice, and rule 13 outright: it allows <code>Bash(curl *)</code>. What it gets right is the part that took the longest to learn,
-        which is the rule layer: a locked always-on rule, a <code>why</code> field recording the incident
-        that produced it, seventy-eight named targets, and hooks on four events.
+        The charter in <a class="xref" href="#s-3">section 3</a> is mine and it is running. It fails rule 1 seven times over. It fails rule 4 three times (<code>make shell</code>, <code>make tinker</code> and <code>make artisan</code> are all reachable through the door). It fails rule 7 through <code>Skill(update-config)</code> and a self-protecting deny that would sit in the file it protects. Rule 9 fails in about a dozen recipes that interpolate <code>$(ARGS)</code> unquoted, rule 10 twice, and rule 13 outright: it allows <code>Bash(curl *)</code>. What it gets right is the part that took the longest to learn: the rule layer. That layer holds a locked always-on rule, a <code>why</code> field recording the incident that produced it, seventy-eight named targets, and hooks on four events.
       </p>
       <p>
         That split is the honest lesson of the page, and it is why the intent framing is worth the
         trouble. I modeled the intent correctly in prose and then encoded it in a language that cannot
-        hold it, and the encoding drifted for a year without anybody noticing, because nothing compares
+        hold it. The encoding drifted for a year without anybody noticing, because nothing compares
         the two. Level 2 below is the level at which they stop drifting apart.
       </p>
 
@@ -2892,7 +2785,7 @@ shell:         <span class="c-pass">## interactive shell in the container. A del
         <p>
           A permission list is not a security posture you tune. It is a description of how many ways your
           project can be run, and it will be exactly as long as that number. Give the project one door,
-          put the toolchain in a container behind it, deny the flags that redirect the door and the edits
+          put the toolchain in a container behind it. Deny the flags that redirect the door and the edits
           that rewrite it, and the list becomes short enough that somebody reads it. Everything else on
           this page is what happens after somebody does.
         </p>

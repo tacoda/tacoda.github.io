@@ -647,10 +647,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Two hundred commits. <em>One of them did it.</em></h1>
     <p class="standfirst">
-      Reading a diff and hunting a regression are different skills, and only one of them has a weekly
+      Reading a diff and hunting a regression are different skills, and only one of them gets a weekly
       exercise. Agents are worst at hunting, because a hunt searches over states you must observe,
-      not over text. The skill also decays fastest in a codebase where nobody on the team typed most
-      of the history. Thirty minutes, one real regression, a known answer, and the agent closed.
+      not over text. That skill also decays fastest in a codebase where nobody on the team typed most
+      of the history. Which is why this drill is thirty minutes, one real regression, a known answer,
+      and the agent closed.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -741,14 +742,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Third, and worst, the skill only gets practised during incidents. Nobody bisects for fun. So
         the reps arrive at the least convenient moment: under time pressure, in front of an audience.
-        An incident is a poor classroom.
+        Under that pressure, nobody learns the procedure well.
       </p>
 
       <div class="takeaway">
         <span class="label">What the drill is for</span>
         <p>
           Moving the reps off the incident. Thirty minutes a month, a real regression with a known
-          answer, no stakes. The night it matters, the procedure is already boring.
+          answer, no stakes. Then the night it matters, the procedure already feels boring.
         </p>
       </div>
     </div>
@@ -810,8 +811,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           If there is no reliable reproducer at 0:08, stop the drill and build one with the time
           left. A hunt that starts from an unreliable reproducer converges on a random commit and
-          reports it with total confidence. That outcome is worse than not finishing, so learning to
-          abort at this point is itself a result worth having.
+          reports it with total confidence. That outcome is worse than not finishing, so a hunter
+          who stops here still produces a real result.
         </p>
       </div>
     </div>
@@ -886,8 +887,8 @@ git rebase --onto drill $OLD main</code></pre>
         <span class="label">One dealer rule above all</span>
         <p>
           Never say how far back it goes. A hunter who knows the range is two hundred commits, not two
-          thousand, starts reasoning about which commits look suspicious. Bisect exists precisely so
-          that nobody has to do that reasoning.
+          thousand, starts reasoning about which commits look suspicious. Which is why bisect exists:
+          nobody has to do that reasoning.
         </p>
       </div>
     </div>
@@ -933,20 +934,20 @@ TRIPWIRES    if the answer is a merge commit, I will ______
       <p>
         The verified line at the top is the one that does the work. Do five runs on the bad commit and
         five on the good one, before anything else. A reproducer that fails four times out of five
-        still produces an answer, and nothing afterwards tells that answer apart from a real one.
+        still produces an answer. Nothing afterwards tells that answer apart from a real one.
       </p>
       <p>
         The tripwires exist because all three of those results mean one thing: your bound or your
-        reproducer is wrong. In the moment, a hunter rationalises every one of them instead. Writing
-        down the response in advance is what makes it survive contact with a plausible story.
+        reproducer is wrong. In the moment, a hunter rationalises every one of them instead. So write
+        the response down in advance, which is what makes it survive contact with a plausible story.
       </p>
 
       <div class="takeaway">
         <span class="label">The step count is the honest bit</span>
         <p>
-          Two hundred commits is eight tests. A thousand is just ten. Write the number down before you
-          start, and the search becomes an arithmetic fact instead of a feeling about progress. That
-          fact is also the earliest warning that you have stopped bisecting and started guessing.
+          Two hundred commits is eight tests. A thousand is just ten. So write the number down before
+          you start, and the search becomes an arithmetic fact instead of a feeling about progress.
+          That fact is also the earliest warning that you have stopped bisecting and started guessing.
         </p>
       </div>
     </div>
@@ -975,8 +976,8 @@ TRIPWIRES    if the answer is a merge commit, I will ______
       <p>
         The bad end is usually easy: the code fails now, and that failure is why you are here. The good end is
         where people guess. "It worked in the 2.3 release" is a memory, and a memory about software
-        behavior from three months ago is not evidence. Check out the tag, run the reproducer, watch it
-        pass. Then it is a bound.
+        behavior from three months ago is not evidence. So check out the tag, run the reproducer, and
+        watch it pass. Only then is it a bound.
       </p>
       <p>
         If the reproducer fails at the supposed good end too, that failure is not a setback. Instead,
@@ -1071,8 +1072,8 @@ git bisect run /tmp/check.sh</code></pre>
           Marking an unbuildable commit as bad produces a wrong answer that looks right. No other
           mistake in a bisect does it so often. The commit that fails to compile has nothing to do with
           your regression. Calling it
-          bad tells git the transition happened before that commit, so skip is not a weaker answer than
-          bad, but the true one.
+          bad tells git the transition happened before that commit. Mark it skip instead, because skip
+          records the truth that bad would hide.
         </p>
       </div>
     </div>
@@ -1178,8 +1179,8 @@ git bisect run /tmp/check.sh</code></pre>
         <span class="label">The one to internalise</span>
         <p>
           Bisect answers "where did the behavior change", which is not the same question as "where is
-          the defect". Most of the time they coincide. But the times they do not coincide are the times
-          the hunt is worth doing well. A hunter who cannot tell the two questions apart will fix the
+          the defect". Most of the time the two coincide. But when they diverge, the hunt matters most.
+          A hunter who cannot tell the two questions apart will fix the
           wrong file with great confidence.
         </p>
       </div>
@@ -1239,9 +1240,9 @@ git bisect run /tmp/check.sh</code></pre>
 
       <p>
         As with reverse-review, the total is not the interesting number. Losing <em>bounded</em>
-        repeatedly is a discipline problem with an easy fix. Losing <em>distinguished</em> repeatedly
-        is a much deeper thing, because the hunter is treating a search result as a diagnosis. That
-        habit survives into every incident they will ever run.
+        repeatedly is a discipline problem, and an easy one to fix. By contrast, losing
+        <em>distinguished</em> repeatedly is the deeper failure, because the hunter is treating a
+        search result as a diagnosis. That habit survives into every incident they will ever run.
       </p>
 
       <div class="callout">
@@ -1277,9 +1278,10 @@ git bisect run /tmp/check.sh</code></pre>
     <div class="rung-body">
       <p>
         You do arithmetic without a calculator while learning arithmetic, and with one for the rest of
-        your life. The drill closes the agent for thirty minutes a month, because an agent will run the
-        whole search and hand back an answer. A rep you did not perform is not a rep. In a real
-        incident, use everything you have.
+        your life. The drill works the same way. It closes the agent for thirty minutes a month,
+        because an agent will run the whole search and hand back an answer. Then the rep is one you
+        never performed, and that does not train you. In a real incident, though, use everything you
+        have.
       </p>
 
       <div class="tablewrap">
@@ -1299,9 +1301,8 @@ git bisect run /tmp/check.sh</code></pre>
 
       <p>
         Every item in the right-hand column is a judgment about evidence you observed yourself, and the
-        drill trains every one of them. The argument for the exercise is not that agents are bad at
-        hunting, though they are. The real point is that the parts you still supply are the parts
-        nobody practises.
+        drill trains every one of them. Yes, agents are bad at hunting. But the deeper reason for the
+        exercise is that the parts you still supply are the parts nobody practises.
       </p>
 
       <div class="takeaway">

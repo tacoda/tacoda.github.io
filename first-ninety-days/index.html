@@ -646,11 +646,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Ninety days to a junior who can say <em>wait</em>.</h1>
     <p class="standfirst">
-      The pieces exist: a standard for what a merge requires, an exercise that trains the catch, a lab
-      that shows how a plausible wrong answer feels from the inside. What is missing is the order,
-      because handed all four at once on day one, a new engineer reads them as opinions. Sequenced,
-      the same four are a ladder. Three phases, one hour of senior time a week, and a bar at the end
-      that you either clear or repeat.
+      The pieces exist: a standard for what a merge requires, an exercise that trains the catch, and a
+      lab. That lab shows how a plausible wrong answer feels from the inside. What is missing is the
+      order, because a new engineer handed all four at once on day one reads them as opinions.
+      Sequenced, those same four become a ladder. Three phases, one hour of senior time a week, and a
+      bar at the end that you either clear or repeat.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -739,7 +739,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         The sequence below exists to make each piece land at the moment it becomes obvious. The
         workshop is a revelation at day thirty-five and trivia at day one. By then the junior has
         personally shipped something they did not understand, and watched a senior find it in ninety
-        seconds. The material has not changed. The reader has.
+        seconds. The material has not changed, but the reader has.
       </p>
 
       <div class="takeaway">
@@ -815,8 +815,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The floor: nothing merges that you cannot explain</h2>
         <p class="thesis">
-          One law, adopted before anything else, because every later phase is a way of raising this
-          same bar.
+          One law to adopt before anything else, because every later phase raises the same bar.
         </p>
         <div class="chips">
           <span class="chip kind-rule"><b>rule</b> four claims, spoken</span>
@@ -977,8 +976,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         <a href="/junior-to-senior/">The workshop</a> puts the junior in front of a change where every
         test passes and the behavior is wrong in a way that costs money. Read cold on day one, it is a
-        clever puzzle. Read at day thirty-five, after four weeks of defending claims and four reps
-        against planted defects, the whole thing clicks: they recognize the shape from their own week.
+        clever puzzle. Read at day thirty-five, the whole thing clicks. By then they have spent four
+        weeks defending claims and four reps against planted defects, so they recognize the shape from
+        their own week.
       </p>
       <p>
         The workshop's second half is where the ninety days turn. It moves from "how do I catch this"
@@ -1030,7 +1030,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        Reverse-review now runs on real diffs off the team's queue. The miss rate goes up and the
+        Reverse-review now runs on real diffs off the team's queue. So the miss rate goes up and the
         confidence goes down, both correctly. Live diffs mostly contain nothing wrong, which is itself
         the lesson. A clean review that says "I looked at these four things and they are fine, here is
         why" is a real deliverable. Without that skill, the junior starts inventing findings to look
@@ -1045,7 +1045,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Fold</span>
-          <span class="what">If the junior withdraws a correct finding under mild social pressure, that is the finding of the session, and it is more important than the defect was.</span>
+          <span class="what">If the junior withdraws a correct finding under mild social pressure, that is the finding of the session. It matters more than the defect did.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Hold</span>
@@ -1060,7 +1060,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         This drill exists because the failure mode it targets is the expensive one. A junior who cannot
         find defects is a junior. A junior who finds them and then abandons them when a confident
-        person disagrees will still be doing that at eight years in, and by then nobody is checking.
+        person disagrees keeps doing that at eight years in. By then nobody is checking.
       </p>
 
       <h3 class="sub">Phase gate</h3>
@@ -1120,7 +1120,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         The deliverable is a merged pull request against the team's own configuration, and the body of
-        that PR names the incident. Not "we should validate inputs here" but "on the fourteenth this
+        that PR names the incident. Not "we should validate inputs here". But "on the fourteenth this
         class silently double-charged a test account for six hours; this is the constraint that would
         have refused it". That sentence is what makes the rule survive the next person who finds it
         annoying.
@@ -1184,8 +1184,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </ul>
 
       <p>
-        If it ships, it ships. If it does not, that is still a complete result at day ninety, and it is
-        a far better one than a change that shipped and nobody can explain.
+        If it ships, it ships. Even if it does not, that is still a complete result at day ninety. It
+        beats a change that shipped and nobody can explain.
       </p>
     </div>
   </section>
@@ -1238,9 +1238,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="takeaway">
         <span class="label">The comparison that matters</span>
         <p>
-          Four hours of new senior time against the alternative, which is a year of reviewing changes
-          that nobody on the team can explain, then absorbing that maintenance yourself. The cheap
-          option is the one with the schedule attached.
+          Four hours of new senior time against the alternative. That alternative is a year of
+          reviewing changes nobody on the team can explain, then absorbing the maintenance yourself.
+          The cheap option is the one with the schedule attached.
         </p>
       </div>
     </div>
@@ -1272,29 +1272,28 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="pass">
           <span class="when">Catches</span>
-          <span class="what">Eight or more defects caught and classified across the ninety days, at least three of them in live diffs.</span>
+          <span class="what">Catches and classifies eight or more defects across the ninety days, at least three of them in live diffs.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Holds</span>
-          <span class="what">At least one correct position defended with evidence against a senior arguing the other way.</span>
+          <span class="what">Defends at least one correct position with evidence, against a senior arguing the other way.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Authors</span>
-          <span class="what">One rule merged into the team's harness, with the incident named in the pull request.</span>
+          <span class="what">Merges one rule into the team's harness and names the incident in the pull request.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Ships</span>
-          <span class="what">One change owned end to end, self-reviewed first, with a trail that includes what they turned down.</span>
+          <span class="what">Owns one change end to end, self-reviews it first, and leaves a trail that includes what they turned down.</span>
         </li>
       </ol>
 
       <p>
         Clearing all five means they can hold the team's merge bar unaccompanied: L2 comprehension as
-        routine, L3 on the changes where being wrong is expensive. Note what that is not. The
-        Comprehension Standard grades diffs and not people, deliberately, so "they are an L3" is a
+        routine, L3 on the changes where being wrong is expensive. That does not make them an L3. The
+        Comprehension Standard grades diffs, not people, deliberately, so "they are an L3" is a
         category error. What the five artifacts buy is narrower and more useful: their ordinary
-        changes no longer need a second reader. That is the honest ceiling for ninety days, and it is
-        a real one.
+        changes no longer need a second reader. That is the honest ceiling for ninety days.
       </p>
 
       <div class="callout">

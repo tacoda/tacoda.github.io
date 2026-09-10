@@ -763,7 +763,7 @@ flowchart TD
       </figure>
 
       <p>
-        Notice how little of this is agentic. Four of the five model-calling nodes are one
+        Little of this is agentic. Four of the five model-calling nodes are one
         constrained LLM call with a fixed input and output shape. Only
         <code>research-worker</code> runs a real loop, because only research needs one:
         the number of searches is not knowable in advance. Everything else is a transformation that
@@ -840,9 +840,9 @@ workers:
 
       <p>
         Five lines. Each one expands into a real subsystem configured in <code>config/</code>. The
-        HTTP server binds <code>0.0.0.0:3111</code> with a request timeout and a concurrency limit,
-        and the state store enables trigger fan-out. The queue picks a persistence adapter, and
-        observability turns on traces, metrics, and logs under the service name
+        HTTP server binds <code>0.0.0.0:3111</code> with a request timeout and a concurrency limit.
+        The state store then enables trigger fan-out. The queue picks a persistence adapter.
+        Meanwhile, observability turns on traces, metrics, and logs under the service name
         <code>concept-expander</code>.
       </p>
 
@@ -1001,9 +1001,9 @@ return {
       </figure>
 
       <p>
-        The <code>202</code> is the design. The request does not wait for research to finish, and it
-        could not: this pipeline runs for minutes. The caller gets an id, the queue drives the rest,
-        and <code>/result</code> reports where it has got to.
+        The intake returns <code>202</code> at once. The request cannot wait for research to
+        finish, because this pipeline runs for minutes. So the caller gets an id, the queue drives
+        the rest, and <code>/result</code> reports where it has got to.
       </p>
 
       <h3 class="sub">Why the payload is a pointer and not the data</h3>
@@ -1172,7 +1172,7 @@ iii --config config.yaml
       </figure>
 
       <p>
-        The interesting entry point is not the HTTP one. Try this instead:
+        You can also call one node directly, through the engine:
       </p>
 
       <figure class="code">
@@ -1193,7 +1193,7 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Traces</span>
-          <span class="what">OpenTelemetry spans at full sampling, exported to memory for local work. A run is a tree across six processes rather than six unrelated log streams.</span>
+          <span class="what">The observability worker exports OpenTelemetry spans at full sampling to memory for local work. A run is a tree across six processes rather than six unrelated log streams.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Logs</span>
@@ -1201,7 +1201,7 @@ iii trigger http::result --json '{"body":{"job_id":"&lt;id&gt;"}}'</code></pre>
         </li>
         <li data-signal="warn">
           <span class="when">The default</span>
-          <span class="what">Exporter is <code>memory</code> and sampling is <code>1.0</code>. Correct for development, wrong for production on both counts, and worth changing before this ever handles real volume.</span>
+          <span class="what">Exporter is <code>memory</code> and sampling is <code>1.0</code>. Both are correct for development and wrong for production, so change them before this ever handles real volume.</span>
         </li>
       </ol>
     </div>

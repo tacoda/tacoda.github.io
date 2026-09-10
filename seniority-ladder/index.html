@@ -729,13 +729,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         <a href="/comprehension-standard/">The Comprehension Standard</a> is explicit that its levels
         grade diffs and not people. A staff engineer merges an L1 dependency bump on Tuesday, and a
-        first-year engineer an L3 pricing-rule change on Wednesday. Read as a career
-        ladder, it becomes an insult and stops being usable as a merge bar.
+        first-year engineer an L3 pricing-rule change on Wednesday. If a team reads it
+        as a career ladder, it becomes an insult and stops working as a merge bar.
       </p>
       <p>
         But teams still need to answer the other question, because somebody has to decide who the
-        team trusts with what. Left unwritten, that decision gets made by tenure, by volume, or by who
-        speaks confidently in meetings. This document exists so the second question has its own
+        team trusts with what. If nobody writes it down, tenure, volume, or the loudest voice in meetings makes that decision. This document exists so the second question has its own
         vocabulary and stops borrowing the first one's.
       </p>
 
@@ -803,9 +802,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        A single axis is a constraint worth defending. Most ladders are a list of adjectives, and a
-        room can argue adjectives into whatever conclusion it already wanted. "Last check on
-        what" is answerable by watching what happens when this person is on holiday.
+        A single axis is a constraint worth defending. Most ladders are a list of adjectives, so a
+        room can argue adjectives into whatever conclusion it already wanted. But you can answer
+        "last check on what" by watching what happens when this person takes holiday.
       </p>
       <p>
         The rungs are cumulative in trust but not in activity. An R4 still merges their own changes and
@@ -815,9 +814,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">One rung at a time</span>
         <p>
-          Nobody skips. A person who has never held a correct finding under pushback will not author
-          the team's constraints well. Authoring a rule means holding a position, permanently and in
-          writing, against everyone who finds it inconvenient.
+          Nobody skips. Authoring a rule means holding a position, permanently and in writing, against
+          everyone who finds it inconvenient. So a person who has never held a correct finding under
+          pushback will not author the team's constraints well.
         </p>
       </div>
     </div>
@@ -852,7 +851,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <li>Asked "what happens if this runs twice", they answer from the code rather than from the agent's summary of the code.</li>
         <li>Their spoken explanation and their pull request description are not the same text, because a person read the diff in between.</li>
         <li>They ask for a second reader on something that scared them, before anyone tells them to.</li>
-        <li>They can point at the line they were least sure about. Everyone has one. Being able to name it is the skill.</li>
+        <li>They can point at the line they were least sure about. Everyone has one, and naming it is the skill.</li>
       </ul>
 
       <div class="callout">
@@ -869,8 +868,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">The artifact</span>
         <p>
           Two consecutive changes where all four claims land without prompting: what changed, why it is
-          correct, what it could break, how you would know. Not written down anywhere special. Said
-          out loud, to a person, twice running.
+          correct, what it could break, how you would know. They do not write it down anywhere special.
+          They say it out loud, to a person, twice running.
         </p>
       </div>
 
@@ -908,10 +907,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        "Ordinary" is not a vibe, but the exemption list already written in the charter: the changes
-        the team has decided do not need the raised bar. Money, authorization, data integrity, and
-        anything nobody can cheaply roll back stay off this rung, however good the person is. That
-        exclusion is a property of the change, not of the person.
+        "Ordinary" comes from the exemption list already in the charter, not from a vibe. That list
+        holds the changes the team has decided do not need the raised bar: money, authorization, and
+        data integrity. Anything nobody can cheaply roll back belongs there too. So all of those stay
+        off this rung, however good the person is. That exclusion is a property of the change, not of
+        the person.
       </p>
 
       <h3 class="sub">Looks like</h3>
@@ -926,9 +926,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">The tell</span>
         <p>
           Throughput climbs and escaped defects climb with it. They are merging what passes rather
-          than what is right, and green is doing the deciding. The quieter version of the same tell:
-          six months of history with no record of ever turning down anything the agent proposed. Nobody
-          is that well served by a model.
+          than what is right, and green is doing the deciding. But a quieter version of the same tell
+          is six months of history with no record of ever turning down anything the agent proposed.
+          Nobody is that well served by a model.
         </p>
       </div>
 
@@ -978,10 +978,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">The tell, in two symmetric forms</span>
         <p>
-          Findings that are only ever stylistic: a way of participating in review without ever being
-          accountable for the semantics. And its mirror, the review that never ends, where every
-          approval waits behind one more question. Both are strategies for never being the
-          person who said yes to the thing that broke.
+          Some people only ever file stylistic findings, which is a way of participating in review
+          while staying unaccountable for the semantics. And its mirror is the review that never ends,
+          where every approval waits behind one more question. Both are strategies for never being
+          the person who said yes to the thing that broke.
         </p>
       </div>
 
@@ -1035,7 +1035,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div class="callout">
         <span class="label">The tell</span>
         <p>
-          The charter only ever grows. Every incident adds a paragraph and nobody ever removes one,
+          The charter only ever grows. So every incident adds a paragraph and nobody ever removes one,
           until the charter is too long to finish. At that point it has stopped applying to anything.
           The person producing that outcome usually feels the most responsible in the room, which
           makes this tell hard to raise.
@@ -1150,10 +1150,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        Notice that every surviving signal is about subtraction: what got rejected, what did not escape,
-        what got smaller. Subtraction is not an aesthetic preference, but a consequence of which half
-        of the work got automated. Production did, so the human contribution shows up in the gap
-        between what got produced and what shipped.
+        Every surviving signal is about subtraction: what got rejected, what did not escape, what got
+        smaller. Subtraction is not an aesthetic preference, but a consequence of which half of the
+        work got automated. Production did, so the human contribution shows up in the gap between
+        what got produced and what shipped.
       </p>
     </div>
   </section>
@@ -1237,7 +1237,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Say it plainly, early, and reversibly. A rung is not a title, does not appear in anyone's
         email signature, and does not move compensation on its own. That is what makes it safe to move
-        a rung down. Being safe to move down is the entire reason it means anything when it moves up.
+        a rung down, which is also why moving one up means anything.
       </p>
 
       <div class="takeaway">

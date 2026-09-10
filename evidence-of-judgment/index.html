@@ -645,12 +645,12 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>The work that proves you're senior <em>leaves no trace</em>.</h1>
     <p class="standfirst">
-      A merged pull request is a record. A suggestion you turned down is not. Neither is the feature
-      that shrank from six weeks to two days, or the incident that did not happen because you refused
-      something in March. As soon as the agent writes the code, "look at my commits" stops being an
-      argument. Everything that replaces it is subtractive: what got rejected, what did not escape,
-      what got smaller. No system records any of it by default. This is how to record it without
-      turning your job into bookkeeping.
+      A merged pull request is a record. A suggestion you turned down is not, and neither is the
+      feature that shrank from six weeks to two days. The incident you prevented by refusing something
+      in March leaves no trace either. So once the agent writes the code, "look at my commits" stops
+      being an argument. Everything that replaces it is subtractive: what got rejected, what did not
+      escape, what got smaller. No system records any of it by default, which is why you record it
+      yourself without turning the job into bookkeeping.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -725,9 +725,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        That worked because writing the code and demonstrating you could write the code were the same
+        That worked because writing the code and showing you could write the code were the same
         motion. The artifact and the evidence were one object. Now something else writes most of the
-        artifact, and what you contributed sits in the difference between what it proposed and what
+        artifact, so what you contributed sits in the difference between what it proposed and what
         shipped. Nothing stores that difference.
       </p>
 
@@ -748,10 +748,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         There is a second-order effect worth naming, because it decides how urgent this is. Reviewers
-        are already noticing that shipped volume has stopped correlating with quality, and the
-        institutional response is to reach for something else to count. If nobody supplies a better
-        measure, they will settle on whatever is easiest to extract from the tooling, which will be
-        worse than what it replaced. Supplying the better measure is partly your job now.
+        are already noticing that shipped volume has stopped correlating with quality, so the
+        institution reaches for something else to count. If nobody supplies a better measure, they
+        will settle on whatever is easiest to extract from the tooling. That metric will be worse than
+        the one it replaced. So supplying the better measure is partly your job now.
       </p>
     </div>
   </section>
@@ -828,8 +828,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
 
       <p>
-        Notice what is not on the list: features delivered, tickets closed, lines written, systems
-        launched. Those are not worthless, but they no longer distinguish anybody. So a packet built
+        Features delivered, tickets closed, lines written, and systems launched are all missing from
+        the list. Those are not worthless, but they no longer distinguish anybody. So a packet built
         on them reads as a report on how much the agent produced while you were nearby.
       </p>
     </div>
@@ -879,8 +879,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <strong>Cost if wrong.</strong> Without it a rejection log is a list of preferences and reads
         like fussiness. With it, each line becomes an argument. Turning down a suggestion that would
         have cost nothing is housekeeping and does not belong in the file. Turning down one that would
-        have double-charged customers is the entire job, and the difference between those two is
-        exactly what a reviewer is trying to establish.
+        have double-charged customers is the entire job. That difference is exactly what a reviewer is
+        trying to establish.
       </p>
 
       <h3 class="sub">Two practical rules</h3>
@@ -923,8 +923,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         A private log kept diligently all year and a private log written the week before review look
         identical on the page. That is a real problem and it is worth solving structurally rather than
-        by asking people to trust you. A sentence in a pull request body from March is public, its
-        date is not yours to set, and you wrote it when you had nothing to gain.
+        by asking people to trust you. A sentence in a pull request body from March is public, and its
+        date is not yours to set. You also wrote it when you had nothing to gain.
       </p>
 
       <figure class="code">
@@ -1019,7 +1019,8 @@ gh search prs --commenter "@me" --merged-at "&gt;2026-01-01"</code></pre>
         <p>
           Archaeology recovers maybe a third, and a label makes reconstructed evidence legitimate.
           "Reconstructed from PR history in October" is fine and honest. But presenting it as a log
-          kept all year is a small lie about exactly the trait it claims. A bad trade at any odds.
+          kept all year is a small lie about exactly the trait it claims. That is a bad trade at any
+          odds.
         </p>
       </div>
     </div>
@@ -1039,7 +1040,7 @@ gh search prs --commenter "@me" --merged-at "&gt;2026-01-01"</code></pre>
         <h2>The packet: six claims, one page</h2>
         <p class="thesis">
           A packet that needs eight pages is a packet whose author could not identify the six things
-          that mattered. That failure is itself a demonstration.
+          that mattered. That failure is itself evidence.
         </p>
       </div>
     </div>
@@ -1120,10 +1121,9 @@ gh search prs --commenter "@me" --merged-at "&gt;2026-01-01"</code></pre>
       </div>
 
       <p>
-        The structural fix is worth more than the request. Once "what the agent proposed and what I did
-        instead" is a standing section in the template, every engineer produces this evidence as a
-        byproduct of working. The old commit history had exactly that property, and it is the one
-        worth getting back.
+        The structural fix is worth more than the request. Once that section becomes standard in the
+        template, every engineer produces this evidence as a byproduct of working. The old commit
+        history had exactly that property, and it is the one worth getting back.
       </p>
     </div>
   </section>
@@ -1175,8 +1175,8 @@ gh search prs --commenter "@me" --merged-at "&gt;2026-01-01"</code></pre>
         <p>
           Everything on this page works as evidence read by a human who can evaluate whether a specific
           refusal was wise. None of it works as a number on a dashboard. If someone proposes tracking
-          rejections per engineer per sprint, say that the proposal makes the signal worthless within
-          one quarter, and offer the qualitative version instead.
+          rejections per engineer per sprint, say the proposal makes the signal worthless within one
+          quarter. Offer the qualitative version instead.
         </p>
       </div>
     </div>
@@ -1215,16 +1215,16 @@ gh search prs --commenter "@me" --merged-at "&gt;2026-01-01"</code></pre>
       <p>
         In a year that is roughly a hundred and twenty lines, most of them timestamped by a system you
         do not control. They describe precisely the work that used to be invisible. Promotion aside,
-        that file is also the most useful document you will own: the only honest record of what you
-        were deciding while something else wrote the code.
+        that file is also the most useful document you will own. It is the only honest record of what
+        you were deciding while something else wrote the code.
       </p>
 
       <div class="takeaway">
         <span class="label">The real reason to keep it</span>
         <p>
           Reviewing the file after six months tells you something no performance cycle will. If
-          the entries are all small, the work is not exercising your judgment on anything that matters,
-          and that is a fact about the job rather than about you. Finding that out in month six is worth
+          the entries are all small, the work is not exercising your judgment on anything that matters.
+          That is a fact about the job rather than about you. Finding that out in month six is worth
           considerably more than winning the promotion in month twelve.
         </p>
       </div>

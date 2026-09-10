@@ -649,8 +649,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <p class="standfirst">
       Most teams write their charter on day one, from best practices, in one sitting. That charter is
       a list of guesses: nobody can say what a line cost, so someone argues it away the first time it
-      is inconvenient. Nobody authors a good charter. Charters accrete, one incident at a time, and
-      every rule carries the date and the damage that put it there. Here is one, in full, annotated
+      is inconvenient. So nobody authors a good charter. Instead it accretes, one incident at a time,
+      and every rule carries the date and the damage that put it there. Here is one, in full, annotated
       line by line.
     </p>
     <p class="byline">
@@ -718,23 +718,23 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>A charter written in advance is a list of guesses</h2>
         <p class="thesis">
-          The best practices you would put in it on day one are the ones the model already follows. The
-          rules that matter are the ones your codebase taught you, and you cannot know those yet.
+          The best practices you would put in it on day one are the ones the model already follows. But
+          the rules that matter are the ones your codebase taught you, and you cannot know those yet.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        Watch what happens to a day-one charter. It says "write clean, maintainable code" and "follow
-        existing patterns" and "add tests". Every line is true, and none of it changes any behaviour,
-        because the model was already close to that. Then a real problem arrives and somebody adds a
-        paragraph about it. Now the charter is nine tenths ornament and one tenth load-bearing, and
-        nobody inside can tell which is which.
+        A day-one charter says "write clean, maintainable code" and "follow existing patterns" and
+        "add tests". But every line is true and none of it changes any behaviour, because the model was
+        already close to that. Then a real problem arrives and somebody adds a paragraph about it. Now
+        the charter is nine tenths ornament and one tenth load-bearing, and nobody inside can tell
+        which is which.
       </p>
       <p>
         The alternative is uncomfortable and works: start with nothing, and add a rule only after
-        something has gone wrong. The resulting charter is shorter, and every line has a story. Then
+        something has gone wrong. So the charter comes out shorter, and every line has a story. Then
         someone proposes dropping a rule under deadline pressure, and the answer is a cost, not an
         opinion.
       </p>
@@ -756,8 +756,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">The test for any line you are about to add</span>
         <p>
           Can you name the specific thing that went wrong without it? If not, you are writing a wish.
-          Wishes are free to add and impossible to remove, which is the exact combination that produces
-          a charter nobody reads.
+          Such wishes are free to add and impossible to remove, which is the exact combination that
+          produces a charter nobody reads.
         </p>
       </div>
     </div>
@@ -832,9 +832,9 @@ and ask. Do not pick the one that is easier to implement.
       </figure>
 
       <p>
-        Seven sections, six of them traceable to a specific bad day. Notice how much is absent:
-        nothing about style, nothing about naming, nothing about architecture. No instruction to be
-        careful or thorough either. §5 is about why.
+        Six of the seven sections trace to a specific bad day, and the seventh is a standing policy.
+        Nothing here covers style, naming, or architecture, and nothing tells the agent to be careful
+        or thorough. So §5 explains why.
       </p>
     </div>
   </section>
@@ -897,9 +897,10 @@ then round half-up to cents. Never float on a money path.
         <span class="label">Why "~$40/day" and not "a bug"</span>
         <p>
           Six months from now somebody will propose relaxing this rule because it is inconvenient in
-          one place. "It caused a bug" loses that argument. "It cost forty dollars a day for three
-          weeks before anyone noticed" wins it. That number also lets you lose the argument on the
-          occasions when forty dollars a day is genuinely the right price.
+          one place. The weak answer, "it caused a bug," loses that argument. So give the strong one
+          instead: "it cost forty dollars a day for three weeks before anyone noticed." That number
+          also lets you lose the argument on the days when forty dollars a day is genuinely the right
+          price.
         </p>
       </div>
     </div>
@@ -918,8 +919,8 @@ then round half-up to cents. Never float on a money path.
       <div>
         <h2>Why these three are at three different altitudes</h2>
         <p class="thesis">
-          Same charter, three enforcement strengths, and the choice is not about how much the team
-          cares. The shape of the failure decides it.
+          The same charter carries three enforcement strengths, and the shape of the failure picks each
+          one, not the strength of the team's feelings.
         </p>
       </div>
     </div>
@@ -986,9 +987,8 @@ then round half-up to cents. Never float on a money path.
       <div>
         <h2>The most valuable rule is the one you cannot enforce</h2>
         <p class="thesis">
-          "When the ticket and the code disagree about the rule, stop and ask." No gate can detect
-          that disagreement. It stays anyway, and it is the line that has prevented the most
-          expensive failures.
+          "When the ticket and the code disagree about the rule, stop and ask." Yet no gate can detect
+          that disagreement. It stays anyway, because it has prevented the most expensive failures.
         </p>
       </div>
     </div>
@@ -996,17 +996,17 @@ then round half-up to cents. Never float on a money path.
     <div class="rung-body">
       <p>
         INC-94 is worth telling in full, because it is the failure mode that survives every mechanical
-        control on this page. A ticket asked for discount codes to apply to shipping. But the code had
-        a three-year-old undocumented rule: the system never discounts shipping, because of how the
-        carrier contract settles. The agent implemented the ticket anyway. Every test passed, every
-        gate passed, and review approved it. Then the company spent five weeks under-billing carriers
-        before anyone connected the ticket and the rule.
+        control on this page. In it, a ticket asked for discount codes to apply to shipping. But the
+        code had a three-year-old undocumented rule: the system never discounts shipping, because of
+        how the carrier contract settles. The agent implemented the ticket anyway. Every test passed,
+        every gate passed, and review approved it. Then the company spent five weeks under-billing
+        carriers before anyone connected the ticket and the rule.
       </p>
       <p>
-        No gate catches that failure. The change matched the ticket, matched the tests, and matched the
-        codebase style. Only a person catches it, by noticing that two sources of truth disagree and
-        asking which one is wrong. That is the whole skill, and the exercises in this catalog exist to
-        build it.
+        No gate catches that failure. So the change matched the ticket, the tests, and the codebase
+        style. But only a person catches it, by noticing that two sources of truth disagree and asking
+        which one is wrong. That is the whole skill, and the exercises in this catalog exist to build
+        it.
       </p>
 
       <div class="callout">
@@ -1024,8 +1024,8 @@ then round half-up to cents. Never float on a money path.
         <p>
           Train for it. A rule marked <code>none</code> is a standing instruction to the humans. So
           you install it with <a href="/reverse-review/">reverse-review</a> and
-          <a href="/junior-to-senior/">the workshop</a>, not with a hook. Every charter rule at the
-          <code>none</code> altitude should point at how the team practises it.
+          <a href="/junior-to-senior/">the workshop</a>, not with a hook. And every charter rule at
+          that altitude should point at how the team practises it.
         </p>
       </div>
     </div>
@@ -1044,8 +1044,8 @@ then round half-up to cents. Never float on a money path.
       <div>
         <h2>Six things left out on purpose</h2>
         <p class="thesis">
-          The omissions define a charter. Every line you add dilutes the ones that matter, so argue
-          the omissions as hard as the inclusions.
+          The omissions define a charter. So argue the omissions as hard as the inclusions: every line
+          you add dilutes the ones that matter.
         </p>
       </div>
     </div>
@@ -1082,9 +1082,9 @@ then round half-up to cents. Never float on a money path.
         <span class="label">Ordering is a real effect, and a reason to stay short</span>
         <p>
           The model follows instructions near the top of a long document better than instructions near
-          the bottom. You have two responses. So order a long charter with care, or keep it short
+          the bottom. That leaves two responses: order a long charter with care, or keep it short
           enough that order does not matter. The second holds up better, because the first depends on
-          today's models. Then you would have to re-verify it every time a model changes.
+          the current model. Then you would have to re-verify it every time a model changes.
         </p>
       </div>
     </div>
@@ -1103,7 +1103,7 @@ then round half-up to cents. Never float on a money path.
       <div>
         <h2>A fixed budget, because growth is the default</h2>
         <p class="thesis">
-          Nothing in the ordinary operation of a team ever removes a charter rule. Without a hard
+          Nothing in the ordinary operation of a team ever removes a charter rule. So without a hard
           constraint the charter only grows, until it stops working on a day nobody can name.
         </p>
         <div class="chips">
@@ -1132,7 +1132,7 @@ then round half-up to cents. Never float on a money path.
       <div class="takeaway">
         <span class="label">Promotion is the move to reach for first</span>
         <p>
-          A rule that becomes a check or a gate stops needing to be prose at all. The agent does not
+          A rule that becomes a check or a gate stops needing to be prose at all. So the agent does not
           have to remember it, the charter gets a line shorter, and the constraint gets stronger.
           <a href="/harness/">Promotion to the harness</a> is the same idea worked through five
           different mount points.
@@ -1154,17 +1154,17 @@ then round half-up to cents. Never float on a money path.
       <div>
         <h2>Deletion day</h2>
         <p class="thesis">
-          One afternoon a year, with the audit trail open. For each rule, the question is not "is this
-          still a good idea" but "when did it last do anything".
+          One afternoon a year, with the audit trail open. Then, for each rule, ask when it last did
+          anything, rather than whether it is still a good idea.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        Deletion day is why <a href="/audit-trail/">the trail records passes as well as blocks</a>. A
-        rule that has never blocked anything is either second nature or dead. Both look identical from
-        the outside until you have the numbers.
+        Deletion day is why <a href="/audit-trail/">the trail records passes as well as blocks</a>. So
+        a rule that has never blocked anything is either second nature or dead. Both look identical
+        from the outside until you have the numbers.
       </p>
 
       <div class="tablewrap">
@@ -1184,19 +1184,19 @@ then round half-up to cents. Never float on a money path.
       </div>
 
       <p>
-        Two judgement calls in that table are worth naming. A rule with four blocks in a year stays,
-        because the metric is expected damage, not frequency. So one double-charge event dwarfs a
-        hundred scope warnings. A rule with a hundred and forty-seven blocks is not a success story.
-        Something upstream keeps producing changes that violate it, so the rule absorbs a problem
-        instead of solving it.
+        Two judgement calls in that table are worth naming. First, a rule with four blocks in a year
+        stays, because the metric is expected damage, not frequency. So one double-charge event dwarfs
+        a hundred scope warnings. Second, a rule with a hundred and forty-seven blocks is not a success
+        story: something upstream keeps producing changes that violate it. So the rule absorbs a
+        problem instead of solving it.
       </p>
 
       <div class="callout">
         <span class="label">The deletion has to be someone's job</span>
         <p>
           Additions happen on their own, because adding a rule is how a team shows the incident
-          mattered. Deletion has no such motivation behind it, so it never happens on its own. Put a
-          name and a date on it, or accept that the charter grows forever.
+          mattered. But deletion has no such motivation behind it, so it never happens on its own. So
+          put a name and a date on it, or accept that the charter grows forever.
         </p>
       </div>
     </div>
@@ -1238,9 +1238,9 @@ then round half-up to cents. Never float on a money path.
 
       <p>
         It will not stay empty for long, and every line that arrives will have earned its place. Two
-        exceptions are reasonable on day one. A comprehension bar counts, because that rule is a
-        policy decision rather than a lesson. So does anything you carry over from a previous team,
-        with the original incident still attached.
+        exceptions are reasonable on day one. One is a comprehension bar, because that rule is a
+        policy decision rather than a lesson. The other is anything you carry over from a previous
+        team, with the original incident still attached.
       </p>
 
       <div class="takeaway">

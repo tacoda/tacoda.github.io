@@ -672,11 +672,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>The oldest multi-agent architecture is the <em>least used</em></h1>
     <p class="standfirst">
-      Hearsay-II solved speech understanding in 1975 with a shape almost nobody reaches for now:
-      a shared knowledge space, plus knowledge sources that each declare when they are worth waking.
-      The shape has no control flow at all: nothing calls anything. That last property is why it
-      fits agents better than the pipeline you probably drew instead. A pipeline commits to the
-      order of operations at design time, and an agent's whole value is deciding at runtime.
+      Hearsay-II solved speech understanding in 1975 with a shape almost nobody reaches for now.
+      It pairs a shared knowledge space with knowledge sources that each declare when they are worth waking.
+      That shape has no control flow at all: nothing calls anything. So it fits agents better than the
+      pipeline you probably drew instead. A pipeline commits to the order of operations at design time,
+      but an agent's whole value is deciding at runtime.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -687,8 +687,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="provenance">
       companion repo · <a href="https://github.com/tacoda/iii-blackboard"><code>github.com/tacoda/iii-blackboard</code></a><br>
       built twice · once as <a href="https://iii.dev">iii</a> configuration, once from scratch in stdlib Python<br>
-      the workload · the same incident analysis all three repos run : extract claims, propose an explanation, score it, accept<br>
-      verification · every iii command shown was executed against a live engine (0.22.0) before it was written down<br>
+      the workload · the same incident analysis all three repos run: extract claims, propose an explanation, score it, accept<br>
+      verification · I ran every iii command shown against a live engine (0.22.0) before writing it down<br>
       tests · <code>6 passed</code>, offline and deterministic
     </div>
 
@@ -741,7 +741,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Nothing calls anything</h2>
         <p class="thesis">
-          A pipeline is a graph you draw. A blackboard is a space you post into. The difference
+          A pipeline is a graph you draw. A blackboard is a space you post into. But the difference
           shows up the moment the work stops matching the graph.
         </p>
       </div>
@@ -808,8 +808,8 @@ flowchart TD
       <div class="callout">
         <span class="label">The honest case against</span>
         <p>
-          That last row is the price, and it is a real one. A blackboard run is harder to reason
-          about before it happens, and harder to test exhaustively. If your stages never change (intake,
+          That last row is the real cost. A blackboard run is harder to reason about before it
+          happens, and harder to test exhaustively. If your stages never change (intake,
           validate, transform, emit), a pipeline is clearer, cheaper, and easier to debug. So build the
           pipeline instead. When the <em>set</em> of applicable steps varies per input, reach for a
           blackboard. A fixed graph handles that variation worst.
@@ -874,7 +874,7 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
       </figure>
 
       <p>
-        That reason string is the detail worth stealing. Opportunistic control is the hardest kind
+        That reason string is the detail to copy. Opportunistic control is the hardest kind
         to debug, because there is no call stack to read. So "why didn't anything happen?" is the
         characteristic failure. Here every scheduling decision explains itself, and you did
         not have to instrument anything to get it. Classic blackboard implementations built those
@@ -927,7 +927,7 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
             <tr><td>Competing writes to a slot</td><td><code>state::compare-and-set</code></td><td>config</td></tr>
             <tr><td>Change notification</td><td><code>state:created</code> / <code>updated</code> / <code>deleted</code></td><td>config</td></tr>
             <tr><td>Explaining a decision</td><td>the condition's <code>reason</code> string</td><td><strong>free</strong></td></tr>
-            <tr class="flag"><td>Agenda / priority scheduling</td><td><code>priority_field</code> , RabbitMQ adapter only</td><td><strong>gap</strong></td></tr>
+            <tr class="flag"><td>Agenda / priority scheduling</td><td><code>priority_field</code>, RabbitMQ adapter only</td><td><strong>gap</strong></td></tr>
             <tr class="flag"><td>Quiescence detection</td><td>—</td><td><strong>gap</strong></td></tr>
           </tbody>
         </table>
@@ -936,8 +936,8 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
       <p>
         The agenda gap is a deployment detail with real consequences. The builtin and redis queue
         adapters ignore message priority, so a single-node blackboard has an
-        <em>unordered</em> agenda. Every eligible knowledge source still runs, so you only lose
-        control over which one runs first. The next rung shows why that ordering is the difference
+        <em>unordered</em> agenda. That still runs every eligible knowledge source: you only lose
+        control over which one runs first. So the next rung shows why that ordering is the difference
         between an optimization and a bill.
       </p>
     </div>
@@ -990,7 +990,7 @@ $ <span class="c-dim"># same condition, weaker hypothesis</span>
 
       <p>
         Four outcomes, and only one of them is "solved". Those four are the honest shape of
-        opportunistic control. Writing them out makes the earlier gap concrete: <strong>nothing
+        opportunistic control: <strong>nothing
         calls anything, so nothing ends on its own.</strong> Termination is a thing you build, and
         it looks free in the diagram.
       </p>
@@ -1038,15 +1038,15 @@ conf:    0.86</code></pre>
       <ul>
         <li>
           <strong>The activation condition is the whole architecture.</strong> Everything else is
-          bookkeeping. Get the predicates wrong and a blackboard is a hash map with extra steps. A
-          wrong predicate fails <em>silently</em>, because nothing fires, so build your tests around
-          that failure.
+          bookkeeping. Get the predicates wrong and a blackboard is a hash map with extra steps. So
+          build your tests around that failure: a wrong predicate fails <em>silently</em>, because
+          nothing fires.
         </li>
         <li>
           <strong>Opportunism needs a termination story, and it is yours.</strong> Both
-          implementations needed an explicit quiescence check. iii's <code>state::barrier</code>
-          answers "wait for N contributions". It does not answer "nothing is eligible anymore", and
-          that second question is the one that ends a run.
+          implementations needed an explicit quiescence check. So iii's <code>state::barrier</code>
+          answers "wait for N contributions". But it does not answer "nothing is eligible anymore",
+          and that second question is the one that ends a run.
         </li>
         <li>
           <strong>Agent knowledge sources make the priority function load-bearing.</strong> With
@@ -1057,15 +1057,14 @@ conf:    0.86</code></pre>
         </li>
         <li>
           <strong>Partial results are a first-class outcome.</strong> A pipeline that can't finish
-          has failed. A blackboard that reaches quiescence has told you something true: given what
-          the blackboard holds, no knowledge source can contribute further. Agent systems often hit
-          the edge of what they can determine, so that partial answer is more useful than an
-          exception.
+          has failed. But a blackboard that reaches quiescence has told you something true: given what
+          it holds, no knowledge source can contribute further. Because agent systems often hit
+          the edge of what they can determine, that partial answer beats an exception.
         </li>
       </ul>
 
       <div class="callout">
-        <span class="label">The reframe worth keeping</span>
+        <span class="label">The reframe</span>
         <p>
           Most teams wire agents as pipelines because that is what the tooling suggests, not
           because the work is pipeline-shaped. If you have ever added a branch to skip a stage with
@@ -1089,8 +1088,8 @@ conf:    0.86</code></pre>
       <div>
         <h2>Fifty-year-old architecture, unusually good fit</h2>
         <p class="thesis">
-          Not because it is clever, but because it declines to decide the thing agents need to
-          decide at runtime.
+          It works because it declines to decide, at design time, what agents need to decide at
+          runtime.
         </p>
       </div>
     </div>
@@ -1098,16 +1097,16 @@ conf:    0.86</code></pre>
     <div class="rung-body">
       <div class="takeaway">
         <p>
-          <strong>Use a blackboard when the set of applicable steps varies per input.</strong> Not
-          when the content varies, because a pipeline handles varying content fine. Use one when you
-          cannot name in advance which knowledge sources apply, because a fixed graph handles that
+          <strong>Use a blackboard when the set of applicable steps varies per input.</strong> Do not
+          use one when only the content varies, because a pipeline handles that fine. Use it when you
+          cannot name in advance which knowledge sources apply: a fixed graph handles that
           case worst. Agent systems hit it often.
         </p>
         <p>
           <strong>On iii, most of the architecture is configuration.</strong> Levels are state scopes, knowledge
           sources are bound functions, activation conditions are <code>fp::condition</code>
-          entries, and contention is <code>compare-and-set</code>. You get self-explaining
-          scheduling decisions for free. You do not get an ordered agenda without RabbitMQ, and you
+          entries, and contention is <code>compare-and-set</code>. So you get self-explaining
+          scheduling decisions for free. But you do not get an ordered agenda without RabbitMQ, and you
           do not get quiescence detection at all.
         </p>
         <p>
@@ -1120,7 +1119,7 @@ conf:    0.86</code></pre>
       <p>
         The companion repo has both implementations side by side. It also has a demo that walks the
         activation conditions flipping between <code>allow</code> and <code>skip</code> against a
-        live engine. The six tests are offline and deterministic. Read
+        live engine. Those six tests are offline and deterministic. Read
         <code>test_quiescence_when_nothing_eligible</code> first, because that outcome is the whole
         architecture in one assertion.
       </p>

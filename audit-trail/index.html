@@ -313,13 +313,13 @@ footer b { color: var(--fg); font-weight: 600; }
     <span class="lbl">What this page is</span>
     <p>
       An audit trail answers one question from a stranger:
-      <b>why does this line exist?</b> Below is a single agent run, recorded end to end, including
-      the moment a gate refused its first attempt. Click any step to see the record it produced,
-      and why each field is in the schema.
+      <b>why does this line exist?</b> Below is a single agent run, recorded end to end. It includes
+      the moment a gate refused its first attempt. Click any step to see the record it produced.
+      Then read why each field is in the schema.
     </p>
     <p>
-      Nothing here comes from a real run: every name, hash, and timestamp is a stand-in. The schema
-      in the right-hand column is the part to steal.
+      Nothing here comes from a real run, so every name, hash, and timestamp is a stand-in. That
+      leaves the schema in the right-hand column as the part to steal.
     </p>
   </div>
 
@@ -367,9 +367,9 @@ footer b { color: var(--fg); font-weight: 600; }
         <div class="note warn">
           <span class="lbl">The field everyone forgets</span>
           <p>
-            <b>charter_sha.</b> Without it, nobody can say which rules were in force, because the
-            charter moves thirty times a year. It also joins every run to the eval history. Trace a
-            quality regression back to the exact rule edit that preceded it.
+            <b>charter_sha.</b> Without it, nobody can say which rules were in force. The
+            charter moves thirty times a year. This field also joins every run to the eval history. So you can
+            trace a quality regression back to the exact rule edit that preceded it.
           </p>
         </div>
       </div>
@@ -391,9 +391,9 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <div class="note">
           <span class="lbl">Record references, not contents</span>
           <p>
-            Store path plus content hash plus the repo sha. Never the file body. Bodies bloat the trail,
-            duplicate your source of truth, and turn a log store into a place secrets live forever. The
-            hash proves what the agent read, and the repo already has the text.
+            Store the path, the content hash, and the repo sha, never the file body. Bodies bloat the
+            trail and duplicate your source of truth, so they turn a log store into a place where secrets
+            live forever. That is why the hash alone proves what the agent read: the repo already holds the text.
           </p>
         </div>
       </div>
@@ -486,9 +486,9 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <div class="note warn">
           <span class="lbl">Bound the retries, and record the bound</span>
           <p>
-            Two attempts, then a human. An unbounded correction loop burns budget and talks itself
-            into satisfying the gate, not the problem. Record the budget in the trail, so "why did
-            this escalate" has an answer that is not somebody's memory.
+            Two attempts, then a human. Cap it there, because an unbounded loop burns budget and
+            talks itself into satisfying the gate instead of the problem. That cap belongs in the trail,
+            so "why did this escalate" has an answer that is not somebody's memory.
           </p>
         </div>
       </div>
@@ -504,9 +504,9 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
         <div class="note ok">
           <span class="lbl">Passes are data too</span>
           <p>
-            Four rules ran, and the trail records all four. A trail that records only failures cannot
-            answer the most useful maintenance question. Which of our rules has not blocked anything in
-            twelve months?
+            Four rules ran, and the trail records all four. But a trail that records only failures
+            cannot answer the most useful maintenance question: which rules have not blocked anything
+            in twelve months?
           </p>
         </div>
       </div>
@@ -652,34 +652,34 @@ CHARTER.md                 <span class="dim">sha a91f…  read</span>
       </div>
       <div class="finding high">
         <div class="h"><b>Fails the test</b><span class="badge reject">logs only</span></div>
-        <p>Timestamps, tool names, token counts. Answers "what happened". Cannot answer "why this and not the other thing".</p>
+        <p>Timestamps, tool names, and token counts answer "what happened". They cannot answer "why this and not the other thing".</p>
       </div>
       <div class="finding medium">
         <div class="h"><b>Partial</b><span class="badge changes">no charter version</span></div>
-        <p>Gates recorded but not which charter produced them. You know a rule fired; you cannot reconstruct the ruleset it belonged to.</p>
+        <p>Gates are recorded, but not which charter produced them. So you know a rule fired, yet cannot reconstruct the ruleset it belonged to.</p>
       </div>
       <div class="finding low">
         <div class="h"><b>Passes</b><span class="badge accept">audit trail</span></div>
-        <p>Alternatives, gate verdicts including passes, charter sha, accountable human. Reconstructable by a stranger.</p>
+        <p>Alternatives, gate verdicts including passes, charter sha, accountable human. So a stranger can reconstruct the whole change.</p>
       </div>
     </div>
     <div class="panel">
       <h3>WHERE TO START</h3>
       <p class="dim">
-        Do not build a store. Append one JSON line per run to a file, with eight fields:
+        Do not build a store. Instead, append one JSON line per run to a file, with eight fields:
       </p>
       <pre><code>{"run_id","initiated_by","model","charter_sha",
  "repo_sha","gates","alternatives","outcome"}</code></pre>
       <p class="dim" style="margin-top:8px">
-        That is an afternoon, it fits in the repo, and it passes the replay test. Everything on this
-        page is what you add after the cheap version has proved somebody actually opens it.
+        That takes an afternoon, fits in the repo, and passes the replay test. So add everything else
+        on this page only after the cheap version proves somebody actually opens it.
       </p>
       <div class="note warn" style="margin-top:12px">
         <span class="lbl">The trap</span>
         <p>
-          Teams build the dashboard first and the schema second. The view is beautiful, and the data
-          under it cannot answer the only question that matters. The schema is the product, and this
-          page is only a way of looking at it.
+          Teams build the dashboard first and the schema second. Its view is beautiful, yet the data
+          underneath cannot answer the only question that matters. So treat the schema as the product,
+          and this page as one way of looking at it.
         </p>
       </div>
     </div>

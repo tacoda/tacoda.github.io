@@ -666,11 +666,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Stop asking whether they can <em>build it</em>.</h1>
     <p class="standfirst">
-      The junior loop rested on one signal: give them a small problem, see if working code comes back.
-      That signal is gone. Allow the agent and everyone passes, but ban it and you are deliberately
-      measuring the one condition that will never occur again in their career. So most teams picked
-      the ban, and they now screen hard for a skill they do not want. The replacement is not a harder
-      puzzle: it is handing them the agent's code and asking whether it should merge.
+      The junior loop rested on one signal: give them a small problem, see if working code came back.
+      That signal is gone. Allow the agent and everyone passes. Ban it and you measure a condition
+      that will never occur again in their career. So most teams picked the ban, and they now screen
+      hard for a skill they do not want. The replacement is direct: hand them the agent's code and ask
+      whether it should merge.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -760,16 +760,15 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </figure>
 
       <p>
-        The banned branch feels rigorous, which is why it won. Worth stating what it does: it selects
-        for the candidates who best simulate a working environment that no longer exists. It also
+        The banned branch feels rigorous, which is why it won. Look at what it selects for: candidates
+        who best simulate a working environment that no longer exists. Because of that, it also
         selects against people who have already adapted to the one that does. If your
-        team writes code with an agent every day, an interview that forbids one is not a higher bar,
-        just a different bar, pointed somewhere else.
+        team writes code with an agent every day, an interview that forbids one is not a higher bar.
+        It is a different bar, pointed somewhere else.
       </p>
       <p>
-        The way out is not a cleverer puzzle, but noticing that the thing you were using production
-        as a proxy for was never production. You wanted to know whether this person will eventually be
-        able to tell right from plausible, which is testable in forty-five minutes, and always was.
+        The fix is not a cleverer puzzle. It is noticing what you wanted all along: whether this person
+        can tell right from plausible. That skill is testable in forty-five minutes, and always was.
         Nobody bothered because the proxy used to be cheaper.
       </p>
 
@@ -806,8 +805,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         A take-home now returns a well-structured, tested, documented submission from almost everyone,
         and the artifact cannot say who understood it. Asking candidates not to use an agent
-        penalises the honest ones relative to the rest, which is bad design in any process and worse
-        in a process about integrity.
+        penalises the honest ones. That is bad design in any process, and worse in a process
+        about integrity.
       </p>
       <p>
         There is a partial rescue that some teams use: let them use anything, then spend thirty minutes
@@ -891,8 +890,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         That last row is the honest summary of the whole page. You are hiring a junior for their
         trajectory, and trajectory is a derivative that no single point can show you. Everything below
-        is about extracting the best available point estimate, and §9 is about the fact that the point
-        estimate was never going to be enough.
+        extracts the best available point estimate. Section 9 covers why the point estimate was never
+        going to be enough.
       </p>
     </div>
   </section>
@@ -910,8 +909,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Forty-five minutes on code they did not write</h2>
         <p class="thesis">
-          One agent-written change with one planted defect. Agent fully available. The question is not
-          "fix it". The question is "should this merge?"
+          One agent-written change with one planted defect. The agent stays fully available. Do not ask
+          them to fix it. Ask whether it should merge.
         </p>
         <div class="chips">
           <span class="chip kind-agent"><b>agent</b> allowed, encouraged</span>
@@ -957,7 +956,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           If every candidate's diff is defective, word gets out within a month and you are testing
           whether people were briefed. And a candidate who finds a bug in a correct
-          change has told you something serious: they will do that to their colleagues' work every week
+          change has told you something serious. They will do that to their colleagues' work every week
           for years.
         </p>
       </div>
@@ -1001,7 +1000,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         Weight <em>proved</em> above <em>found</em> for a junior. Finding the defect is partly luck at
-        this level; going and checking before committing to an answer is a disposition, and disposition
+        this level. Going and checking before committing to an answer is a disposition, and disposition
         is what survives training. Take the candidate who misses the defect and says "I am not sure
         about this line, here is how I would find out". If the method they name is the right one, that
         beats spotting the defect and not saying why.
@@ -1084,15 +1083,15 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Algorithm puzzles</span>
-          <span class="what">Measures preparation, and preparation is now nearly free and wholly automated, so you are ranking candidates on how recently they ground through a practice set.</span>
+          <span class="what">This measures preparation, and preparation is now nearly free and wholly automated. You end up ranking candidates on how recently they ground through a practice set.</span>
         </li>
         <li data-signal="block">
           <span class="when">Build a small app</span>
-          <span class="what">Measures prompting. Fine as a warm-up if you enjoy it. Not evidence.</span>
+          <span class="what">This measures prompting. It works as a warm-up if you enjoy it, but it is not evidence.</span>
         </li>
         <li data-signal="block">
           <span class="when">Side-project portfolio</span>
-          <span class="what">Once a decent proxy for curiosity, now a proxy for having had unstructured time, since the artifact costs a weekend to produce regardless of understanding. Ask about one project in depth instead of counting them.</span>
+          <span class="what">This once proxied for curiosity. Now it proxies for having had unstructured time, since the artifact costs a weekend to produce regardless of understanding. Ask about one project in depth instead of counting them.</span>
         </li>
         <li data-signal="block">
           <span class="when">"Explain this code" as a quiz</span>
@@ -1149,7 +1148,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">One question that does a lot of work</span>
         <p>
           "What would have to be true for this to be wrong?" Ask it in the exercise and again about
-          their own past project. It is the same question the mentor asks in reverse-review, so a
+          their own past project. It is the same question the mentor asks in reverse-review. A
           strong answer here forecasts a strong first quarter instead of just correlating with one.
         </p>
       </div>
@@ -1230,10 +1229,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
     <div class="rung-body">
       <p>
-        Every organisation unhappy with its junior hiring responds by lengthening the interview, and it
-        does not work: the variable that decides the outcome is not in the room. How fast does this
+        Every organisation unhappy with its junior hiring lengthens the interview. That does not work,
+        because the variable that decides the outcome is not in the room. How fast does this
         person improve when told something? No format resolves that from a single sitting, and a sixth
-        round does not get you closer to it.
+        round does not get you closer.
       </p>
       <p>
         What does resolve it is a first month with a gate in it. If a new engineer is doing spoken
@@ -1268,8 +1267,8 @@ flowchart LR
       <p>
         None of this argues for a careless interview. It argues that the marginal hour is worth far
         more after the offer than before it. A team with a real
-        <a href="/first-ninety-days/">first ninety days</a> can afford a shorter loop, because
-        it is no longer asking the interview to do something interviews cannot do.
+        <a href="/first-ninety-days/">first ninety days</a> can afford a shorter loop. It is no longer
+        asking the interview to do something interviews cannot do.
       </p>
 
       <div class="takeaway">

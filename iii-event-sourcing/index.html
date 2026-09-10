@@ -652,11 +652,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Your agent transcript is <em>already</em> an event log</h1>
     <p class="standfirst">
-      Event sourcing derives state instead of storing it. The authoritative record is an
-      append-only log of what happened, and every read model is a fold over that log. An agent
-      system produces the log whether or not it means to. So the choice is not whether to have
-      one, but what you get out of it. Commit to the log and you get replay, projections and an
-      audit trail. Ignore it and you keep a chat history you grep when something breaks.
+      Event sourcing derives state instead of storing it. Its authoritative record is an
+      append-only log of what happened. Every read model is a fold over that log. An agent system
+      produces such a log whether or not it means to. So the choice is not whether to have one,
+      but what you get out of it. Commit to the log and you gain replay, projections and an audit
+      trail. Ignore it and you keep a chat history you grep when something breaks.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -731,7 +731,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         A write never updates a value in place. It appends <code>HypothesisScored{confidence: 0.86}</code>
         to a stream, and the current confidence is whatever the fold over that stream returns.
-        Every read model derives from the log, which makes it disposable and rebuildable. If a
+        Because every read model derives from the log, it stays disposable and rebuildable. If a
         projection has a bug, fix the fold and replay instead of migrating corrupted rows.
       </p>
 
@@ -759,8 +759,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
           code again. With a model in the loop you <em>cannot</em>: a second run gives you a
           different run. Because of that, the log is the only record of what the agent saw and
           decided. That record moves replay from a convenience to the debugging surface you depend
-          on. So the row above about unbounded growth is a price worth paying here, and often not
-          elsewhere.
+          on. So here that unbounded growth buys replay, and elsewhere it often
+          does not.
         </p>
       </div>
     </div>
@@ -847,8 +847,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
       <p>
         <code>session::append</code> has no conditional write. Pass <code>expected_revision</code>
-        and the engine accepts the parameter, ignores it, and appends anyway. No error tells you
-        that your concurrency control does nothing:
+        and the engine accepts the parameter, ignores it, and appends anyway. So your concurrency
+        control does nothing, and nothing reports it.
       </p>
 
       <figure class="code">
@@ -932,15 +932,15 @@ $ iii trigger session::get-message entry_id=e_fd3ce7e1ffe6
       </figure>
 
       <p>
-        Four lines. Which is what makes the absence notable: this is not a hard feature to write.
-        The convincing near-miss is what makes it dangerous rather than just missing.
+        Four lines. So the absence stands out because the feature is easy to write. But the
+        convincing near-miss makes it dangerous rather than just missing.
       </p>
 
       <p>
         The more valuable half of the from-scratch build is the <code>UnreliableBus</code>. That bus
         is a notification channel that is at-least-once and unordered <em>on purpose</em>, because
-        <code>session-manager</code> documents that contract for itself. It exists so one test can
-        prove the claim below, which is the single most transferable finding in this series:
+        <code>session-manager</code> documents that contract for itself. That bus lets one test
+        prove the most transferable finding in this series:
       </p>
 
       <figure class="code">
@@ -1040,7 +1040,7 @@ assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
         <p>
           <strong>On iii, the store is already there and the concurrency control is not.</strong>
           <code>session-manager</code> gives you streams, typed events, chain ordering, projections
-          via trigger bindings, and fork-for-replay. It does not give you conditional append, it
+          via trigger bindings, and fork-for-replay. It does not give you conditional append. It
           accepts <code>expected_revision</code> and ignores it, and concurrent appends branch
           silently. Put the version in <code>state</code>, compare-and-set before you append, and
           never the other way round.
@@ -1054,12 +1054,12 @@ assert len(naive.state["claims"]) != len(truth["claims"])</code></pre>
       </div>
 
       <p>
-        That ends the series: the same incident-analysis workflow over
+        The series runs the same incident-analysis workflow over
         <a href="/iii-for-otp-practitioners/">actors and supervision</a>, a
-        <a href="/iii-blackboard/">blackboard</a>, and an event log. Three architectures, one task,
-        two implementations each. The pattern across all three is that iii supplies more of each
-        model than expected. Its gaps are consistently the parts that fail without an error, rather
-        than with one.
+        <a href="/iii-blackboard/">blackboard</a>, and an event log. That is three architectures,
+        one task, two implementations each. Across all three, iii supplies more of each model than
+        expected. Its gaps are consistently the parts that fail without an error rather than
+        with one.
       </p>
     </div>
   </section>

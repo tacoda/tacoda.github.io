@@ -650,7 +650,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       Guardrails decide what the agent may not do. A factory decides what it produces. Neither one
       tells you whether last Tuesday's rule change helped, hurt, or did nothing. So without an
       instrument, every charter edit is an act of faith performed by the person with the strongest
-      opinion. This is the smallest thing that answers the question: a frozen set, assertions before
+      opinion. This is the smallest thing that answers the question. A frozen set, assertions before
       judges, blind pairwise comparison, and an honest account of what sixty runs can detect.
     </p>
     <p class="byline">
@@ -718,7 +718,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>The one file nobody tests</h2>
         <p class="thesis">
-          Your code has tests. Your infrastructure has a plan. The document that shapes every line the
+          Your code has tests. Your infrastructure has a plan. But the document that shapes every line the
           agent writes gets edited on a hunch and merged on a nod.
         </p>
       </div>
@@ -728,14 +728,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         A charter accumulates. Somebody adds a paragraph after an incident. Somebody else adds three
         rules about naming, and a fourth person pastes in a style guide. Each addition is defensible on
-        its own, and nobody measures the total. Two failure modes follow, and both are silent.
-        Rules contradict each other, so the agent picks one at random per session. Or the document gets
-        long enough that the agent stops following the instructions at the bottom. Nobody notices which
+        its own, but nobody measures the total. So two failure modes follow, and both are silent.
+        First, rules contradict each other, and the agent picks one at random per session. Then the document gets
+        long enough that the agent stops following the instructions at the bottom, and nobody notices which
         third stopped working.
       </p>
       <p>
-        The reason is not laziness: measuring a non-deterministic system looks like it needs apparatus
-        nobody has time to build. It does not. The version below is roughly a hundred and fifty lines
+        Laziness is not the reason. Measuring a non-deterministic system looks like it needs apparatus
+        nobody has time to build. It does not. Instead, the version below is roughly a hundred and fifty lines
         of Python, and catches both failure modes within a week.
       </p>
 
@@ -756,7 +756,7 @@ prompts/*.txt         <span class="c-block">merged on a nod</span>
         <span class="label">The claim this page defends</span>
         <p>
           A charter change should arrive with evidence, in the same way a code change arrives with a
-          test. Not a benchmark, not a leaderboard. Evidence: on twenty frozen tasks, this edit made
+          test. It is not a benchmark or a leaderboard. The evidence is this: on twenty frozen tasks, this edit made
           things better, worse, or nothing we can distinguish.
         </p>
       </div>
@@ -806,10 +806,10 @@ CHECKS = [
 
       <h3 class="sub">Choosing twenty</h3>
       <ul>
-        <li><strong>Real tickets, past tense.</strong> Take work already done: you get a known-good outcome for free, and a task shaped like your real work. No synthetic task has that shape.</li>
-        <li><strong>Spread across the failure modes you care about.</strong> If half your charter is about money handling, several tasks should touch money. The set states what you worry about.</li>
-        <li><strong>Include three you expect to fail.</strong> A set everything passes cannot show improvement, only regression, so headroom is a design requirement.</li>
-        <li><strong>Two that need a refusal.</strong> Tasks where the correct behaviour is to stop and ask. Without them, charters that are pure encouragement score too well.</li>
+        <li><strong>Real tickets, past tense.</strong> Take work already done: you get a known-good outcome for free, and a task shaped like your real work. That shape is one no synthetic task has.</li>
+        <li><strong>Spread across the failure modes you care about.</strong> If half your charter is about money handling, several tasks should touch money. So the set states what you worry about.</li>
+        <li><strong>Include three you expect to fail.</strong> Because a set everything passes cannot show improvement, only regression, headroom is a design requirement.</li>
+        <li><strong>Two that need a refusal.</strong> These tasks demand that the agent stop and ask. Without them, charters that are pure encouragement score too well.</li>
       </ul>
 
       <div class="callout">
@@ -868,7 +868,7 @@ def policy_cited(w, r):
       <p>
         Each check above turns one charter rule into a measurement. Compiling the same rule into
         <a href="/guardrails/">a hook</a> is the other half of the move, aimed at enforcement instead
-        of measurement. The payoff is the same either way: a property a script can check stops being a
+        of measurement. Either way, the payoff is the same: a property a script can check stops being a
         matter of opinion.
       </p>
 
@@ -893,8 +893,7 @@ def policy_cited(w, r):
         <span class="label">The "test fails when reverted" check is the best one here</span>
         <p>
           Revert the implementation, keep the new test, run the suite. If it stays green the agent
-          wrote a decoration. Two lines of shell, catches a defect class that survives every review,
-          and no judge required.
+          wrote a decoration. This takes two lines of shell, catches a defect class that survives every review, and needs no judge.
         </p>
       </div>
     </div>
@@ -913,8 +912,7 @@ def policy_cited(w, r):
       <div>
         <h2>A judge is an instrument, so calibrate it</h2>
         <p class="thesis">
-          Nobody would trust a thermometer they had never compared against a known temperature. Model
-          judges get deployed on the strength of the prompt sounding sensible.
+          Nobody would trust a thermometer they had never compared against a known temperature. Yet teams deploy model judges on the strength of a prompt that sounds sensible.
         </p>
         <div class="chips">
           <span class="chip kind-gate"><b>pin</b> the model version</span>
@@ -946,11 +944,11 @@ Answer NO if you are unsure.
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Binary</span>
-          <span class="what">Yes or no, never one-to-five. Numeric scales from a model are not interval scales. Averaging them produces a number with no meaning, and everyone puts that number in a slide anyway.</span>
+          <span class="what">Yes or no, never one-to-five. Numeric scales from a model are not interval scales. So averaging them produces a number with no meaning, and everyone puts that number in a slide anyway.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Anchored</span>
-          <span class="what">A concrete example of each verdict, from your own codebase. Anchors move judges more than any amount of instruction prose.</span>
+          <span class="what">A concrete example of each verdict, from your own codebase. Those anchors move judges more than any amount of instruction prose.</span>
         </li>
         <li data-signal="pass">
           <span class="when">One property</span>
@@ -989,7 +987,7 @@ Answer NO if you are unsure.
         <h2>Compare two outputs, never score one</h2>
         <p class="thesis">
           Absolute scores drift with everything: the weather in the prompt, the model version, the
-          judge's mood. Relative comparisons on the same task are stable, and relative is all you ever
+          judge's mood. But relative comparisons on the same task are stable, and relative is all you ever
           needed.
         </p>
       </div>
@@ -997,8 +995,8 @@ Answer NO if you are unsure.
 
     <div class="rung-body">
       <p>
-        Never ask "is this output good". Ask "is the charter on this branch better than the one on
-        main". So run both charters on the same task, and ask the judge which it prefers. Hide the two
+        Never ask "is this output good". Instead ask "is the charter on this branch better than the one on
+        main". So run both charters on the same task, and ask the judge which it prefers. Then hide the two
         labels, and swap the order.
       </p>
 
@@ -1027,8 +1025,8 @@ Answer NO if you are unsure.
 
       <p>
         The discard is the important line. Position bias is well-documented and ordinary: a judge can
-        prefer whichever output it sees first. Run one order and that bias passes into your results
-        undetected. Run both orders and the bias becomes a visible tie, which is honest and costs one
+        prefer whichever output it sees first. Because of that, a single order lets the bias into your results
+        undetected. So running both orders turns the bias into a visible tie, which is honest and costs one
         extra call.
       </p>
 
@@ -1085,8 +1083,8 @@ Answer NO if you are unsure.
       </div>
 
       <p>
-        Read the table the right way round. A twenty-task set with a few runs each is a <em>regression
-        detector</em>. It will tell you when a charter edit broke something, which is the failure that
+        A twenty-task set with a few runs each is a <em>regression
+        detector</em>. So it will tell you when a charter edit broke something, which is the failure that
         costs you money. It will not tell you which of two reasonable phrasings is five percent better.
         A loop that appears to answer that question is reporting noise with a confident face.
       </p>
@@ -1097,7 +1095,7 @@ Answer NO if you are unsure.
           Report three outcomes: <strong>regression</strong>, <strong>improvement</strong>, and
           <strong>indistinguishable</strong>. Regression means worse on multiple tasks, beyond the tie
           rate. Improvement means better on multiple tasks, and large. The third is a legitimate result
-          rather than a failure to get one, and most edits land there. A team that can say
+          rather than a failure to get one, and most edits land there. So a team that can say
           "indistinguishable" out loud is a team whose other two verdicts mean something.
         </p>
       </div>
@@ -1204,7 +1202,7 @@ jobs:
       <h3 class="sub">Cost</h3>
       <p>
         A full pairwise run is <code>tasks × k × 2</code> agent invocations plus <code>tasks × k ×
-        2</code> judge calls. Twenty tasks at k=3 is 120 agent runs and 120 judge calls. Price that
+        2</code> judge calls. Twenty tasks at k=3 is 120 agent runs and 120 judge calls. Then price that
         against your own provider once, put the figure in the README, and revisit it when the number
         changes. That bill is usually small next to one senior engineer spending a day arguing about a
         paragraph.
@@ -1222,7 +1220,7 @@ jobs:
         <p>
           Tune long enough and the charter gets very good at these twenty tasks and no better at the
           job. The symptom is a rising score with no corresponding change in what people complain
-          about. The countermeasure is a held-out set: five tasks you run once a quarter and never
+          about. So the countermeasure is a held-out set: five tasks you run once a quarter and never
           tune against. If the twenty improve and the five do not, you have been optimising the
           instrument.
         </p>

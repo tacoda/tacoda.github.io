@@ -158,7 +158,7 @@
       <div class="body center" style="gap:0;">
         <div style="width:100%; max-width:920px;">
           <h1 class="title" style="font-size:62px; max-width:24ch;">Making AI reliable <span style="color:var(--signal)">and</span> governable</h1>
-          <p class="lede" style="font-size:24px; max-width:46ch; margin-top:24px;">Fold the processes, policies, and regulation you already run into the harness. Wrap the model in deterministic layers it cannot talk its way past : gates you enforce, and an audit trail you can read.</p>
+          <p class="lede" style="font-size:24px; max-width:46ch; margin-top:24px;">Fold the processes, policies, and regulation you already run into the harness. Then wrap the model in deterministic layers it cannot talk its way past : gates you enforce, and an audit trail you can read.</p>
           <div class="legend" style="margin-top:38px;">
             <span><i class="sw-signal"></i> soft : rules the model reads</span>
             <span><i class="sw-gate"></i> hard : gates the harness enforces</span>
@@ -203,7 +203,7 @@
           </div>
         </div>
         <div class="col center" style="flex:.9;">
-          <div class="pull">Nobody had touched the model. Nobody had touched the rules. The variance was real, it was the substrate, and it was going to keep happening.<cite>Harness Engineering · Ch.3</cite></div>
+          <div class="pull">Nobody had touched the model, and nobody had touched the rules. So the variance was real: it came from the substrate and it was going to keep happening.<cite>Harness Engineering · Ch.3</cite></div>
         </div>
       </div>
     </section>
@@ -217,7 +217,7 @@
           <ul class="clean" style="gap:18px;">
             <li>Temperature zero <b>narrows</b> the distribution , but it does not <b>collapse</b> it.</li>
             <li>Sampling shifts with tool-result order, file timestamps, how the last turn tokenized, the order of a directory listing.</li>
-            <li>Identical prompt, identical model , <b>different output</b>, because the inputs are never identical at the byte level.</li>
+            <li>The prompt and model are identical, yet the output <b>differs</b>, because the inputs are never identical at the byte level.</li>
           </ul>
         </div>
         <div class="col center">
@@ -229,7 +229,7 @@
     <!-- 5 · THE BAND (canvas) -->
     <section class="slide">
       <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> The Reliability Band</div>
-      <h2>You can't flatten the signal. You can narrow the band.</h2>
+      <h2>You can't flatten the signal. But you can narrow the band.</h2>
       <div class="body center" style="margin-top:12px;">
         <canvas id="bandCanvas" width="1060" height="352" style="width:1060px; height:352px;"></canvas>
       </div>
@@ -245,7 +245,7 @@
       <h2>The band is a number a skeptic can check.</h2>
       <div class="body">
         <div class="col center" style="flex:1.2;">
-          <div class="pull gate">A repository carrying a charter with the properties this book describes produces a measurably narrower agent-output band than the same repository without one, holding the model constant.<cite>Harness Engineering · Ch.3 : the falsifiable claim</cite></div>
+          <div class="pull gate">A repository carrying a charter with the properties this book describes measurably narrows its agent-output band. The same repository without a charter, model held constant, produces a wider band.<cite>Harness Engineering · Ch.3 : the falsifiable claim</cite></div>
         </div>
         <div class="col center">
           <div class="panel" style="width:100%;">
@@ -288,7 +288,7 @@
           </svg>
         </div>
         <div class="col center">
-          <div class="pull">The agent does not change your standards. It enforces them. The lower the standards, the more enforcement you get.<cite>Harness Engineering · Ch.2</cite></div>
+          <div class="pull">The agent does not change your standards. It enforces them. So the lower the standards, the more enforcement you get.<cite>Harness Engineering · Ch.2</cite></div>
           <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:34ch;">Volume is the variable that did not exist before , and volume picks whichever side the existing code points at.</p>
         </div>
       </div>
@@ -338,7 +338,7 @@
     <!-- 9 · REFRAME -->
     <section class="slide">
       <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> The Reframe</div>
-      <h2>You don't need a new AI policy. Codify the one you already have.</h2>
+      <h2>You don't need a new AI policy. Instead, codify the one you already have.</h2>
       <div class="body">
         <div class="col center" style="flex:1.1;">
           <p class="lede" style="font-size:23px; max-width:30ch; color:var(--fg);">You already run the processes that make AI governable. Change control. Code review. Approvals. Separation of duties.</p>
@@ -416,8 +416,8 @@
           </svg>
         </div>
         <div class="col center">
-          <div class="pull">Governance states the policy. The repo is where it becomes a wall.<cite>Harness Engineering · Ch.62</cite></div>
-          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:22px; max-width:36ch;">The charter need not stay a document. The same layer can enforce itself as a harness , with gates for the irreversible policies , or serve org knowledge the agent queries on demand, as a RAG index or an MCP server.</p>
+          <div class="pull">Governance states the policy. But the repo is where it becomes a wall.<cite>Harness Engineering · Ch.62</cite></div>
+          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:22px; max-width:36ch;">The charter need not stay a document. That same layer can run as a harness, with gates for the irreversible policies. Or it can serve org knowledge the agent queries on demand, through a RAG index or an MCP server.</p>
         </div>
       </div>
     </section>
@@ -490,7 +490,7 @@
         <div class="col center">
           <ul class="clean" style="gap:16px;">
             <li><b>Second signer</b> on a payments deploy.</li>
-            <li>Tool call <b>held</b> because the diff touches a sensitive surface.</li>
+            <li>The harness <b>holds</b> a tool call because the diff touches a sensitive surface.</li>
             <li>The pause is a <b>row in the record</b> : accountable judgment where the regime requires it.</li>
           </ul>
         </div>
@@ -553,15 +553,15 @@
     <!-- 17 · ATTESTATIONS -->
     <section class="slide">
       <div class="eyebrow"><span class="dot gate"></span><span class="dot stop"></span> Attestations · the gate with teeth</div>
-      <h2>A step will not open until its checks are green.</h2>
+      <h2>The loop will not open a step until its checks are green.</h2>
       <div class="body">
         <div class="col center" style="flex:1;">
           <ul class="clean" style="gap:16px;">
             <li class="gate">A step <b>declares</b> the checks required before entry.</li>
             <li class="gate">The loop <b>refuses to enter</b> until they attest green.</li>
-            <li>A missing or failed attestation <b>raises</b> , and it does not proceed.</li>
+            <li>A missing or failed attestation <b>raises an error</b>, and the run stops.</li>
           </ul>
-          <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:38ch;">A violated design preference is a finding a sensor records. A leaked credential or an unmet attestation is a stop.</p>
+          <p class="serif" style="font-size:17px; color:var(--muted); margin-top:22px; max-width:38ch;">A violated design preference is a finding a sensor records. But a leaked credential or an unmet attestation is a stop.</p>
         </div>
         <div class="col center">
           <div class="panel" style="width:100%;">
@@ -573,7 +573,7 @@
               </div>
               <div style="border-left:3px solid var(--gate); padding-left:16px;">
                 <div class="stat" style="font-size:18px; color:var(--gate); font-weight:700;">strict</div>
-                <p style="font-size:16px; color:var(--muted);">Deny by default. Allow only a whitelist. Every policy gap becomes a <b>visible refusal</b>, not a silent allow.</p>
+                <p style="font-size:16px; color:var(--muted);">Deny by default. Allow only a whitelist. Instead of allowing a policy gap silently, the harness raises a <b>visible refusal</b>.</p>
               </div>
             </div>
           </div>
@@ -589,17 +589,17 @@
         <div class="col center">
           <div class="panel" style="width:100%; border-left:3px solid var(--gate);">
             <div class="kicker" style="color:var(--gate)">Retention</div>
-            <p style="font-size:18px;">Audit records carry a purge policy. "Keep forever" and "keep ninety days" are both choices you <b>write down</b> , not accidents of disk space.</p>
+            <p style="font-size:18px;">Audit records carry a purge policy. Both "Keep forever" and "keep ninety days" are choices you <b>write down</b>, not accidents of disk space.</p>
           </div>
         </div>
         <div class="col center">
           <div class="panel" style="width:100%; border-left:3px solid var(--gate);">
             <div class="kicker" style="color:var(--gate)">Residency</div>
-            <p style="font-size:18px;">Self-hosted. The record lives in a jurisdiction you chose, <b>inside the same compliance boundary</b> as the code it describes.</p>
+            <p style="font-size:18px;">You host the record yourself. It lives in a jurisdiction you chose, <b>inside the same compliance boundary</b> as the code it describes.</p>
           </div>
         </div>
       </div>
-      <p class="serif" style="text-align:center; font-size:17px; color:var(--muted); margin:20px auto 0;">Today's detection is tomorrow's prevention. What observability catches twice, governance prevents the third time.</p>
+      <p class="serif" style="text-align:center; font-size:17px; color:var(--muted); margin:20px auto 0;">What observability catches twice, governance prevents the third time.</p>
     </section>
 
     <!-- 19 · SIX PHASES -->
@@ -657,7 +657,7 @@
 <span class="k">## Identity statements</span>   <span class="c"># what we refuse to ship</span></pre>
         </div>
         <div class="col center">
-          <div class="pull gate">The seam, made real: business governance compiled into lines an agent reads , and the load-bearing ones harden into gates.</div>
+          <div class="pull gate">This makes the seam real: business governance compiles into lines an agent reads, and the load-bearing ones harden into gates.</div>
         </div>
       </div>
     </section>
@@ -668,7 +668,7 @@
       <h2>A deterministic system that does the wrong thing is a reliable defect.</h2>
       <div class="body">
         <div class="col center" style="flex:1.1;">
-          <div class="pull stop">The charter's rules might not change the agent's behavior at all. The harness's graph might route perfectly and produce the wrong answer. Measure rather than assert.<cite>Harness Engineering · Ch.61</cite></div>
+          <div class="pull stop">The charter's rules might not change the agent's behavior at all. The harness's graph might route perfectly and still produce the wrong answer. So measure rather than assert.<cite>Harness Engineering · Ch.61</cite></div>
         </div>
         <div class="col center">
           <div class="panel" style="width:100%;">
@@ -704,7 +704,7 @@
       <div class="body center" style="gap:0;">
         <div style="max-width:920px;">
           <h1 class="title" style="font-size:46px; max-width:26ch;">Don't make the model deterministic. <span style="color:var(--gate)">Wrap it</span> in things that are.</h1>
-          <p class="lede" style="font-size:21px; max-width:48ch; margin-top:22px;">Narrow the band. Compile the policy you already run down the ladder until the agent meets it as a wall , one you can enforce, observe, and audit. The amplifier will multiply whatever it finds. Point it at your discipline.</p>
+          <p class="lede" style="font-size:21px; max-width:48ch; margin-top:22px;">Narrow the band. Compile the policy you already run down the ladder until the agent meets it as a wall , one you can enforce, observe, and audit. The amplifier will multiply whatever it finds, so point it at your discipline.</p>
         </div>
       </div>
     </section>

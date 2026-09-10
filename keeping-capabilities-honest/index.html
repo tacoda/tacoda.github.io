@@ -878,11 +878,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     <h1>A capability is bought once and <em>paid for</em> every turn.</h1>
     <p class="standfirst">
       Installing a command, a skill, a sub-agent or a server takes an afternoon. Keeping a catalog of
-      them good is the standing job, and it is a different job. Every capability charges rent on every
+      them good is the standing job, and it is a different job. So every capability charges rent on every
       turn and pays out only when it fires. A constraint that fails to fire lets a violation through,
-      and you find out. A capability that fails to fire produces work that is merely worse, and nobody
-      measures that. This page is the ledger, the determinism, and the four numbers that make the
-      silence audible.
+      and you find out. But a capability that fails to fire produces work that is merely worse, and nobody
+      measures that. That is why this page is the ledger, the determinism, and the four numbers that make
+      the silence audible.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -959,9 +959,8 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     <span class="kicker">Part I</span>
     <h2>What decays</h2>
     <p>
-      A catalog does not stay good on its own. Three sections on the forces that pull it apart: the
-      bill that compounds, the failure that makes no sound, and the five ways a working set of
-      capabilities goes quietly stale.
+      A catalog does not stay good on its own. So three sections follow on what pulls it apart: a
+      compounding bill, a silent failure, and five ways a working set goes quietly stale.
     </p>
   </div>
    <!-- ============ 0 ============ -->
@@ -992,7 +991,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 
     <div class="rung-body">
       <p>
-        Context is a budget and it is spent on every request. A rule you wrote crowds out a rule you
+        You spend the context budget on every request. A rule you wrote crowds out a rule you
         need. A tool schema you never call crowds out both. This is the resource capabilities compete
         for, and it is the reason the four rungs exist as four rungs rather than as one file format.
       </p>
@@ -1047,8 +1046,8 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 
       <h3 class="sub">0.2 · Where the invoked tokens land, which is the actual trade</h3>
       <p>
-        The four rungs split cleanly in two, and the split is not about power. It is about which
-        window pays. A command and a skill put their work in front of you. A sub-agent and an MCP
+        The four rungs split cleanly in two, and the split is about which window pays rather than which
+        is powerful. A command and a skill put their work in front of you. A sub-agent and an MCP
         server put their work somewhere else and hand back a result.
       </p>
 
@@ -1082,24 +1081,24 @@ flowchart TD
       <p>
         So the sub-agent is the one rung that can hand context back. It spends a one-line description
         on every turn and saves you a thousand lines of reading when it fires. Nothing else on the
-        ladder does that, and it is why a research task that would fill your window belongs there
+        ladder does that. That is why a research task that would fill your window belongs there
         rather than in a skill.
       </p>
 
       <h3 class="sub">0.3 · The arithmetic, which you can run today</h3>
       <p>
-        Standing cost is not a file size. It is a file size multiplied by every turn of every session
-        that has the capability in scope. Get the multiplier and the choice usually makes itself.
+        Standing cost is a file size multiplied by every turn of every session that has the capability
+        in scope. So get the multiplier, and the choice usually makes itself.
       </p>
 
       <ol class="sequence">
         <li data-signal="none">
           <span class="when">count the bill</span>
-          <span class="what">Run <code>/context</code> in a fresh session. It reports what is standing in the window before you have asked for anything: system prompt, memory files, tool schemas, and the descriptions of every command, skill and sub-agent in scope.</span>
+          <span class="what">Run <code>/context</code> in a fresh session. It reports what is standing in the window before you have asked for anything. That covers the system prompt, memory files, tool schemas, and the descriptions of every command, skill and sub-agent in scope.</span>
         </li>
         <li data-signal="none">
           <span class="when">count the turns</span>
-          <span class="what">Take a normal working session and count assistant turns. Twenty is a small one. The standing bill is paid once per turn, so multiply.</span>
+          <span class="what">Take a normal working session and count assistant turns. Twenty is a small one. You pay the standing bill once per turn, so multiply.</span>
         </li>
         <li data-signal="warn">
           <span class="when">count the fires</span>
@@ -1113,8 +1112,8 @@ flowchart TD
 
       <p>
         I am not publishing a token table for the four rungs. The honest ranges are wide, and mine
-        would be wrong for your repository within a week. What holds across setups is the shape: a
-        description is tens of tokens, a skill body is hundreds to thousands, and a chatty MCP server
+        would be wrong for your repository within a week. What holds across setups is the shape. A
+        description is tens of tokens, and a skill body runs hundreds to thousands. A chatty MCP server
         can stand for more than every skill you own put together. Measure the last one first.
       </p>
 
@@ -1169,14 +1168,14 @@ flowchart TD
       <p>
         Watch the two failures side by side. A hook that should have blocked a migration and did not
         leaves a migration in the tree. A skill that should have been loaded and was not leaves a
-        commit message in the wrong format, or a test written the way the model likes rather than the
-        way your suite is written. The second one merges.
+        commit message in the wrong format. It can also leave a test written the way the model likes
+        rather than the way your suite is written. The second one merges.
       </p>
 
       <p>
-        So a capability needs an instrument that a constraint does not. A constraint gets audited by
-        its violations. A capability has to be audited by its invocations, and the invocation is the
-        thing nobody is looking at. Between installing a capability and it doing any good, there are
+        So a capability needs an instrument that a constraint does not. You audit a constraint by its
+        violations. You have to audit a capability by its invocations, and the invocation is the thing
+        nobody watches. Between installing a capability and it doing any good, there are
         five gates, and every one of them fails quietly.
       </p>
 
@@ -1246,7 +1245,7 @@ flowchart TD
         <span class="label">The instrument, stated early because the rest of the page assumes it</span>
         <p>
           Count invocations per capability per week, from the transcript rather than from memory. A
-          capability with a standing cost and no invocations is not neutral. It is a tax with a good
+          capability with a standing cost and no invocations is a tax with a good
           reputation. <a class="xref" href="#s-8">Section 8</a> names the four numbers worth having, and
           <a class="xref" href="#s-9">section 9</a> is the counting procedure.
         </p>
@@ -1271,7 +1270,7 @@ flowchart TD
         <p class="thesis">
           A capability that worked in March can be useless in September without anybody touching it.
           The repository moved, a plugin updated, a sibling arrived, the model changed. Four of the
-          five failures below leave no trace in any diff, which is why maintenance here is a
+          five failures below leave no trace in any diff. That is why maintenance here is a
           measurement problem before it is a writing problem.
         </p>
         <div class="chips">
@@ -1325,15 +1324,15 @@ flowchart TD
       </div>
 
       <p>
-        The five have one thing in common worth naming. Every one of them is a change in the
-        <em>relationship</em> between a capability and its surroundings, rather than a change in the
-        capability. The file is the same file. The repository, the catalog, the vocabulary and the
+        The five share one property. Each is a change in the
+        <em>relationship</em> between a capability and its surroundings rather than a change in the
+        capability itself. The file is the same file. The repository, the catalog, the vocabulary and the
         model around it are not, and none of those movements sends you a notification.
       </p>
 
       <p>
         Two of the five have a repair that removes the failure mode instead of detecting it. Variance
-        goes away when a decidable question is decided by code, which is Part II. Bloat goes away when
+        goes away when code decides a decidable question, which is Part II. Bloat goes away when
         the catalog has a fixed budget, which is <a class="xref" href="#s-11">section 11</a>. The other
         three you have to watch for, and Part III is how.
       </p>
@@ -1342,8 +1341,8 @@ flowchart TD
         <span class="label">The one that gets people</span>
         <p>
           Body staleness is the failure that looks like success. The capability fires, the transcript
-          shows it loaded, the invocation count looks healthy, and the model quietly ignores what it
-          said because the paths are wrong. A count of fires cannot see it. Only reading what happened
+          shows it loaded, and the invocation count looks healthy. But the model quietly ignores what
+          it said, because the paths are wrong. A count of fires cannot see it. Only reading what happened
           after the fire can, which is why <a class="xref" href="#s-8">section 8</a> keeps a number that
           costs human attention rather than a query.
         </p>
@@ -1355,10 +1354,10 @@ flowchart TD
     <span class="kicker">Part II</span>
     <h2>Determinism</h2>
     <p>
-      One of the five rots has a real cure rather than a detector. Anything decidable can be decided by
-      code, and the code is cheaper than the rung people buy to get it. Five sections: what determinism
-      is worth, the pattern that installs it, the one predicate behind several mounts, the questions no
-      script can answer, and the order to spend in.
+      One of the five rots has a real cure rather than a detector. Anything decidable is something code
+      can decide, and the code is cheaper than the rung people buy to get it. Five sections follow. They
+      cover what determinism is worth, the pattern that installs it, and the one predicate behind several
+      mounts. Then come the questions no script can answer, and the order to spend in.
     </p>
   </div>
 
@@ -1410,7 +1409,7 @@ flowchart TD
       </div>
 
       <p>
-        So the design question is never <em>is the model good at this</em>. It is <em>is this
+        So the design question is never <em>is the model good at this</em>. Ask instead <em>is this
         decidable</em>. If it is, code decides it, and the model's job becomes choosing when to run the
         code and fixing what it reports. That division survives model changes, which is the other thing
         determinism buys and the one that matters over a year.
@@ -1456,9 +1455,9 @@ flowchart TD
 
     <div class="rung-body">
       <p>
-        Section 3 said the answer has to stop moving. This is how you make it stop, and the mechanism
-        is a file in a directory plus one sentence telling the model to run it rather than think about
-        it. No new rung, no schema, no process to keep alive.
+        Section 3 said the answer has to stop moving. This is how you make it stop. The mechanism
+        is a file in a directory plus one sentence that tells the model to run it rather than think
+        about it. No new rung, no schema, no process to keep alive.
       </p>
 
       <h3 class="sub">4.1 · The sentence that carries it</h3>
@@ -1486,8 +1485,8 @@ flowchart TD
       <p>
         The third exit code is the part people leave out and the one that keeps a script honest. A
         checker that cannot distinguish <em>nothing wrong</em> from <em>I could not look</em> will
-        report clean on the day it breaks, and the model will believe it. That failure has an exact
-        analogue on the constraint side, where
+        report clean on the day it breaks. Then the model believes it. That failure has an exact
+        analogue on the constraint side.
         <a href="/layers-and-promotion/">Layers and Promotion</a> found a pipeline reporting done over
         a tree with two violations in it.
       </p>
@@ -1563,10 +1562,10 @@ flowchart TD
       </div>
 
       <p>
-        The three rows are one script with three mounts, which is the property
+        The three rows are one script with three mounts. That is the property
         <a href="/constraint-engineering/">Constraint Engineering</a> asks of a good constraint: one
         identity, one predicate, many mounts. Write the predicate once. Then decide separately whether
-        the agent may skip it, because that decision is a constraint decision and it does not belong
+        the agent may skip it. That decision is a constraint decision, so it does not belong
         to this ladder at all.
       </p>
 
@@ -1588,8 +1587,8 @@ flowchart TD
         <p class="thesis">
           A script decides. It does not judge. Whether a migration is reversible is decidable. Whether a
           name is clear, whether a test asserts the thing that matters, whether an abstraction earns its
-          keep: none of those are predicates, and a script that pretends otherwise returns a confident
-          wrong answer with no distribution left to warn you.
+          keep: none of those are predicates. A script that pretends otherwise returns a confident
+          wrong answer, with no distribution left to warn you.
         </p>
         <div class="chips">
           <span class="chip kind-mcp"><b>decidable</b> code settles it</span>
@@ -1609,7 +1608,7 @@ flowchart TD
 
       <h3 class="sub">6.2 · Most judgments have a decidable shadow, and it is worth finding</h3>
       <p>
-        The useful move is not to pick a side. It is to split the question. Almost every judgment
+        The useful move is to split the question rather than pick a side. Almost every judgment
         contains a smaller decidable claim, and the script takes that part while the model keeps the
         rest. You get one answer where one answer is possible and an opinion only where an opinion is
         unavoidable.
@@ -1631,7 +1630,7 @@ flowchart TD
       </div>
 
       <p>
-        There is a trap in the last column and it is worth naming, because I fell into it.
+        The last column hides a trap, and I fell into it.
         <a href="/layers-and-promotion/">Layers and Promotion</a> found that a gate enforcing the
         decidable shadow of a rule makes the judging rung <em>look</em> deletable. The counts go green,
         the shadow is covered, and the part that needed taste is quietly no longer being asked. Keep
@@ -1641,8 +1640,8 @@ flowchart TD
       <h3 class="sub">6.3 · Judgment needs an eval, not a script</h3>
       <p>
         Those questions belong to a model, and a model's answers need the apparatus in
-        <a href="/eval-loop/">The Eval Loop</a>: a golden set, a distribution rather than one run, and
-        a number that moves. The division of labor is the useful part. <b>Code for verdicts, models for
+        <a href="/eval-loop/">The Eval Loop</a>. That calls for a golden set, a distribution rather than
+        one run, and a number that moves. The division of labor is the useful part. <b>Code for verdicts, models for
         selection and repair.</b> A capability that mixes them into one prose instruction gets the
         variance of the model on the question the script could have settled.
       </p>
@@ -1702,7 +1701,7 @@ flowchart TD
       </div>
 
       <p>
-        The last row is the one to be strict about. Reaching for a server to get repeatable answers is
+        Be strict about the last row. Reaching for a server to get repeatable answers is
         paying a schema on every turn for something a fifty-line script does for nothing. The five
         reasons that do justify it are in
         <a href="/capability-ladder/#s-5">the first half of this pair</a>, and repeatability is deliberately
@@ -1714,8 +1713,8 @@ flowchart TD
         <p>
           A bundled script first. Then the same script mounted in a hook, if the agent must not skip
           it. Then an MCP server, and only for one of the five reasons in
-          <a href="/capability-ladder/#s-5">the first half of this pair</a>: several clients, an
-          interactive sign-in, a broad surface worth typing, a vendor implementation, or a contract
+          <a href="/capability-ladder/#s-5">the first half of this pair</a>. Those are several clients,
+          an interactive sign-in, a broad surface worth typing, a vendor implementation, or a contract
           other teams build against. Reaching for a server to get repeatable answers is paying a schema
           on every turn for something a fifty-line script does for free.
         </p>
@@ -1781,10 +1780,10 @@ flowchart TD
           I ran twelve experiments on constraint placement and wrote them up in
           <a href="/layers-and-promotion/">Layers and Promotion</a>, including the two bugs in my own
           measurement. I have not run the equivalent for capability placement. The experiment I would
-          run is the same shape: one task set, four arms, the same job carried as a command, a skill,
-          a sub-agent and a server, measuring task quality, tokens standing and tokens invoked. Until
-          somebody runs it, treat this page's ranking as accounting plus opinion, and the accounting
-          is the part you can check today on your own machine.
+          run is the same shape. It uses one task set and four arms, with the same job carried as a
+          command, a skill, a sub-agent and a server. It measures task quality, tokens standing and
+          tokens invoked. Until somebody runs it, treat this page's ranking as accounting plus opinion.
+          The accounting is the part you can check today on your own machine.
         </p>
       </div>
     </div>
@@ -1804,8 +1803,8 @@ flowchart TD
         <h2>Count it from the record, not from memory</h2>
         <p class="thesis">
           Memory flatters the capabilities you were proud of. The record does not. Session transcripts hold
-          every tool call, every skill load and every sub-agent dispatch, so the first three numbers are a
-          query away and the fourth is a habit.
+          every tool call, every skill load and every sub-agent dispatch. So the first three numbers are a
+          query away, and the fourth is a habit.
         </p>
         <div class="chips">
           <span class="chip kind-agent"><b>transcripts</b> line-delimited json</span>
@@ -1846,9 +1845,9 @@ jq -r 'select(.type=="assistant")
       </figure>
 
       <p>
-        Join that count to the standing bill from <code>/context</code> and you have the cost ratio
-        from <a class="xref" href="#s-0">section 0</a>, per capability, from your own work rather than
-        from a table on a web page. Every capability with a standing line and a zero in the count
+        Join that count to the standing bill from <code>/context</code>, and you have the cost ratio
+        from <a class="xref" href="#s-0">section 0</a>. That ratio is per capability, from your own work
+        rather than from a table on a web page. Every capability with a standing line and a zero in the count
         column is a decision waiting to be made.
       </p>
 
@@ -1876,8 +1875,8 @@ jq -r 'select(.type=="assistant")
     <span class="kicker">Part IV</span>
     <h2>The loop</h2>
     <p>
-      What to do with the numbers. Three sections: when to move a capability up or down the ladder, how to
-      hold the standing bill flat, and the standard with the cadence attached.</p>
+      What to do with the numbers. Three sections follow. They cover when to move a capability up or down the ladder, and how to
+      hold the standing bill flat. The last one carries the standard and its cadence.</p>
   </div>
 
    <!-- ============ 10 ============ -->
@@ -1909,8 +1908,7 @@ jq -r 'select(.type=="assistant")
       <p>
         The signals below are the ones I trust, and each row is an observation rather than a feeling.
         Record the observation next to the change. The argument two quarters later is always about
-        whether the move was ever justified, and the answer is either in a commit message or it is
-        gone.
+        whether the move was ever justified. The answer is either in a commit message or it is gone.
       </p>
 
       <div class="tablewrap">
@@ -1950,7 +1948,7 @@ jq -r 'select(.type=="assistant")
       <div>
         <h2>A fixed standing budget, and a deletion day to enforce it</h2>
         <p class="thesis">
-          Constraint charters get held to a fixed size because everyone can feel the cost of a rule. Nobody
+          Teams hold constraint charters to a fixed size because everyone can feel the cost of a rule. Nobody
           feels the cost of a skill, so capability catalogs grow without opposition. The repair is the same
           one: a number decided in advance, and a day in the calendar where the counts decide.
         </p>
@@ -1971,8 +1969,8 @@ jq -r 'select(.type=="assistant")
       </p>
       <p>
         So: a fixed number of standing lines, decided in advance. Adding one means removing one or
-        making the case that the budget should rise. On deletion day, the invocation count decides,
-        and the argument that it might be useful later does not, because a bundled file or a command
+        making the case that the budget should rise. On deletion day, the invocation count decides.
+        The argument that it might be useful later does not. A bundled file or a command
         can hold it at no standing cost until later arrives.
       </p>
 
@@ -2000,7 +1998,7 @@ jq -r 'select(.type=="assistant")
           <span class="ref"><a class="xref" href="/capability-ladder/#s-3">ladder §3</a></span>
         </li>
         <li>
-          <span class="t">Reach for a process wall only for several clients, an interactive sign-in, a broad surface worth typing, a vendor implementation, or a contract other teams build against. Repeatability is a script. Five reasons, and tidiness is not among them.</span>
+          <span class="t">Reach for a process wall only for several clients, an interactive sign-in, or a broad surface worth typing. Add a vendor implementation, or a contract other teams build against. Repeatability is a script. Five reasons, and tidiness is not among them.</span>
           <span class="ref"><a class="xref" href="/capability-ladder/#s-5">ladder §5</a></span>
         </li>
       </ol>
@@ -2009,7 +2007,7 @@ jq -r 'select(.type=="assistant")
         <span class="label">The compression, if you only keep one paragraph</span>
         <p>
           You are trading window space for reach. Rungs 0 and 1 put text in front of the model, so buy
-          them for knowledge that changes what it does and keep the always-on part to a line. Rungs 2
+          them for knowledge that changes what it does. Keep the always-on part to a line. Rungs 2
           and 3 put a wall between the model and the work, so buy them when the work would otherwise
           crowd out the job. Everything else on these two pages is the accounting behind that sentence.
         </p>
@@ -2032,7 +2030,7 @@ jq -r 'select(.type=="assistant")
         <p class="thesis">
           A standard that cannot be failed is a mood. These are checkable, mostly by looking at files
           and twice by running a query. The rules that describe a capability's shape belong to the
-          first half of this pair, and they are restated here because a standard split across two
+          first half of this pair. I restate them here, because a standard split across two
           pages is not a standard.
         </p>
       </div>
@@ -2052,7 +2050,7 @@ jq -r 'select(.type=="assistant")
         <li><span class="t">Re-run the golden set after <b>any description edit</b>, including one that arrived in a plugin update. A trigger change is a behavior change.</span><span class="ref">§2 · §9</span></li>
         <li><span class="t">Every sub-agent declares its <b>grant</b> and its <b>return shape</b>. An omitted grant is the widest one.</span><span class="ref"><a class="xref" href="/capability-ladder/#s-10">ladder §10</a></span></li>
         <li><span class="t">Skills keep <b>procedure in the body</b> and reference in bundled files. A body that loads a manual is a defect.</span><span class="ref"><a class="xref" href="/capability-ladder/#s-2">ladder §2</a></span></li>
-        <li><span class="t">Anything <b>decidable</b> is decided by code. Measure variance on any answer a gate trusts, and move it to a script when the count is above one.</span><span class="ref">§3 · §6</span></li>
+        <li><span class="t">Code decides anything <b>decidable</b>. Measure variance on any answer a gate trusts, and move it to a script when the count is above one.</span><span class="ref">§3 · §6</span></li>
         <li><span class="t">Buy determinism from the cheap end: a <b>script</b>, then a CLI, then a hook, then a server. Repeatability is not one of the five reasons for a process wall.</span><span class="ref">§7</span></li>
         <li><span class="t">Tools are shaped like the <b>task</b>, not like the upstream API, and they return the answer rather than the payload.</span><span class="ref"><a class="xref" href="/capability-ladder/#s-4">ladder §4</a></span></li>
         <li><span class="t">Anything crossing a process wall from outside is <b>data, not instruction</b>, and the constraint that enforces that lives in your harness.</span><span class="ref"><a class="xref" href="/capability-ladder/#s-4">ladder §4</a></span></li>
@@ -2078,17 +2076,17 @@ jq -r 'select(.type=="assistant")
 
       <p>
         The cadence column matters more than the rule list. Every rule here that has ever slipped for
-        me slipped because it had no date attached, and a maintenance standard without a date is a
+        me slipped because it had no date attached. A maintenance standard without a date is a
         preference. Put the monthly count and the quarterly deletion day in the same calendar the rest
         of your engineering rituals live in.
       </p>
 
       <h3 class="sub">12.3 · Where I fail it</h3>
       <p>
-        I am at level 2 and not level 3. The rule I miss is the last one: I have the invocation counts
-        and I have never held a deletion day for capabilities, so my own catalog has grown for months
+        I am at level 2 and not level 3. The rule I miss is the last one. I have the invocation counts,
+        but I have never held a deletion day for capabilities. So my own catalog has grown for months,
         while the constraint side of the same charter stayed inside a fixed budget. That asymmetry is
-        the thing that made me write this page, and it is exactly the bias the page describes. Removing
+        why I wrote this page, and it is exactly the bias the page describes. Removing
         a rule feels like accepting risk, so it gets argued. Removing a skill feels like losing
         something for nothing, so it never gets raised.
       </p>
@@ -2098,8 +2096,8 @@ jq -r 'select(.type=="assistant")
         <p>
           Capabilities are the half of the charter that fails quietly. Spend standing cost on triggers
           and invoked cost on everything else. Decide anything decidable with a script, and buy a
-          process wall only for the five reasons that justify one. Then count the fires, because a
-          capability you cannot show firing is indistinguishable from one you never wrote, except that
+          process wall only for the five reasons that justify one. Then count the fires.
+          A capability you cannot show firing is indistinguishable from one you never wrote, except that
           you are paying for it on every turn.
         </p>
       </div>

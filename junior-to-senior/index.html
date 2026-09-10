@@ -667,9 +667,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <h1>How to grow from junior to senior in the <em>age of AI</em></h1>
     <p class="standfirst">
       The agent changes what it means to be junior more than what it means to be senior. A senior
-      already has the judgment the tool can't supply, and a junior is building that judgment at the
-      exact moment the tool offers to skip it. The tool hands you working code faster than you can
-      understand it, so the whole pull is to accept the diff and move on. This workshop is the
+      already holds the judgment the tool can't supply. So a junior is building that judgment right
+      when the tool offers to skip it. The tool hands you working code faster than you can
+      understand it, so the pull is to accept the diff and move on. This workshop is the
       structured refusal to skip.
     </p>
     <p class="byline">
@@ -856,9 +856,8 @@ python app.py                                <span class="c-block"># cash total 
       </figure>
 
       <p>
-        Look at those last two lines. The test suite is <strong>green</strong>, and yet the customer
-        is now billed a nickel more than the correct cash total. This is the one idea the whole
-        session is built on:
+        The test suite is <strong>green</strong>, and yet the customer now owes a nickel more than
+        the correct cash total.
       </p>
 
       <div class="callout">
@@ -869,12 +868,12 @@ python app.py                                <span class="c-block"># cash total 
       </div>
 
       <p>
-        A nickel doesn't sound like much. It's a nickel on 40% of cash totals, every register, every
-        day, taken from customers who trusted the marked price. That's the bug that becomes a refund
-        program. The shipped suite only used totals that round the same way either direction, so it
-        never noticed the flip. That diff rounds to the <em>nearest</em> nickel, the textbook
-        cash-rounding scheme, written with a <code>float</code>, instead of <em>down</em>, the
-        charter's customer's-favor policy.
+        A nickel doesn't sound like much. But it's a nickel on 40% of cash totals, every register,
+        every day, taken from customers who trusted the marked price. So that's the bug that becomes
+        a refund program. The shipped suite only used totals that round the same way either
+        direction, so it never noticed the flip. The diff instead rounds to the <em>nearest</em>
+        nickel, the textbook cash-rounding scheme, which uses a <code>float</code>. It ignores
+        <em>down</em>, the charter's customer's-favor policy.
       </p>
 
       <p>Leave the diff applied. You'll investigate it next.</p>
@@ -955,9 +954,9 @@ python app.py                                <span class="c-block"># cash total 
     <div class="rung-body">
       <p>
         A $10.83 total is 1083¢. Customer's favor rounds <strong>down</strong> to <code>1080</code>
-        ($10.80). The "simplified" code rounds to nearest: <code>1085</code> ($10.85), a nickel the
-        customer never owed. Write one test asserting cash never rounds <em>up</em>, using totals
-        whose last digit forces the direction, the case the shipped suite skipped:
+        ($10.80). The "simplified" code instead rounds to nearest: <code>1085</code> ($10.85), a
+        nickel the customer never owed. So write one test asserting cash never rounds <em>up</em>,
+        using totals whose last digit forces the direction, the case the shipped suite skipped:
       </p>
 
       <figure class="code">
@@ -1006,7 +1005,7 @@ python app.py                                <span class="c-block"># cash total 
     <div class="rung-body">
       <p>
         <strong>Feedforward</strong> is a <em>rule</em> in <code>CLAUDE.md</code> that shapes the
-        code <em>before</em> it's written. <strong>Feedback</strong> is a <em>hook</em> in
+        code <em>before</em> the agent writes it. <strong>Feedback</strong> is a <em>hook</em> in
         <code>.claude/hooks/</code> that checks the result <em>after</em> and refuses a bad one.
         Both are already on, so open the <code>seed/</code> folder in your agent and run two quick
         prompts.
@@ -1037,7 +1036,7 @@ to a nickel now that pennies are gone.</code></pre>
 amount is 1080 — cash rounded against the customer.</span></code></pre>
       </figure>
       <p>
-        Told <em>why</em>, the agent puts it back. The same gate also blocks at
+        Once it hears <em>why</em>, the agent puts it back. The same gate also blocks at
         <code>git commit</code>, so a bad version can't be saved <em>or</em> shipped.
       </p>
 
@@ -1106,12 +1105,12 @@ amount is 1080 — cash rounded against the customer.</span></code></pre>
             <tr>
               <td><code>round-gate-edit.py</code></td>
               <td><code>PostToolUse</code> on <code>Edit</code>/<code>Write</code></td>
-              <td><strong>Fast.</strong> Fires the instant <code>money.py</code> is saved; agent corrected mid-task, fix is local. The bad code did exist on disk for a moment.</td>
+              <td><strong>Fast.</strong> Fires the instant <code>money.py</code> is saved; the agent corrects it mid-task, so the fix is local. The bad code did exist on disk for a moment.</td>
             </tr>
             <tr>
               <td><code>round-gate-commit.py</code></td>
               <td><code>PreToolUse</code> on <code>git commit</code></td>
-              <td><strong>Late.</strong> Fires only at ship time; nothing bad ever lands, but the mistake may be buried under later work, so the fix costs more.</td>
+              <td><strong>Late.</strong> Fires only at ship time; nothing bad ever lands, but later work may bury the mistake, so the fix costs more.</td>
             </tr>
           </tbody>
         </table>
@@ -1133,7 +1132,7 @@ amount is 1080 — cash rounded against the customer.</span></code></pre>
       <p>Each swap is one step; undo it when done.</p>
       <ul>
         <li><strong>Weak rule.</strong> Replace the rounding line in <code>CLAUDE.md</code> with the line from <code>.claude/rules/cash-vague.md</code>, restart the agent, and re-run the first prompt above. Watch the vague rule fail to steer.</li>
-        <li><strong>Commit gate alone.</strong> Delete the <code>PostToolUse</code> block from <code>.claude/settings.json</code> so only the late gate is wired, then re-run the second prompt. The bad edit now sails through and is caught only at commit. That gap between "caught on save" and "caught at ship" is the cost of a slow loop.</li>
+        <li><strong>Commit gate alone.</strong> Delete the <code>PostToolUse</code> block from <code>.claude/settings.json</code> so only the late gate is wired, then re-run the second prompt. The bad edit now sails through, and only the commit gate catches it. That gap between "caught on save" and "caught at ship" is the cost of a slow loop.</li>
       </ul>
 
       <div class="takeaway">
@@ -1202,30 +1201,29 @@ if got != want:                <span class="c-dim"># block when the code failed 
 
       <h3 class="sub">Why you still have to change the code</h3>
       <p>
-        At the size of this seed the rule is right in front of the agent, and the contradiction is
-        glaring. So a capable agent follows the rule and even flags the stale code as wrong. We
-        tested exactly this contradiction on fresh agents: the rule said up, the code said down.
-        They rounded up every time, and one of them explicitly called out the old code as
-        non-compliant. <strong>The imitation problem is a scale effect.</strong> In a real codebase
-        of thousands of lines, the rule is one entry in a long charter, and round-down rounding
-        repeats across dozens of call sites. There the <em>prevailing pattern in the code</em>
-        becomes the strongest signal the agent has, so it copies that pattern past a rule it barely
-        weighs. The lab is too small to reproduce this; the takeaway is what it points at.
+        At the size of this seed the rule sits right in front of the agent, and the contradiction
+        is glaring. So a capable agent follows the rule, and it even flags the stale code as wrong.
+        We tested exactly this contradiction on fresh agents: the rule said up, the code said down.
+        They rounded up every time, and one of them called out the old code as non-compliant.
+        <strong>The imitation problem is a scale effect.</strong> In a real codebase of thousands of
+        lines, the rule is one entry in a long charter. Round-down rounding then repeats across
+        dozens of call sites. There the <em>prevailing pattern in the code</em> becomes the
+        strongest signal the agent has, so it copies that pattern past a rule it barely weighs. The
+        lab is too small to reproduce this, so the takeaway is what it points at.
       </p>
 
       <div class="callout">
         <span class="label">Where it bites hardest</span>
         <p>
-          Rounding direction is a simple, local decision the model can derive from the rule alone,
-          which is exactly why the lab agents got it right. The rules imitation actually defeats are
-          the <em>design-level</em> ones, where most of a charter's rules live. Those rules read like
+          Rounding direction is a simple, local decision the model can derive from the rule alone.
+          That is why the lab agents got it right. The rules imitation actually defeats are the
+          <em>design-level</em> ones, where most of a charter's rules live. Those rules read like
           "use ports and adapters," "no business logic in controllers," or "depend on interfaces,
-          not concretes," and there is no one-line correct answer to copy. So the agent infers "how
-          we do it here" from the surrounding code. If most of the codebase ignores the rule, the
-          counterexamples <em>are</em> the pattern, and the agent replicates them. The more
-          non-compliant code, the stronger the pull. The cost of a rule the code contradicts isn't a
-          wrong penny; it's an architecture that drifts further from its own charter with every
-          change.
+          not concretes." None of them has a one-line correct answer to copy. So the agent infers
+          "how we do it here" from the surrounding code. If most of the codebase ignores the rule,
+          the counterexamples <em>are</em> the pattern, and the agent replicates them. So the more
+          non-compliant code, the stronger the pull. A rule the code contradicts costs more than a
+          wrong penny: every change drifts the architecture further from its own charter.
         </p>
       </div>
 
@@ -1236,7 +1234,7 @@ if got != want:                <span class="c-dim"># block when the code failed 
         </li>
         <li data-signal="block">
           <span class="when">The pattern</span>
-          <span class="what">At scale, the code is what the agent imitates. Leave a round-down implementation in the tree and you've planted the pattern the next change copies, and the more of it there is, the louder it gets.</span>
+          <span class="what">At scale, the code is what the agent imitates. Leave a round-down implementation in the tree, and you plant the pattern the next change copies. The more of it there is, the louder it gets.</span>
         </li>
       </ol>
 
@@ -1314,9 +1312,9 @@ flowchart LR
           This lab is a toy: a two-line <code>round_cash</code> does not deserve a rule and two
           hooks. In real life you'd read it once and move on, and you would never gate something
           this small. Every rule and hook costs effort to write and, worse, to keep true as the code
-          changes. So the goal is never <em>the most</em> constraints. It's <strong>the fewest
-          constraints that buy a tight-enough band</strong>: you add one only when something real
-          needs it. Money, security, data integrity, a policy with legal or financial weight.
+          changes. So the goal is not <em>the most</em> constraints. It is <strong>the fewest
+          constraints that buy a tight-enough band</strong>, and you add one only when something
+          real needs it. Money, security, data integrity, a policy with legal or financial weight.
         </p>
       </div>
 
@@ -1325,8 +1323,8 @@ flowchart LR
         policies and requirements, many contributors, an agent making changes all day. There the code
         surface is huge, no human reads every diff, and comprehension alone can't scale. So a few
         well-placed rules and hooks on the things that actually carry risk keep the band tight when
-        nothing else can. That is when the two mechanisms you practiced today earn their cost, and
-        knowing <em>when not</em> to reach for them is as much the senior's job as knowing how.
+        nothing else can. That is when the two mechanisms you practiced today earn their cost.
+        Knowing <em>when not</em> to reach for them matters as much as knowing how.
       </p>
 
       <h3 class="sub">What you leave with</h3>
@@ -1349,9 +1347,9 @@ flowchart LR
         means. The job is solving a business problem: someone needs a bill settled correctly, a
         customer not overcharged, a policy honored. Code is how we've done that, but the "round down,
         customer's favor" policy is the <em>why</em> the code exists at all. The agent commoditizes
-        the means, it produces the code faster than you can, which doesn't shrink your job, it
+        the means, because it produces the code faster than you can. That doesn't shrink your job; it
         <em>reveals</em> it. What's left when the typing is free is the part that was always the real
-        work: understanding the problem well enough to know what correct even means. That
+        work. You have to understand the problem well enough to know what "correct" even means. That
         understanding was always what seniority meant, not the typing speed. The agent just made it
         impossible to hide behind the keyboard.
       </p>
@@ -1367,7 +1365,7 @@ flowchart LR
         </li>
         <li data-signal="none">
           <span class="when">The shift</span>
-          <span class="what"><strong>Confusion is a signal, not a shame.</strong> A stall means the charter never explained it (a gap the <em>team</em> owes you) or you haven't understood it yet (a gap <em>you</em> close by asking). Name which. Juniors hide it and merge; point at the line instead and say "I don't get this yet."</span>
+          <span class="what"><strong>Confusion is a signal, not a shame.</strong> A stall means the charter never explained it (a gap the <em>team</em> owes you). Or you haven't understood it yet (a gap <em>you</em> close by asking). Name which. Juniors hide it and merge; point at the line instead and say "I don't get this yet."</span>
         </li>
         <li data-signal="none">
           <span class="when">The shift</span>
@@ -1390,7 +1388,7 @@ flowchart LR
       </div>
 
       <p>
-        And the highest-leverage hour you have: <strong>pair with a senior, and mine the
+        And the highest-value hour you have: <strong>pair with a senior, and mine the
         <em>why</em>, not the answer.</strong> The <em>what</em> is on the screen; the <em>why</em>
         is in their head. So bring a filled card and ask about the question you stalled on, rather
         than a blank "explain this" prompt. Watch what they distrust: seniors flinch at certain diffs before they can say

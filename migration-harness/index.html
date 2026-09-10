@@ -647,10 +647,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>Ten thousand files. <em>Nine thousand are a codemod.</em></h1>
     <p class="standfirst">
-      Large mechanical migrations are the best thing agents do, and the way most teams attempt them
-      throws that advantage away. Pointing an agent at ten thousand call sites is slow, expensive,
-      non-deterministic and unreviewable, and it spends the judgment-capable tool on work a syntax tree
-      handles perfectly. The design that works splits by determinism: a codemod takes the mechanical
+      Large mechanical migrations are the best thing agents do. But the way most teams attempt them
+      throws that advantage away. Pointing an agent at ten thousand call sites is slow, expensive
+      and non-deterministic. It also spends the judgment-capable tool on work a syntax tree handles
+      perfectly. So the design that works splits by determinism. A codemod takes the mechanical
       majority in one reviewable diff, and the agent gets only the residue that needed a decision.
     </p>
     <p class="byline">
@@ -728,14 +728,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <p>
         Run an agent over ten thousand files and every single one becomes non-deterministic. Two runs
         produce different diffs, so a file that was correct on Tuesday comes back changed on Thursday.
-        Nothing is reviewable in bulk, because no two changes match in text even where the
-        transformation was the same. And you have paid inference for nine thousand transformations that
+        Because no two changes match in text, nothing is reviewable in bulk, even where the
+        transformation was the same. And you pay inference for nine thousand transformations that
         a syntax tree would do for free, in eleven seconds.
       </p>
       <p>
         The opposite failure is just as common. A team writes a codemod, it handles eighty percent, and
         two thousand sites remain. Those sites become a spreadsheet that three engineers grind through
-        for a quarter. Agents are good at that work. The team is doing it by hand, because it framed
+        for a quarter. But agents are good at that work. So the team does it by hand, because it framed
         the codemod as the whole solution, not the first stage.
       </p>
 
@@ -757,7 +757,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           Split the work by whether it has one correct answer, not by directory, team, or file count. A
           transformation with one correct output belongs in a codemod forever, however many of them
-          there are. A transformation that requires choosing belongs to an agent, however few.
+          there are. But a transformation that requires choosing belongs to an agent, however few.
         </p>
       </div>
     </div>
@@ -776,7 +776,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>Count the shapes before writing anything</h2>
         <p class="thesis">
-          You do not have one migration. You have four, and two of them are not migrations at all.
+          You do not have one migration. But you have four, and two of them are not migrations at all.
         </p>
       </div>
     </div>
@@ -830,9 +830,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">What the census tells you</h3>
       <ul>
-        <li><strong>Shape D is not a migration.</strong> Every one of those tolerance comparisons exists because somebody was papering over float error. In integer cents the tolerance is meaningless, and each site is a question: was that comparison hiding a real discrepancy? Some of them were, which makes it a bug hunt wearing a migration's clothes.</li>
-        <li><strong>Shape C is a policy question first.</strong> Where exactly does rounding happen, and in whose favour? Until a human answers that question, no tool of any kind can do the work correctly. That is the brick-coloured category, and it is the thing that sinks migrations.</li>
-        <li><strong>The ratio is the plan.</strong> 87/13 says write the codemod. If the census had come back 40/60, the whole approach would be wrong. You want that number before you build anything.</li>
+        <li><strong>Shape D is not a migration.</strong> Every one of those tolerance comparisons exists because somebody was papering over float error. But in integer cents the tolerance is meaningless, and each site is a question: was that comparison hiding a real discrepancy? Some of them were, which makes it a bug hunt wearing a migration's clothes.</li>
+        <li><strong>Shape C is a policy question first.</strong> Where exactly does rounding happen, and in whose favour? But until a human answers that question, no tool of any kind can do the work correctly. That is the brick-coloured category, and it is the thing that sinks migrations.</li>
+        <li><strong>The ratio is the plan.</strong> An 87/13 split says write the codemod. But a 40/60 split would mean the whole approach is wrong. So get that number before you build anything.</li>
       </ul>
 
       <div class="callout">
@@ -882,8 +882,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         A codemod that tries hard produces the worst outcome available. Most changes in the diff are
-        correct, a few are wrong, and nothing marks which is which. Nobody can review a diff of that
-        shape at ten thousand files. A codemod that refuses produces two artifacts instead: one you
+        correct, a few are wrong, and nothing marks which is which. So nobody can review a diff of that
+        shape at ten thousand files. But a codemod that refuses produces two artifacts instead: one you
         can review in bulk, and one worklist.
       </p>
 
@@ -899,7 +899,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">Review the mechanical diff by shape, not by file</span>
         <p>
           Nine thousand changes are reviewable when every change has the same form. Read twenty of
-          shape A, confirm they match, and the argument covers all 6,800. An agent-produced diff
+          shape A, confirm they match, and the argument covers all 6,800. But an agent-produced diff
           destroys that uniformity, which is the biggest reason to keep this stage deterministic.
         </p>
       </div>
@@ -929,11 +929,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="pass">
           <span class="when">Scope</span>
-          <span class="what">One file. Not one module, not one "area". You cannot revert a unit that touches four files without considering the other three.</span>
+          <span class="what">One file. Not one module, not one "area". So a unit that touches four files is not a unit you can revert on its own.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Input</span>
-          <span class="what">The refusal record, the file, the policy decision from §1, and nothing else. No repository-wide context: the unit does not need it, and wide context is where scope creep enters.</span>
+          <span class="what">The refusal record, the file, the policy decision from §1, and nothing else. And no repository-wide context: the unit does not need it, and wide context is where scope creep enters.</span>
         </li>
         <li data-signal="warn">
           <span class="when">Output</span>
@@ -941,16 +941,16 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Escape hatch</span>
-          <span class="what">The unit may return <code>UNCLEAR</code> with a question. Roughly one in twenty will, and those are the interesting ones. An agent forced to always produce a change will produce a plausible wrong one.</span>
+          <span class="what">The unit may return <code>UNCLEAR</code> with a question. And roughly one in twenty will come back that way, which makes them the interesting ones. That is why an agent that must always produce a change will produce a plausible wrong one.</span>
         </li>
       </ol>
 
       <div class="callout">
         <span class="label">The escape hatch is not optional</span>
         <p>
-          Without it, every ambiguous site gets a confident answer. And in a diff, nothing separates a
-          confident answer to an ambiguous question from a correct one. With it, you get a shortlist
-          of sixty sites that need a human and eleven hundred that do not.
+          Without it, the agent answers every ambiguous site confidently. And in a diff, nothing
+          separates a confident answer to an ambiguous question from a correct one. With it, you get a
+          shortlist of sixty sites that need a human and eleven hundred that do not.
         </p>
       </div>
     </div>
@@ -998,9 +998,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">Four properties that make the fan-out survivable</h3>
       <ul>
-        <li><strong>One writer per file.</strong> Partition the queue by path. Two workers on one file is the only true race here, and partitioning removes it without locks.</li>
-        <li><strong>Idempotence on path plus sha.</strong> A rerun is a no-op, so you can kill the whole fleet at any moment and start it again. Migrations run for days, so a restart will happen.</li>
-        <li><strong>Requeue on drift.</strong> The repository keeps moving while you work. A file whose sha changed goes back in the queue rather than getting a diff computed against a stale reading.</li>
+        <li><strong>One writer per file.</strong> Since two workers on one file is the only true race here, partition the queue by path. That removes the race without locks.</li>
+        <li><strong>Idempotence on path plus sha.</strong> A rerun is a no-op, so you can kill the whole fleet at any moment and start it again. And because migrations run for days, a restart will happen.</li>
+        <li><strong>Requeue on drift.</strong> The repository keeps moving while you work. So when a file's sha has changed, you requeue it instead of computing a diff against a stale reading.</li>
         <li><strong>The dead-letter queue is the deliverable.</strong> Not a failure log. It is the ranked list of sites that need a person, and that list is the output you wanted.</li>
       </ul>
 
@@ -1008,8 +1008,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <span class="label">Bounded concurrency, and not for cost reasons</span>
         <p>
           Twenty workers, not two hundred. Human review throughput is the limit that binds first, so
-          fourteen hundred commits on Monday buy nothing if the team can review sixty a day. Match the
-          fleet to the reviewers: the queue drains on exactly the same date, with less rework.
+          fourteen hundred commits on Monday buy nothing if the team can review sixty a day. So match
+          the fleet to the reviewers: the queue drains on exactly the same date, with less rework.
         </p>
       </div>
     </div>
@@ -1029,14 +1029,14 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <h2>The old implementation is still there. Use it.</h2>
         <p class="thesis">
           In a migration, a perfect reference implementation of the correct behaviour already exists.
-          Almost nobody uses it.
+          But almost nobody uses it.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        Unit tests check the cases somebody thought of. A differential test checks the cases that
+        Unit tests check the cases somebody thought of. But a differential test checks the cases that
         happen, which for a billing system means a year of real transactions. Replay them through both
         implementations and compare.
       </p>
@@ -1067,7 +1067,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         Where no recorded inputs exist, generate them: property-based testing over the input domain,
-        comparing old and new. Generated inputs are weaker than real traffic and much stronger than
+        comparing old and new. But generated inputs are weaker than real traffic and much stronger than
         your existing unit tests, because both implementations can disagree.
       </p>
     </div>
@@ -1096,7 +1096,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="none">
           <span class="when">First</span>
-          <span class="what">Add the new representation alongside the old. A <code>total_cents</code> field written in parallel with <code>total</code>, both maintained. Nothing reads the new one yet.</span>
+          <span class="what">Add the new representation alongside the old. Then write a <code>total_cents</code> field alongside <code>total</code>, and maintain both. Nothing reads the new one yet.</span>
         </li>
         <li data-signal="pass">
           <span class="when">Then</span>
@@ -1104,7 +1104,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="warn">
           <span class="when">Per merge</span>
-          <span class="what">One shape, one module, differential replay attached to the pull request. Reviewers read twenty representative changes, then every residue commit one by one.</span>
+          <span class="what">One shape, one module, differential replay attached to the pull request. That lets reviewers read twenty representative changes, then every residue commit one by one.</span>
         </li>
         <li data-signal="block">
           <span class="when">Last</span>
@@ -1124,7 +1124,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           Not when the new one works. Teams reach ninety-five percent, declare victory, and leave both
           representations in place forever. That end state is worse than either representation alone.
-          Put the deletion on the calendar at the start, with a name against it.
+          So put the deletion on the calendar at the start, with a name against it.
         </p>
       </div>
     </div>
@@ -1143,7 +1143,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <div>
         <h2>What the split bought</h2>
         <p class="thesis">
-          The interesting number is not the time saved but where the human attention went.
+          Where the human attention went is the interesting number, not the time saved.
         </p>
       </div>
     </div>
@@ -1168,8 +1168,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <p>
         Two thirds of the human time went to the thirteen percent that needed judgment. The sixty
-        escalations got two full days, and that distribution is the entire point. The comparison here
-        is not against doing the work by hand: it is against the all-agent version. That version would
+        escalations got two full days, and that distribution is the entire point. So compare this to
+        the all-agent version, not to doing the work by hand. That version would
         cost eight times the inference and produce a diff nobody can review in bulk. It would answer
         those sixty questions instead of asking them.
       </p>
@@ -1199,11 +1199,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <ol class="sequence">
         <li data-signal="block">
           <span class="when">All mechanical</span>
-          <span class="what">If the census comes back 100% mechanical, you need a codemod and a reviewer, and nothing else. Building a fan-out for it is elaborate procrastination.</span>
+          <span class="what">If the census comes back 100% mechanical, you need a codemod and a reviewer, and nothing else. So building a fan-out for it is elaborate procrastination.</span>
         </li>
         <li data-signal="block">
           <span class="when">A rename</span>
-          <span class="what">Your language server does the rename correctly and for free, with full type awareness. No version of a rename needs an agent.</span>
+          <span class="what">Your language server does the rename correctly and for free, with full type awareness. So no version of a rename needs an agent.</span>
         </li>
         <li data-signal="block">
           <span class="when">No oracle</span>
@@ -1211,7 +1211,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         </li>
         <li data-signal="block">
           <span class="when">Unresolved policy</span>
-          <span class="what">The 890-site question from §1, unanswered. No amount of tooling substitutes for somebody deciding where rounding happens. Start anyway and you get inconsistency that is far harder to find than the original problem.</span>
+          <span class="what">The 890-site question from §1, unanswered. No amount of tooling substitutes for somebody deciding where rounding happens. So start anyway and you get inconsistency far harder to find than the original problem.</span>
         </li>
       </ol>
 
@@ -1220,8 +1220,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         <p>
           Write the census script and nothing else. One afternoon, no commitment. It answers the one
           question that shapes the whole project: what fraction of this migration has one correct
-          answer? Everything on this page follows from that number, and teams that skip the census
-          choose an architecture before they have the fact that decides it.
+          answer? So everything on this page follows from that number. Teams that skip the census
+          choose an architecture before they know the number that decides it.
         </p>
       </div>
     </div>

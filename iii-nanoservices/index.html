@@ -761,11 +761,11 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     </div>
     <h1>An agent breaks most of what a distributed system <em>assumes</em>.</h1>
     <p class="standfirst">
-      The agent chooses the graph at runtime, a step can take minutes, and nothing the step did can
-      be undone. Those properties decide which distributed models survive. Five have worked for me
-      on iii: a reliable queue, nanoservices, the blackboard, actors with supervision, and event
-      sourcing. Five have not, and the reason repeats. Each one assumes determinism, bounded
-      latency, or a control flow fixed at design time.
+      The agent chooses the graph at runtime. A step can take minutes, and nothing the step did can
+      be undone. Those three properties decide which distributed models survive. Five have worked
+      for me on iii: a reliable queue, nanoservices, the blackboard, actors with supervision, and
+      event sourcing. Five have not, and each one assumes determinism, bounded latency, or a
+      control flow fixed at design time.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -867,9 +867,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </ol>
 
       <p>
-        None of those six is exotic on its own. Long-running jobs, at-least-once delivery and human
-        approval steps all predate agents by decades. What is unusual is getting all six at once, in
-        every workload, with no way to opt out of any of them.
+        None of those six is exotic on its own. Each one predates agents by decades: long-running
+        jobs, at-least-once delivery, human approval steps. But getting all six at once, in every
+        workload, with no way to opt out of any of them, is what is new.
       </p>
 
       <h3 class="sub">What this page does not do</h3>
@@ -882,10 +882,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">The counter-argument</h3>
       <p>
-        You can build an agentic system as one process with a loop and a list of tools. For a
-        single-user prototype that is the correct answer, and nothing here beats it on time to first
-        result. The shapes below start paying later: when a run outlives a process, when two runs
-        overlap, or when someone has to explain what the system decided and why.
+        You can build an agentic system as one process with a loop and a list of tools. That is the
+        correct answer for a single-user prototype, and nothing here beats it on time to first
+        result. The shapes below start paying later. They pay when a run outlives a process,
+        when two runs overlap, or when someone must explain what the system decided and why.
       </p>
 
     </div>
@@ -911,15 +911,15 @@ footer strong { color: var(--ink-2); font-weight: 600; }
     <div class="rung-body">
 
       <p>
-        A queue moves the job record out of the worker. State lives in the message and in whatever
-        store the message points at, so the process holding it becomes disposable. Kill a worker
-        mid-step and the work is still there. That single property is what makes a forty-minute run
+        A queue moves the job record out of the worker. So state lives in the message and in whatever
+        store the message points at, and the process holding it becomes disposable. Kill a worker
+        mid-step and the work is still there. That single property makes a forty-minute run
         survivable on hardware you restart.
       </p>
       <p>
-        It also gives you a place to put a step that has not happened yet. A synchronous caller has
-        to wait or give up, while a publisher writes a message and stops caring. When a human
-        checkpoint can sit for hours, per property 6, having somewhere to park the job is the
+        It also gives you a place to put a step that has not happened yet. Instead, a synchronous
+        caller has to wait or give up, while a publisher writes a message and stops caring. A human
+        checkpoint can sit for hours, per property 6. Having somewhere to park the job is the
         difference between a design and a timeout.
       </p>
 
@@ -933,9 +933,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </p>
       <p>
         The second charge is subtler. You will want a lock somewhere, and property 2 says you cannot
-        have one. A lease long enough to cover a slow model call is a lease long enough to strand
-        work when a node dies. Optimistic writes with an explicit parent chain handle this better
-        than any lock length I have tried.
+        have one. A lease long enough to cover a slow model call will also strand work when a node
+        dies. Optimistic writes with an explicit parent chain handle this better than any lock
+        length I have tried.
       </p>
 
     </div>
@@ -962,10 +962,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">The term, and what it does not settle</h3>
       <p>
-        A microservice does one job as a service. A nanoservice is abstracted a level down, at the
-        function. I have gone back and forth on the word and I am settling on it. "Very small
-        microservice" describes the size while missing the thing that actually moved, which is the
-        unit of abstraction.
+        A microservice does one job as a service. A nanoservice moves that abstraction down a level,
+        to the function. I have gone back and forth on the word and I am settling on it. "Very small
+        microservice" describes the size while missing what actually moved, which is the unit of
+        abstraction.
       </p>
       <p>
         Function-level decomposition is also what functions as a service already means, so
@@ -997,21 +997,20 @@ footer strong { color: var(--ink-2); font-weight: 600; }
 
       <h3 class="sub">Why that transport suits agents</h3>
       <p>
-        The network traffic happens inside the engine. A node connects out, holds a websocket, and
-        receives a function call, so there is no web request between the pieces of your system. No
-        DNS lookup, no connection setup, no HTTP framing, and no ingress hop per call.
+        The network traffic happens inside the engine: a node connects out, holds a websocket, and
+        receives a function call. So no web request crosses between the pieces of your system. That
+        drops the DNS lookup, the connection setup, the HTTP framing, and the ingress hop per call.
       </p>
       <p>
-        That matters more here than it would on a service graph, and the reason is granularity. Cut
-        a system at the function level and you get many small hops where a microservice graph had a
-        few coarse ones. Per-hop overhead becomes the dominant overhead. So the cheaper hop is what
-        makes the finer cut affordable at all, which I think is why FaaS graphs tend to stay coarse
-        in practice.
+        That matters more here than on a service graph, and granularity is why. Cut a system at the
+        function level and you get many small hops where a microservice graph had a few coarse ones.
+        So per-hop overhead becomes the dominant overhead. That is what makes the finer cut
+        affordable at all, and likely why FaaS graphs stay coarse in practice.
       </p>
       <p>
         Two smaller consequences follow. There is no HTTP surface per node, so nothing to route,
         authenticate at the edge, or expose. And a node is a process holding a socket rather than a
-        server. The same graph runs on a laptop in a few terminals, or in a cluster, without
+        server. So the same graph runs on a laptop in a few terminals, or in a cluster, without
         changing shape.
       </p>
 
@@ -1022,10 +1021,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         instead, which is what lets the wiring change without editing a caller.
       </p>
       <p>
-        Choreographed services are the contrast worth drawing. When each service calls the next by
-        name, the code holds the graph. But property 1 says that graph is the part an agent decides
-        at runtime. So a shape that hard-codes the order fights the one thing you added the model to
-        do.
+        Set choreographed services against that. When each service calls the next by name, the code
+        holds the graph. But property 1 says an agent decides that graph at runtime. So a shape that
+        hard-codes the order fights the one thing you added the model to do.
       </p>
 
       <h3 class="sub">The integration tax it does not charge</h3>
@@ -1037,10 +1035,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         fit together.
       </p>
       <p>
-        Here the whole graph is defined in code, in one place, and the engine runs it. A change that
+        Here you define the whole graph in code, in one place, and the engine runs it. A change that
         updates a function updates its callers too, or the engine fails. That is a guarantee, not a
-        convention, and it removes the coordination cost. There is one definition and one engine
-        reading it, not a contract negotiated between two deployments.
+        convention, and it removes the coordination cost. So there is one definition and one engine
+        reading it, not a contract two deployments negotiate.
       </p>
       <p>
         Compare where the two designs put the mismatch. Independently deployed services defer it to
@@ -1048,10 +1046,10 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         refuses instead, at the point you wired it wrong, which is the cheapest moment to find out.
       </p>
       <p>
-        Be clear about what that trades away. Microservices buy independent deployability, and this
-        gives it up: one definition means one blast radius, and every node shares the engine version.
-        If your problem is many teams shipping on separate clocks, that is the wrong trade. This
-        shape suits a small team, or one engineer with an agent.
+        Microservices buy independent deployability; this shape gives it up. One definition means one
+        blast radius, and every node shares the engine version. If many teams ship on separate
+        clocks, that is the wrong trade. This shape suits a small team, or one engineer with an
+        agent.
       </p>
 
       <h3 class="sub">The bill</h3>
@@ -1091,9 +1089,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
         emerges from what is currently known.
       </p>
       <p>
-        Agents already behave that way. A pipeline commits to the order at design time, so every
-        time the work needs a different order, you add a branch or a retry loop. The blackboard never
-        had an order to commit to.
+        Agents already behave that way. A pipeline, by contrast, commits to the order at design
+        time. So every time the work needs a different order, you add a branch or a retry loop. The
+        blackboard never had an order to commit to.
       </p>
 
       <h3 class="sub">The bill</h3>
@@ -1139,9 +1137,8 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </p>
       <p>
         Half of the vocabulary survives that translation as a YAML entry or a trigger binding. The
-        other half has no referent, and not because a feature is missing: the problem it solved does
-        not arise once state is durable. That is the finding I did not expect when I built it both
-        ways.
+        other half has no referent, because the problem it solved does not arise once state is
+        durable. That is the finding I did not expect when I built it both ways.
       </p>
 
       <h3 class="sub">The bill</h3>
@@ -1167,7 +1164,7 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       </div>
       <h2 id="h-5">Event sourcing, which you are doing already</h2>
       <p class="thesis">
-        An agent produces an append-only log whether or not it means to. The choice is not whether
+        An agent produces an append-only log whether or not it means to. So the choice is not whether
         to have one, but what you get out of it.
       </p>
       <div class="chips">
@@ -1256,9 +1253,9 @@ footer strong { color: var(--ink-2); font-weight: 600; }
       <h3 class="sub">Where I could be wrong</h3>
       <p>
         This list is reasoning from §0, not a report on five failed builds. I did not construct each
-        rejected shape to watch it break, so treat the verdicts as predictions with their mechanism
-        stated, which at least makes them arguable. If you have run one of these against real agent
-        traffic and it held, the mechanism above is the part to attack.
+        rejected shape to watch it break, so treat the verdicts as predictions. I state a mechanism
+        for each, which at least makes them arguable. If you have run one of these against real
+        agent traffic and it held, the mechanism above is the part to attack.
       </p>
       <p>
         One boundary is worth naming. Everything here assumes the model is in the loop at runtime.
