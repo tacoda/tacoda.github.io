@@ -678,7 +678,7 @@
       <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span> The six phases · policy-governed touchpoints</div>
       <h2>Every boundary is a checkpoint the orchestrator will not skip.</h2>
       <div class="body center">
-        <svg viewBox="0 0 1150 220" style="width:100%; height:100%;">
+        <svg viewBox="0 0 1150 200" style="width:100%; height:100%;">
           <path d="M76 116 H137" class="s-line" fill="none" marker-end="url(#arr)"/>
           <path d="M171 116 H232" class="s-line" fill="none" marker-end="url(#arr)"/>
           <path d="M286 116 H347" class="s-line" fill="none" marker-end="url(#arr)"/>
@@ -731,7 +731,7 @@
             <line x1="148" y1="109" x2="162" y2="109" class="s-faint"/>
             <line x1="148" y1="116" x2="162" y2="116" class="s-faint"/>
             <line x1="148" y1="123" x2="157" y2="123" class="s-faint"/>
-            <text x="155" y="186" text-anchor="middle" class="t-faint" font-size="10.5">contract approval</text>
+            <text x="155" y="84" text-anchor="middle" class="t-faint" font-size="10.5">contract approval</text>
           </g>
           <g>
             <rect x="351" y="99" width="28" height="34" rx="3" class="f-panel"/>
@@ -739,7 +739,7 @@
             <line x1="358" y1="109" x2="372" y2="109" class="s-faint"/>
             <line x1="358" y1="116" x2="372" y2="116" class="s-faint"/>
             <line x1="358" y1="123" x2="367" y2="123" class="s-faint"/>
-            <text x="365" y="186" text-anchor="middle" class="t-faint" font-size="10.5">plan</text>
+            <text x="365" y="84" text-anchor="middle" class="t-faint" font-size="10.5">plan</text>
           </g>
           <g>
             <rect x="561" y="99" width="28" height="34" rx="3" class="f-panel"/>
@@ -747,7 +747,7 @@
             <line x1="568" y1="109" x2="582" y2="109" class="s-faint"/>
             <line x1="568" y1="116" x2="582" y2="116" class="s-faint"/>
             <line x1="568" y1="123" x2="577" y2="123" class="s-faint"/>
-            <text x="575" y="186" text-anchor="middle" class="t-faint" font-size="10.5">diff</text>
+            <text x="575" y="84" text-anchor="middle" class="t-faint" font-size="10.5">diff</text>
           </g>
           <g>
             <rect x="771" y="99" width="28" height="34" rx="3" class="f-panel"/>
@@ -755,7 +755,7 @@
             <line x1="778" y1="109" x2="792" y2="109" class="s-faint"/>
             <line x1="778" y1="116" x2="792" y2="116" class="s-faint"/>
             <line x1="778" y1="123" x2="787" y2="123" class="s-faint"/>
-            <text x="785" y="186" text-anchor="middle" class="t-faint" font-size="10.5">change approval</text>
+            <text x="785" y="84" text-anchor="middle" class="t-faint" font-size="10.5">change approval</text>
           </g>
           <g>
             <rect x="981" y="99" width="28" height="34" rx="3" class="f-panel"/>
@@ -763,7 +763,7 @@
             <line x1="988" y1="109" x2="1002" y2="109" class="s-faint"/>
             <line x1="988" y1="116" x2="1002" y2="116" class="s-faint"/>
             <line x1="988" y1="123" x2="997" y2="123" class="s-faint"/>
-            <text x="995" y="186" text-anchor="middle" class="t-faint" font-size="10.5">change pipeline</text>
+            <text x="995" y="84" text-anchor="middle" class="t-faint" font-size="10.5">change pipeline</text>
           </g>
           <text x="575" y="40" text-anchor="middle" class="t-faint" font-size="12">no boundary crossed without a verdict : every verdict leaves a document</text>
         </svg>
@@ -978,8 +978,8 @@
     ctx.moveTo(W - 10, midY - rh); ctx.lineTo(W - 4, midY - rh); ctx.lineTo(W - 4, midY + rh); ctx.lineTo(W - 10, midY + rh);
     ctx.stroke(); ctx.globalAlpha = 1;
     ctx.font = '12px ' + MONO; ctx.fillStyle = muted;
-    ctx.textAlign = 'left';  ctx.fillText('all possible solutions', 14, midY - lh - 14);
-    ctx.textAlign = 'right'; ctx.fillText('shippable solutions', W - 14, midY - rh - 26);
+    ctx.textAlign = 'left';  ctx.fillText('all possible solutions', 14, midY - lh - 8);
+    ctx.textAlign = 'right'; ctx.fillText('shippable solutions', W - 14, midY - rh - 20);
     ctx.textAlign = 'start';
 
     ctx.strokeStyle = signal; ctx.lineWidth = 2.5;
