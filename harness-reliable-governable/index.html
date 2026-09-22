@@ -970,16 +970,23 @@
       ctx.fillStyle = faint; ctx.fillText(GATES[g].label, gx, LABEL_Y);
     }
 
-    /* width of the band at each end, with the two populations named */
-    ctx.strokeStyle = muted; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.65;
-    var lh = railHalf(0), rh = railHalf(W);
-    ctx.beginPath();
-    ctx.moveTo(10, midY - lh); ctx.lineTo(4, midY - lh); ctx.lineTo(4, midY + lh); ctx.lineTo(10, midY + lh);
-    ctx.moveTo(W - 10, midY - rh); ctx.lineTo(W - 4, midY - rh); ctx.lineTo(W - 4, midY + rh); ctx.lineTo(W - 10, midY + rh);
-    ctx.stroke(); ctx.globalAlpha = 1;
-    ctx.font = '12px ' + MONO; ctx.fillStyle = muted;
-    ctx.textAlign = 'left';  ctx.fillText('all possible solutions', 14, midY - lh - 8);
-    ctx.textAlign = 'right'; ctx.fillText('shippable solutions', W - 14, midY - rh - 20);
+    /* the band's extent at each end, measured by an arrow and named above it */
+    function extent(x, label, align, tx) {
+      var half = railHalf(x), top = midY - half, bot = midY + half, head = 5;
+      ctx.strokeStyle = muted; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.7;
+      ctx.beginPath();
+      ctx.moveTo(x, top); ctx.lineTo(x, bot);
+      ctx.moveTo(x - head, top + head); ctx.lineTo(x, top); ctx.lineTo(x + head, top + head);
+      ctx.moveTo(x - head, bot - head); ctx.lineTo(x, bot); ctx.lineTo(x + head, bot - head);
+      ctx.stroke();
+      ctx.globalAlpha = 0.45; ctx.lineWidth = 1; ctx.setLineDash([2, 4]);
+      ctx.beginPath(); ctx.moveTo(x, top - 7); ctx.lineTo(x, top - 19); ctx.stroke();
+      ctx.setLineDash([]); ctx.globalAlpha = 1;
+      ctx.font = '12px ' + MONO; ctx.fillStyle = muted; ctx.textAlign = align;
+      ctx.fillText(label, tx, top - 26);
+    }
+    extent(16, 'all possible solutions', 'left', 10);
+    extent(W - 16, 'shippable solutions', 'right', W - 10);
     ctx.textAlign = 'start';
 
     ctx.strokeStyle = signal; ctx.lineWidth = 2.5;
