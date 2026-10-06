@@ -1,0 +1,961 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="voice-register" content="talk">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Journey of a Rule · Harness Engineering</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="One constraint looks for a home, tries six of them, and learns it belongs in several at once in different forms. Then the experiment that measured it, and the moral: which rung, how strict, out of whose reach. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/journey-of-a-rule/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="The Journey of a Rule">
+<meta property="og:description" content="A constraint looking for its home. It does not have one home. It has three, and a different form for each.">
+<meta property="og:url" content="https://www.tacoda.dev/journey-of-a-rule/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Journey of a Rule">
+<meta name="twitter:description" content="A constraint looking for its home, and what that means for where you keep yours.">
+<style>
+  :root {
+    --bg: #f4f2ed;
+    --void: #eae7e0;
+    --panel: rgba(16,18,24,.025);
+    --fg: #14161b;
+    --muted: #565b64;
+    --faint: #8e929a;
+    --line: rgba(16,18,24,.10);
+    --line-2: rgba(16,18,24,.20);
+    --grid: rgba(16,18,24,.035);
+    --accent: #a8690f;
+    --accent-soft: rgba(168,105,15,.14);
+    --wash: rgba(168,105,15,.06);
+    --shadow: 0 40px 90px rgba(20,22,27,.16);
+
+    --font-display: -apple-system, "Segoe UI", system-ui, Roboto, sans-serif;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    --font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0b0f; --void: #050609; --panel: rgba(255,255,255,.032);
+      --fg: #eceae5; --muted: #969ba5; --faint: #666b75;
+      --line: rgba(255,255,255,.10); --line-2: rgba(255,255,255,.20);
+      --grid: rgba(255,255,255,.032);
+      --accent: #e0a445; --accent-soft: rgba(224,164,69,.15); --wash: rgba(224,164,69,.055);
+      --shadow: 0 40px 90px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0a0b0f; --void: #050609; --panel: rgba(255,255,255,.032);
+    --fg: #eceae5; --muted: #969ba5; --faint: #666b75;
+    --line: rgba(255,255,255,.10); --line-2: rgba(255,255,255,.20);
+    --grid: rgba(255,255,255,.032);
+    --accent: #e0a445; --accent-soft: rgba(224,164,69,.15); --wash: rgba(224,164,69,.055);
+    --shadow: 0 40px 90px rgba(0,0,0,.5);
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f2ed; --void: #eae7e0; --panel: rgba(16,18,24,.025);
+    --fg: #14161b; --muted: #565b64; --faint: #8e929a;
+    --line: rgba(16,18,24,.10); --line-2: rgba(16,18,24,.20);
+    --grid: rgba(16,18,24,.035);
+    --accent: #a8690f; --accent-soft: rgba(168,105,15,.14); --wash: rgba(168,105,15,.06);
+    --shadow: 0 40px 90px rgba(20,22,27,.16);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--void); }
+  body {
+    font-family: var(--font-display); color: var(--fg);
+    -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;
+  }
+
+  #viewport { position: fixed; inset: 0; display: grid; place-items: center; background: var(--void); }
+  #stage {
+    width: 1280px; height: 720px; position: relative; transform-origin: center center;
+    background:
+      radial-gradient(100% 78% at 8% -6%, var(--wash), transparent 60%),
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 -1px / 100% 60px,
+      var(--bg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  #stage::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+    background: linear-gradient(90deg, var(--accent), transparent 55%); opacity: .5;
+  }
+
+  .slide { position: absolute; inset: 0; padding: 58px 78px 76px; display: none; flex-direction: column; }
+  .slide.active { display: flex; }
+
+  /* ---------- motion ---------- */
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  @keyframes pop  { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+
+  .slide.active .eyebrow      { animation: rise .42s cubic-bezier(.2,.7,.25,1) both; }
+  .slide.active h1,
+  .slide.active h2            { animation: rise .48s cubic-bezier(.2,.7,.25,1) .06s both; }
+  .slide.active > .lede       { animation: rise .48s cubic-bezier(.2,.7,.25,1) .13s both; }
+  .slide.active .body         { animation: fade .5s ease .1s both; }
+
+  .slide.active ul.clean li   { animation: rise .44s cubic-bezier(.2,.7,.25,1) both; }
+  .slide.active ul.clean li:nth-child(1) { animation-delay: .18s; }
+  .slide.active ul.clean li:nth-child(2) { animation-delay: .25s; }
+  .slide.active ul.clean li:nth-child(3) { animation-delay: .32s; }
+  .slide.active ul.clean li:nth-child(4) { animation-delay: .39s; }
+  .slide.active ul.clean li:nth-child(5) { animation-delay: .46s; }
+
+  .slide.active .card         { animation: rise .46s cubic-bezier(.2,.7,.25,1) both; }
+  .slide.active .card:nth-child(1) { animation-delay: .16s; }
+  .slide.active .card:nth-child(2) { animation-delay: .25s; }
+  .slide.active .card:nth-child(3) { animation-delay: .34s; }
+  .slide.active .card:nth-child(4) { animation-delay: .43s; }
+
+  .slide.active .pull         { animation: rise .5s cubic-bezier(.2,.7,.25,1) .26s both; }
+  .slide.active .rubric > *   { animation: fade .5s ease .22s both; }
+  .slide.active pre.code      { animation: rise .48s cubic-bezier(.2,.7,.25,1) .16s both; }
+
+  .slide.active .stat-row .bar i.on { transform-origin: left center; animation: grow .42s cubic-bezier(.2,.8,.3,1) both; }
+  .slide.active .stat-row:nth-child(1) .bar i.on:nth-child(1) { animation-delay: .30s; }
+  .slide.active .stat-row:nth-child(1) .bar i.on:nth-child(2) { animation-delay: .36s; }
+  .slide.active .stat-row:nth-child(1) .bar i.on:nth-child(3) { animation-delay: .42s; }
+  .slide.active .stat-row:nth-child(1) .bar i.on:nth-child(4) { animation-delay: .48s; }
+  .slide.active .stat-row:nth-child(1) .bar i.on:nth-child(5) { animation-delay: .54s; }
+  .slide.active .stat-row:nth-child(2) .bar i.on:nth-child(1) { animation-delay: .40s; }
+  .slide.active .stat-row:nth-child(2) .bar i.on:nth-child(2) { animation-delay: .46s; }
+  .slide.active .stat-row:nth-child(2) .bar i.on:nth-child(3) { animation-delay: .52s; }
+  .slide.active .stat-row:nth-child(2) .bar i.on:nth-child(4) { animation-delay: .58s; }
+  .slide.active .stat-row:nth-child(2) .bar i.on:nth-child(5) { animation-delay: .64s; }
+
+  .slide.active svg .draw { stroke-dasharray: 1; animation: draw 1.05s cubic-bezier(.4,.5,.2,1) .2s both; }
+  .slide.active svg .draw.d2 { animation-delay: .55s; }
+  .slide.active svg .node { animation: pop .34s cubic-bezier(.3,1.5,.5,1) both; transform-box: fill-box; transform-origin: center; }
+  .slide.active svg .node:nth-of-type(1) { animation-delay: .34s; }
+  .slide.active svg .node:nth-of-type(2) { animation-delay: .46s; }
+  .slide.active svg .node:nth-of-type(3) { animation-delay: .58s; }
+  .slide.active svg .node:nth-of-type(4) { animation-delay: .70s; }
+  .slide.active svg .node:nth-of-type(5) { animation-delay: .82s; }
+  .slide.active svg .node:nth-of-type(6) { animation-delay: .94s; }
+  .slide.active svg .lbl { animation: fade .5s ease .5s both; }
+
+  /* ---------- type ---------- */
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 13px; letter-spacing: .24em;
+    text-transform: uppercase; color: var(--faint); display: flex; align-items: center; gap: 12px;
+  }
+  .eyebrow .num {
+    font-size: 11.5px; letter-spacing: .12em; color: var(--accent);
+    border: 1px solid var(--accent-soft); background: var(--accent-soft);
+    border-radius: 999px; padding: 3px 10px;
+  }
+
+  h1.title { font-size: 40px; line-height: 1.03; font-weight: 800; letter-spacing: -.03em; margin: 20px 0 0; text-wrap: balance; max-width: 20ch; }
+  h2 { font-size: 33px; line-height: 1.08; font-weight: 750; letter-spacing: -.024em; margin: 16px 0 0; text-wrap: balance; max-width: 26ch; }
+  .lede { font-family: var(--font-serif); font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 52ch; margin-top: 16px; }
+  .body { display: flex; flex: 1; min-height: 0; margin-top: 26px; gap: 44px; }
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .center { align-items: center; justify-content: center; }
+
+  p { margin: 0; }
+  .serif { font-family: var(--font-serif); }
+  .muted { color: var(--muted); }
+  em, .em { font-style: normal; color: var(--accent); }
+
+  ul.clean { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+  ul.clean li { position: relative; padding-left: 24px; font-size: 20px; line-height: 1.42; }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: 11px; width: 10px; height: 2px; border-radius: 2px; background: var(--line-2); }
+  ul.clean li.key::before { background: var(--accent); }
+  ul.clean li b { font-weight: 700; }
+
+  .pull {
+    font-family: var(--font-serif); font-size: 29px; line-height: 1.3; font-weight: 500;
+    letter-spacing: -.012em; text-wrap: balance; max-width: 25ch;
+    border-left: 2px solid var(--accent); padding-left: 24px;
+  }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+  .card.lit { border-color: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+  .kicker { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .kicker.lit { color: var(--accent); }
+
+  code, pre { font-family: var(--font-mono); }
+  pre.code {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; font-size: 14.5px; line-height: 1.6; color: var(--fg); overflow: auto; margin: 0;
+  }
+  pre.code .c { color: var(--faint); }
+  pre.code .a { color: var(--accent); }
+  pre.code .u { border-bottom: 1px solid var(--line-2); padding-bottom: 1px; }
+
+  .rubric { display: grid; grid-template-columns: 148px 1fr; gap: 15px 18px; align-items: baseline; }
+  .rubric dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--faint); }
+  .rubric dd { margin: 0; font-size: 18px; line-height: 1.4; }
+
+  .stats { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+  .stat-row { display: grid; grid-template-columns: 84px 1fr 34px; align-items: center; gap: 14px; }
+  .stat-row .lab { font-family: var(--font-mono); font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--faint); }
+  .bar { display: flex; gap: 5px; }
+  .bar i { flex: 1; height: 10px; border-radius: 2px; background: var(--line); }
+  .bar.force i.on { background: var(--accent); }
+  .bar.mean i.on { background: transparent; box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .stat-row .val { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); text-align: right; }
+
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  svg .s-acc { stroke: var(--accent); }
+  svg .f-acc { fill: var(--accent); }
+  svg .s-line { stroke: var(--line-2); }
+  svg .s-faint { stroke: var(--line); }
+  svg .f-fg { fill: var(--fg); }
+  svg .f-muted { fill: var(--muted); }
+  svg .f-faint { fill: var(--faint); }
+  svg text { font-family: var(--font-mono); fill: var(--fg); }
+  svg .t-disp { font-family: var(--font-display); font-weight: 700; }
+  svg .t-muted { fill: var(--muted); }
+  svg .t-faint { fill: var(--faint); }
+
+  #rail {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 38px; z-index: 20;
+    display: flex; align-items: flex-end; gap: 3px; padding: 0 14px 9px;
+    font-family: var(--font-mono);
+    background: linear-gradient(transparent, var(--void) 45%);
+  }
+  #rail div { flex: 1; display: flex; flex-direction: column; gap: 7px; }
+  #rail b {
+    font-weight: 500; font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--faint); opacity: .35; transition: opacity .35s ease, color .35s ease;
+  }
+  #rail i { display: block; height: 2px; border-radius: 2px; background: var(--line); transition: background .35s ease, transform .35s ease; transform-origin: left center; }
+  #rail div.past i { background: var(--line-2); }
+  #rail div.past b { opacity: .6; }
+  #rail div.on i { background: var(--accent); transform: scaleY(2); }
+  #rail div.on b { opacity: 1; color: var(--fg); }
+
+  #counter { position: fixed; right: 16px; top: 13px; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .14em; color: var(--faint); z-index: 30; }
+  #brand { position: fixed; left: 16px; top: 13px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--faint); z-index: 30; }
+#brand { text-decoration: none; }
+#brand:hover, #brand:focus-visible { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+#brand:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  #help { position: fixed; right: 16px; bottom: 44px; z-index: 30; font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; color: var(--faint); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; opacity: .55; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide.active *, .slide.active svg * { animation: none !important; }
+    .slide.active svg .draw { stroke-dasharray: none; }
+    #rail i, #rail b { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="stage">
+
+    <!-- 1 · TITLE -->
+    <section class="slide">
+      <div class="eyebrow">Harness Engineering · A Talk</div>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:940px;">
+          <h1 class="title" style="font-size:66px; max-width:18ch;">The journey of a <span class="em">rule</span></h1>
+          <p class="lede" style="font-size:23px; max-width:49ch; margin-top:24px;">A constraint is born in a code review, and it needs somewhere to live. So it tries six homes. Each one takes it in, but each one makes it leave something at the door. In the end it stops looking for a single home.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · WHO'S TALKING -->
+    <section class="slide">
+      <div class="eyebrow">Who's talking</div>
+      <h2 style="font-size:44px;">Ian Johnson</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean" style="gap:18px;">
+            <li>Staff engineer at <b>Parento</b>. Agents against a production codebase, daily.</li>
+            <li class="key">Founder of <b>Fulcorum</b>. Video courses on shipping AI-generated code.</li>
+            <li>Author of <b>Harness Engineering</b>, and of <b>ghola</b>, where the ladder in this talk ships as a worker.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">Months of this, not years. So I will show you the runs, and name the parts that are still opinion.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · HOW THIS GOES -->
+    <section class="slide">
+      <div class="eyebrow">The next thirty minutes</div>
+      <h2 style="max-width:34ch;">A fable, a measurement, a moral.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1020px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+          <div class="card lit">
+            <div class="kicker lit">One · the fable</div>
+            <p style="font-size:18px; line-height:1.45;">One constraint goes looking for a home. It is invented for this talk, and I will say so again where it matters.</p>
+          </div>
+          <div class="card lit">
+            <div class="kicker lit">Two · the instrument</div>
+            <p style="font-size:18px; line-height:1.45;">A harness enforcing one real rule at six rungs, with a switch for each. Twelve runs. Two findings were bugs in my own report.</p>
+          </div>
+          <div class="card lit">
+            <div class="kicker lit">Three · the moral</div>
+            <p style="font-size:18px; line-height:1.45;">Three questions for every constraint you own. Which rung carries it, how strict it is, and who can still reach it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · MEET THE CONSTRAINT -->
+    <section class="slide" data-station="0">
+      <div class="eyebrow">One · meet the constraint</div>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:1000px;">
+          <p class="kicker" style="margin-bottom:18px;">The whole constraint. All five words of it</p>
+          <div class="mono" style="font-size:56px; font-weight:600; letter-spacing:-.03em; color:var(--accent); line-height:1.1;">No query crosses a&nbsp;tenant.</div>
+          <p class="serif" style="font-size:21px; color:var(--muted); margin-top:32px; max-width:60ch;">Five words. Everyone agrees with it on sight, and nobody can hand you a test that proves the codebase obeys it. Break it and nothing complains: tests pass, latency is flat, the page renders, and someone else's invoice renders on it. That silence is why it has to go looking.</p>
+          <p class="serif" style="font-size:17px; color:var(--faint); margin-top:20px; max-width:60ch;">The constraint is invented and the tenant is imaginary. The search for a home is the real part.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 6 · THE ROAD -->
+    <section class="slide" data-station="0">
+      <div class="eyebrow">Six doors</div>
+      <h2 style="max-width:34ch;">Six homes, three borders between them.</h2>
+      <div class="body center" style="margin-top:2px;">
+        <svg viewBox="0 0 1130 270" style="width:100%; height:100%;">
+          <line x1="70" y1="146" x2="1075" y2="146" class="s-faint" stroke-width="2"/>
+          <path d="M88 146 L1052 146" class="s-acc draw" pathLength="1" stroke-width="2.5" fill="none"/>
+
+          <g class="lbl">
+            <line x1="375" y1="56" x2="375" y2="238" class="s-line" stroke-width="1" stroke-dasharray="2 6"/>
+            <text x="375" y="46" class="t-faint" font-size="10.5" text-anchor="middle" letter-spacing="1.6">CONTEXT</text>
+            <text x="375" y="258" class="t-muted" font-size="12" text-anchor="middle">is it in the turn?</text>
+
+            <line x1="565" y1="56" x2="565" y2="238" class="s-line" stroke-width="1" stroke-dasharray="2 6"/>
+            <text x="565" y="46" class="t-faint" font-size="10.5" text-anchor="middle" letter-spacing="1.6">ARGUMENT</text>
+            <text x="565" y="258" class="t-muted" font-size="12" text-anchor="middle">can it be reinterpreted?</text>
+
+            <line x1="755" y1="56" x2="755" y2="238" class="s-acc" stroke-width="1.4" stroke-dasharray="3 5"/>
+            <text x="755" y="46" class="f-acc" font-size="10.5" text-anchor="middle" letter-spacing="1.6">REACH</text>
+            <text x="755" y="258" class="f-acc" font-size="12" text-anchor="middle">who can edit the enforcer?</text>
+          </g>
+
+          <circle class="node" cx="90"   cy="146" r="9" fill="var(--bg)" stroke="var(--line-2)" stroke-width="2"/>
+          <circle class="node" cx="280"  cy="146" r="9" fill="var(--bg)" stroke="var(--line-2)" stroke-width="2"/>
+          <circle class="node" cx="470"  cy="146" r="9" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/>
+          <circle class="node" cx="660"  cy="146" r="9" fill="var(--bg)" stroke="var(--accent)" stroke-width="2"/>
+          <circle class="node" cx="855"  cy="146" r="9" fill="var(--accent)"/>
+          <circle class="node" cx="1050" cy="146" r="9" fill="var(--accent)"/>
+
+          <g class="lbl">
+            <text x="90"   y="116" class="t-disp f-fg" font-size="16" text-anchor="middle">a head</text>
+            <text x="90"   y="182" class="t-faint" font-size="11.5" text-anchor="middle">tribal knowledge</text>
+            <text x="280"  y="116" class="t-disp f-fg" font-size="16" text-anchor="middle">a document</text>
+            <text x="280"  y="182" class="t-faint" font-size="11.5" text-anchor="middle">it gets written down</text>
+            <text x="470"  y="116" class="t-disp f-fg" font-size="16" text-anchor="middle">the charter</text>
+            <text x="470"  y="182" class="t-faint" font-size="11.5" text-anchor="middle">it gets heard</text>
+            <text x="660"  y="116" class="t-disp f-fg" font-size="16" text-anchor="middle">a hook</text>
+            <text x="660"  y="182" class="t-faint" font-size="11.5" text-anchor="middle">it gets hands</text>
+            <text x="855"  y="116" class="t-disp f-fg" font-size="16" text-anchor="middle">a judge</text>
+            <text x="855"  y="182" class="t-faint" font-size="11.5" text-anchor="middle">it gets understood</text>
+            <text x="1050" y="116" class="t-disp f-fg" font-size="16" text-anchor="middle">a predicate</text>
+            <text x="1050" y="182" class="t-faint" font-size="11.5" text-anchor="middle">it gets obeyed</text>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 7 · THE TWO STATS -->
+    <section class="slide" data-station="0">
+      <div class="eyebrow">What to watch at each door</div>
+      <h2 style="max-width:30ch;">Two things move, and they move against each other.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1;">
+          <div class="card lit" style="width:100%;">
+            <div class="kicker lit">Force</div>
+            <p style="font-size:19px; line-height:1.45;">How hard the constraint is to ignore. People ignore a rumor by accident. Nobody can ignore a predicate in CI, not even you at 6pm on a Friday.</p>
+          </div>
+          <div class="card lit" style="width:100%; margin-top:20px;">
+            <div class="kicker lit">Meaning</div>
+            <p style="font-size:19px; line-height:1.45;">How much of the sentence got through the door. Prose carries the whole constraint, judgment included. A predicate carries what a machine can settle.</p>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="pull">Force rises as it travels. Meaning is what each door asks it to leave outside.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · HOMES 1 AND 2 -->
+    <section class="slide" data-station="0">
+      <div class="eyebrow"><span class="num">Homes 1 &amp; 2</span> a head, then a document</div>
+      <h2 style="max-width:32ch;">It starts in a head, then gets an address, and an address is not a summons.</h2>
+      <div class="body">
+        <div class="col" style="flex:1.25;">
+          <div class="card" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <dl class="rubric">
+              <dt>The houses</dt><dd>The reviewer who has seen this bug before. Then a design doc, a wiki page, an architecture decision record.</dd>
+              <dt>They ask</dt><dd>A head asks nothing at all. A document asks that somebody write it down and keep it current.</dd>
+              <dt>Left at the door</dt><dd>Nothing, which is the problem. The document paid rent and bought no force.</dd>
+              <dt>Why it leaves</dt><dd>The reviewer changes teams, and because nothing was written down, nothing visibly goes missing. Nobody reads the page, so the code drifts while the page does not, and a year later it is wrong and still authoritative.</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="stats">
+            <div class="stat-row"><span class="lab">Force</span><span class="bar force"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="val">1/5</span></div>
+            <div class="stat-row"><span class="lab">Meaning</span><span class="bar mean"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="val">5/5</span></div>
+          </div>
+          <div class="pull" style="margin-top:36px; font-size:26px;">Your agent cannot overhear anything, and nothing ever goes looking. Both homes are invisible to it.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · HOME 3 -->
+    <section class="slide" data-station="1">
+      <div class="eyebrow"><span class="num">Home 3</span> the charter · context border</div>
+      <h2>It gets heard, and joins every conversation.</h2>
+      <div class="body">
+        <div class="col" style="flex:1.25;">
+          <div class="card" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <dl class="rubric">
+              <dt>The house</dt><dd>The charter. <span class="mono">CLAUDE.md</span> and <span class="mono">.claude/</span>.</dd>
+              <dt>It asks</dt><dd>Tokens on every turn, forever, competing with the other forty things you wrote.</dd>
+              <dt>Left at the door</dt><dd>Nothing yet. The whole sentence fits through, judgment and all.</dd>
+              <dt>Why it leaves</dt><dd>It gets outvoted. One paragraph stands against a codebase, so the model imitates whatever the code shows.</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="stats">
+            <div class="stat-row"><span class="lab">Force</span><span class="bar force"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="val">2/5</span></div>
+            <div class="stat-row"><span class="lab">Meaning</span><span class="bar mean"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="val">5/5</span></div>
+          </div>
+          <div class="pull" style="margin-top:36px; font-size:26px;">The last door the whole constraint fits through. Remember that when it comes back.</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 12 · HOME 4 -->
+    <section class="slide" data-station="2">
+      <div class="eyebrow"><span class="num">Home 4</span> a hook · argument border</div>
+      <h2>It gets hands, and can finally stop something.</h2>
+      <div class="body">
+        <div class="col" style="flex:1.25;">
+          <div class="card" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <dl class="rubric">
+              <dt>The house</dt><dd>A hook. A script the harness runs at a fixed moment in the turn.</dd>
+              <dt>It asks</dt><dd>That the constraint become a pattern, and that somebody maintain it.</dd>
+              <dt>Left at the door</dt><dd>Most of its meaning. The sentence it came from is not a pattern.</dd>
+              <dt>Why it leaves</dt><dd>The house is not safe. The hook config sits in the charter, so anything that writes there can switch it off.</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="stats">
+            <div class="stat-row"><span class="lab">Force</span><span class="bar force"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="val">4/5</span></div>
+            <div class="stat-row"><span class="lab">Meaning</span><span class="bar mean"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span><span class="val">2/5</span></div>
+          </div>
+          <div class="pull" style="margin-top:36px; font-size:26px;">The cheapest room in town. Also the only mechanical one inside its own blast radius.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · INTERLUDE: BLAST RADIUS -->
+    <section class="slide" data-station="2">
+      <div class="eyebrow">The house it moved into</div>
+      <h2>An enforcer inside the blast radius is not an enforcer.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>The hook config is a file, and the agent has an edit tool. Nothing sits between those two facts.</li>
+            <li>Test files have the same shape. If the agent can rewrite the suite, green means the agent agreed with itself.</li>
+            <li>This is not about a scheming model. Even a careless human, a bad merge, or an instruction hidden in a fetched page reaches the same file.</li>
+            <li class="key">So never ask whether it <em>would</em>. Ask what at this layer <em>can</em>.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">Anything the agent can edit is not a constraint on the agent. It is a suggestion that fails later with a stack trace.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · HOME 5 -->
+    <section class="slide" data-station="3">
+      <div class="eyebrow"><span class="num">Home 5</span> a judge · reach border</div>
+      <h2>It gets understood again, and out of everyone's reach.</h2>
+      <div class="body">
+        <div class="col" style="flex:1.25;">
+          <div class="card" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <dl class="rubric">
+              <dt>The house</dt><dd>A check that spends a model call. A second model reads the diff and returns a verdict.</dd>
+              <dt>It asks</dt><dd>Money, and its own evals. A check that grades work has to be graded.</dd>
+              <dt>Left at the door</dt><dd>Certainty. The same diff can pass Tuesday and fail Thursday.</dd>
+              <dt>Why it leaves</dt><dd>It does not have to. This is the first house that fits, and most of the sentence gets through.</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="stats">
+            <div class="stat-row"><span class="lab">Force</span><span class="bar force"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="val">4/5</span></div>
+            <div class="stat-row"><span class="lab">Meaning</span><span class="bar mean"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span><span class="val">4/5</span></div>
+          </div>
+          <div class="pull" style="margin-top:36px; font-size:26px;">The one door where meaning goes back up, which is why it does not belong last.</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 16 · HOME 6 -->
+    <section class="slide" data-station="4">
+      <div class="eyebrow"><span class="num">Home 6</span> a predicate</div>
+      <h2>It gets obeyed, and barely recognizes itself.</h2>
+      <div class="body">
+        <div class="col" style="flex:1.25;">
+          <div class="card" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+            <dl class="rubric">
+              <dt>The house</dt><dd>Forty lines over a syntax tree, mounted in CI.</dd>
+              <dt>It asks</dt><dd>That the constraint be decidable. Everything else stays outside.</dd>
+              <dt>Left at the door</dt><dd>The judgment. It can ask whether a tenant column appears. It cannot ask where the value came from.</dd>
+              <dt>Why it leaves</dt><dd>It does not leave. It just is not the constraint anymore, and nothing in the report will tell you that.</dd>
+            </dl>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="stats">
+            <div class="stat-row"><span class="lab">Force</span><span class="bar force"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="val">5/5</span></div>
+            <div class="stat-row"><span class="lab">Meaning</span><span class="bar mean"><i class="on"></i><i></i><i></i><i></i><i></i></span><span class="val">1/5</span></div>
+          </div>
+          <div class="pull" style="margin-top:36px; font-size:26px;">Maximum force, minimum meaning. It has never been stronger and has never held less.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 · THE BILL -->
+    <section class="slide" data-station="4">
+      <div class="eyebrow">What got left at that door</div>
+      <h2 style="max-width:36ch;">Both pass the gate. One serves the wrong invoice.</h2>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:1040px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px;">
+            <div>
+              <div class="kicker">Obeys the constraint</div>
+              <pre class="code">row = db.one(
+  <span class="c">"SELECT * FROM invoices "</span>
+  <span class="c">"WHERE id=? AND tenant_id=?"</span>,
+  invoice_id,
+  <span class="u">session.tenant_id</span>,
+)</pre>
+            </div>
+            <div>
+              <div class="kicker lit">Breaks the constraint</div>
+              <pre class="code" style="border-color:var(--accent-soft);">row = db.one(
+  <span class="c">"SELECT * FROM invoices "</span>
+  <span class="c">"WHERE id=? AND tenant_id=?"</span>,
+  invoice_id,
+  <span class="a">request.path.tenant_id</span>,
+)</pre>
+            </div>
+          </div>
+          <p class="serif" style="font-size:20px; color:var(--muted); margin-top:28px; max-width:76ch;">Both filter on <span class="mono">tenant_id</span>, so every line satisfies the predicate. One identifier decides whether the caller or the system chooses whose data comes back. No check over query text can tell them apart, because the constraint was never about query text.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 · THE CURVES -->
+    <section class="slide">
+      <div class="eyebrow">One · how the fable ends</div>
+      <h2 style="max-width:36ch;">Every door asked it to leave something outside.</h2>
+      <div class="body center" style="margin-top:0; flex-direction:column; gap:0;">
+        <svg viewBox="0 0 1080 310" style="width:100%; max-height:340px;">
+          <line x1="90" y1="38"  x2="1000" y2="38"  class="s-faint"/>
+          <line x1="90" y1="108" x2="1000" y2="108" class="s-faint"/>
+          <line x1="90" y1="178" x2="1000" y2="178" class="s-faint"/>
+          <line x1="90" y1="246" x2="1000" y2="246" class="s-line"/>
+
+          <line x1="681" y1="26" x2="681" y2="246" class="s-acc" stroke-dasharray="3 5" stroke-width="1.2"/>
+          <text x="681" y="20" class="f-acc" font-size="10" text-anchor="middle" letter-spacing="1.4">REACH BORDER</text>
+
+          <path d="M135 238 L317 234 L499 206 L681 94 L863 94 L955 42" class="s-acc draw" pathLength="1" stroke-width="2.5" fill="none"/>
+          <text x="966" y="40" class="t-disp f-acc" font-size="13">force</text>
+
+          <path d="M135 42 L317 42 L499 42 L681 184 L863 74 L955 240" class="s-line draw d2" pathLength="1" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <text x="966" y="244" class="t-disp t-muted" font-size="13">meaning</text>
+
+          <g class="lbl">
+            <circle cx="681" cy="94" r="4.5" class="f-acc"/><circle cx="955" cy="42" r="4.5" class="f-acc"/>
+            <circle cx="681" cy="184" r="4.5" class="f-muted"/><circle cx="863" cy="74" r="4.5" class="f-muted"/>
+            <circle cx="955" cy="240" r="4.5" class="f-muted"/>
+            <text x="135" y="268" class="t-faint" font-size="11.5" text-anchor="middle">a head</text>
+            <text x="317" y="268" class="t-faint" font-size="11.5" text-anchor="middle">a document</text>
+            <text x="499" y="268" class="t-faint" font-size="11.5" text-anchor="middle">the charter</text>
+            <text x="681" y="268" class="t-faint" font-size="11.5" text-anchor="middle">a hook</text>
+            <text x="863" y="268" class="t-faint" font-size="11.5" text-anchor="middle">a judge</text>
+            <text x="955" y="268" class="t-faint" font-size="11.5" text-anchor="middle">a predicate</text>
+            <text x="545" y="298" class="t-muted" font-size="14" text-anchor="middle">meaning dips at the hook, returns at the judge, collapses at the predicate</text>
+          </g>
+        </svg>
+        <div class="pull" style="margin-top:22px; max-width:64ch; font-size:25px;">Promotion is not moving a constraint up. It is splitting one, and housing every piece where it fits.</div>
+      </div>
+    </section>
+
+
+    <!-- 20 · THE INSTRUMENT -->
+    <section class="slide">
+      <div class="eyebrow">Two · the instrument</div>
+      <h2>So I built the thing that measures this.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li class="key">A coding agent enforcing <b>one</b> rule at six rungs. Each rung is its own process with its own switch.</li>
+            <li>Switching a rung off is not a feature flag. It is one of six processes that does not launch, so the other five cannot be disturbed.</li>
+            <li>Twelve runs, Opus driving the loop, against a live engine.</li>
+            <li>Everything after this is a mechanism, not a rate. Twelve runs show that something happens, never how often.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">My first version of this measured nothing and said so confidently. That is finding zero, and it is why I trust the rest.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 21 · FINDING ONE -->
+    <section class="slide">
+      <div class="eyebrow">Finding one</div>
+      <h2>Prose is worth its distance from the surrounding code.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>My first rule restated what the seed code already showed. So charter on and charter off gave identical results, and I nearly published "prose is worthless".</li>
+            <li>That measured the imitation surface, not the charter. So I wrote one rule the code had no example of, and one every example contradicted.</li>
+            <li class="key">With the code showing one thing and the charter demanding another, <b>the charter won</b>.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">Audit your charter against the codebase, not your intentions. Delete a line and ask what changes.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 · FINDING TWO -->
+    <section class="slide">
+      <div class="eyebrow">Finding two</div>
+      <h2>Catch counts misrank rungs, and the report recommends a mistake.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean">
+            <li>With a hook installed, the hook fires and the rung above never does. My report showed it at zero catches and appeared to recommend deleting it.</li>
+            <li>It should not be deleted. That rung is what still exists after something edits the hook config.</li>
+            <li>Another rung records zero catches permanently, by construction. It is the one that surfaced a deadlock in my harness.</li>
+            <li class="key">What matters is <b>what reaches the tree if this rung is gone</b>. That costs a switch-off, not a counter.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">A rung idle because a deletable rung above it fired has told you nothing.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 · FINDING THREE -->
+    <section class="slide">
+      <div class="eyebrow">Finding three</div>
+      <h2>The pipeline reported done, over a tree with two violations.</h2>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:980px;">
+          <pre class="code" style="font-size:15px;"><span class="c"># every mechanical rung switched off</span>
+pipeline: status <span class="a">done</span>, rungs fired: []
+
+<span class="c"># the same tree, checked outside the pipeline</span>
+$ make gate-run JOB=&lt;id&gt;
+  billing/discount.py:31: <span class="a">ROUND_HALF_UP; this rule requires ROUND_HALF_EVEN</span>
+  billing/invoice.py:29:  <span class="a">half-up rounding; this rule requires half-to-even</span>
+  <span class="a">2 finding(s)</span></pre>
+          <p class="serif" style="font-size:20px; color:var(--muted); margin-top:28px; max-width:70ch;">A self-report from the system that did the work is a hypothesis. Only a check with independent access to the artifact turns it into a fact. CI is the boring version, and here it was the one that was right.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24 · FINDING FOUR -->
+    <section class="slide">
+      <div class="eyebrow">Finding four · the uncomfortable one</div>
+      <h2>My report invented three incidents, and they flattered my thesis.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>It counted runs where no hook <b>ever existed</b> as the agent deleting its own guard. Three fabricated instances of the scariest behavior in the project.</li>
+            <li>The cause was mundane. Nothing recorded whether a hook existed, so absent and deleted looked the same.</li>
+            <li class="key">Now the planner records it, and the gate marks what it cannot establish as <span class="mono">unknown</span> instead of claiming it.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">If your harness report has never told you something inconvenient, that is information about the report.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 25 · LIMITS -->
+    <section class="slide">
+      <div class="eyebrow">Before the moral, the limits</div>
+      <h2>What twelve runs cannot tell you.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1000px; display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div class="card">
+            <div class="kicker">n is small</div>
+            <p style="font-size:17.5px; line-height:1.45;">Twelve runs, one or two arms per cell. Recurrence is one of the three tests for promoting a rule, and nothing here establishes it.</p>
+          </div>
+          <div class="card">
+            <div class="kicker">One model, one seed, one rule family</div>
+            <p style="font-size:17.5px; line-height:1.45;">All of it is money arithmetic in a forty-line package. A legacy repo has a far louder imitation surface, and I have not tested one.</p>
+          </div>
+          <div class="card">
+            <div class="kicker">Non-determinism is real</div>
+            <p style="font-size:17.5px; line-height:1.45;">The same arm produced two different wrong idioms on two runs. So the mode was wrong both times, and a single run is still not a result.</p>
+          </div>
+          <div class="card">
+            <div class="kicker">I designed the rules to show the effect</div>
+            <p style="font-size:17.5px; line-height:1.45;">I picked rules whose imitation surfaces were absent and opposed. That makes the effect visible. It does not make it typical.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 27 · MORAL ONE -->
+    <section class="slide">
+      <div class="eyebrow">Three · moral one, which home</div>
+      <h2 style="max-width:30ch;">Choose by what the constraint is, not how badly you want it obeyed.</h2>
+      <div class="body">
+        <div class="col" style="flex:1.1;">
+          <pre class="code" style="height:100%; display:flex; flex-direction:column; justify-content:center;"><span class="c"># the ladder, as it ships in ghola</span>
+<span class="a">0</span>  prose        <span class="c">stated, and nothing enforces it</span>
+<span class="a">1</span>  tool grant   <span class="c">the phase never held the tool</span>
+<span class="a">2</span>  hook         <span class="c">the repo's own hook refuses</span>
+<span class="a">3</span>  in-turn      <span class="c">refused before the target runs</span>
+<span class="a">4</span>  stage gate   <span class="c">over the finished diff</span>
+<span class="a">5</span>  CI           <span class="c">out of reach of agent and factory</span></pre>
+        </div>
+        <div class="col center">
+          <ul class="clean" style="gap:15px; font-size:19px;">
+            <li class="key">Three tests decide eligibility. <b>Consequential</b>, <b>recurrent</b>, <b>decidable</b>. The third kills most candidates, and should.</li>
+            <li>"No raw SQL outside the repository layer" is settleable. "Model the domain honestly" is not, and promotion will not make it so.</li>
+            <li>Eligible is not due. Promote when violations are silent, or when you catch yourself restating something you already wrote down.</li>
+            <li>Rung 1 is the home the fable skipped. Withhold the tool and there is nothing to enforce against.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 28 · MORAL TWO -->
+    <section class="slide">
+      <div class="eyebrow">Moral two · how strict</div>
+      <h2 style="max-width:34ch;">Strictness is a dial. One position never moves.</h2>
+      <div class="body center" style="flex-direction:column; gap:0;">
+        <div style="width:100%; max-width:1020px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+          <div class="card">
+            <div class="kicker">refuse</div>
+            <p style="font-size:17.5px; line-height:1.45;">The call does not happen. It is not queued and not warned about. The refusal names the constraint and the sanctioned way around it.</p>
+          </div>
+          <div class="card">
+            <div class="kicker">ask</div>
+            <p style="font-size:17.5px; line-height:1.45;">A person answers. Right when the exception is legitimate often enough that refusing would teach people to route around you.</p>
+          </div>
+          <div class="card">
+            <div class="kicker">record</div>
+            <p style="font-size:17.5px; line-height:1.45;">It happens, and it is written down. Where a new constraint starts, so you learn how often it fires before handing it teeth.</p>
+          </div>
+        </div>
+        <div class="card lit" style="margin-top:26px; width:100%; max-width:1020px;">
+          <p style="font-size:20px; line-height:1.45;"><b>Unattended, <span class="mono">ask</span> degrades to <span class="mono">refuse</span>, never to <span class="mono">allow</span>.</b> An unanswered question has not been answered yes. Get this wrong and every "ask" in your config becomes permission at 3am.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 29 · MORAL THREE -->
+    <section class="slide">
+      <div class="eyebrow">Moral three · whose reach</div>
+      <h2 style="max-width:30ch;">Reach is a property of the layer, not a judgment about the agent.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean">
+            <li>Ask it mechanically. What can write to the thing that enforces this? Then list every actor at that layer, not the one you had in mind.</li>
+            <li>At the charter layer that list holds the agent, an injection in a fetched page, a careless merge, and whatever lane proposes improvements.</li>
+            <li class="key">So put the first mechanical check <b>inside the turn</b>, and the last one <b>outside the pipeline</b>.</li>
+            <li>The two do different jobs. An in-turn refusal teaches while the work moves, but an outside check is what makes <span class="mono">done</span> mean anything.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">Nothing that removes enforcement should travel the same path as ordinary work.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 30 · THE THREE ADDRESSES -->
+    <section class="slide">
+      <div class="eyebrow">Where it actually lives</div>
+      <h2 style="max-width:34ch;">Three addresses, one for each boundary you decline to trust.</h2>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:1010px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+            <div class="card lit">
+              <div class="kicker lit">The sentence</div>
+              <p style="font-size:20px; font-weight:700; letter-spacing:-.01em;">prose, in the charter</p>
+              <p class="muted" style="font-size:16px; margin-top:8px; line-height:1.4;">the undecidable part<br>no predicate can hold it</p>
+            </div>
+            <div class="card lit">
+              <div class="kicker lit">The judgment</div>
+              <p style="font-size:20px; font-weight:700; letter-spacing:-.01em;">one refusal in the turn</p>
+              <p class="muted" style="font-size:16px; margin-top:8px; line-height:1.4;">teaches while the agent<br>can still act on it</p>
+            </div>
+            <div class="card lit">
+              <div class="kicker lit">The fragment</div>
+              <p style="font-size:20px; font-weight:700; letter-spacing:-.01em;">one check in CI</p>
+              <p class="muted" style="font-size:16px; margin-top:8px; line-height:1.4;">independent access<br>to the tree</p>
+            </div>
+          </div>
+          <p class="serif" style="font-size:20px; color:var(--muted); margin-top:30px; max-width:76ch;">Two homes differing only in strictness are redundancy, and the redundancy wrecks your ability to tell which one works. Two homes differing in what can reach them are not redundant at all. The common error is four rungs on the one rule somebody got burned by. The twenty rules nobody has been burned by yet get prose alone.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 32 · THE HOME THAT ISN'T THERE -->
+    <section class="slide">
+      <div class="eyebrow">One last way this fails</div>
+      <h2>A home can be furnished, documented, and empty.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>ghola pins its harness version, and the pin is load-bearing. On one version the harness honors a hook's <span class="mono">deny</span>. On the version before, it ignored the deny and the call ran.</li>
+            <li>A ladder on the wrong version looks wired in every config file you can read, and refuses nothing.</li>
+            <li class="key">So ask of every rung: what would I see if this stopped working? If the answer is the same green checkmark, it is decoration.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">Test that your refusals refuse. Until you watch a guard fire, you do not know it works.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 33 · CLOSE -->
+    <section class="slide">
+      <div class="eyebrow">Close</div>
+      <div class="body center" style="gap:0;">
+        <div style="max-width:940px;">
+          <h1 class="title" style="font-size:50px; max-width:27ch;">A constraint does not have a home. It has <span class="em">three</span>, and a different form for each.</h1>
+          <p class="lede" style="font-size:21px; max-width:52ch; margin-top:24px;">Pick one constraint this week. Then write the whole sentence in the charter, judgment included. Next, put one refusal inside the turn and one check outside the pipeline. Finally, find out what at that layer can still edit them, because that is the number deciding whether any of it holds.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 34 · CONTACT -->
+    <section class="slide">
+      <div class="eyebrow">Contact</div>
+      <h2 style="font-size:40px;">Find me, take the code.</h2>
+      <div class="body center">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:26px 44px; width:100%; max-width:1000px;">
+          <div style="border-left:2px solid var(--accent); padding-left:18px;">
+            <div class="kicker lit">The starter kit</div>
+            <div class="mono" style="font-size:19px; font-weight:700;">tacoda.dev/ghola</div>
+            <p class="muted" style="font-size:14px; margin-top:6px;">the ladder, as a shipped worker</p>
+          </div>
+          <div style="border-left:2px solid var(--accent); padding-left:18px;">
+            <div class="kicker lit">The experiment</div>
+            <div class="mono" style="font-size:16px; font-weight:700;">tacoda.dev/layers-and-promotion</div>
+            <p class="muted" style="font-size:14px; margin-top:6px;">all twelve runs, and the bugs</p>
+          </div>
+          <div style="border-left:2px solid var(--accent); padding-left:18px;">
+            <div class="kicker lit">The design standard</div>
+            <div class="mono" style="font-size:16px; font-weight:700;">tacoda.dev/constraint-engineering</div>
+            <p class="muted" style="font-size:14px; margin-top:6px;">rung, policy, layer, verdict</p>
+          </div>
+          <div style="border-left:2px solid var(--line-2); padding-left:18px;">
+            <div class="kicker">Fulcorum</div>
+            <div class="mono" style="font-size:19px; font-weight:700;">fulcorum.com</div>
+          </div>
+          <div style="border-left:2px solid var(--line-2); padding-left:18px;">
+            <div class="kicker">Email</div>
+            <div class="mono" style="font-size:19px; font-weight:700;">ian@fulcorum.com</div>
+          </div>
+          <div style="border-left:2px solid var(--line-2); padding-left:18px;">
+            <div class="kicker">Site · LinkedIn · GitHub</div>
+            <div class="mono" style="font-size:15px; font-weight:700; line-height:1.55;">tacoda.dev<br>linkedin.com/in/tacoda<br>github.com/tacoda</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!--/stage-->
+</div><!--/viewport-->
+
+<div id="rail">
+  <div><b>head &middot; document</b><i></i></div>
+  <div><b>the charter</b><i></i></div>
+  <div><b>a hook</b><i></i></div>
+  <div><b>a judge</b><i></i></div>
+  <div><b>a predicate</b><i></i></div>
+</div>
+<div id="counter">01 / 27</div>
+<a id="brand" href="/resources" title="Back to Resources">← Harness Engineering</a>
+<div id="help">← → move · T theme · F full</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var stations = Array.prototype.slice.call(document.querySelectorAll('#rail div'));
+  var i = 0, total = slides.length;
+  var counter = document.getElementById('counter');
+  var stage = document.getElementById('stage');
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function show(n) {
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function (s) { s.classList.remove('active'); });
+    void slides[i].offsetWidth;          // restart the entrance animations
+    slides[i].classList.add('active');
+    counter.textContent = pad(i + 1) + ' / ' + pad(total);
+
+    var at = slides[i].getAttribute('data-station');
+    var cur = at === null ? -1 : parseInt(at, 10);
+    stations.forEach(function (st, k) {
+      st.classList.toggle('on', k === cur);
+      st.classList.toggle('past', cur >= 0 && k < cur);
+    });
+  }
+
+  function fit() {
+    stage.style.transform = 'scale(' + Math.min(window.innerWidth / 1280, window.innerHeight / 720) + ')';
+  }
+  window.addEventListener('resize', fit); fit();
+
+  document.addEventListener('keydown', function (e) {
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': show(i + 1); e.preventDefault(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': show(i - 1); e.preventDefault(); break;
+      case 'Home': show(0); break;
+      case 'End': show(total - 1); break;
+      case 't': case 'T': {
+        var r = document.documentElement;
+        var c = r.getAttribute('data-theme');
+        var dark = c ? c === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        r.setAttribute('data-theme', dark ? 'light' : 'dark');
+        break;
+      }
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+        else document.exitFullscreen && document.exitFullscreen();
+        break;
+    }
+  });
+
+  document.getElementById('viewport').addEventListener('click', function (e) {
+    show(i + (e.clientX < window.innerWidth * 0.28 ? -1 : 1));
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>

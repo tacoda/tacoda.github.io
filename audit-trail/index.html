@@ -49,6 +49,15 @@ a:hover { text-decoration: underline; }
 
 .app { max-width: 1400px; margin: 0 auto; padding: 16px; }
 
+.backlink {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--dim);
+  text-decoration: none;
+  letter-spacing: .02em;
+}
+.backlink:hover,
+.backlink:focus-visible { color: var(--purple); text-decoration: underline; }
 /* ---------- header ---------- */
 header {
   display: flex;
@@ -296,6 +305,8 @@ footer b { color: var(--fg); font-weight: 600; }
 <body>
 
 <div class="app">
+
+  <a class="backlink" href="/resources">← Resources</a>
 
   <header>
     <div class="brand">

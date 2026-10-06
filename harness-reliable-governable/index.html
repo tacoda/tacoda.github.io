@@ -139,6 +139,9 @@
   #band > i { display: block; height: 100%; background: linear-gradient(90deg, var(--gate), var(--signal)); transition: width .3s ease; }
   #counter { position: absolute; right: 84px; bottom: 22px; font-family: var(--font-mono); font-size: 13px; letter-spacing: .12em; color: var(--faint); }
   #brand { position: absolute; left: 84px; bottom: 20px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+#brand { text-decoration: none; }
+#brand:hover, #brand:focus-visible { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+#brand:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
 
   #help { position: fixed; right: 16px; top: 14px; z-index: 30; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--faint); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; opacity: .8; }
 
@@ -863,7 +866,7 @@
 
 <div id="band"><i></i></div>
 <div id="counter">01 / 24</div>
-<div id="brand">Harness Engineering</div>
+<a id="brand" href="/resources" title="Back to Resources">← Harness Engineering</a>
 <div id="help">← → move · T theme · F full</div>
 
 <script>

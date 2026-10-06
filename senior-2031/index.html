@@ -143,6 +143,13 @@
   #band > i { display: block; height: 100%; background: linear-gradient(90deg, var(--gate), var(--signal)); transition: width .3s ease; }
   #counter { position: absolute; right: 84px; bottom: 22px; font-family: var(--font-mono); font-size: 13px; letter-spacing: .12em; color: var(--faint); }
   #brand { position: absolute; left: 84px; bottom: 20px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+#brand { text-decoration: none; }
+.docref { color: var(--gate); text-decoration: none; border-bottom: 1px solid var(--gate); }
+.docref:hover, .docref:focus-visible { color: var(--fg); border-bottom-color: var(--fg); }
+.docref:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+
+#brand:hover, #brand:focus-visible { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+#brand:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
 
   #help { position: fixed; right: 16px; top: 14px; z-index: 30; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--faint); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; opacity: .8; }
 
@@ -579,7 +586,7 @@
             <li class="gate">A CI gate can enforce that the claim was <b>made</b>. Only a person can check that it is <b>true</b>.</li>
             <li><span class="stat">CHARTER-GAP</span> means nothing in the repo answers "why". That is a finding your org should want.</li>
           </ul>
-          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:18px;">tacoda.dev/comprehension-standard</p>
+          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:18px;"><a class="docref" href="/comprehension-standard/">tacoda.dev/comprehension-standard</a></p>
         </div>
       </div>
     </section>
@@ -599,7 +606,7 @@
         </div>
         <div class="col center">
           <div class="pull gate">Reviewing the agent is safe in a way reviewing your own work never is. Nothing is at stake, so people look harder.</div>
-          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:22px;">tacoda.dev/reverse-review</p>
+          <p class="serif" style="font-size:16px; color:var(--muted); margin-top:22px;"><a class="docref" href="/reverse-review/">tacoda.dev/reverse-review</a></p>
         </div>
       </div>
     </section>
@@ -722,8 +729,8 @@
           <div style="grid-column:1 / -1; border-left:3px solid var(--gate); padding-left:18px;">
             <div class="kicker" style="color:var(--gate)">The four moves, in full</div>
             <div style="display:flex; gap:40px; margin-top:4px;">
-              <div class="stat" style="font-size:19px; font-weight:700;">tacoda.dev/comprehension-standard</div>
-              <div class="stat" style="font-size:19px; font-weight:700;">tacoda.dev/reverse-review</div>
+              <div class="stat" style="font-size:19px; font-weight:700;"><a class="docref" href="/comprehension-standard/">tacoda.dev/comprehension-standard</a></div>
+              <div class="stat" style="font-size:19px; font-weight:700;"><a class="docref" href="/reverse-review/">tacoda.dev/reverse-review</a></div>
             </div>
           </div>
         </div>
@@ -735,7 +742,7 @@
 
 <div id="band"><i></i></div>
 <div id="counter">01 / 24</div>
-<div id="brand">Harness Engineering</div>
+<a id="brand" href="/resources" title="Back to Resources">← Harness Engineering</a>
 <div id="help">← → move · T theme · F full</div>
 
 <script>

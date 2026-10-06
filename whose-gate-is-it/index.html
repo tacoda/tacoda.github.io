@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="voice-register" content="talk">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whose Gate Is It · Harness Engineering</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Charter, harness and factory are three contexts, and every control you own sits in one of them. Where the gates are, what belongs at each, and why the ownership line only disagrees with the context line in one place. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/whose-gate-is-it/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Whose Gate Is It">
+<meta property="og:description" content="Three contexts, six rungs, and two boundary lines that only cross in one place.">
+<meta property="og:url" content="https://www.tacoda.dev/whose-gate-is-it/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Whose Gate Is It">
+<meta name="twitter:description" content="Where the gates are in a charter, a harness and a factory, and who owns each one.">
+<style>
+  :root {
+    --ink: #10131a;
+    --bg: #ece9e2;
+    --panel: #f4f2ec;
+    --fg: #191c22;
+    --muted: #5c626e;
+    --faint: #8b909b;
+    --line: rgba(16,19,26,.14);
+    --line-strong: rgba(16,19,26,.28);
+    --signal: #b9761c;   /* amber — charter · the project declares */
+    --signal-tint: rgba(185,118,28,.14);
+    --gate: #167e76;     /* teal — harness · the turn controls */
+    --gate-tint: rgba(22,126,118,.12);
+    --stop: #b23a2e;     /* red — factory · delivery settles */
+    --stop-tint: rgba(178,58,46,.10);
+    --grid: rgba(16,19,26,.06);
+
+    --font-display: -apple-system, "Segoe UI", system-ui, Roboto, sans-serif;
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+    --font-mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c0e14; --panel: #141821; --fg: #e6e6e0; --muted: #9aa0ad; --faint: #6b7280;
+      --line: rgba(255,255,255,.11); --line-strong: rgba(255,255,255,.22);
+      --signal: #e0952e; --signal-tint: rgba(224,149,46,.16);
+      --gate: #3fb1a6; --gate-tint: rgba(63,177,166,.15);
+      --stop: #d6584a; --stop-tint: rgba(214,88,74,.16);
+      --grid: rgba(255,255,255,.05);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c0e14; --panel: #141821; --fg: #e6e6e0; --muted: #9aa0ad; --faint: #6b7280;
+    --line: rgba(255,255,255,.11); --line-strong: rgba(255,255,255,.22);
+    --signal: #e0952e; --signal-tint: rgba(224,149,46,.16);
+    --gate: #3fb1a6; --gate-tint: rgba(63,177,166,.15);
+    --stop: #d6584a; --stop-tint: rgba(214,88,74,.16);
+    --grid: rgba(255,255,255,.05);
+  }
+  :root[data-theme="light"] {
+    --bg: #ece9e2; --panel: #f4f2ec; --fg: #191c22; --muted: #5c626e; --faint: #8b909b;
+    --line: rgba(16,19,26,.14); --line-strong: rgba(16,19,26,.28);
+    --signal: #b9761c; --signal-tint: rgba(185,118,28,.14);
+    --gate: #167e76; --gate-tint: rgba(22,126,118,.12);
+    --stop: #b23a2e; --stop-tint: rgba(178,58,46,.10);
+    --grid: rgba(16,19,26,.06);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+  body { font-family: var(--font-display); color: var(--fg); -webkit-font-smoothing: antialiased; }
+
+  #viewport { position: fixed; inset: 0; display: grid; place-items: center; background: var(--bg); }
+  #stage { width: 1280px; height: 720px; position: relative; transform-origin: center center; background: var(--bg); }
+
+  .slide { position: absolute; inset: 0; padding: 66px 84px 74px; display: none; flex-direction: column; background: var(--bg); }
+  .slide.active { display: flex; }
+
+  .eyebrow { font-family: var(--font-mono); font-size: 15px; letter-spacing: .22em; text-transform: uppercase; color: var(--faint); display: flex; align-items: center; gap: 12px; }
+  .eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--signal); flex: none; }
+  .eyebrow .dot.gate { background: var(--gate); }
+  .eyebrow .dot.stop { background: var(--stop); }
+
+  h1.title { font-size: 40px; line-height: 1.06; font-weight: 800; letter-spacing: -.02em; margin: 18px 0 0; text-wrap: balance; max-width: 20ch; }
+  h2 { font-size: 32px; line-height: 1.1; font-weight: 800; letter-spacing: -.015em; margin: 14px 0 0; text-wrap: balance; max-width: 24ch; }
+  .lede { font-family: var(--font-serif); font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 52ch; margin-top: 16px; }
+  .body { display: flex; flex: 1; min-height: 0; margin-top: 24px; gap: 40px; }
+  .col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .center { align-items: center; justify-content: center; }
+
+  p { margin: 0; }
+  .serif { font-family: var(--font-serif); }
+  .muted { color: var(--muted); }
+
+  ul.clean { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
+  ul.clean li { position: relative; padding-left: 26px; font-size: 20px; line-height: 1.4; color: var(--fg); }
+  ul.clean li::before { content: ""; position: absolute; left: 0; top: 11px; width: 11px; height: 2px; background: var(--signal); }
+  ul.clean li.gate::before { background: var(--gate); }
+  ul.clean li.stop::before { background: var(--stop); }
+  ul.clean li b { font-weight: 700; }
+  ul.clean li .muted { color: var(--muted); }
+
+  .pull { font-family: var(--font-serif); font-size: 29px; line-height: 1.32; font-weight: 500; letter-spacing: -.01em; text-wrap: balance; max-width: 26ch; border-left: 3px solid var(--signal); padding-left: 26px; }
+  .pull.gate { border-color: var(--gate); }
+  .pull.stop { border-color: var(--stop); }
+  .pull cite { display: block; font-family: var(--font-mono); font-style: normal; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--faint); margin-top: 18px; }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 22px 24px; }
+  .panel.signal { box-shadow: inset 3px 0 0 var(--signal); }
+  .panel.gate   { box-shadow: inset 3px 0 0 var(--gate); }
+  .panel.stop   { box-shadow: inset 3px 0 0 var(--stop); }
+  .kicker { font-family: var(--font-mono); font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .kicker.signal { color: var(--signal); }
+  .kicker.gate { color: var(--gate); }
+  .kicker.stop { color: var(--stop); }
+
+  code, pre { font-family: var(--font-mono); }
+  pre.code { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; font-size: 15.5px; line-height: 1.62; color: var(--fg); overflow: auto; margin: 0; }
+  pre.code .c { color: var(--faint); }
+  pre.code .k { color: var(--signal); }
+  pre.code .g { color: var(--gate); }
+  pre.code .s { color: var(--stop); }
+
+  .legend { display: flex; gap: 24px; font-family: var(--font-mono); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+  .legend .sw-signal { background: var(--signal); }
+  .legend .sw-gate { background: var(--gate); }
+  .legend .sw-stop { background: var(--stop); }
+
+  svg .s-signal { stroke: var(--signal); }
+  svg .f-signal { fill: var(--signal); }
+  svg .s-gate { stroke: var(--gate); }
+  svg .f-gate { fill: var(--gate); }
+  svg .s-stop { stroke: var(--stop); }
+  svg .f-stop { fill: var(--stop); }
+  svg .s-line { stroke: var(--line-strong); }
+  svg .s-faint { stroke: var(--line); }
+  svg .f-fg { fill: var(--fg); }
+  svg .f-muted { fill: var(--muted); }
+  svg .f-panel { fill: var(--panel); }
+  svg text { font-family: var(--font-mono); fill: var(--fg); }
+  svg .t-disp { font-family: var(--font-display); font-weight: 700; }
+  svg .t-muted { fill: var(--muted); }
+  svg .t-faint { fill: var(--faint); }
+
+  /* deck-local: the rung table, the split table, the context chip */
+  .rungs { display: flex; flex-direction: column; gap: 9px; width: 100%; }
+  .rungs .r { display: grid; grid-template-columns: 74px 104px 1fr; align-items: center; gap: 18px;
+              background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 11px 16px; }
+  .rungs .r.signal { box-shadow: inset 3px 0 0 var(--signal); }
+  .rungs .r.gate   { box-shadow: inset 3px 0 0 var(--gate); }
+  .rungs .r.stop   { box-shadow: inset 3px 0 0 var(--stop); }
+  .rungs .r.off    { box-shadow: inset 3px 0 0 var(--line-strong); opacity: .72; }
+  .rungs .n { font-family: var(--font-mono); font-size: 17px; font-weight: 700; }
+  .rungs .w { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .rungs .d { font-size: 17px; line-height: 1.35; }
+  .rungs .d b { font-weight: 700; }
+  .rungs .d span { color: var(--muted); }
+
+  .split { display: grid; grid-template-columns: 148px 1fr 1fr; gap: 1px; width: 100%;
+           background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .split > div { background: var(--panel); padding: 11px 16px; font-size: 16.5px; line-height: 1.35; }
+  .split > div.h { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+  .split > div.t { font-family: var(--font-mono); font-size: 15px; color: var(--gate); }
+  .split > div.none { color: var(--faint); }
+
+  .stat { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  #band { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--grid); }
+  #band > i { display: block; height: 100%; background: linear-gradient(90deg, var(--signal), var(--gate), var(--stop)); transition: width .3s ease; }
+  #counter { position: absolute; right: 84px; bottom: 22px; font-family: var(--font-mono); font-size: 13px; letter-spacing: .12em; color: var(--faint); }
+  #brand { position: absolute; left: 84px; bottom: 20px; font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+#brand { text-decoration: none; }
+#brand:hover, #brand:focus-visible { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+#brand:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  #help { position: fixed; right: 16px; top: 14px; z-index: 30; font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; color: var(--faint); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; opacity: .8; }
+
+  @media (prefers-reduced-motion: reduce) { #band > i { transition: none; } }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="stage">
+
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="f-muted"/></marker>
+        <marker id="arrS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" class="f-stop"/></marker>
+      </defs>
+    </svg>
+
+    <!-- 1 · TITLE -->
+    <section class="slide active">
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span><span class="dot stop"></span> Harness Engineering · A Talk</div>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:960px;">
+          <h1 class="title" style="font-size:62px; max-width:16ch;">Whose gate is it?</h1>
+          <p class="lede" style="font-size:23px; max-width:50ch; margin-top:24px;">Every control you own lives in one of three contexts. The charter says what this project is about, the harness says how a turn happens, the factory says how work ships. Each holds different levers, changes at a different rate, and answers to a different team. The two boundaries agree almost everywhere, and the one place they disagree is where you spend all your arguments.</p>
+          <div class="legend" style="margin-top:38px;">
+            <span><i class="sw-signal"></i> charter · the project declares</span>
+            <span><i class="sw-gate"></i> harness · the turn controls</span>
+            <span><i class="sw-stop"></i> factory · delivery settles</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · WHO'S TALKING -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Who's talking</div>
+      <h2 style="font-size:42px;">Ian Johnson</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <ul class="clean" style="gap:18px; font-size:21px;">
+            <li>Staff engineer at <b>Parento</b>. Agents against a production codebase, daily.</li>
+            <li class="gate">Founder of <b>Fulcorum</b> <span class="muted">· fulcorum.com</span>, video courses on shipping AI-generated code.</li>
+            <li>Author of <b>Harness Engineering</b>, and of <b>ghola</b>, where these three contexts ship as a worker.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">I published this model, then corrected it twice. Both corrections are in this talk, at the slides where they cost me something.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · HOW THIS GOES -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> The next thirty minutes</div>
+      <h2 style="max-width:32ch;">A map, a ladder, and an argument about who holds it.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1030px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+          <div class="panel signal">
+            <div class="kicker signal">One · the map</div>
+            <p style="font-size:18px; line-height:1.45;">Three contexts, the levers in each, and the one-way arrow between them that most designs point backwards.</p>
+          </div>
+          <div class="panel gate">
+            <div class="kicker gate">Two · the rungs</div>
+            <p style="font-size:18px; line-height:1.45;">Six places a gate can physically sit, plus two that sit off the ladder. One rule, shown at three of them.</p>
+          </div>
+          <div class="panel stop">
+            <div class="kicker stop">Three · the owners</div>
+            <p style="font-size:18px; line-height:1.45;">Where the ownership line follows the context line, where it does not, and the rule that makes the overlap survivable.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · THE SEAM -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> One · the argument you keep having</div>
+      <h2 style="max-width:30ch;">Everybody already owns all three. Almost nobody has drawn the lines.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>Platform ships a harness, and one repository's opinion keeps landing inside it where every other repository inherits it.</li>
+            <li class="gate">Development writes a charter, and a third of it is trying to configure a pipeline it cannot reach.</li>
+            <li class="stop">Both sides are right about the problem. Neither has agreed on the address, so the fix lands wherever the person who noticed it has commit access.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">The argument is never about the rule, only about which of you gets to change it next quarter.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · THREE CONTEXTS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> The map</div>
+      <h2 style="max-width:34ch;">Three contexts, and each one answers a different question.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1040px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+          <div class="panel signal">
+            <div class="kicker signal">charter · this project</div>
+            <p class="serif" style="font-size:22px; line-height:1.3; font-weight:500;">What is this repository about?</p>
+            <p class="muted" style="font-size:16.5px; line-height:1.4; margin-top:14px;">Claims about one codebase, written by the people inside it. Changes <b>constantly</b>.</p>
+          </div>
+          <div class="panel gate">
+            <div class="kicker gate">harness · development</div>
+            <p class="serif" style="font-size:22px; line-height:1.3; font-weight:500;">How does a turn happen?</p>
+            <p class="muted" style="font-size:16.5px; line-height:1.4; margin-top:14px;">The shape of the work the agent does, everywhere it runs. Changes <b>rarely</b>.</p>
+          </div>
+          <div class="panel stop">
+            <div class="kicker stop">factory · delivery</div>
+            <p class="serif" style="font-size:22px; line-height:1.3; font-weight:500;">How does work ship?</p>
+            <p class="muted" style="font-size:16.5px; line-height:1.4; margin-top:14px;">Ordering, gates and the record, shared across every repository. Changes <b>very rarely</b>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · ONE DIRECTION -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> The arrow</div>
+      <h2 style="max-width:32ch;">The dependency points one way, and the arrow is the whole design.</h2>
+      <div class="body center" style="flex-direction:column; gap:0;">
+        <svg viewBox="0 0 1110 300" style="width:100%; max-height:300px;">
+          <rect x="24"  y="70" width="300" height="118" rx="10" class="f-panel" stroke="var(--stop)" stroke-width="1.6"/>
+          <rect x="396" y="70" width="300" height="118" rx="10" class="f-panel" stroke="var(--gate)" stroke-width="1.6"/>
+          <rect x="768" y="70" width="300" height="118" rx="10" class="f-panel" stroke="var(--signal)" stroke-width="1.6"/>
+
+          <text x="174" y="112" class="t-disp f-fg" font-size="22" text-anchor="middle">factory</text>
+          <text x="174" y="142" class="t-muted" font-size="13.5" text-anchor="middle">how work ships</text>
+          <text x="174" y="166" class="t-faint" font-size="12" text-anchor="middle">platform</text>
+
+          <text x="546" y="112" class="t-disp f-fg" font-size="22" text-anchor="middle">harness</text>
+          <text x="546" y="142" class="t-muted" font-size="13.5" text-anchor="middle">how a turn happens</text>
+          <text x="546" y="166" class="t-faint" font-size="12" text-anchor="middle">platform and development</text>
+
+          <text x="918" y="112" class="t-disp f-fg" font-size="22" text-anchor="middle">charter</text>
+          <text x="918" y="142" class="t-muted" font-size="13.5" text-anchor="middle">what this project is about</text>
+          <text x="918" y="166" class="t-faint" font-size="12" text-anchor="middle">development</text>
+
+          <line x1="330" y1="129" x2="386" y2="129" class="s-line" stroke-width="2" marker-end="url(#arr)"/>
+          <line x1="702" y1="129" x2="758" y2="129" class="s-line" stroke-width="2" marker-end="url(#arr)"/>
+          <text x="358" y="118" class="t-faint" font-size="11" text-anchor="middle">hands in</text>
+          <text x="730" y="118" class="t-faint" font-size="11" text-anchor="middle">reads</text>
+
+          <path d="M900 216 L560 216" class="s-stop" stroke-width="2" stroke-dasharray="5 6" fill="none" marker-end="url(#arrS)"/>
+          <line x1="722" y1="204" x2="746" y2="228" class="s-stop" stroke-width="2.4"/>
+          <line x1="746" y1="204" x2="722" y2="228" class="s-stop" stroke-width="2.4"/>
+          <text x="730" y="256" class="f-stop" font-size="13" text-anchor="middle">a charter that configured the harness would be one repository governing the fleet</text>
+        </svg>
+        <div class="pull stop" style="margin-top:14px; max-width:78ch; font-size:24px;">The factory knows about the harness. The harness must not know about the factory, because a harness that cannot run without a queue is a harness no developer can run at all.</div>
+      </div>
+    </section>
+
+    <!-- 7 · THE LEVERS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> The levers, named</div>
+      <h2 style="max-width:34ch;">A component in the wrong context is the common defect.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1050px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:22px;">
+            <div class="panel signal">
+              <div class="kicker signal">charter</div>
+              <p style="font-size:17px; line-height:1.6; font-family:var(--font-mono);">rule · hook · skill<br>command · agent<br>predicate · convention</p>
+              <p class="muted" style="font-size:15.5px; margin-top:14px;">changes constantly</p>
+            </div>
+            <div class="panel gate">
+              <div class="kicker gate">harness</div>
+              <p style="font-size:17px; line-height:1.6; font-family:var(--font-mono);">prompt · tool · policy<br>budget · context<br>phase</p>
+              <p class="muted" style="font-size:15.5px; margin-top:14px;">changes rarely</p>
+            </div>
+            <div class="panel stop">
+              <div class="kicker stop">factory</div>
+              <p style="font-size:17px; line-height:1.6; font-family:var(--font-mono);">stage · gate · guard<br>ordering · record</p>
+              <p class="muted" style="font-size:15.5px; margin-top:14px;">changes very rarely</p>
+            </div>
+          </div>
+          <p class="serif" style="font-size:19.5px; color:var(--muted); margin-top:26px; max-width:80ch;">An <b>eval</b> belongs to none of them and can sit in all three, because it measures what no rule can decide and it changes whenever the thing it measures does. Give it the lifecycle of its subject, never the lifecycle of its context.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · THE CHANGE-RATE DIAGNOSTIC -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> The cheapest diagnostic you own</div>
+      <h2 style="max-width:32ch;">Proposals should thin out with distance from the code.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>Most of what goes wrong is something one repository wanted and never wrote down, so a healthy quarter is mostly charter changes.</li>
+            <li class="gate">A quarter with three factory changes and no charter ones tells you the distribution is wrong. It does not tell you the factory needs work.</li>
+            <li class="stop">Those rates are a diagnostic and never a schedule. Nobody should be hitting a quota on harness edits.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">Count where last quarter's changes landed. That histogram is a map of who currently believes they own what.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · THE SIX RUNGS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> Two · where a gate can sit</div>
+      <h2 style="max-width:36ch;">Six rungs, and the context changes under you three times.</h2>
+      <div class="body center" style="margin-top:18px;">
+        <div class="rungs" style="max-width:1060px;">
+          <div class="r signal"><span class="n">0</span><span class="w">charter</span><span class="d"><b>the rule.</b> <span>Prose the model reads and applies. Free to write, free to ignore, and it enforces nothing.</span></span></div>
+          <div class="r signal"><span class="n">2</span><span class="w">charter</span><span class="d"><b>the hook.</b> <span>The repository's own script, on an event. Cheap and mechanical, and the agent it governs can delete it.</span></span></div>
+          <div class="r gate"><span class="n">3i</span><span class="w">harness</span><span class="d"><b>the judging phase.</b> <span>A phase inside the turn that reads and refuses. Holds rules no predicate can express.</span></span></div>
+          <div class="r gate"><span class="n">3d</span><span class="w">harness</span><span class="d"><b>the predicate.</b> <span>Code in front of every call the model makes. Exact, cheap per call, blind to what it cannot parse.</span></span></div>
+          <div class="r stop"><span class="n">4i</span><span class="w">factory</span><span class="d"><b>the review stage.</b> <span>A pass that reads the finished work. Sees everything the turn produced, and nothing about how.</span></span></div>
+          <div class="r stop"><span class="n">4d</span><span class="w">factory</span><span class="d"><b>the stage gate.</b> <span>A gate on the diff and on what gets published. The last mechanical rung the factory controls.</span></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · THE TWO VERDICTS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> Why every context holds two</div>
+      <h2 style="max-width:32ch;">There are two ways to settle a question, and each context can do both.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1;">
+          <div class="panel signal" style="width:100%;">
+            <div class="kicker signal">inferential · a model judges</div>
+            <p style="font-size:19px; line-height:1.45;">A model reads the work and returns a verdict. It decides what no predicate can express, it costs tokens, and it can be wrong in two directions: by missing a violation, and by inventing one.</p>
+          </div>
+          <div class="panel gate" style="width:100%; margin-top:20px;">
+            <div class="kicker gate">deterministic · code settles</div>
+            <p style="font-size:19px; line-height:1.45;">Code reads the work and settles it. Exact, cheap at every call, and blind to everything it cannot parse. It never surprises you, which is both halves of the trade.</p>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="pull gate">Making a verdict more exact inside one context costs a function. Moving it to the next context costs a boundary and a new blind spot. Take the cheap move first.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · THE TWO OFF-CHAIN RUNGS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> The two that sit off the ladder</div>
+      <h2 style="max-width:30ch;">Two rungs are not on the chain, and both stay off it for a reason.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.1;">
+          <div class="rungs">
+            <div class="r off"><span class="n">1</span><span class="w">tool grant</span><span class="d"><b>It withholds a capability</b> <span>rather than deciding a case, so a rule cannot move here and still be the same rule. Withhold the tool and there is nothing left to enforce against.</span></span></div>
+            <div class="r off" style="margin-top:14px;"><span class="n">5</span><span class="w">ci</span><span class="d"><b>It sits outside</b> <span>the process that produced the work, and outside the process that checked it. That independence is the entire product.</span></span></div>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="pull stop">Move your rules into CI and you have spent the one rung that could have told you the other five were lying.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · ONE RULE, THREE ADDRESSES -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> One rule, three addresses, three owners</div>
+      <h2 style="max-width:34ch;">The same sentence, written three times by two teams.</h2>
+      <div class="body center" style="gap:0;">
+        <div style="width:100%; max-width:1050px;">
+          <pre class="code" style="font-size:15px;"><span class="c"># rung 0 · charter · development writes it, development deletes it</span>
+<span class="k">"Every outbound HTTP call goes through lib/http. No direct requests."</span>
+
+<span class="c"># rung 3d · harness · platform ships the predicate, development registers the rule</span>
+<span class="g">deny</span>(Edit) <span class="c">if</span> adds_import(<span class="k">"requests"</span>) <span class="c">and</span> path <span class="c">not under</span> <span class="k">"lib/http/"</span>
+
+<span class="c"># rung 4d · factory · platform owns it, and nothing in the turn can reach it</span>
+<span class="s">stage_gate</span>: grep -rn <span class="k">"^import requests"</span> --include=*.py | reject_outside lib/http</pre>
+          <p class="serif" style="font-size:19.5px; color:var(--muted); margin-top:26px; max-width:82ch;">One sentence, and the owner changes twice on the way down. Nobody writes all three, and none of the three files mentions that the other two exist.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · KEEP THE BACKSTOP -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> Before you promote anything</div>
+      <h2 style="max-width:34ch;">One predicate at two boundaries is not one rule enforced twice.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li class="gate">An in-harness check sees <b>tool calls</b>. It watches the work being made, and it can refuse while the agent can still act on the refusal.</li>
+            <li class="stop">A stage gate sees the <b>finished tree</b>. It watches what came out, including everything that arrived by a path the harness never saw.</li>
+            <li>Move a rule up and delete what it used to sit on, and you have silently removed the rung that caught what the new one cannot see.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">Ask what each rung can see. Two rungs that see the same thing are redundancy. Two that see different things are coverage.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · TWO LINES -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> Three · whose lever is it</div>
+      <h2 style="max-width:32ch;">Two lines, drawn by two different questions.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.15;">
+          <div class="panel signal" style="width:100%;">
+            <div class="kicker signal">the context line</div>
+            <p style="font-size:19px; line-height:1.45;">What does this thing govern? One project, one turn, or one delivery. I have written before that this line has nothing to do with ownership, and that is still true.</p>
+          </div>
+          <div class="panel stop" style="width:100%; margin-top:18px;">
+            <div class="kicker stop">the ownership line</div>
+            <p style="font-size:19px; line-height:1.45;">Who can change it, and who gets paged when it is wrong? A second line, laid over the first, and answered by a different fact about your org.</p>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="pull stop">They agree at the charter and they agree at the factory. They cross in the harness, which is why the harness is where every org-design argument actually lives.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · THE CHARTER IS DEVELOPMENT'S -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Where the lines agree · one</div>
+      <h2 style="max-width:32ch;">The charter belongs to the people who own the code it describes.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>Every line is a claim about one repository, and only the team inside it knows whether the claim is still true this week.</li>
+            <li>It changes constantly, so routing those changes through another team's queue prices the charter out of being maintained.</li>
+            <li class="gate">Platform still owns two things here: the format the charter has to parse as, and the budget it has to fit in. Never the sentences.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">A charter written by a team that does not read the codebase is a list of guesses, and guesses are what a charter is supposed to replace.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · THE FACTORY IS PLATFORM'S -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> Where the lines agree · two</div>
+      <h2 style="max-width:32ch;">The factory belongs to whoever gets paged when delivery breaks.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li class="stop">Stages, gates, guards, ordering and the record are one pipeline shared by every repository, so every change is a change for all of them at once.</li>
+            <li class="stop">A gate has to sit out of reach of the work it judges. In practice that means out of reach of the repository as well, not only out of reach of the agent.</li>
+            <li>This is the context where "who can edit it" stops being an org-chart question and becomes a security property.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull stop">A gate the repository can edit is a gate the repository has already passed.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 · THE HARNESS SPLIT -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> Where they cross</div>
+      <h2 style="max-width:36ch;">Inside the harness, the split runs through the component list.</h2>
+      <div class="body center" style="margin-top:18px;">
+        <div class="split" style="max-width:1060px;">
+          <div class="h">component</div><div class="h">platform owns</div><div class="h">development owns</div>
+          <div class="t">prompt</div><div>the skeleton and the phase contract</div><div>what this repository contributes to it</div>
+          <div class="t">tool</div><div>which tools exist, and what they do</div><div>which of them a phase gets here</div>
+          <div class="t">policy</div><div>the floor every repository inherits</div><div>tightening it, and only tightening it</div>
+          <div class="t">budget</div><div>the ceiling, because it is money</div><div class="none">nothing</div>
+          <div class="t">context</div><div>the loading mechanism and its limits</div><div>what this repository loads into a turn</div>
+          <div class="t">phase</div><div>the shape of a turn</div><div class="none">nothing</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 18 · FLOOR AND CEILING -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot gate"></span> The rule that makes the overlap survivable</div>
+      <h2 style="max-width:30ch;">Platform sets the floor. Development tightens and never loosens.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li class="gate">One direction is free. A repository asking for a stricter rule than the fleet is a repository doing your job for you, so let it, and log that it did.</li>
+            <li class="stop">The other direction is a bypass wearing a config file. A repository that can loosen the floor has no floor, only a default.</li>
+            <li>Every loosening that is genuinely legitimate gets a named escape hatch that the harness counts. A spike in that counter is the floor asking to be changed.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull gate">Too loose is a blast radius. Too tight is a bypass flag by Thursday. A floor you can only tighten is how you get neither.<cite>tacoda.dev/narrow-door</cite></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 · THE ORG LAYER -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Where security and compliance land</div>
+      <h2 style="max-width:34ch;">Org standards split by what they govern, not by who wrote them.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li class="gate">A standard about how code gets <b>written</b> belongs in the harness, because it has to reach every turn, including the one a developer runs locally at 11pm.</li>
+            <li class="stop">A standard about how code <b>ships</b> belongs in the factory, at the delivery rungs, where it can see the finished tree.</li>
+            <li>Both are org-layer rules with the same author. They live in different contexts because they govern different things.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull">Security hands you one document. Half is harness policy, half is a stage gate, and shipping it as one file puts one half in the wrong place.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 · FAILURE MODES -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot stop"></span> Getting it backwards</div>
+      <h2 style="max-width:30ch;">Four ways this breaks, and each one has a tell you can look up today.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1050px; display:grid; grid-template-columns:1fr 1fr; gap:22px;">
+          <div class="panel signal">
+            <div class="kicker signal">platform writes the charter</div>
+            <p style="font-size:17.5px; line-height:1.45;">Rules that describe no repository in particular. <b>The tell:</b> a charter nobody has edited in a quarter, in a codebase that ships weekly.</p>
+          </div>
+          <div class="panel stop">
+            <div class="kicker stop">development owns the stage gate</div>
+            <p style="font-size:17.5px; line-height:1.45;">The gate sits inside its own blast radius. <b>The tell:</b> a gate with a perfect record, which usually means it has never been allowed to refuse.</p>
+          </div>
+          <div class="panel gate">
+            <div class="kicker gate">a repo rule lands in the harness</div>
+            <p style="font-size:17.5px; line-height:1.45;">Every other repository inherits an opinion it never asked for. <b>The tell:</b> a policy with one team's service name written inside it.</p>
+          </div>
+          <div class="panel gate">
+            <div class="kicker gate">the harness reads the factory</div>
+            <p style="font-size:17.5px; line-height:1.45;">The harness stops running on a laptop. <b>The tell:</b> a developer cannot answer what their own rules do to a single turn.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 21 · THE PLACEMENT TEST -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> The test, for anything you add</div>
+      <h2 style="max-width:34ch;">Three questions, and the second one is not the first one.</h2>
+      <div class="body center">
+        <div style="width:100%; max-width:1040px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px;">
+          <div class="panel signal">
+            <div class="kicker signal">1 · what does it govern</div>
+            <p style="font-size:18px; line-height:1.45;">This project, a turn, or a delivery. That answer picks the context, and it is a fact about the rule rather than about your team.</p>
+          </div>
+          <div class="panel gate">
+            <div class="kicker gate">2 · who gets paged</div>
+            <p style="font-size:18px; line-height:1.45;">That answer picks the owner. Ask it separately, out loud, because the two answers come apart in the harness and nowhere else.</p>
+          </div>
+          <div class="panel stop">
+            <div class="kicker stop">3 · can the governed edit it</div>
+            <p style="font-size:18px; line-height:1.45;">Not whether they would. Whether they can. If they can, you own a convention, and you should stop calling it a gate.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 · MONDAY -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Monday</div>
+      <h2 style="max-width:30ch;">One move each, and they are deliberately different moves.</h2>
+      <div class="body">
+        <div class="col center">
+          <div class="panel gate" style="width:100%;">
+            <div class="kicker gate">if you run the platform</div>
+            <ul class="clean" style="gap:12px; margin-top:6px;">
+              <li class="gate" style="font-size:18.5px;">Publish the floor as one versioned file, then count who tightens it and who asks you to loosen it.</li>
+              <li class="gate" style="font-size:18.5px;">Switch the factory off and run one turn. If the harness cannot start, your arrow points the wrong way.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="col center">
+          <div class="panel signal" style="width:100%;">
+            <div class="kicker signal">if you write the code</div>
+            <ul class="clean" style="gap:12px; margin-top:6px;">
+              <li style="font-size:18.5px;">Find the lines in your charter that are trying to configure a pipeline, and move them or delete them.</li>
+              <li style="font-size:18.5px;">For your loudest rule, name the rung it sits on. If the answer is prose and you expected a gate, that gap is your next week.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 · LIMITS -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Before you take any of this home</div>
+      <h2 style="max-width:30ch;">What I have not measured, said plainly.</h2>
+      <div class="body">
+        <div class="col center" style="flex:1.05;">
+          <ul class="clean">
+            <li>The change rates come from my own repositories and from one production codebase. I have not counted them across teams, so treat them as a shape and not as a benchmark.</li>
+            <li class="gate">The harness split on the earlier slide is where I have changed my mind most, and that table is its third version.</li>
+            <li class="stop">The reviewing stage sat in my model as a capability for a long time before I noticed it was also a rung. Everything downstream of that mistake was wrong for about a year.</li>
+          </ul>
+        </div>
+        <div class="col center">
+          <div class="pull stop">If a model like this has never cost its author a correction, you are looking at a diagram rather than at something anyone ran.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24 · CLOSE -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span><span class="dot gate"></span><span class="dot stop"></span> Close</div>
+      <div class="body center" style="gap:0;">
+        <div style="max-width:940px;">
+          <h1 class="title" style="font-size:48px; max-width:26ch;">A control has a context and an owner, and those are two different answers.</h1>
+          <p class="lede" style="font-size:21px; max-width:54ch; margin-top:24px;">Pick one rule your team argues about. Name the context it governs, then name who gets paged when it is wrong, and write both down where the other team can read them. If those two answers land on the same group, the rule is already home. If they do not, you are in the harness, and now you know what the argument was about.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 25 · CONTACT -->
+    <section class="slide">
+      <div class="eyebrow"><span class="dot"></span> Contact</div>
+      <h2 style="font-size:38px;">Find me, take the model.</h2>
+      <div class="body center">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:26px 44px; width:100%; max-width:1000px;">
+          <div style="border-left:2px solid var(--signal); padding-left:18px;">
+            <div class="kicker signal">The model</div>
+            <div style="font-family:var(--font-mono); font-size:16px; font-weight:700;">tacoda.dev/constraint-engineering</div>
+            <p class="muted" style="font-size:14px; margin-top:6px;">contexts, families, both ladders</p>
+          </div>
+          <div style="border-left:2px solid var(--gate); padding-left:18px;">
+            <div class="kicker gate">The rungs</div>
+            <div style="font-family:var(--font-mono); font-size:16px; font-weight:700;">tacoda.dev/layers-and-promotion</div>
+            <p class="muted" style="font-size:14px; margin-top:6px;">one rule at six rungs, measured</p>
+          </div>
+          <div style="border-left:2px solid var(--stop); padding-left:18px;">
+            <div class="kicker stop">The floor</div>
+            <div style="font-family:var(--font-mono); font-size:16px; font-weight:700;">tacoda.dev/narrow-door</div>
+            <p class="muted" style="font-size:14px; margin-top:6px;">permissions, and where they bite</p>
+          </div>
+          <div style="border-left:2px solid var(--line-strong); padding-left:18px;">
+            <div class="kicker">Fulcorum</div>
+            <div style="font-family:var(--font-mono); font-size:19px; font-weight:700;">fulcorum.com</div>
+          </div>
+          <div style="border-left:2px solid var(--line-strong); padding-left:18px;">
+            <div class="kicker">Email</div>
+            <div style="font-family:var(--font-mono); font-size:19px; font-weight:700;">ian@fulcorum.com</div>
+          </div>
+          <div style="border-left:2px solid var(--line-strong); padding-left:18px;">
+            <div class="kicker">Site · LinkedIn · GitHub</div>
+            <div style="font-family:var(--font-mono); font-size:15px; font-weight:700; line-height:1.55;">tacoda.dev<br>linkedin.com/in/tacoda<br>github.com/tacoda</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!--/stage-->
+</div><!--/viewport-->
+
+<div id="band"><i></i></div>
+<div id="counter">01 / 25</div>
+<a id="brand" href="/resources" title="Back to Resources">← Harness Engineering</a>
+<div id="help">← → move · T theme · F full</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var i = 0, total = slides.length;
+  var counter = document.getElementById('counter');
+  var bandFill = document.querySelector('#band > i');
+  var stage = document.getElementById('stage');
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function show(n) {
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    counter.textContent = pad(i + 1) + ' / ' + pad(total);
+    bandFill.style.width = (i / (total - 1) * 100) + '%';
+  }
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit); fit();
+
+  document.addEventListener('keydown', function (e) {
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown': show(i + 1); e.preventDefault(); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp': show(i - 1); e.preventDefault(); break;
+      case 'Home': show(0); break;
+      case 'End': show(total - 1); break;
+      case 't': case 'T': {
+        var r = document.documentElement;
+        var cur = r.getAttribute('data-theme');
+        var dark = cur ? cur === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        r.setAttribute('data-theme', dark ? 'light' : 'dark');
+        break;
+      }
+      case 'f': case 'F':
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+        else document.exitFullscreen && document.exitFullscreen();
+        break;
+    }
+  });
+
+  document.getElementById('viewport').addEventListener('click', function (e) {
+    show(i + (e.clientX < window.innerWidth * 0.28 ? -1 : 1));
+  });
+
+  show(0);
+})();
+</script>
+
+</body>
+</html>
