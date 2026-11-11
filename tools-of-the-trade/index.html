@@ -953,7 +953,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       Your agent won't give the same answer twice, and it doesn't have to. What you want is answers
       that land inside a band you can read, debug, and ship. This page is the kit: twelve levers that
       tell you where a fix belongs, and twenty-three tools to make it. Each tool says when to reach
-      for it, what to expect, and how to check it worked. Fair warning: most changes measure as no
+      for it, what to expect, and how to check it worked. Most changes will measure as no
       change at all, and that's still worth knowing.
     </p>
     <p class="byline">
@@ -1162,7 +1162,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
           <h3 data-n="L11">Someone wants to loosen a control <span class="narrows output">narrows output</span></h3>
           <dl>
             <div><dt class="how">Do</dt><dd>Don't. The platform sets the floor, and a team can tighten it but never loosen it.</dd></div>
-            <div><dt class="ex">Example</dt><dd>Security baselines, banned dependencies, and licenses are locked at the org level, and the book keeps those locks "scarce on purpose."</dd></div>
+            <div><dt class="ex">Example</dt><dd>The org locks security baselines, banned dependencies, and licenses, and the book keeps those locks "scarce on purpose."</dd></div>
           </dl>
           <p class="more">Tools · <a href="#t-9">09 permissions</a> · <a href="/whose-gate-is-it/">Whose Gate Is It</a></p>
         </article>
@@ -1244,7 +1244,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
             <div><dt class="when">When</dt><dd>The agent copies the code's bad habits instead of following your rules. When a name and a rule disagree, the name wins.</dd></div>
             <div><dt class="how">How</dt><dd>Enforce module boundaries with an import linter, so a layer is more than a folder name. Rename vague names. Swap clever code for boring code. Do this before you write a rule about it.</dd></div>
             <div><dt class="ex">Example</dt><dd>Same <code>CLAUDE.md</code>, same prompt, two repos. One diff touched 9 files across 5 packages and silenced tests, while the other touched 4 files and stayed green.</dd></div>
-            <div><dt class="expect">Expect</dt><dd>Smaller diffs that land where they should. It's the slowest tool here, and the book argues it has the most leverage.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Smaller diffs that land where they should, because the agent now copies the pattern you want.</dd></div>
             <div><dt class="verify">Verify</dt><dd>Track files touched per change. On the book's eight-question architecture checklist, three or more "no" answers predict an eleven-file diff.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/cold-codebase/">Cold Codebase</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 17–18 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 8–9</p>
@@ -1257,7 +1257,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
             <div><dt class="how">How</dt><dd>Pin what the code does today, right or wrong, with literal values. Start with money, permissions, and customer data. Then block the agent from editing those tests, because under pressure it rewrites the test instead of the code.</dd></div>
             <div><dt class="ex">Example</dt><dd><code>assert shipping_fee(0, "domestic") == 4.99  # Pinned, not endorsed.</code> The number looks wrong, but a warehouse report depends on it.</dd></div>
             <div><dt class="expect">Expect</dt><dd>The agent can tell a fix from a regression, and so can you. Changes that break behavior fail before anyone reviews them.</dd></div>
-            <div><dt class="verify">Verify</dt><dd>Break the code on purpose: flip <code>&gt;</code> to <code>&gt;=</code>, or return a constant. The suite has to go red. If it stays green, that line was never tested.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Break the code on purpose: flip <code>&gt;</code> to <code>&gt;=</code>, or return a constant. The suite has to go red. If it stays green, nothing was testing that line.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/legacy-with-an-agent/">Legacy Code With an Agent</a> · <a href="/layers-and-promotion/">Layers and Promotion</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 19 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 12, 15</p>
         </article>
@@ -1318,7 +1318,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
             <div><dt class="when">When</dt><dd>The main session fills with search output and the answers get worse, or you need a check no script can do.</dd></div>
             <div><dt class="how">How</dt><dd>Decide what the sub-agent returns before you write its prompt: a few bullets with <code>file:line</code> evidence and no prose. Start a judge's prompt with "Default to FAIL," and test it against cases a person already labeled.</dd></div>
             <div><dt class="ex">Example</dt><dd>A sub-agent that hands back 30 lines instead of 3,000 keeps the main session clear for the actual work.</dd></div>
-            <div><dt class="expect">Expect</dt><dd>A cleaner main session, and a second opinion that catches what scripts miss. A judge shares the model's blind spots, though, so treat it as an instrument, not an oracle.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>A cleaner main session, and a second opinion that catches what scripts miss. A judge shares the model's blind spots, though, so it misses what the model misses.</dd></div>
             <div><dt class="verify">Verify</dt><dd>Check each judge against 20 human labels. Pin the judge's model, because changing it resets your history.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/eval-loop/">The Eval Loop</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 20, 49</p>
@@ -1328,7 +1328,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
           <h3 data-n="09">Permissions</h3>
           <dl>
             <div><dt class="when">When</dt><dd>The agent can run more than it should, or it asks so often that people start clicking through.</dd></div>
-            <div><dt class="how">How</dt><dd>Deny by default. Give each thing the agent should do its own make target, and allow that. If a check can't reach a confident yes, the answer is no. Run it all in a sandbox, and keep production out of reach.</dd></div>
+            <div><dt class="how">How</dt><dd>Deny by default. Put each thing the agent should do behind its own make target, and allow that. If a check can't reach a confident yes, the answer is no. Run it all in a sandbox, and keep production out of reach.</dd></div>
             <div><dt class="ex">Example</dt><dd>Allow <code>make test</code>, and deny <code>php artisan test</code>. The allowlist fits on one screen, and Docker catches what <code>make</code> leaves open.</dd></div>
             <div><dt class="expect">Expect</dt><dd>Fewer prompts and a smaller blast radius at the same time. Too loose is a blast radius, and too tight is a bypass flag by Thursday.</dd></div>
             <div><dt class="verify">Verify</dt><dd>Watch prompts per session, because a rising count means someone's about to bypass them. Log every call to an append-only log.</dd></div>
@@ -1464,7 +1464,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
             <div><dt class="when">When</dt><dd>You change a rule, a skill, a gate, or a model, and you want to know whether it helped.</dd></div>
             <div><dt class="how">How</dt><dd>Check in about twenty tasks and leave them alone. Score with exit codes and greps first, then a judge, then a person spot-checking. Compare two outputs blind, and run each side 30 times or more.</dd></div>
             <div><dt class="ex">Example</dt><dd>At a 70% pass rate, a drop to 50% takes about 95 runs per side to see. A rise to 80% takes about 300.</dd></div>
-            <div><dt class="expect">Expect</dt><dd>You'll catch regressions reliably. You won't catch small wins, and most edits will come back "can't tell." That's a real answer.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>You'll catch regressions reliably. You won't catch small wins, and most edits will come back "can't tell," which is still an answer.</dd></div>
             <div><dt class="verify">Verify</dt><dd>Report one of three results: worse, better, or can't tell. Run it in CI on every rules change.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/eval-loop/">The Eval Loop</a> · <a href="/gauge/">Gauge</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 30, 46</p>
@@ -1474,7 +1474,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
           <h3 data-n="19">The factory</h3>
           <dl>
             <div><dt class="when">When</dt><dd>Several agents work a backlog in parallel, and runs crash, collide, or merge for reasons nobody can reconstruct.</dd></div>
-            <div><dt class="how">How</dt><dd>Run the work from a queue, not from an agent, so no model decides what runs next. Give each phase an exit. Put gates before actions, and write a record after each one.</dd></div>
+            <div><dt class="how">How</dt><dd>Run the work from a queue, not from an agent, so no model decides what runs next. Every phase needs an exit. Put gates before actions, and write a record after each one.</dd></div>
             <div><dt class="ex">Example</dt><dd>One run, step by step: plan, edit, a gate blocks <code>money_is_integer</code>, the agent revises on retry 1 of 2, the gate passes, verify, merge. Every step leaves a row.</dd></div>
             <div><dt class="expect">Expect</dt><dd>A crash resumes from the last step instead of starting over, and every merge has a reason on file.</dd></div>
             <div><dt class="verify">Verify</dt><dd>Each quarter, pick a change merged three months ago. From the record alone, name the rejected alternative, the rule that applied, and the person accountable.</dd></div>
@@ -1572,7 +1572,7 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div>
         <h2>Keep it going</h2>
         <p class="thesis">
-          Every miss is a lesson. If something gets caught twice, make sure it can't happen a third time.
+          When something gets caught twice, make sure it can't happen a third time.
         </p>
       </div>
     </div>
