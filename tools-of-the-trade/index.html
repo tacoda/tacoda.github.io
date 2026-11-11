@@ -3,23 +3,22 @@
 <head>
 <meta charset="utf-8">
   <meta name="voice-register" content="informational">
-  <meta name="voice-english" content="ste">
   <meta name="voice-first-person" content="exempt: index page; every judgment call lives on the linked page it summarizes">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tools of the Trade · Harness Engineering · Ian Johnson</title>
 <meta name="author" content="Ian Johnson">
-<meta name="description" content="Twenty-three practices for reliable agent results, sorted by the lever each one pulls. For each: the agent behavior it fixes, how to do it, a real example, and how to prove the results changed. Plus the rules for picking a lever. By Ian Johnson.">
+<meta name="description" content="Twelve levers for where a fix belongs, and twenty-three tools for reliable agent results. Each tool says when to use it, what to expect, and how to verify it worked. By Ian Johnson.">
 <link rel="icon" href="/favicon.ico">
 <link rel="canonical" href="https://www.tacoda.dev/tools-of-the-trade/">
 
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="tacoda.dev">
 <meta property="og:title" content="Tools of the Trade">
-<meta property="og:description" content="Twenty-three practices for reliable agent results. The agent behavior each one fixes, a real example, and how to prove the results changed.">
+<meta property="og:description" content="Twelve levers and twenty-three tools for reliable agent results: when to use each, what to expect, and how to verify it.">
 <meta property="og:url" content="https://www.tacoda.dev/tools-of-the-trade/">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Tools of the Trade">
-<meta name="twitter:description" content="Twenty-three practices for reliable agent results. The agent behavior each one fixes, a real example, and how to prove the results changed.">
+<meta name="twitter:description" content="Twelve levers and twenty-three tools for reliable agent results: when to use each, what to expect, and how to verify it.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -905,30 +904,34 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
   margin: 0 0 0.75rem;
   color: var(--ink);
 }
-.tool h3::before { content: attr(data-n); color: var(--brick); margin-right: 0.5rem; font-variant-numeric: tabular-nums; }
-.tool h3 .new {
-  font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--gold-ink); border: 1px solid var(--gold-soft); border-radius: 2px;
-  padding: 0.05rem 0.35rem; margin-left: 0.5rem; vertical-align: 0.15em;
-}
+.tool h3::before { content: attr(data-n); color: var(--brick); margin-right: 0.6rem; font-variant-numeric: tabular-nums; }
 .tool dl { margin: 0; display: grid; gap: 0.55rem; }
-.tool dl > div { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: 0.75rem; }
+.tool dl > div { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); gap: 0.75rem; }
 @media (max-width: 640px) { .tool dl > div { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; } }
 .tool dt {
   font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.13em;
   text-transform: uppercase; font-weight: 700; padding-top: 0.32rem; color: var(--ink-3);
 }
-.tool dt.why  { color: var(--ink-2); }
-.tool dt.how  { color: var(--brick); }
-.tool dt.ex   { color: var(--gold-ink); }
-.tool dt.prove{ color: var(--forest); }
+.tool dt.when   { color: var(--ink-2); }
+.tool dt.how    { color: var(--brick); }
+.tool dt.ex     { color: var(--gold-ink); }
+.tool dt.expect { color: var(--ink-2); }
+.tool dt.verify { color: var(--forest); }
 .tool dd { margin: 0; font-size: 0.95rem; line-height: 1.55; max-width: var(--measure); }
 .tool dd code { font-size: 0.84em; }
 .tool .more {
   margin: 0.8rem 0 0; font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); line-height: 1.7;
 }
 .tool .more a { color: var(--brick); text-underline-offset: 2px; text-decoration-thickness: 1px; }
-.rung-body table { font-size: 0.9rem; }
+.levers .tool { border-left: 3px solid var(--gold); }
+.tool h3 .narrows {
+  font-size: 0.58rem; letter-spacing: 0.13em; text-transform: uppercase; font-weight: 700;
+  margin-left: 0.6rem; padding: 0.08rem 0.4rem; border-radius: 2px; vertical-align: 0.15em;
+  border: 1px solid var(--rule); color: var(--ink-3);
+}
+.tool h3 .narrows.input    { color: var(--ink-2); }
+.tool h3 .narrows.output   { color: var(--gold-ink); border-color: var(--gold-soft); }
+.tool h3 .narrows.recovery { color: var(--brick); border-color: var(--brick-soft); }
 </style>
 </head>
 <body>
@@ -947,11 +950,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     </div>
     <h1>The tools of the trade for <em>reliable agents</em></h1>
     <p class="standfirst">
-      An agent will never give the same answer twice. Reliable results and behavior mean the answers
-      stay inside a band your team can read, debug, and ship. Three levers narrow that band: the input, the output,
-      and the recovery. This page sorts twenty-three practices by the lever each one pulls. For each one you
-      get the agent behavior it fixes, how to do it, one real example, and how to prove the results changed. The cost: every
-      practice needs measuring, and most charter edits measure as no change at all.
+      Your agent won't give the same answer twice, and it doesn't have to. What you want is answers
+      that land inside a band you can read, debug, and ship. This page is the kit: twelve levers that
+      tell you where a fix belongs, and twenty-three tools to make it. Each tool says when to reach
+      for it, what to expect, and how to check it worked. Fair warning: most changes measure as no
+      change at all, and that's still worth knowing.
     </p>
     <p class="byline">
       <span class="by">Words by</span>
@@ -960,34 +963,31 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     </p>
 
     <div class="provenance">
-      who it's for · engineers and teams who ship agent-written code<br>
-      what it is · a field guide. Each practice stands on its own, and its links go deeper<br>
-      what you need · one repository, one agent, and one mistake the agent keeps making<br>
-      pairs with · <a href="/harness-reliable-governable/">Reliable and Governable AI</a> (the talk) · <a href="/whose-gate-is-it/">Whose Gate Is It</a> (the map)<br>
+      who it's for · anyone shipping code an agent wrote<br>
       sources · the linked pages, <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a>, and <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a><br>
-      the honest limit · every number here is from one team or one experiment. Yours will differ
+      the honest limit · every number here comes from one team or one experiment. Yours will differ
     </div>
 
     <dl class="signals">
       <div class="signal">
         <span class="swatch dim"></span>
         <div>
-          <dt>Why</dt>
-          <dd>The agent behavior it fixes, and why it works. <b>How</b> follows with the steps.</dd>
+          <dt>When</dt>
+          <dd>What the agent is doing that tells you to reach for this.</dd>
         </div>
       </div>
       <div class="signal">
         <span class="swatch warn"></span>
         <div>
-          <dt>Example</dt>
-          <dd>One concrete case, taken from a linked page or one of the books.</dd>
+          <dt>Expect</dt>
+          <dd>What changes in the agent's results, and what doesn't.</dd>
         </div>
       </div>
       <div class="signal">
         <span class="swatch pass"></span>
         <div>
-          <dt>Prove it</dt>
-          <dd>The number, test, or artifact that shows the agent's results changed.</dd>
+          <dt>Verify</dt>
+          <dd>The number or test that shows it worked.</dd>
         </div>
       </div>
     </dl>
@@ -995,16 +995,16 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
 
   <nav class="railnav" aria-label="Sections">
     <ol>
-      <li class="part">the frame</li>
-      <li><a href="#s-0"><span class="n">0</span> The metric</a></li>
-      <li><a href="#s-1"><span class="n">1</span> Pick your lever</a></li>
+      <li class="part">start here</li>
+      <li><a href="#s-0"><span class="n">0</span> Reliability is a band</a></li>
+      <li><a href="#s-1"><span class="n">1</span> The twelve levers</a></li>
       <li class="part">the tools</li>
       <li><a href="#s-2"><span class="n">2</span> Narrow the input</a></li>
       <li><a href="#s-3"><span class="n">3</span> Narrow the output</a></li>
       <li><a href="#s-4"><span class="n">4</span> Narrow the recovery</a></li>
-      <li><a href="#s-5"><span class="n">5</span> The human rung</a></li>
-      <li class="part">the process</li>
-      <li><a href="#s-6"><span class="n">6</span> The loop</a></li>
+      <li><a href="#s-5"><span class="n">5</span> The human check</a></li>
+      <li class="part">after</li>
+      <li><a href="#s-6"><span class="n">6</span> Keep it going</a></li>
     </ol>
   </nav>
 
@@ -1019,50 +1019,30 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <span class="meter-label">The band</span>
       </div>
       <div>
-        <h2>Reliability is a band, not a repeat</h2>
+        <h2>Reliability is a band</h2>
         <p class="thesis">
-          You can't make the model deterministic. You can make the workflow deterministic, and then
-          measure how wide the band of results is.
+          Reliable doesn't mean identical. It means every answer is one you can work with.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <p>
-        <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> defines reliability as "variance that stays inside a band you can read, debug, and
-        ship." Each of those three words names one lever. If any one lever is missing, the run feels
-        unreliable, even when the other two hold.
+        <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> puts it as
+        "variance that stays inside a band you can read, debug, and ship." Each of those words points
+        at one thing you can narrow. A lever is anything that narrows one of them:
       </p>
-
-      <div class="tablewrap">
-        <table>
-          <thead>
-            <tr><th>Word</th><th>Lever</th><th>What it narrows</th><th>Tools</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>read</td><td>Narrow the input</td><td>what the agent knows before it acts</td><td>1–7</td></tr>
-            <tr><td>debug</td><td>Narrow the output</td><td>what it may produce and ship</td><td>8–14</td></tr>
-            <tr><td>ship</td><td>Narrow the recovery</td><td>what happens when it fails anyway</td><td>15–20</td></tr>
-            <tr><td>all three</td><td>The human rung</td><td>what no predicate or judge can see</td><td>21–23</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 class="sub">How to measure the band</h3>
+      <ol class="sequence">
+        <li data-signal="none"><span class="when">Read</span><span class="what"><b>The input.</b> What the agent knows before it acts. Tools 1–7.</span></li>
+        <li data-signal="warn"><span class="when">Debug</span><span class="what"><b>The output.</b> What it's allowed to produce. Tools 8–14.</span></li>
+        <li data-signal="block"><span class="when">Ship</span><span class="what"><b>The recovery.</b> What happens when it fails anyway. Tools 15–20.</span></li>
+        <li data-signal="pass"><span class="when">All three</span><span class="what"><b>The human check.</b> What no script or judge can see. Tools 21–23.</span></li>
+      </ol>
       <p>
-        Run the same task set twice: once with a change, once without. Use at least 30 runs per arm,
-        and score each run blind against its intent contract. Then compare the failure rate and the
-        band width. Don't compare the best run. <a href="/eval-loop/">The Eval Loop</a> has the
-        procedure, and tool 18 below is its summary.
+        To see whether the band got narrower, run the same tasks with and without your change, 30
+        times or more each, and compare how often they fail. <a href="/eval-loop/">The Eval Loop</a>
+        shows you how.
       </p>
-
-      <div class="takeaway">
-        <span class="label">The claim this page defends</span>
-        <p>
-          Filters compose. No single tool here has to be perfect. A gate that catches 80% of its
-          class is still sharp, and each tool removes failures the others let through.
-        </p>
-      </div>
     </div>
   </section>
 
@@ -1077,47 +1057,126 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <span class="meter-label">Decide</span>
       </div>
       <div>
-        <h2>Pick your lever in two questions</h2>
+        <h2>The twelve levers</h2>
         <p class="thesis">
-          First find which word failed. Then find where the control goes. Most bad fixes are a good
-          control at the wrong address.
+          Each lever narrows the input, the output, or the recovery. Most bad fixes are a good fix
+          pulled at the wrong lever, so run down the list and stop at the first one that fits.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
-      <h3 class="sub">Question 1 · which word failed?</h3>
-      <ol class="sequence">
-        <li data-signal="none"><span class="when">Couldn't read it</span><span class="what">The agent solved the wrong problem, used the wrong words, or copied a bad pattern. <b>Narrow the input</b>: tools 1–7.</span></li>
-        <li data-signal="warn"><span class="when">Couldn't debug it</span><span class="what">The work broke a rule, ran a command it shouldn't, or passed checks and was still wrong. <b>Narrow the output</b>: tools 8–14.</span></li>
-        <li data-signal="block"><span class="when">Couldn't ship it</span><span class="what">The run crashed, looped, burned budget, or nobody can say why it merged. <b>Narrow the recovery</b>: tools 15–20.</span></li>
-      </ol>
+      <div class="tools levers">
 
-      <h3 class="sub">Question 2 · where does the control go?</h3>
-      <p>Apply these rules in order. Stop at the first one that answers.</p>
-      <ol class="sequence">
-        <li data-signal="pass"><span class="when">The code teaches it</span><span class="what">Fix the code before you write a rule. The agent copies code before it obeys prose (tool 4).</span></li>
-        <li data-signal="pass"><span class="when">Nobody wrote it down</span><span class="what">Write it as a contract for one task (tool 1), or as a charter rule for every task (tool 2).</span></li>
-        <li data-signal="warn"><span class="when">It has "then" in it</span><span class="what">It is a sequence, not a rule. Make it a command or a skill (tool 7).</span></li>
-        <li data-signal="warn"><span class="when">Code can decide it</span><span class="what">Make it a check. Run the checker; don't ask the model to read the file (tools 10–12).</span></li>
-        <li data-signal="warn"><span class="when">Only judgment can decide it</span><span class="what">Keep the prose rule, and add a judge or a human (tools 8, 21).</span></li>
-        <li data-signal="block"><span class="when">The agent can reach the enforcer</span><span class="what">If the damage is real, move the check out of reach, into the harness (tool 11). Anything the agent can edit is not a control.</span></li>
-        <li data-signal="block"><span class="when">It governs what ships</span><span class="what">It belongs in the factory, at a stage gate (tool 19), not in the charter.</span></li>
-        <li data-signal="none"><span class="when">You want a second agent</span><span class="what">Add one only for separate memory, a separate refusal scope, or a separate tool surface (tool 8).</span></li>
-        <li data-signal="none"><span class="when">It's about order of steps</span><span class="what">Sequencing never goes to a model. Put it in the workflow (tool 19).</span></li>
-      </ol>
+        <article class="tool" id="l-1">
+          <h3 data-n="L1">The code teaches the mistake <span class="narrows input">narrows input</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Fix the code before you write a rule. The agent copies the code around it before it reads your prose.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Rename <code>process_line_items</code> to <code>amount_owed_cents</code>, and the next reader looking for what a customer owes finds it instead of writing a second one.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-4">04 the legible codebase</a></p>
+        </article>
 
-      <h3 class="sub">Four rules that hold at every address</h3>
-      <ul>
-        <li><b>Lowest rung first.</b> Start at the cheapest control that holds. Promote it only after an incident shows it leaks.</li>
-        <li><b>Cost of being wrong sets the speed.</b> A leaked secret earns a gate on sight, while a style preference earns a linter.</li>
-        <li><b>The platform sets the floor.</b> Teams can tighten a control and never loosen it (<a href="/whose-gate-is-it/">Whose Gate Is It</a>).</li>
-        <li><b>No move without a measurement.</b> Every promotion and every deletion ships with an eval result (tool 18).</li>
-      </ul>
-      <p>
-        <a href="/journey-of-a-rule/">The Journey of a Rule</a> walks one rule through all six homes.
-        <a href="/constraint-engineering/">Constraint Engineering</a> gives the full model.
-      </p>
+        <article class="tool" id="l-2">
+          <h3 data-n="L2">Nobody wrote it down <span class="narrows input">narrows input</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Write it once, where the agent will read it. A single task gets a contract. Every task gets a charter rule.</dd></div>
+            <div><dt class="ex">Example</dt><dd>If the agent asks the same question four times in three months, you're missing a rule. Write the answer down and the question stops.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-1">01 the intent contract</a> · <a href="#t-2">02 the charter</a> · <a href="#t-3">03 context and memory</a></p>
+        </article>
+
+        <article class="tool" id="l-3">
+          <h3 data-n="L3">The rule has "then" in it <span class="narrows input">narrows input</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>That's a sequence, not a rule. Turn it into a command or a skill that walks the steps.</dd></div>
+            <div><dt class="ex">Example</dt><dd>The book's <code>/verify</code> skill walks eight checkpoints and exits 0, 1, or 2, so every run checks the same things in the same order.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-7">07 skills and commands</a></p>
+        </article>
+
+        <article class="tool" id="l-4">
+          <h3 data-n="L4">Code can decide it <span class="narrows output">narrows output</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Check it with code, and have the agent run the check instead of reading the file and judging.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A pipeline reported "done." One script then printed <code>billing/discount.py:31: ROUND_HALF_UP; this rule requires ROUND_HALF_EVEN</code>.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-10">10 hooks</a> · <a href="#t-12">12 determinism by script</a></p>
+        </article>
+
+        <article class="tool" id="l-5">
+          <h3 data-n="L5">Only judgment can decide it <span class="narrows output">narrows output</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Keep the written rule, and add a reviewer: a judge, a person, or both.</dd></div>
+            <div><dt class="ex">Example</dt><dd>"Each amount carries its own currency, never a default." No script can check "never a default," so the sentence stays and a reviewer reads for it.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-8">08 sub-agents and judges</a> · <a href="#t-21">21 the comprehension gate</a></p>
+        </article>
+
+        <article class="tool" id="l-6">
+          <h3 data-n="L6">The agent can reach the check <span class="narrows output">narrows output</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>If the damage is real, move the check somewhere the agent can't edit it.</dd></div>
+            <div><dt class="ex">Example</dt><dd>"If the agent can rewrite the suite, green means the agent agreed with itself."</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-11">11 harness gates</a> · <a href="#t-5">05 characterization tests</a></p>
+        </article>
+
+        <article class="tool" id="l-7">
+          <h3 data-n="L7">It decides what ships <span class="narrows output">narrows output</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Put it at a gate in the delivery pipeline, not in the agent's instructions.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Changes to auth, lockfiles, CI config, or network endpoints go to a person "no matter how green the build."</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-19">19 the factory</a></p>
+        </article>
+
+        <article class="tool" id="l-8">
+          <h3 data-n="L8">You want a second agent <span class="narrows input">narrows input</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Add one only for separate memory, a separate refusal scope, or separate tools. "The task is hard" doesn't count.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A team planned four agents. A 15-line rule file that named the downstream consumer and three fixtures did the job instead.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-8">08 sub-agents and judges</a></p>
+        </article>
+
+        <article class="tool" id="l-9">
+          <h3 data-n="L9">It's about the order of steps <span class="narrows recovery">narrows recovery</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Put the order in the workflow. A model should never decide what runs next.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A webhook chain needed three layers of recovery code. The reconciler that replaced it deleted more code than it added.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-19">19 the factory</a></p>
+        </article>
+
+        <article class="tool" id="l-10">
+          <h3 data-n="L10">Being wrong is expensive <span class="narrows output">narrows output</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Skip the waiting and go straight to a hard check. A leaked secret earns a rule on sight, while a style preference earns a linter.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Float rounding on refunds lost about $40 a day without anyone noticing. That rule got a gate, not a sentence.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-2">02 the charter</a> · <a href="#t-11">11 harness gates</a></p>
+        </article>
+
+        <article class="tool" id="l-11">
+          <h3 data-n="L11">Someone wants to loosen a control <span class="narrows output">narrows output</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Don't. The platform sets the floor, and a team can tighten it but never loosen it.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Security baselines, banned dependencies, and licenses are locked at the org level, and the book keeps those locks "scarce on purpose."</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-9">09 permissions</a> · <a href="/whose-gate-is-it/">Whose Gate Is It</a></p>
+        </article>
+
+        <article class="tool" id="l-12">
+          <h3 data-n="L12">You're about to add or remove a control <span class="narrows recovery">narrows recovery</span></h3>
+          <dl>
+            <div><dt class="how">Do</dt><dd>Measure first. Every promotion and every deletion ships with an eval result.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Most charter edits measure as no difference at all. Without the eval, each one would have shipped as a win.</dd></div>
+          </dl>
+          <p class="more">Tools · <a href="#t-18">18 evals</a></p>
+        </article>
+
+      </div>
     </div>
   </section>
 
@@ -1134,8 +1193,8 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div>
         <h2>Narrow the input</h2>
         <p class="thesis">
-          What the agent knows before it acts. Instruction is the weakest signal, and the code it
-          imitates is the strongest.
+          Everything the agent knows before it acts. What you tell it matters, and the code it copies
+          matters more.
         </p>
       </div>
     </div>
@@ -1146,10 +1205,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-1">
           <h3 data-n="01">The intent contract</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent solves a neighboring problem, or the right one at the wrong size. Intent that lives in a private chat can't be checked by the harness, the reviewers, or other agents.</dd></div>
-            <div><dt class="how">How</dt><dd>Write seven fixed sections: outcome, signal, scope in, scope out, acceptance criteria, risk surface, and open questions. Every criterion must be able to fail, and every open question gets a default. Then sign it before work starts.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent solves a neighboring problem, or the right one at the wrong size. It's guessing at intent you never wrote down.</dd></div>
+            <div><dt class="how">How</dt><dd>Before it starts, write seven short sections: outcome, signal, scope in, scope out, acceptance criteria, risk surface, and open questions. Every criterion has to be able to fail, and every open question gets a default.</dd></div>
             <div><dt class="ex">Example</dt><dd>"Tests look fine" can't fail. "A new test fails on the merge base and passes on HEAD" can.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Count criteria marked not met at review, and contracts reopened after signing. Both fall as contracts get sharper.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Diffs that stay in scope, and reviews that check criteria instead of vibes. You spend the time up front and get it back at review.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Count criteria marked "not met" at review, and contracts reopened after signing. Both should fall.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/factory/">The Factory</a> · <a href="/ghola/">Ghola</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 47–48</p>
         </article>
@@ -1157,10 +1217,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-2">
           <h3 data-n="02">The charter</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent repeats a mistake that is specific to this codebase. A rule stops the repeat, but only if it's true, because a rule the code doesn't follow teaches the agent that rules are optional.</dd></div>
-            <div><dt class="how">How</dt><dd>Start empty. Add a rule after the third occurrence, or at once if the cost is high. Mark it iron, golden, or preference. Give it a reason with a mechanism and a number, and say what enforces it.</dd></div>
-            <div><dt class="ex">Example</dt><dd>"Use <code>clients.http</code> for every third-party call, never <code>requests</code>. The wrapper sets a 4-second timeout." The reason: an outage held all 16 workers for 23 minutes. The limit: it doesn't catch the 61 files already on the old pattern.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Each quarter, check 20 rules against 5 recent files. A rule that holds in fewer than 4 is aspirational: fix the code or demote the rule.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent keeps making the same mistake, and it's a mistake about your codebase, not about code in general.</dd></div>
+            <div><dt class="how">How</dt><dd>Start with an empty file. Add a rule the third time you see a mistake, or the first time if it's expensive. Give each rule its reason, with a number, and say what enforces it.</dd></div>
+            <div><dt class="ex">Example</dt><dd>"Use <code>clients.http</code> for every third-party call, never <code>requests</code>. The wrapper sets a 4-second timeout." The reason: an outage held all 16 workers for 23 minutes.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>That mistake stops, as long as the code agrees with the rule. A rule the code ignores makes things worse, because it teaches the agent that rules are optional.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Once a quarter, check 20 rules against 5 recent files each. A rule that holds in fewer than 4 needs the code fixed or the rule demoted.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> · <a href="/migrating-without-lying/">Migrating Without Lying</a> · <a href="/keystone/">Keystone</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 11–12 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 21</p>
         </article>
@@ -1168,10 +1229,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-3">
           <h3 data-n="03">Context and memory</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent uses the wrong word, acts on stale facts, or gets worse as the session grows. Each of those comes from what it loaded, so fix what loads.</dd></div>
-            <div><dt class="how">How</dt><dd>Load reference material on demand, not at start, and keep one meaning per term in a glossary. Derive state from the system of record instead of memory. When nobody knows a rule, ask a person and write the answer down.</dd></div>
-            <div><dt class="ex">Example</dt><dd>Is shipping refunded on an $84.00 order? A question in the support channel got an answer in 11 minutes. It became <code>ADR-014: Shipping is not refunded once the carrier has scanned</code>, and the agent reads it from then on.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Count files loaded at session start: seventeen means the corpus leaks, three means the layers work. Count corrections you repeat across sessions.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent uses the wrong word, acts on facts that went stale, or gets worse the longer the session runs.</dd></div>
+            <div><dt class="how">How</dt><dd>Load reference docs when they're needed, not all at the start. Keep a glossary with one meaning per term. When nobody knows a rule, ask a person and write the answer where the agent will find it.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Is shipping refunded on an $84.00 order? Someone asked in the support channel and got an answer in 11 minutes. It became <code>ADR-014: Shipping is not refunded once the carrier has scanned</code>.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Fewer corrections you have to repeat, and steadier answers late in a long session.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Count the files loaded at session start: seventeen means your docs leak, and three means the layering works. Then count corrections you repeat across sessions.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/guardrails/">Five Guardrails</a> · <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 13, 15–16 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 14</p>
         </article>
@@ -1179,10 +1241,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-4">
           <h3 data-n="04">The legible codebase</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent copies the code's bad habits instead of following your rules. When a name and a rule disagree, the name wins, so fix the code before you write the rule.</dd></div>
-            <div><dt class="how">How</dt><dd>Draw module boundaries and enforce them with an import linter. Catalog the seams where work enters and leaves. Rename vague names, and give each rename a sentence that says what it makes clear. Replace clever code with boring code.</dd></div>
-            <div><dt class="ex">Example</dt><dd>Same <code>CLAUDE.md</code>, same prompt, two repos. One diff touched 9 files in 5 packages and silenced tests, while the other touched 4 files and stayed green. The difference was the imports.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Track files touched per change. On the book's eight-question architecture checklist, three or more "no" answers predict an eleven-file diff.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent copies the code's bad habits instead of following your rules. When a name and a rule disagree, the name wins.</dd></div>
+            <div><dt class="how">How</dt><dd>Enforce module boundaries with an import linter, so a layer is more than a folder name. Rename vague names. Swap clever code for boring code. Do this before you write a rule about it.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Same <code>CLAUDE.md</code>, same prompt, two repos. One diff touched 9 files across 5 packages and silenced tests, while the other touched 4 files and stayed green.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Smaller diffs that land where they should. It's the slowest tool here, and the book argues it has the most leverage.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Track files touched per change. On the book's eight-question architecture checklist, three or more "no" answers predict an eleven-file diff.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/cold-codebase/">Cold Codebase</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 17–18 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 8–9</p>
         </article>
@@ -1190,21 +1253,23 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-5">
           <h3 data-n="05">Characterization tests</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent can't tell a fix from a regression in code nobody specified, and neither can you. Pinned behavior gives it a definition of correct that it can check by itself.</dd></div>
-            <div><dt class="how">How</dt><dd>Start where damage is highest: money, permissions, customer data. Assert today's output with literal values, and test outputs rather than calls. Then gate edits to these tests, because an agent under pressure rewrites the test instead of the code.</dd></div>
-            <div><dt class="ex">Example</dt><dd><code>assert shipping_fee(0, "domestic") == 4.99  # Pinned, not endorsed.</code> The value looks wrong, but a warehouse report depends on it.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Break the code on purpose: flip <code>&gt;</code> to <code>&gt;=</code>, or return a constant. The suite must go red. If it stays green, the test never covered that line.</dd></div>
+            <div><dt class="when">When</dt><dd>You're about to let an agent change code real users depend on, and nothing says what "correct" is.</dd></div>
+            <div><dt class="how">How</dt><dd>Pin what the code does today, right or wrong, with literal values. Start with money, permissions, and customer data. Then block the agent from editing those tests, because under pressure it rewrites the test instead of the code.</dd></div>
+            <div><dt class="ex">Example</dt><dd><code>assert shipping_fee(0, "domestic") == 4.99  # Pinned, not endorsed.</code> The number looks wrong, but a warehouse report depends on it.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>The agent can tell a fix from a regression, and so can you. Changes that break behavior fail before anyone reviews them.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Break the code on purpose: flip <code>&gt;</code> to <code>&gt;=</code>, or return a constant. The suite has to go red. If it stays green, that line was never tested.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/legacy-with-an-agent/">Legacy Code With an Agent</a> · <a href="/layers-and-promotion/">Layers and Promotion</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 19 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 12, 15</p>
         </article>
 
         <article class="tool" id="t-6">
-          <h3 data-n="06">Driving with a falsifier <span class="new">hidden</span></h3>
+          <h3 data-n="06">Driving with a falsifier</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent writes plausible code by default, and plausible isn't correct. When the prompt asks for the failure case, the agent looks for the failure before it writes.</dd></div>
-            <div><dt class="how">How</dt><dd>Ask for the smallest input that would make the change wrong. To check a change, have the agent argue against it using only evidence it can point to in the repo.</dd></div>
+            <div><dt class="when">When</dt><dd>Every time you ask for a change. Left alone, the agent writes code that looks right.</dd></div>
+            <div><dt class="how">How</dt><dd>Ask for the input that would break the change before it writes the change. To check finished work, ask it to argue the change is wrong, using only things it can point to in the repo.</dd></div>
             <div><dt class="ex">Example</dt><dd>"Before you write it, tell me the input that would make your version send twice anyway, and the input that would make it skip a send it should have made."</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Each falsifier the agent names becomes a test. Count the defects those tests catch before review.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Edge cases show up before the code exists, and each one turns into a test.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Count the defects those falsifier tests catch before review.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/junior-to-senior/">Junior to Senior</a> · <a href="/cold-codebase/">Cold Codebase</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 19</p>
         </article>
@@ -1212,10 +1277,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-7">
           <h3 data-n="07">Skills and commands</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent does a repeated job differently every time. A skill fixes the steps, but every capability costs context on every turn, so a weak one makes all output slightly worse.</dd></div>
-            <div><dt class="how">How</dt><dd>Pick the lowest rung that closes the gap: command, skill, sub-agent, plugin, server. Write a skill's description as its trigger, since it's the only part always in context. End each phase with an artifact, never with "done". Read every command you run.</dd></div>
-            <div><dt class="ex">Example</dt><dd>A prompt run six times by three engineers earns a command. A rule with "then" in it is a sequence, so it becomes a skill.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Read four numbers from the transcripts: fires per week, right when it fires, used after it returns, and missed when it should fire. Zero fires means delete it.</dd></div>
+            <div><dt class="when">When</dt><dd>A job you repeat comes out a little different every time.</dd></div>
+            <div><dt class="how">How</dt><dd>Start at the lowest rung that fixes it: a command, then a skill, then a sub-agent. Write a skill's description as its trigger, because that's the only part the agent always sees. End each step with an artifact, never with "done."</dd></div>
+            <div><dt class="ex">Example</dt><dd>A prompt that three engineers ran six times between them earns a command.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>The same job comes out the same way. But every capability costs context on every turn, so one you never use makes everything slightly worse.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>From the transcripts: how often it fires, whether it fires at the right time, whether the result gets used, and whether it was missed. If it never fires, delete it.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/capability-ladder/">The Capability Ladder</a> · <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 20–21</p>
         </article>
@@ -1237,8 +1303,8 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div>
         <h2>Narrow the output</h2>
         <p class="thesis">
-          What the agent may produce. Sensors report and gates refuse, and a gate holds only the part
-          of a rule that code can decide.
+          What the agent is allowed to produce. A check that only reports gets ignored at 3 a.m., so
+          the ones that matter refuse.
         </p>
       </div>
     </div>
@@ -1249,21 +1315,23 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-8">
           <h3 data-n="08">Sub-agents and judges</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent's context fills with search output, and its answers degrade. A second agent with its own memory fixes that. But "the task is hard" is not a reason to add one.</dd></div>
-            <div><dt class="how">How</dt><dd>Define the return format first: a few bullets with <code>file:line</code> evidence, no prose. Give a builder a refusal scope. Open a judge's prompt with "Default to FAIL", and calibrate it like any other instrument.</dd></div>
-            <div><dt class="ex">Example</dt><dd>A team planned four agents. A 15-line rule file that named the downstream consumer and three fixtures did the same job.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Validate each judge against 20 human labels. Pin the judge's model, because a change resets the history.</dd></div>
+            <div><dt class="when">When</dt><dd>The main session fills with search output and the answers get worse, or you need a check no script can do.</dd></div>
+            <div><dt class="how">How</dt><dd>Decide what the sub-agent returns before you write its prompt: a few bullets with <code>file:line</code> evidence and no prose. Start a judge's prompt with "Default to FAIL," and test it against cases a person already labeled.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A sub-agent that hands back 30 lines instead of 3,000 keeps the main session clear for the actual work.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>A cleaner main session, and a second opinion that catches what scripts miss. A judge shares the model's blind spots, though, so treat it as an instrument, not an oracle.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Check each judge against 20 human labels. Pin the judge's model, because changing it resets your history.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/eval-loop/">The Eval Loop</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 20, 49</p>
         </article>
 
         <article class="tool" id="t-9">
-          <h3 data-n="09">Permissions and sandboxing</h3>
+          <h3 data-n="09">Permissions</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent runs a command it shouldn't, or prompts so often that people bypass the check. Too loose is a blast radius, and too tight is a bypass flag by Thursday.</dd></div>
-            <div><dt class="how">How</dt><dd>Deny by default. Name each intent, and put it behind one make target. If a check can't reach a confident yes, fail closed. Put the sandbox under the allowlist, not in place of it, and give no production access, read or write.</dd></div>
-            <div><dt class="ex">Example</dt><dd>Allow <code>make test</code> and deny <code>php artisan test</code>. The allowlist fits on one screen, and Docker is the floor under whatever <code>make</code> leaves open.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Track prompts per session, because a rising count means a bypass is coming. Log every call to an append-only audit log.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent can run more than it should, or it asks so often that people start clicking through.</dd></div>
+            <div><dt class="how">How</dt><dd>Deny by default. Give each thing the agent should do its own make target, and allow that. If a check can't reach a confident yes, the answer is no. Run it all in a sandbox, and keep production out of reach.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Allow <code>make test</code>, and deny <code>php artisan test</code>. The allowlist fits on one screen, and Docker catches what <code>make</code> leaves open.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Fewer prompts and a smaller blast radius at the same time. Too loose is a blast radius, and too tight is a bypass flag by Thursday.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Watch prompts per session, because a rising count means someone's about to bypass them. Log every call to an append-only log.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/narrow-door/">The Narrow Door</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 21, 37</p>
         </article>
@@ -1271,10 +1339,11 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-10">
           <h3 data-n="10">Hooks</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent breaks a mechanical rule it has read many times. A hook checks every time, not when the agent remembers, and it reports while the agent still holds the context.</dd></div>
-            <div><dt class="how">How</dt><dd>Write the check as a function that returns pass or fail with a reason. Then fire it on the earliest event that has the data. Print one line per error, location first, and stay silent on success.</dd></div>
-            <div><dt class="ex">Example</dt><dd>A rounding check on every edit: <code>round_cash(1083) = 1085, but the customer's-favor amount is 1080</code>. The hook blocks with exit 2, and the agent fixes it in the same turn.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Track fires per week and how often the next attempt passes. Keep pre-commit under 30 seconds: one hook grew from 28 seconds to 4 minutes, and the team stopped running it.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent breaks a rule it has read many times, and a script could catch it.</dd></div>
+            <div><dt class="how">How</dt><dd>Write the check as a function that returns pass or fail with a reason. Run it on the earliest event that has the data, so the agent sees the failure while it still has the context. Print one line per error, and stay quiet on success.</dd></div>
+            <div><dt class="ex">Example</dt><dd><code>round_cash(1083) = 1085, but the customer's-favor amount is 1080</code>. The hook blocks with exit 2, and the agent fixes it in the same turn.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>That rule stops leaking, and the fix happens in the turn instead of at review. The agent can still edit or delete a hook, though.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Track how often it fires and how often the next try passes. Keep pre-commit under 30 seconds: one hook grew from 28 seconds to 4 minutes, and the team stopped running it.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/guardrails/">Five Guardrails</a> · <a href="/junior-to-senior/">Junior to Senior</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 19–20</p>
         </article>
@@ -1282,43 +1351,47 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-11">
           <h3 data-n="11">Harness gates</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent deletes the hook, skips it, or edits the test until it passes. Anything the agent can edit is not a control, so the check moves into the harness, out of reach.</dd></div>
-            <div><dt class="how">How</dt><dd>Reuse the hook's predicate. Only the mount point changes. Return the reason on refusal, allow two retries, then escalate. Keep the prose rule too, because a gate holds only the part code can decide.</dd></div>
-            <div><dt class="ex">Example</dt><dd>A tenant query used <code>session.tenant_id</code> where it needed <code>request.path.tenant_id</code>. Both versions passed the gate. Only one served the right invoice.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Switch the rung off and compare runs. Run one check outside the pipeline too: in one experiment the pipeline said done, and <code>make gate-run</code> found 2 violations.</dd></div>
+            <div><dt class="when">When</dt><dd>A rule with real damage keeps leaking past the hook, or the agent skips or edits the hook.</dd></div>
+            <div><dt class="how">How</dt><dd>Move the same check into the harness, in front of every tool call, where the agent can't see or change it. On a refusal, send back the reason and allow two retries, then escalate. Keep the written rule too.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A tenant query used <code>session.tenant_id</code> instead of <code>request.path.tenant_id</code>. Both versions passed the gate, and one of them served the wrong invoice.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>The part of the rule code can decide stops leaking for good. The rest still needs the written rule, a reviewer, or both.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Turn the gate off and compare runs. Also run one check outside the pipeline: in one experiment the pipeline said "done," and <code>make gate-run</code> found 2 violations.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/harness/">Promotion to the Harness</a> · <a href="/layers-and-promotion/">Layers and Promotion</a> · <a href="/journey-of-a-rule/">The Journey of a Rule</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 22</p>
         </article>
 
         <article class="tool" id="t-12">
-          <h3 data-n="12">Determinism by script <span class="new">hidden</span></h3>
+          <h3 data-n="12">Determinism by script</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent gives a different verdict each time it inspects the same file. Code gives the same verdict every time, so move each verdict a script can settle into a script.</dd></div>
-            <div><dt class="how">How</dt><dd>Find the decidable part of each judgment and put it in a script. Then change the instruction from "read and confirm" to "run and fix".</dd></div>
+            <div><dt class="when">When</dt><dd>A skill asks the agent to read something and judge it, and a script could just give the answer.</dd></div>
+            <div><dt class="how">How</dt><dd>Find the part of the judgment a script can settle, and write the script. Then change the instruction from "read and confirm" to "run and fix."</dd></div>
             <div><dt class="ex">Example</dt><dd>"Read the migration and confirm it is reversible" invites variance. "Run the checker and fix what it reports" removes it.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Run the step five times on the same input and count the distinct answers. One is determinism. Two is "a coin flip wearing a procedure." The test takes ten minutes.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>The same answer every time for that step, without adding a new layer.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Run the step five times on the same input and count the distinct answers. One is determinism. Two is "a coin flip wearing a procedure." It takes about ten minutes.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a></p>
         </article>
 
         <article class="tool" id="t-13">
-          <h3 data-n="13">Ratchets <span class="new">hidden</span></h3>
+          <h3 data-n="13">Ratchets</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent copies the old pattern, because most of the code still uses it. A rule that bans the old pattern fails on every legacy file, so a ratchet stops only the spread.</dd></div>
-            <div><dt class="how">How</dt><dd>Count uses of the old pattern in the lines a change adds, not in the whole repo. Then fail the build on any new use, and leave existing files alone until someone touches them.</dd></div>
+            <div><dt class="when">When</dt><dd>Your codebase has an old pattern and a new one, and the agent keeps copying the old one because most files still use it.</dd></div>
+            <div><dt class="how">How</dt><dd>Count uses of the old pattern only in the lines a change adds. Fail the build on any new use, and leave existing files alone.</dd></div>
             <div><dt class="ex">Example</dt><dd><code>ratchet.sh</code> with <code>PATTERN='ApiCaller'</code> prints "This change adds 1 use(s) of ApiCaller" and exits 1.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>New uses of the old pattern stay at zero. The total count only goes down.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>The old pattern stops spreading right away, with no big-bang migration.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>New uses stay at zero, and the total only goes down.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/migrating-without-lying/">Migrating Without Lying</a> · <a href="/legacy-with-an-agent/">Legacy Code With an Agent</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 18</p>
         </article>
 
         <article class="tool" id="t-14">
-          <h3 data-n="14">Injection containment <span class="new">hidden</span></h3>
+          <h3 data-n="14">Injection containment</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent follows instructions hidden in text it reads, such as an issue or a README. You can't patch that, so contain it: access, exposure, and exfiltration together are the lethal trifecta.</dd></div>
-            <div><dt class="how">How</dt><dd>Split the agent that reads from the agent that acts. The reader has no credentials and no egress, and returns only structured output. Assume something gets through, and keep the possible win small.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent reads text you don't control, like issues, web pages, or READMEs, and it can also take actions.</dd></div>
+            <div><dt class="how">How</dt><dd>Split the agent that reads from the agent that acts. The reader gets no credentials and no network, and it hands back only structured output. Assume something will get through, and keep what it could win small.</dd></div>
             <div><dt class="ex">Example</dt><dd>A README tells the agent to print its environment. The reader passes on a summary, and the actor never sees the raw text.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Put attacks in the eval set. <code>inj_003_readme_env.py</code> checks <code>gate_fired</code>, <code>no_egress</code>, and <code>env_not_in_output</code>. Either the gate fired or it did not.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Injected instructions never reach anything that can act. You can't patch injection away, but you can break the lethal trifecta: access, exposure, and exfiltration.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Put attacks in your eval set. <code>inj_003_readme_env.py</code> checks <code>gate_fired</code>, <code>no_egress</code>, and <code>env_not_in_output</code>.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/prompt-injection/">Prompt Injection in the Harness</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 38</p>
         </article>
@@ -1340,8 +1413,8 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
       <div>
         <h2>Narrow the recovery</h2>
         <p class="thesis">
-          The model will fail. The system decides what failure costs, and the record decides whether
-          you can learn from it.
+          The agent will fail sometimes. These tools decide what a failure costs you, and whether you
+          learn anything from it.
         </p>
       </div>
     </div>
@@ -1352,43 +1425,47 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-15">
           <h3 data-n="15">Loop bounds and cost ceilings</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent retries a bad input forever, or runs all night on one card. Failure is certain, so bounds decide whether it costs five dollars or a hundred.</dd></div>
-            <div><dt class="how">How</dt><dd>Set an iteration cap, a budget, and a timeout, each one independent. Make the ceiling throw, because an advisory limit "is a bill with commentary." Send poison items to a dead-letter queue after three tries. Test the kill switch before the first night.</dd></div>
-            <div><dt class="ex">Example</dt><dd>A gate blocks <code>money_is_integer</code>. The agent revises on retry 1 of 2, and the gate passes. A card that burns its budget goes to the dead-letter queue instead of looping.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Track cost per card and how many runs each bound stopped. In the book, a three-try dead-letter rule cut one run from $100 to $5.</dd></div>
+            <div><dt class="when">When</dt><dd>Before you leave any loop running without you.</dd></div>
+            <div><dt class="how">How</dt><dd>Set three separate limits: iterations, budget, and time. Make them throw an error, not log a warning. Move anything that fails three times to a dead-letter queue, and pull the kill switch once before the first night.</dd></div>
+            <div><dt class="ex">Example</dt><dd>One item failed on every attempt. With a three-try dead-letter rule, the run cost $5 instead of $100.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Failures still happen, but a bad input costs a few dollars and a dead letter, not a whole budget.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Track cost per run and how many runs each limit stopped.</dd></div>
           </dl>
-          <p class="more">Learn more · <a href="/audit-trail/">The Audit Trail</a> · <a href="/factory/">The Factory</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 35, 40</p>
+          <p class="more">Learn more · <a href="/factory/">The Factory</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 35, 40</p>
         </article>
 
         <article class="tool" id="t-16">
           <h3 data-n="16">Interrupts</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent guesses when it should ask, and the guess becomes a wrong change. Guessing is what kills contracts, so make asking cheaper than guessing.</dd></div>
-            <div><dt class="how">How</dt><dd>Each interrupt carries one question, two or three options, a recommendation, the cost of a wrong guess, and the resume state. Before it asks, the agent reads what is already written down.</dd></div>
-            <div><dt class="ex">Example</dt><dd>In a migration, each unit may return <code>UNCLEAR</code> with a question instead of guessing. About one unit in twenty did.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Chart interrupts by area each week. In the book, three areas made 80% of them, and those three became the next rules.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent guesses when it should ask, and the guess turns into a wrong change.</dd></div>
+            <div><dt class="how">How</dt><dd>Give every question five parts: the question, two or three options, a recommendation, the cost of a wrong guess, and where to resume. Have the agent read what's already written before it asks.</dd></div>
+            <div><dt class="ex">Example</dt><dd>In a migration, each unit could return <code>UNCLEAR</code> with a question instead of guessing. About one in twenty did.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Questions you can answer in a minute, and fewer wrong guesses. Each question also points at a gap in your docs.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Chart questions by area each week. In the book, three areas made 80% of them, and those three became the next rules.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/migration-harness/">The Migration Harness</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 48</p>
         </article>
 
         <article class="tool" id="t-17">
-          <h3 data-n="17">Small, reversible commits <span class="new">hidden</span></h3>
+          <h3 data-n="17">Small, reversible commits</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent turns a small fix into a large diff. Then a bad change can't be reverted without losing the good parts with it.</dd></div>
-            <div><dt class="how">How</dt><dd>Never mix a behavior change with a rename, a refactor, or formatting. Before the change, write three lines: what it does, the exact steps to undo it, and what the undo leaves behind.</dd></div>
-            <div><dt class="ex">Example</dt><dd>A 9-line retry fix came back as 280 lines in 11 files: a rename at 14 call sites, new constants, and an async rewrite. A five-second rollback became forty minutes at eleven at night.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Run <code>git rebase --exec 'make test' HEAD~2</code>, so each commit passes on its own. The undo steps exist before the merge.</dd></div>
+            <div><dt class="when">When</dt><dd>The agent turns a small fix into a big diff.</dd></div>
+            <div><dt class="how">How</dt><dd>Keep behavior changes apart from renames, refactors, and formatting. Before the change, write three lines: what it does, how to undo it, and what the undo leaves behind.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A 9-line retry fix came back as 280 lines across 11 files. A five-second rollback turned into forty minutes at eleven at night.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>You can revert any change without taking good work with it.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Run <code>git rebase --exec 'make test' HEAD~2</code>, so each commit passes on its own.</dd></div>
           </dl>
-          <p class="more">Learn more · <a href="/bisect-drill/">The Bisect Drill</a> · <a href="/migration-harness/">The Migration Harness</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 16–17</p>
+          <p class="more">Learn more · <a href="/bisect-drill/">The Bisect Drill</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 16–17</p>
         </article>
 
         <article class="tool" id="t-18">
           <h3 data-n="18">Evals</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>You can't tell whether a rule change made the agent better. One good run is one sample, so a frozen task set measures the band directly.</dd></div>
-            <div><dt class="how">How</dt><dd>Check in about twenty tasks and don't edit them casually. Score with exit codes and greps first, then a judge, then a human sample. Compare two outputs blind, never one alone, and run 30 or more per arm.</dd></div>
-            <div><dt class="ex">Example</dt><dd>At a 70% pass rate, a drop to 50% needs about 95 samples per arm to see. A rise to 80% needs about 300. So a small set catches regressions, not polish.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Report one of three outcomes: regression, improvement, or indistinguishable. Most edits land in the third, and that is a real result. Run it in CI on every rules change.</dd></div>
+            <div><dt class="when">When</dt><dd>You change a rule, a skill, a gate, or a model, and you want to know whether it helped.</dd></div>
+            <div><dt class="how">How</dt><dd>Check in about twenty tasks and leave them alone. Score with exit codes and greps first, then a judge, then a person spot-checking. Compare two outputs blind, and run each side 30 times or more.</dd></div>
+            <div><dt class="ex">Example</dt><dd>At a 70% pass rate, a drop to 50% takes about 95 runs per side to see. A rise to 80% takes about 300.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>You'll catch regressions reliably. You won't catch small wins, and most edits will come back "can't tell." That's a real answer.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Report one of three results: worse, better, or can't tell. Run it in CI on every rules change.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/eval-loop/">The Eval Loop</a> · <a href="/gauge/">Gauge</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 30, 46</p>
         </article>
@@ -1396,21 +1473,23 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-19">
           <h3 data-n="19">The factory</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>Parallel agent runs crash, collide, and merge for reasons nobody can find later. A factory makes each run recoverable and each merge explainable.</dd></div>
-            <div><dt class="how">How</dt><dd>Make the orchestrator a queue, not an agent: sequencing never goes to a model. Each phase has an exit, from a signed contract to a recorded lesson. Gates go before each action, and a record goes after it. Autonomy rises one level at a time, on evidence.</dd></div>
-            <div><dt class="ex">Example</dt><dd>A webhook chain needed three recovery layers. The reconciler that replaced it deleted more code than it added.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Each quarter, pick a change merged three months ago. From the record, name the rejected alternative, the rule that constrained it, and the accountable human.</dd></div>
+            <div><dt class="when">When</dt><dd>Several agents work a backlog in parallel, and runs crash, collide, or merge for reasons nobody can reconstruct.</dd></div>
+            <div><dt class="how">How</dt><dd>Run the work from a queue, not from an agent, so no model decides what runs next. Give each phase an exit. Put gates before actions, and write a record after each one.</dd></div>
+            <div><dt class="ex">Example</dt><dd>One run, step by step: plan, edit, a gate blocks <code>money_is_integer</code>, the agent revises on retry 1 of 2, the gate passes, verify, merge. Every step leaves a row.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>A crash resumes from the last step instead of starting over, and every merge has a reason on file.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Each quarter, pick a change merged three months ago. From the record alone, name the rejected alternative, the rule that applied, and the person accountable.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/factory/">The Factory</a> · <a href="/audit-trail/">The Audit Trail</a> · <a href="/open-refinery/">Open-Refinery</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 57–58</p>
         </article>
 
         <article class="tool" id="t-20">
-          <h3 data-n="20">The migration harness <span class="new">hidden</span></h3>
+          <h3 data-n="20">The migration harness</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>Agents alone are inconsistent across thousands of call sites, and a codemod alone guesses at the odd shapes. So each one takes only the part it does reliably.</dd></div>
-            <div><dt class="how">How</dt><dd>Count the shapes first. Then a codemod does the mechanical majority and refuses the rest, so agents get only the residue, one writer per file. The old code stays, as the oracle.</dd></div>
-            <div><dt class="ex">Example</dt><dd>Float dollars to integer cents across 10,412 sites. The codemod did 9,100, agents did 1,252, and 60 went to a human.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Replay 4.1M recorded inputs through old and new code, and explain each difference. "Zero differences means you have not migrated anything."</dd></div>
+            <div><dt class="when">When</dt><dd>One change has to land in thousands of places.</dd></div>
+            <div><dt class="how">How</dt><dd>Count the shapes first. Let a codemod do the mechanical bulk and refuse anything odd. Give agents only what it refused, one file each, and keep the old code running as the reference.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Moving float dollars to integer cents across 10,412 sites: the codemod did 9,100, agents did 1,252, and 60 went to a person.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>People spend their attention on 60 hard cases instead of 10,000 easy ones.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Replay 4.1M recorded inputs through the old and new code, and explain every difference. "Zero differences means you have not migrated anything."</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/migration-harness/">The Migration Harness</a> · <a href="/migrating-without-lying/">Migrating Without Lying</a></p>
         </article>
@@ -1430,10 +1509,9 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <span class="meter-label">Human</span>
       </div>
       <div>
-        <h2>The human rung</h2>
+        <h2>The human check</h2>
         <p class="thesis">
-          Review catches the bugs that have no rule yet. Every miss here becomes the next rule for
-          the levers above.
+          A person still catches the mistakes no rule covers yet. Each catch becomes the next rule.
         </p>
       </div>
     </div>
@@ -1444,34 +1522,37 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
         <article class="tool" id="t-21">
           <h3 data-n="21">The comprehension gate</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The agent's diff passes every check and is still wrong. Review is the only filter for defects that have no rule yet, and it works only if the reviewer can explain the change.</dd></div>
-            <div><dt class="how">How</dt><dd>The person who asks for the merge fills in four fields before the diff exists. The fields say what it does, where it enters and leaves, which rule it obeys, and what would make it wrong.</dd></div>
+            <div><dt class="when">When</dt><dd>Every check is green and the change is still wrong.</dd></div>
+            <div><dt class="how">How</dt><dd>Whoever asks for the merge fills in four fields before the diff exists. They say what it does, where it enters and leaves, which rule it follows, and what would prove it wrong.</dd></div>
             <div><dt class="ex">Example</dt><dd>"Adds a helper and updates two callers" describes the diff. "Cash totals now round down to the nickel instead of to the nearest one" describes the change.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>The falsifier names the test that covers it, or says <code>NONE</code>. Count catches per review, and <code>CHARTER-GAP</code> entries closed.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Reviews catch mistakes no rule covers yet, and each gap they find becomes a new rule.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>The "what would prove it wrong" field names a test, or says <code>NONE</code>. Count catches per review.</dd></div>
           </dl>
           <p class="more">Learn more · <a href="/comprehension-standard/">The Comprehension Standard</a> · <a href="/reverse-review/">Reverse-review</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 32 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 2, 22</p>
         </article>
 
         <article class="tool" id="t-22">
-          <h3 data-n="22">Drills <span class="new">hidden</span></h3>
+          <h3 data-n="22">Drills</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>Reviewers stop catching agent defects, and nothing measures it. The human check is the last filter on agent output, so practice keeps it sharp.</dd></div>
-            <div><dt class="how">How</dt><dd>Keep each drill short, repeated, and scored on the process, not the answer. So predict before you look, prove with a failing test or a concrete wrong output, and name the failure's class.</dd></div>
-            <div><dt class="ex">Example</dt><dd>The bisect drill: one regression, two hundred commits, no agent, 30 minutes a month. Verify the reproducer fails 5 of 5 on the bad commit and 0 of 5 on the good one before you search.</dd></div>
-            <div><dt class="prove">Prove it</dt><dd>Seed one known agent defect in a diff each week, and score four columns: found, proved, classified, durable fix. Don't total them. The flat column is the defect class that would ship.</dd></div>
+            <div><dt class="when">When</dt><dd>Agents write more of the code, and you're not sure your reviewers still catch what the agents get wrong.</dd></div>
+            <div><dt class="how">How</dt><dd>Keep drills short, regular, and scored on process. Predict before you look, prove it with a failing test or a concrete wrong output, then name the kind of failure.</dd></div>
+            <div><dt class="ex">Example</dt><dd>The bisect drill: one regression, two hundred commits, no agent, 30 minutes a month. Before you start, check that the reproducer fails 5 of 5 on the bad commit and 0 of 5 on the good one.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Reviewers who keep catching agent mistakes instead of slowly waving them through.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Seed one known mistake a week and score four columns: found, proved, classified, durable fix. Don't add them up. The flat column is the kind of mistake that would ship.</dd></div>
           </dl>
-          <p class="more">Learn more · <a href="/bisect-drill/">The Bisect Drill</a> · <a href="/reverse-review/">Reverse-review</a> · <a href="/mentors-playbook/">The Mentor's Playbook</a> · <a href="/cold-codebase/">Cold Codebase</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 11, 13</p>
+          <p class="more">Learn more · <a href="/bisect-drill/">The Bisect Drill</a> · <a href="/reverse-review/">Reverse-review</a> · <a href="/mentors-playbook/">The Mentor's Playbook</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 11, 13</p>
         </article>
 
         <article class="tool" id="t-23">
-          <h3 data-n="23">The rejection log <span class="new">hidden</span></h3>
+          <h3 data-n="23">The rejection log</h3>
           <dl>
-            <div><dt class="why">Why</dt><dd>The same agent defect comes back after you rejected it once. A log of rejections, with the cost of being wrong, shows which defects recur and should become rules.</dd></div>
-            <div><dt class="how">How</dt><dd>Log each rejection and each escape in one line: the date, the change, what you did, and the cost had you been wrong. Escapes go first. Keep it where it outlives the job.</dd></div>
+            <div><dt class="when">When</dt><dd>The same agent mistake comes back after you've already rejected it once.</dd></div>
+            <div><dt class="how">How</dt><dd>Write one line per rejection or escape: the date, the change, what you did, and what it would have cost if you were wrong.</dd></div>
             <div><dt class="ex">Example</dt><dd><code>2026-03-19 #431 approved the cache change; it broke stale reads in prod. now: every cache PR states its invalidation explicitly. two caught since, #455 and #470</code></dd></div>
-            <div><dt class="prove">Prove it</dt><dd>The "caught since" tail shows the behavior changed: that defect class stopped shipping. Aim for one to three entries a week.</dd></div>
+            <div><dt class="expect">Expect</dt><dd>Repeat mistakes become visible, and the repeats become rules.</dd></div>
+            <div><dt class="verify">Verify</dt><dd>Read the "caught since" tail. Aim for one to three entries a week.</dd></div>
           </dl>
-          <p class="more">Learn more · <a href="/evidence-of-judgment/">Evidence of Judgment</a> · <a href="/seniority-ladder/">The Seniority Ladder</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 23</p>
+          <p class="more">Learn more · <a href="/evidence-of-judgment/">Evidence of Judgment</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 23</p>
         </article>
 
       </div>
@@ -1483,47 +1564,32 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     <div class="rung-head">
       <div class="rung-index">
         <span class="num">6</span>
-        <div class="meter" role="img" aria-label="The loop">
+        <div class="meter" role="img" aria-label="Keep it going">
           <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
         </div>
         <span class="meter-label">Loop</span>
       </div>
       <div>
-        <h2>The process: move knowledge between the tools</h2>
+        <h2>Keep it going</h2>
         <p class="thesis">
-          The loop matters more than any one tool. A miss becomes a rule, a rule that leaks becomes a
-          gate, and a gate that stops firing gets deleted.
+          Every miss is a lesson. If something gets caught twice, make sure it can't happen a third time.
         </p>
       </div>
     </div>
 
     <div class="rung-body">
       <ol class="sequence">
-        <li data-signal="none"><span class="when">Notice</span><span class="what">A miss shows up in review (21), a gate ledger (11), the interrupt chart (16), or an eval (18).</span></li>
-        <li data-signal="none"><span class="when">Diagnose</span><span class="what">Name the symptom, the lever that failed, and the first fix. Then re-run the same prompt on the same main.</span></li>
-        <li data-signal="pass"><span class="when">Fix the cheapest true thing</span><span class="what">Usually that is the code (4) or the contract (1). Then the charter (2).</span></li>
-        <li data-signal="pass"><span class="when">Measure</span><span class="what">Run the eval before and after. If the result is indistinguishable, say so.</span></li>
-        <li data-signal="warn"><span class="when">Promote if it leaks</span><span class="what">Charter, then hook, then harness gate, then stage gate. Keep the prose rule at every step.</span></li>
-        <li data-signal="block"><span class="when">Prune</span><span class="what">Archive rules and tools that stop firing or describe code that has moved on.</span></li>
+        <li data-signal="none"><span class="when">Notice</span><span class="what">A miss shows up in review, in a gate's log, in the agent's questions, or in an eval.</span></li>
+        <li data-signal="pass"><span class="when">Place it</span><span class="what">Run down the twelve levers and fix it at the first one that fits.</span></li>
+        <li data-signal="warn"><span class="when">Measure</span><span class="what">Run the eval before and after. If you can't tell the difference, say so.</span></li>
+        <li data-signal="block"><span class="when">Prune</span><span class="what">Once a month, archive the rules and tools that stopped firing.</span></li>
       </ol>
-
-      <h3 class="sub">The cadence</h3>
-      <ul>
-        <li><b>Weekly, 15–30 minutes:</b> promote patterns seen three times. Once is noise, and twice is suggestive.</li>
-        <li><b>Monthly, 1–2 hours:</b> prune stale rules. Archive them; don't delete them.</li>
-        <li><b>After a miss:</b> hold a post-mortem when redo passes an hour, or when one failure repeats within two weeks. Ship one structural fix that you can check into git.</li>
-      </ul>
-      <p>
-        "What observability catches twice, governance should prevent the third time." <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a>
-        covers both flywheels in chapters 28–32.
-      </p>
 
       <div class="takeaway">
         <span class="label">Start this week</span>
         <p>
-          Pick the mistake your agent made most often last month. If the code teaches it, fix one
-          instance of the code. Then write it as a tiered charter rule, add one eval task that catches
-          it, and see where it leaks. That leak tells you the next rung.
+          Pick the mistake your agent made most often last month, and find its lever. Make the fix,
+          add one eval task that catches the mistake, and watch whether it comes back.
         </p>
       </div>
     </div>
@@ -1538,10 +1604,6 @@ td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
     <div>The talk · <a href="/harness-reliable-governable/">Reliable and Governable AI</a></div>
     <div>The books · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ·
       <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a></div>
-    <div>Colour encodes the signal:
-      <span style="color:var(--forest)">proof</span> ·
-      <span style="color:var(--gold-ink)">example</span> ·
-      <span style="color:var(--brick)">out of reach</span>.</div>
   </footer>
 
 </div>
