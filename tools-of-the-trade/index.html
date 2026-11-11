@@ -1,0 +1,1612 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+  <meta name="voice-register" content="informational">
+  <meta name="voice-english" content="ste">
+  <meta name="voice-first-person" content="exempt: index page; every judgment call lives on the linked page it summarizes">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools of the Trade · Harness Engineering · Ian Johnson</title>
+<meta name="author" content="Ian Johnson">
+<meta name="description" content="Twenty-three practices for reliable agent results, sorted by the lever each one pulls. For each: the agent behavior it fixes, how to do it, a real example, and how to prove the results changed. Plus the rules for picking a lever. By Ian Johnson.">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://www.tacoda.dev/tools-of-the-trade/">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="tacoda.dev">
+<meta property="og:title" content="Tools of the Trade">
+<meta property="og:description" content="Twenty-three practices for reliable agent results. The agent behavior each one fixes, a real example, and how to prove the results changed.">
+<meta property="og:url" content="https://www.tacoda.dev/tools-of-the-trade/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tools of the Trade">
+<meta name="twitter:description" content="Twenty-three practices for reliable agent results. The agent behavior each one fixes, a real example, and how to prove the results changed.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --brick:        #9C3A2A;
+  --brick-soft:   #C4614C;
+  --brick-wash:   #F4E4E0;
+  --gold:         #B8871F;
+  --gold-ink:         #785810;
+  --gold-soft:    #D6A93C;
+  --gold-wash:    #F7EEDA;
+  --forest:       #2F5D3A;
+  --forest-soft:  #4E8158;
+  --forest-wash:  #E3EDE4;
+
+  --ground:       #F1EEE8;
+  --surface:      #FBF9F5;
+  --surface-2:    #E8E3D9;
+  --ink:          #211C18;
+  --ink-2:        #4A423B;
+  --ink-3:        #6B6157;
+  --rule:         #D6CFC2;
+  --rule-soft:    #E4DED2;
+  --code-bg:      #ECE7DC;
+
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, ui-serif, serif;
+
+  --measure: 66ch;
+  --pad: clamp(1.25rem, 4vw, 3rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --brick:      #D9705C;
+    --brick-soft: #B9503C;
+    --brick-wash: #34211C;
+    --gold:       #D8AA43;
+    --gold-ink:       #D8AA43;
+    --gold-soft:  #B98F2E;
+    --gold-wash:  #322815;
+    --forest:     #71A87C;
+    --forest-soft:#4F8059;
+    --forest-wash:#1B2A1E;
+
+    --ground:     #191512;
+    --surface:    #211C18;
+    --surface-2:  #2C2621;
+    --ink:        #F0EAE1;
+    --ink-2:      #C3B9AC;
+    --ink-3:      #9A8E80;
+    --rule:       #3A322B;
+    --rule-soft:  #2E2823;
+    --code-bg:    #14100D;
+  }
+}
+
+:root[data-theme="dark"] {
+  --brick:      #D9705C;
+  --brick-soft: #B9503C;
+  --brick-wash: #34211C;
+  --gold:       #D8AA43;
+  --gold-ink:       #D8AA43;
+  --gold-soft:  #B98F2E;
+  --gold-wash:  #322815;
+  --forest:     #71A87C;
+  --forest-soft:#4F8059;
+  --forest-wash:#1B2A1E;
+
+  --ground:     #191512;
+  --surface:    #211C18;
+  --surface-2:  #2C2621;
+  --ink:        #F0EAE1;
+  --ink-2:      #C3B9AC;
+  --ink-3:      #9A8E80;
+  --rule:       #3A322B;
+  --rule-soft:  #2E2823;
+  --code-bg:    #14100D;
+}
+
+:root[data-theme="light"] {
+  --brick:      #9C3A2A;
+  --brick-soft: #C4614C;
+  --brick-wash: #F4E4E0;
+  --gold:       #B8871F;
+  --gold-ink:       #785810;
+  --gold-soft:  #D6A93C;
+  --gold-wash:  #F7EEDA;
+  --forest:     #2F5D3A;
+  --forest-soft:#4E8158;
+  --forest-wash:#E3EDE4;
+
+  --ground:     #F1EEE8;
+  --surface:    #FBF9F5;
+  --surface-2:  #E8E3D9;
+  --ink:        #211C18;
+  --ink-2:      #4A423B;
+  --ink-3:      #6B6157;
+  --rule:       #D6CFC2;
+  --rule-soft:  #E4DED2;
+  --code-bg:    #ECE7DC;
+}
+
+/* ---------- reset-ish ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- shell ---------- */
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 var(--pad) 6rem;
+}
+
+/* ---------- masthead ---------- */
+.masthead {
+  padding: clamp(3rem, 8vw, 5.5rem) 0 2.25rem;
+  border-bottom: 3px double var(--rule);
+}
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brick);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+}
+.eyebrow .sep { color: var(--rule); }
+.eyebrow .backlink {
+  color: var(--brick);
+  text-decoration: none;
+  border-bottom: 1px solid var(--brick-soft);
+  padding-bottom: 1px;
+}
+.eyebrow .backlink:hover,
+.eyebrow .backlink:focus-visible { border-bottom-color: var(--brick); }
+.masthead h1 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(2.1rem, 6vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+  max-width: 20ch;
+}
+.masthead h1 em {
+  font-style: normal;
+  color: var(--brick);
+}
+.standfirst {
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+}
+.byline {
+  margin-top: 1.75rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+.byline .by {
+  font-size: 0.63rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.byline .name {
+  font-weight: 700;
+  color: var(--ink);
+  border-bottom: 2px solid var(--gold);
+  padding-bottom: 1px;
+}
+.byline .role { color: var(--ink-3); }
+
+.provenance {
+  margin-top: 1.6rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+/* ---------- signal key ---------- */
+.signals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin: 2.5rem 0 0;
+}
+.signal {
+  background: var(--surface);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+.signal .swatch {
+  width: 14px; height: 14px;
+  flex: none;
+  margin-top: 0.3rem;
+  border-radius: 2px;
+}
+.signal .swatch.block  { background: var(--brick); }
+.signal .swatch.warn   { background: var(--gold); }
+.signal .swatch.pass   { background: var(--forest); }
+.signal .swatch.dim    { background: var(--ink-3); }
+.signal dt {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.signal dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* ---------- nav ---------- */
+.railnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  margin: 0 calc(var(--pad) * -1);
+  padding: 0 var(--pad);
+}
+.railnav ol {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+  max-height: 9.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 1.1rem), transparent);
+  scrollbar-width: thin;
+  margin-left: -0.9rem;
+}
+.railnav li { flex: none; }
+.railnav a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.55rem 0.9rem;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.railnav a .n {
+  font-weight: 700;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.railnav a:hover { color: var(--ink); border-bottom-color: var(--gold-soft); }
+.railnav a.is-active { color: var(--ink); border-bottom-color: var(--brick); }
+.railnav a.is-active .n { color: var(--brick); }
+.railnav a:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.railnav li.part {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.9rem 0.05rem;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  white-space: nowrap;
+  flex: 0 0 100%;
+}
+
+/* ---------- part divider ---------- */
+.part-rule {
+  padding: clamp(2.5rem, 6vw, 4rem) 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.part-rule .kicker {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-ink);
+  font-weight: 700;
+}
+.part-rule h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.part-rule p {
+  font-size: 0.98rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+}
+
+/* ---------- rung ---------- */
+.rung {
+  padding: clamp(3rem, 7vw, 4.75rem) 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: calc(var(--nav-h, 4rem) + 1rem);
+}
+.rung:last-of-type { border-bottom: 0; }
+
+.rung-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 2rem;
+}
+@media (min-width: 900px) {
+  .rung-head { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0 2.5rem; }
+  .rung-index { grid-row: span 3; }
+}
+
+.rung-index {
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.rung-index .num {
+  font-size: clamp(2.5rem, 7vw, 3.9rem);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.meter {
+  display: flex;
+  gap: 3px;
+}
+.meter i {
+  width: 11px; height: 11px;
+  border: 1.5px solid var(--gold-soft);
+  border-radius: 1px;
+  display: block;
+}
+.meter i.on { background: var(--gold); border-color: var(--gold); }
+.meter-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rung h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: clamp(1.35rem, 3.4vw, 1.95rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.rung .thesis {
+  font-size: 1.05rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  margin-top: 0.9rem;
+}
+
+/* ---------- chips ---------- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  border-radius: 2px;
+  color: var(--ink-2);
+}
+.chip b {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+}
+.chip.kind-rule    { border-left: 3px solid var(--gold);   }
+.chip.kind-rule b  { color: var(--gold-ink); }
+.chip.kind-hook    { border-left: 3px solid var(--brick);  }
+.chip.kind-hook b  { color: var(--brick); }
+.chip.kind-gate    { border-left: 3px solid var(--brick);  }
+.chip.kind-gate b  { color: var(--brick); }
+.chip.kind-make    { border-left: 3px solid var(--forest); }
+.chip.kind-make b  { color: var(--forest); }
+.chip.kind-skill   { border-left: 3px solid var(--gold);   }
+.chip.kind-skill b { color: var(--gold-ink); }
+.chip.kind-cmd     { border-left: 3px solid var(--gold);   }
+.chip.kind-cmd b   { color: var(--gold-ink); }
+.chip.kind-agent   { border-left: 3px solid var(--forest); }
+.chip.kind-agent b { color: var(--forest); }
+.chip.kind-config  { border-left: 3px solid var(--ink-3);  }
+.chip.kind-config b{ color: var(--ink-3); }
+
+/* ---------- body ---------- */
+.rung-body {
+  display: grid;
+  gap: 1.4rem;
+}
+@media (min-width: 900px) {
+  .rung-body { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1.4rem 2.5rem; }
+  .rung-body > * { grid-column: 2; }
+}
+.rung-body p { max-width: var(--measure); }
+
+h3.sub {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0.9rem 0 -0.4rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+h3.sub::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+/* ---------- firing sequence ---------- */
+.sequence {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+.sequence li {
+  background: var(--surface);
+  padding: 0.85rem 1.05rem;
+  display: grid;
+  grid-template-columns: 8.5rem minmax(0, 1fr);
+  gap: 0.35rem 1.1rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .sequence li { grid-template-columns: minmax(0, 1fr); }
+}
+.sequence .when {
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.sequence .what { font-size: 0.94rem; line-height: 1.5; }
+.sequence .what code { font-size: 0.86em; }
+.sequence li[data-signal="block"] { border-left: 3px solid var(--brick); }
+.sequence li[data-signal="warn"]  { border-left: 3px solid var(--gold); }
+.sequence li[data-signal="pass"]  { border-left: 3px solid var(--forest); }
+.sequence li[data-signal="none"]  { border-left: 3px solid var(--rule); }
+
+/* ---------- code ---------- */
+.code {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.code figcaption {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.code figcaption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+.code figcaption .tag.block { color: var(--brick); }
+.code figcaption .tag.warn  { color: var(--gold-ink); }
+.code figcaption .tag.pass  { color: var(--forest); }
+.code pre {
+  margin: 0;
+  padding: 0.95rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink);
+  tab-size: 2;
+}
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--code-bg);
+  padding: 0.1em 0.34em;
+  border-radius: 2px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.c-block  { color: var(--brick); }
+.c-warn   { color: var(--gold-ink); }
+.c-pass   { color: var(--forest); }
+.c-dim    { color: var(--ink-3); }
+
+/* ---------- diagrams ---------- */
+/* Mermaid source lives in the page and renders in the browser. The figure
+   body is transparent so the paper shows through the diagram; until the
+   script runs, the source is visible as text. */
+.code.diagram { background: none; }
+.code.diagram .mermaid {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.775rem;
+  line-height: 1.62;
+  color: var(--ink-3);
+  text-align: center;
+}
+.code.diagram .mermaid svg {
+  max-width: 100%;
+  height: auto;
+  background: transparent;
+}
+
+/* ---------- callouts ---------- */
+.callout {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--brick);
+  background: var(--brick-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.callout .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--brick);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.callout p { font-size: 0.95rem; max-width: 62ch; }
+
+.takeaway {
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--forest);
+  background: var(--forest-wash);
+  padding: 1rem 1.15rem;
+  border-radius: 2px;
+}
+.takeaway .label {
+  font-family: var(--mono);
+  font-size: 0.63rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--forest);
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.takeaway p { font-size: 0.95rem; max-width: 62ch; }
+
+/* ---------- data table ---------- */
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 3px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  min-width: 480px;
+}
+table.wide { min-width: 720px; }
+table.xwide { min-width: 880px; }
+caption {
+  caption-side: top;
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+caption .tag {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.6rem;
+}
+caption .tag.block { color: var(--brick); }
+caption .tag.warn  { color: var(--gold-ink); }
+caption .tag.pass  { color: var(--forest); }
+th, td {
+  padding: 0.45rem 0.9rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+  line-height: 1.5;
+}
+th {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  vertical-align: bottom;
+}
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.k { font-weight: 700; color: var(--ink); white-space: nowrap; }
+td em { font-style: normal; color: var(--ink-3); }
+tr.total td {
+  border-top: 2px solid var(--rule);
+  border-bottom: 0;
+  font-weight: 700;
+  background: var(--surface-2);
+}
+tr.flag td { color: var(--brick); }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr[data-signal] td:first-child { border-left: 3px solid var(--rule); }
+tbody tr[data-signal="block"] td:first-child { border-left-color: var(--brick); }
+tbody tr[data-signal="warn"]  td:first-child { border-left-color: var(--gold); }
+tbody tr[data-signal="pass"]  td:first-child { border-left-color: var(--forest); }
+tbody tr.group td {
+  background: var(--surface-2);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--rule);
+}
+/* coverage marks: full, partial, none */
+td.cov { text-align: center; font-size: 0.9rem; line-height: 1.2; }
+td.cov.y { color: var(--forest); }
+td.cov.p { color: var(--gold-ink); }
+td.cov.n { color: var(--rule); }
+
+/* ---------- matrix ---------- */
+.matrix {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0,1fr) minmax(0,1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--mono);
+  overflow: hidden;
+}
+@media (max-width: 620px) { .matrix { grid-template-columns: minmax(0,1fr); } }
+.matrix > * { background: var(--surface); padding: 0.75rem 0.85rem; }
+.matrix .hd, .matrix .rowhd {
+  background: var(--surface-2);
+  font-size: 0.6rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.matrix .rowhd { display: flex; align-items: center; }
+.matrix .cell .pos {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+}
+.matrix .cell.block .pos { color: var(--brick); }
+.matrix .cell.warn  .pos { color: var(--gold-ink); }
+.matrix .cell.pass  .pos { color: var(--forest); }
+.matrix .cell .m { display: block; font-size: 0.78rem; color: var(--ink); }
+.matrix .cell .n { display: block; font-size: 0.68rem; color: var(--ink-3); margin-top: 0.2rem; }
+
+/* ---------- the standard ---------- */
+.standard {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  counter-reset: std;
+  overflow: hidden;
+}
+.standard li {
+  background: var(--surface);
+  padding: 0.7rem 0.95rem;
+  display: grid;
+  grid-template-columns: 1.8rem minmax(0,1fr) auto;
+  gap: 0.2rem 0.85rem;
+  align-items: baseline;
+}
+@media (max-width: 620px) {
+  .standard li { grid-template-columns: 1.8rem minmax(0,1fr); }
+  .standard .ref { grid-column: 2; }
+}
+.standard li::before {
+  counter-increment: std;
+  content: counter(std);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--brick);
+  font-variant-numeric: tabular-nums;
+}
+.standard .t { font-size: 0.95rem; line-height: 1.45; }
+.standard .t b { font-weight: 600; }
+.standard .ref {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+</style>
+<style>
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a,
+.provenance a,
+footer a,
+.standfirst a,
+.thesis a,
+caption a,
+.takeaway a,
+.callout a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.nongoals { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.8; }
+a.xref { color: var(--brick); text-decoration: none;
+  border-bottom: 1px dotted var(--brick-soft); }
+a.xref:hover, a.xref:focus-visible { border-bottom-style: solid; }
+td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
+.nongoals b { color: var(--ink-2); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.62rem; }
+</style>
+<style>
+/* ---------- capability-page additions ---------- */
+footer {
+  padding: 3rem 0 0;
+  border-top: 3px double var(--rule);
+  margin-top: 3rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  line-height: 1.8;
+  display: grid;
+  gap: 0.5rem;
+}
+footer strong { color: var(--ink-2); font-weight: 600; }
+
+/* the four rungs get their own chip colors: open to hidden */
+.chip.kind-mcp    { border-left: 3px solid var(--forest); }
+.chip.kind-mcp b  { color: var(--forest); }
+.chip.kind-ctx    { border-left: 3px solid var(--gold);   }
+.chip.kind-ctx b  { color: var(--gold-ink); }
+.chip.kind-cost   { border-left: 3px solid var(--brick);  }
+.chip.kind-cost b { color: var(--brick); }
+
+/* price rail: the two costs, side by side, under a rung heading */
+.price {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  font-family: var(--mono);
+  overflow: hidden;
+}
+.price > div { background: var(--surface); padding: 0.7rem 0.85rem; }
+.price dt {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.price dd { margin: 0.3rem 0 0; font-size: 0.8rem; color: var(--ink); line-height: 1.5; }
+.price dd em { font-style: normal; color: var(--ink-3); }
+.price div.standing { border-left: 3px solid var(--brick); }
+.price div.invoked  { border-left: 3px solid var(--gold); }
+.price div.returns  { border-left: 3px solid var(--forest); }
+.price div.hides    { border-left: 3px solid var(--ink-3); }
+
+/* prose lists and cross-references, same as the sibling pages */
+.rung-body ul, .rung-body ol.plain { max-width: var(--measure); margin: 0; padding-left: 1.15rem; }
+.rung-body ul li, .rung-body ol.plain li { margin-bottom: 0.5rem; }
+.rung-body a, .provenance a, footer a { color: var(--brick); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.nongoals { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-3); line-height: 1.8; }
+.nongoals b { color: var(--ink-2); letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.62rem; }
+a.xref { color: var(--brick); text-decoration: none; border-bottom: 1px dotted var(--brick-soft); }
+a.xref:hover, a.xref:focus-visible { border-bottom-style: solid; }
+td a.xref, .standard .ref a.xref { border-bottom-color: var(--rule); }
+</style>
+<style>
+/* ---------- tools-of-the-trade additions ---------- */
+.tools {
+  display: grid;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 1.5rem 0 0;
+}
+.tool { background: var(--surface); padding: 1.1rem 1.2rem 1rem; scroll-margin-top: calc(var(--nav-h, 4rem) + 1rem); }
+.tool h3 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 1.02rem;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.75rem;
+  color: var(--ink);
+}
+.tool h3::before { content: attr(data-n); color: var(--brick); margin-right: 0.5rem; font-variant-numeric: tabular-nums; }
+.tool h3 .new {
+  font-size: 0.58rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--gold-ink); border: 1px solid var(--gold-soft); border-radius: 2px;
+  padding: 0.05rem 0.35rem; margin-left: 0.5rem; vertical-align: 0.15em;
+}
+.tool dl { margin: 0; display: grid; gap: 0.55rem; }
+.tool dl > div { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr); gap: 0.75rem; }
+@media (max-width: 640px) { .tool dl > div { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; } }
+.tool dt {
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.13em;
+  text-transform: uppercase; font-weight: 700; padding-top: 0.32rem; color: var(--ink-3);
+}
+.tool dt.why  { color: var(--ink-2); }
+.tool dt.how  { color: var(--brick); }
+.tool dt.ex   { color: var(--gold-ink); }
+.tool dt.prove{ color: var(--forest); }
+.tool dd { margin: 0; font-size: 0.95rem; line-height: 1.55; max-width: var(--measure); }
+.tool dd code { font-size: 0.84em; }
+.tool .more {
+  margin: 0.8rem 0 0; font-family: var(--mono); font-size: 0.7rem; color: var(--ink-3); line-height: 1.7;
+}
+.tool .more a { color: var(--brick); text-underline-offset: 2px; text-decoration-thickness: 1px; }
+.rung-body table { font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <a class="backlink" href="/resources">← Resources</a>
+      <span class="sep">/</span>
+      <span>Harness Engineering</span>
+      <span class="sep">/</span>
+      <span>Tools of the Trade</span>
+      <span class="sep">/</span>
+      <span>field guide</span>
+    </div>
+    <h1>The tools of the trade for <em>reliable agents</em></h1>
+    <p class="standfirst">
+      An agent will never give the same answer twice. Reliable results and behavior mean the answers
+      stay inside a band your team can read, debug, and ship. Three levers narrow that band: the input, the output,
+      and the recovery. This page sorts twenty-three practices by the lever each one pulls. For each one you
+      get the agent behavior it fixes, how to do it, one real example, and how to prove the results changed. The cost: every
+      practice needs measuring, and most charter edits measure as no change at all.
+    </p>
+    <p class="byline">
+      <span class="by">Words by</span>
+      <span class="name">Ian Johnson</span>
+      <span class="role">author of <em>Harness Engineering</em> · tacoda.dev</span>
+    </p>
+
+    <div class="provenance">
+      who it's for · engineers and teams who ship agent-written code<br>
+      what it is · a field guide. Each practice stands on its own, and its links go deeper<br>
+      what you need · one repository, one agent, and one mistake the agent keeps making<br>
+      pairs with · <a href="/harness-reliable-governable/">Reliable and Governable AI</a> (the talk) · <a href="/whose-gate-is-it/">Whose Gate Is It</a> (the map)<br>
+      sources · the linked pages, <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a>, and <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a><br>
+      the honest limit · every number here is from one team or one experiment. Yours will differ
+    </div>
+
+    <dl class="signals">
+      <div class="signal">
+        <span class="swatch dim"></span>
+        <div>
+          <dt>Why</dt>
+          <dd>The agent behavior it fixes, and why it works. <b>How</b> follows with the steps.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch warn"></span>
+        <div>
+          <dt>Example</dt>
+          <dd>One concrete case, taken from a linked page or one of the books.</dd>
+        </div>
+      </div>
+      <div class="signal">
+        <span class="swatch pass"></span>
+        <div>
+          <dt>Prove it</dt>
+          <dd>The number, test, or artifact that shows the agent's results changed.</dd>
+        </div>
+      </div>
+    </dl>
+  </header>
+
+  <nav class="railnav" aria-label="Sections">
+    <ol>
+      <li class="part">the frame</li>
+      <li><a href="#s-0"><span class="n">0</span> The metric</a></li>
+      <li><a href="#s-1"><span class="n">1</span> Pick your lever</a></li>
+      <li class="part">the tools</li>
+      <li><a href="#s-2"><span class="n">2</span> Narrow the input</a></li>
+      <li><a href="#s-3"><span class="n">3</span> Narrow the output</a></li>
+      <li><a href="#s-4"><span class="n">4</span> Narrow the recovery</a></li>
+      <li><a href="#s-5"><span class="n">5</span> The human rung</a></li>
+      <li class="part">the process</li>
+      <li><a href="#s-6"><span class="n">6</span> The loop</a></li>
+    </ol>
+  </nav>
+
+  <!-- ============ 0 ============ -->
+  <section class="rung" id="s-0">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">0</span>
+        <div class="meter" role="img" aria-label="The premise">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">The band</span>
+      </div>
+      <div>
+        <h2>Reliability is a band, not a repeat</h2>
+        <p class="thesis">
+          You can't make the model deterministic. You can make the workflow deterministic, and then
+          measure how wide the band of results is.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <p>
+        <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> defines reliability as "variance that stays inside a band you can read, debug, and
+        ship." Each of those three words names one lever. If any one lever is missing, the run feels
+        unreliable, even when the other two hold.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Word</th><th>Lever</th><th>What it narrows</th><th>Tools</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>read</td><td>Narrow the input</td><td>what the agent knows before it acts</td><td>1–7</td></tr>
+            <tr><td>debug</td><td>Narrow the output</td><td>what it may produce and ship</td><td>8–14</td></tr>
+            <tr><td>ship</td><td>Narrow the recovery</td><td>what happens when it fails anyway</td><td>15–20</td></tr>
+            <tr><td>all three</td><td>The human rung</td><td>what no predicate or judge can see</td><td>21–23</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">How to measure the band</h3>
+      <p>
+        Run the same task set twice: once with a change, once without. Use at least 30 runs per arm,
+        and score each run blind against its intent contract. Then compare the failure rate and the
+        band width. Don't compare the best run. <a href="/eval-loop/">The Eval Loop</a> has the
+        procedure, and tool 18 below is its summary.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">The claim this page defends</span>
+        <p>
+          Filters compose. No single tool here has to be perfect. A gate that catches 80% of its
+          class is still sharp, and each tool removes failures the others let through.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 1 ============ -->
+  <section class="rung" id="s-1">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">1</span>
+        <div class="meter" role="img" aria-label="Decide">
+          <i class="on"></i><i></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Decide</span>
+      </div>
+      <div>
+        <h2>Pick your lever in two questions</h2>
+        <p class="thesis">
+          First find which word failed. Then find where the control goes. Most bad fixes are a good
+          control at the wrong address.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <h3 class="sub">Question 1 · which word failed?</h3>
+      <ol class="sequence">
+        <li data-signal="none"><span class="when">Couldn't read it</span><span class="what">The agent solved the wrong problem, used the wrong words, or copied a bad pattern. <b>Narrow the input</b>: tools 1–7.</span></li>
+        <li data-signal="warn"><span class="when">Couldn't debug it</span><span class="what">The work broke a rule, ran a command it shouldn't, or passed checks and was still wrong. <b>Narrow the output</b>: tools 8–14.</span></li>
+        <li data-signal="block"><span class="when">Couldn't ship it</span><span class="what">The run crashed, looped, burned budget, or nobody can say why it merged. <b>Narrow the recovery</b>: tools 15–20.</span></li>
+      </ol>
+
+      <h3 class="sub">Question 2 · where does the control go?</h3>
+      <p>Apply these rules in order. Stop at the first one that answers.</p>
+      <ol class="sequence">
+        <li data-signal="pass"><span class="when">The code teaches it</span><span class="what">Fix the code before you write a rule. The agent copies code before it obeys prose (tool 4).</span></li>
+        <li data-signal="pass"><span class="when">Nobody wrote it down</span><span class="what">Write it as a contract for one task (tool 1), or as a charter rule for every task (tool 2).</span></li>
+        <li data-signal="warn"><span class="when">It has "then" in it</span><span class="what">It is a sequence, not a rule. Make it a command or a skill (tool 7).</span></li>
+        <li data-signal="warn"><span class="when">Code can decide it</span><span class="what">Make it a check. Run the checker; don't ask the model to read the file (tools 10–12).</span></li>
+        <li data-signal="warn"><span class="when">Only judgment can decide it</span><span class="what">Keep the prose rule, and add a judge or a human (tools 8, 21).</span></li>
+        <li data-signal="block"><span class="when">The agent can reach the enforcer</span><span class="what">If the damage is real, move the check out of reach, into the harness (tool 11). Anything the agent can edit is not a control.</span></li>
+        <li data-signal="block"><span class="when">It governs what ships</span><span class="what">It belongs in the factory, at a stage gate (tool 19), not in the charter.</span></li>
+        <li data-signal="none"><span class="when">You want a second agent</span><span class="what">Add one only for separate memory, a separate refusal scope, or a separate tool surface (tool 8).</span></li>
+        <li data-signal="none"><span class="when">It's about order of steps</span><span class="what">Sequencing never goes to a model. Put it in the workflow (tool 19).</span></li>
+      </ol>
+
+      <h3 class="sub">Four rules that hold at every address</h3>
+      <ul>
+        <li><b>Lowest rung first.</b> Start at the cheapest control that holds. Promote it only after an incident shows it leaks.</li>
+        <li><b>Cost of being wrong sets the speed.</b> A leaked secret earns a gate on sight, while a style preference earns a linter.</li>
+        <li><b>The platform sets the floor.</b> Teams can tighten a control and never loosen it (<a href="/whose-gate-is-it/">Whose Gate Is It</a>).</li>
+        <li><b>No move without a measurement.</b> Every promotion and every deletion ships with an eval result (tool 18).</li>
+      </ul>
+      <p>
+        <a href="/journey-of-a-rule/">The Journey of a Rule</a> walks one rule through all six homes.
+        <a href="/constraint-engineering/">Constraint Engineering</a> gives the full model.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section class="rung" id="s-2">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">2</span>
+        <div class="meter" role="img" aria-label="Input">
+          <i class="on"></i><i class="on"></i><i></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Input</span>
+      </div>
+      <div>
+        <h2>Narrow the input</h2>
+        <p class="thesis">
+          What the agent knows before it acts. Instruction is the weakest signal, and the code it
+          imitates is the strongest.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tools">
+
+        <article class="tool" id="t-1">
+          <h3 data-n="01">The intent contract</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent solves a neighboring problem, or the right one at the wrong size. Intent that lives in a private chat can't be checked by the harness, the reviewers, or other agents.</dd></div>
+            <div><dt class="how">How</dt><dd>Write seven fixed sections: outcome, signal, scope in, scope out, acceptance criteria, risk surface, and open questions. Every criterion must be able to fail, and every open question gets a default. Then sign it before work starts.</dd></div>
+            <div><dt class="ex">Example</dt><dd>"Tests look fine" can't fail. "A new test fails on the merge base and passes on HEAD" can.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Count criteria marked not met at review, and contracts reopened after signing. Both fall as contracts get sharper.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/factory/">The Factory</a> · <a href="/ghola/">Ghola</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 47–48</p>
+        </article>
+
+        <article class="tool" id="t-2">
+          <h3 data-n="02">The charter</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent repeats a mistake that is specific to this codebase. A rule stops the repeat, but only if it's true, because a rule the code doesn't follow teaches the agent that rules are optional.</dd></div>
+            <div><dt class="how">How</dt><dd>Start empty. Add a rule after the third occurrence, or at once if the cost is high. Mark it iron, golden, or preference. Give it a reason with a mechanism and a number, and say what enforces it.</dd></div>
+            <div><dt class="ex">Example</dt><dd>"Use <code>clients.http</code> for every third-party call, never <code>requests</code>. The wrapper sets a 4-second timeout." The reason: an outage held all 16 workers for 23 minutes. The limit: it doesn't catch the 61 files already on the old pattern.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Each quarter, check 20 rules against 5 recent files. A rule that holds in fewer than 4 is aspirational: fix the code or demote the rule.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/anatomy-of-a-charter/">Anatomy of a Charter</a> · <a href="/migrating-without-lying/">Migrating Without Lying</a> · <a href="/keystone/">Keystone</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 11–12 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 21</p>
+        </article>
+
+        <article class="tool" id="t-3">
+          <h3 data-n="03">Context and memory</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent uses the wrong word, acts on stale facts, or gets worse as the session grows. Each of those comes from what it loaded, so fix what loads.</dd></div>
+            <div><dt class="how">How</dt><dd>Load reference material on demand, not at start, and keep one meaning per term in a glossary. Derive state from the system of record instead of memory. When nobody knows a rule, ask a person and write the answer down.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Is shipping refunded on an $84.00 order? A question in the support channel got an answer in 11 minutes. It became <code>ADR-014: Shipping is not refunded once the carrier has scanned</code>, and the agent reads it from then on.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Count files loaded at session start: seventeen means the corpus leaks, three means the layers work. Count corrections you repeat across sessions.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/guardrails/">Five Guardrails</a> · <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 13, 15–16 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 14</p>
+        </article>
+
+        <article class="tool" id="t-4">
+          <h3 data-n="04">The legible codebase</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent copies the code's bad habits instead of following your rules. When a name and a rule disagree, the name wins, so fix the code before you write the rule.</dd></div>
+            <div><dt class="how">How</dt><dd>Draw module boundaries and enforce them with an import linter. Catalog the seams where work enters and leaves. Rename vague names, and give each rename a sentence that says what it makes clear. Replace clever code with boring code.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Same <code>CLAUDE.md</code>, same prompt, two repos. One diff touched 9 files in 5 packages and silenced tests, while the other touched 4 files and stayed green. The difference was the imports.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Track files touched per change. On the book's eight-question architecture checklist, three or more "no" answers predict an eleven-file diff.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/cold-codebase/">Cold Codebase</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 17–18 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 8–9</p>
+        </article>
+
+        <article class="tool" id="t-5">
+          <h3 data-n="05">Characterization tests</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent can't tell a fix from a regression in code nobody specified, and neither can you. Pinned behavior gives it a definition of correct that it can check by itself.</dd></div>
+            <div><dt class="how">How</dt><dd>Start where damage is highest: money, permissions, customer data. Assert today's output with literal values, and test outputs rather than calls. Then gate edits to these tests, because an agent under pressure rewrites the test instead of the code.</dd></div>
+            <div><dt class="ex">Example</dt><dd><code>assert shipping_fee(0, "domestic") == 4.99  # Pinned, not endorsed.</code> The value looks wrong, but a warehouse report depends on it.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Break the code on purpose: flip <code>&gt;</code> to <code>&gt;=</code>, or return a constant. The suite must go red. If it stays green, the test never covered that line.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/legacy-with-an-agent/">Legacy Code With an Agent</a> · <a href="/layers-and-promotion/">Layers and Promotion</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 19 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 12, 15</p>
+        </article>
+
+        <article class="tool" id="t-6">
+          <h3 data-n="06">Driving with a falsifier <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent writes plausible code by default, and plausible isn't correct. When the prompt asks for the failure case, the agent looks for the failure before it writes.</dd></div>
+            <div><dt class="how">How</dt><dd>Ask for the smallest input that would make the change wrong. To check a change, have the agent argue against it using only evidence it can point to in the repo.</dd></div>
+            <div><dt class="ex">Example</dt><dd>"Before you write it, tell me the input that would make your version send twice anyway, and the input that would make it skip a send it should have made."</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Each falsifier the agent names becomes a test. Count the defects those tests catch before review.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/junior-to-senior/">Junior to Senior</a> · <a href="/cold-codebase/">Cold Codebase</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 19</p>
+        </article>
+
+        <article class="tool" id="t-7">
+          <h3 data-n="07">Skills and commands</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent does a repeated job differently every time. A skill fixes the steps, but every capability costs context on every turn, so a weak one makes all output slightly worse.</dd></div>
+            <div><dt class="how">How</dt><dd>Pick the lowest rung that closes the gap: command, skill, sub-agent, plugin, server. Write a skill's description as its trigger, since it's the only part always in context. End each phase with an artifact, never with "done". Read every command you run.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A prompt run six times by three engineers earns a command. A rule with "then" in it is a sequence, so it becomes a skill.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Read four numbers from the transcripts: fires per week, right when it fires, used after it returns, and missed when it should fire. Zero fires means delete it.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/capability-ladder/">The Capability Ladder</a> · <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 20–21</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section class="rung" id="s-3">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">3</span>
+        <div class="meter" role="img" aria-label="Output">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
+        </div>
+        <span class="meter-label">Output</span>
+      </div>
+      <div>
+        <h2>Narrow the output</h2>
+        <p class="thesis">
+          What the agent may produce. Sensors report and gates refuse, and a gate holds only the part
+          of a rule that code can decide.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tools">
+
+        <article class="tool" id="t-8">
+          <h3 data-n="08">Sub-agents and judges</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent's context fills with search output, and its answers degrade. A second agent with its own memory fixes that. But "the task is hard" is not a reason to add one.</dd></div>
+            <div><dt class="how">How</dt><dd>Define the return format first: a few bullets with <code>file:line</code> evidence, no prose. Give a builder a refusal scope. Open a judge's prompt with "Default to FAIL", and calibrate it like any other instrument.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A team planned four agents. A 15-line rule file that named the downstream consumer and three fixtures did the same job.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Validate each judge against 20 human labels. Pin the judge's model, because a change resets the history.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/eval-loop/">The Eval Loop</a> · <a href="/constraint-engineering/">Constraint Engineering</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 20, 49</p>
+        </article>
+
+        <article class="tool" id="t-9">
+          <h3 data-n="09">Permissions and sandboxing</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent runs a command it shouldn't, or prompts so often that people bypass the check. Too loose is a blast radius, and too tight is a bypass flag by Thursday.</dd></div>
+            <div><dt class="how">How</dt><dd>Deny by default. Name each intent, and put it behind one make target. If a check can't reach a confident yes, fail closed. Put the sandbox under the allowlist, not in place of it, and give no production access, read or write.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Allow <code>make test</code> and deny <code>php artisan test</code>. The allowlist fits on one screen, and Docker is the floor under whatever <code>make</code> leaves open.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Track prompts per session, because a rising count means a bypass is coming. Log every call to an append-only audit log.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/narrow-door/">The Narrow Door</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 21, 37</p>
+        </article>
+
+        <article class="tool" id="t-10">
+          <h3 data-n="10">Hooks</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent breaks a mechanical rule it has read many times. A hook checks every time, not when the agent remembers, and it reports while the agent still holds the context.</dd></div>
+            <div><dt class="how">How</dt><dd>Write the check as a function that returns pass or fail with a reason. Then fire it on the earliest event that has the data. Print one line per error, location first, and stay silent on success.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A rounding check on every edit: <code>round_cash(1083) = 1085, but the customer's-favor amount is 1080</code>. The hook blocks with exit 2, and the agent fixes it in the same turn.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Track fires per week and how often the next attempt passes. Keep pre-commit under 30 seconds: one hook grew from 28 seconds to 4 minutes, and the team stopped running it.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/guardrails/">Five Guardrails</a> · <a href="/junior-to-senior/">Junior to Senior</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 19–20</p>
+        </article>
+
+        <article class="tool" id="t-11">
+          <h3 data-n="11">Harness gates</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent deletes the hook, skips it, or edits the test until it passes. Anything the agent can edit is not a control, so the check moves into the harness, out of reach.</dd></div>
+            <div><dt class="how">How</dt><dd>Reuse the hook's predicate. Only the mount point changes. Return the reason on refusal, allow two retries, then escalate. Keep the prose rule too, because a gate holds only the part code can decide.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A tenant query used <code>session.tenant_id</code> where it needed <code>request.path.tenant_id</code>. Both versions passed the gate. Only one served the right invoice.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Switch the rung off and compare runs. Run one check outside the pipeline too: in one experiment the pipeline said done, and <code>make gate-run</code> found 2 violations.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/harness/">Promotion to the Harness</a> · <a href="/layers-and-promotion/">Layers and Promotion</a> · <a href="/journey-of-a-rule/">The Journey of a Rule</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 22</p>
+        </article>
+
+        <article class="tool" id="t-12">
+          <h3 data-n="12">Determinism by script <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent gives a different verdict each time it inspects the same file. Code gives the same verdict every time, so move each verdict a script can settle into a script.</dd></div>
+            <div><dt class="how">How</dt><dd>Find the decidable part of each judgment and put it in a script. Then change the instruction from "read and confirm" to "run and fix".</dd></div>
+            <div><dt class="ex">Example</dt><dd>"Read the migration and confirm it is reversible" invites variance. "Run the checker and fix what it reports" removes it.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Run the step five times on the same input and count the distinct answers. One is determinism. Two is "a coin flip wearing a procedure." The test takes ten minutes.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/keeping-capabilities-honest/">Keeping Capabilities Honest</a></p>
+        </article>
+
+        <article class="tool" id="t-13">
+          <h3 data-n="13">Ratchets <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent copies the old pattern, because most of the code still uses it. A rule that bans the old pattern fails on every legacy file, so a ratchet stops only the spread.</dd></div>
+            <div><dt class="how">How</dt><dd>Count uses of the old pattern in the lines a change adds, not in the whole repo. Then fail the build on any new use, and leave existing files alone until someone touches them.</dd></div>
+            <div><dt class="ex">Example</dt><dd><code>ratchet.sh</code> with <code>PATTERN='ApiCaller'</code> prints "This change adds 1 use(s) of ApiCaller" and exits 1.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>New uses of the old pattern stay at zero. The total count only goes down.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/migrating-without-lying/">Migrating Without Lying</a> · <a href="/legacy-with-an-agent/">Legacy Code With an Agent</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 18</p>
+        </article>
+
+        <article class="tool" id="t-14">
+          <h3 data-n="14">Injection containment <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent follows instructions hidden in text it reads, such as an issue or a README. You can't patch that, so contain it: access, exposure, and exfiltration together are the lethal trifecta.</dd></div>
+            <div><dt class="how">How</dt><dd>Split the agent that reads from the agent that acts. The reader has no credentials and no egress, and returns only structured output. Assume something gets through, and keep the possible win small.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A README tells the agent to print its environment. The reader passes on a summary, and the actor never sees the raw text.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Put attacks in the eval set. <code>inj_003_readme_env.py</code> checks <code>gate_fired</code>, <code>no_egress</code>, and <code>env_not_in_output</code>. Either the gate fired or it did not.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/prompt-injection/">Prompt Injection in the Harness</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 38</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section class="rung" id="s-4">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">4</span>
+        <div class="meter" role="img" aria-label="Recovery">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i>
+        </div>
+        <span class="meter-label">Recovery</span>
+      </div>
+      <div>
+        <h2>Narrow the recovery</h2>
+        <p class="thesis">
+          The model will fail. The system decides what failure costs, and the record decides whether
+          you can learn from it.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tools">
+
+        <article class="tool" id="t-15">
+          <h3 data-n="15">Loop bounds and cost ceilings</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent retries a bad input forever, or runs all night on one card. Failure is certain, so bounds decide whether it costs five dollars or a hundred.</dd></div>
+            <div><dt class="how">How</dt><dd>Set an iteration cap, a budget, and a timeout, each one independent. Make the ceiling throw, because an advisory limit "is a bill with commentary." Send poison items to a dead-letter queue after three tries. Test the kill switch before the first night.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A gate blocks <code>money_is_integer</code>. The agent revises on retry 1 of 2, and the gate passes. A card that burns its budget goes to the dead-letter queue instead of looping.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Track cost per card and how many runs each bound stopped. In the book, a three-try dead-letter rule cut one run from $100 to $5.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/audit-trail/">The Audit Trail</a> · <a href="/factory/">The Factory</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 35, 40</p>
+        </article>
+
+        <article class="tool" id="t-16">
+          <h3 data-n="16">Interrupts</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent guesses when it should ask, and the guess becomes a wrong change. Guessing is what kills contracts, so make asking cheaper than guessing.</dd></div>
+            <div><dt class="how">How</dt><dd>Each interrupt carries one question, two or three options, a recommendation, the cost of a wrong guess, and the resume state. Before it asks, the agent reads what is already written down.</dd></div>
+            <div><dt class="ex">Example</dt><dd>In a migration, each unit may return <code>UNCLEAR</code> with a question instead of guessing. About one unit in twenty did.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Chart interrupts by area each week. In the book, three areas made 80% of them, and those three became the next rules.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/migration-harness/">The Migration Harness</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 48</p>
+        </article>
+
+        <article class="tool" id="t-17">
+          <h3 data-n="17">Small, reversible commits <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent turns a small fix into a large diff. Then a bad change can't be reverted without losing the good parts with it.</dd></div>
+            <div><dt class="how">How</dt><dd>Never mix a behavior change with a rename, a refactor, or formatting. Before the change, write three lines: what it does, the exact steps to undo it, and what the undo leaves behind.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A 9-line retry fix came back as 280 lines in 11 files: a rename at 14 call sites, new constants, and an async rewrite. A five-second rollback became forty minutes at eleven at night.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Run <code>git rebase --exec 'make test' HEAD~2</code>, so each commit passes on its own. The undo steps exist before the merge.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/bisect-drill/">The Bisect Drill</a> · <a href="/migration-harness/">The Migration Harness</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 16–17</p>
+        </article>
+
+        <article class="tool" id="t-18">
+          <h3 data-n="18">Evals</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>You can't tell whether a rule change made the agent better. One good run is one sample, so a frozen task set measures the band directly.</dd></div>
+            <div><dt class="how">How</dt><dd>Check in about twenty tasks and don't edit them casually. Score with exit codes and greps first, then a judge, then a human sample. Compare two outputs blind, never one alone, and run 30 or more per arm.</dd></div>
+            <div><dt class="ex">Example</dt><dd>At a 70% pass rate, a drop to 50% needs about 95 samples per arm to see. A rise to 80% needs about 300. So a small set catches regressions, not polish.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Report one of three outcomes: regression, improvement, or indistinguishable. Most edits land in the third, and that is a real result. Run it in CI on every rules change.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/eval-loop/">The Eval Loop</a> · <a href="/gauge/">Gauge</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 30, 46</p>
+        </article>
+
+        <article class="tool" id="t-19">
+          <h3 data-n="19">The factory</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>Parallel agent runs crash, collide, and merge for reasons nobody can find later. A factory makes each run recoverable and each merge explainable.</dd></div>
+            <div><dt class="how">How</dt><dd>Make the orchestrator a queue, not an agent: sequencing never goes to a model. Each phase has an exit, from a signed contract to a recorded lesson. Gates go before each action, and a record goes after it. Autonomy rises one level at a time, on evidence.</dd></div>
+            <div><dt class="ex">Example</dt><dd>A webhook chain needed three recovery layers. The reconciler that replaced it deleted more code than it added.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Each quarter, pick a change merged three months ago. From the record, name the rejected alternative, the rule that constrained it, and the accountable human.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/factory/">The Factory</a> · <a href="/audit-trail/">The Audit Trail</a> · <a href="/open-refinery/">Open-Refinery</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 57–58</p>
+        </article>
+
+        <article class="tool" id="t-20">
+          <h3 data-n="20">The migration harness <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>Agents alone are inconsistent across thousands of call sites, and a codemod alone guesses at the odd shapes. So each one takes only the part it does reliably.</dd></div>
+            <div><dt class="how">How</dt><dd>Count the shapes first. Then a codemod does the mechanical majority and refuses the rest, so agents get only the residue, one writer per file. The old code stays, as the oracle.</dd></div>
+            <div><dt class="ex">Example</dt><dd>Float dollars to integer cents across 10,412 sites. The codemod did 9,100, agents did 1,252, and 60 went to a human.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Replay 4.1M recorded inputs through old and new code, and explain each difference. "Zero differences means you have not migrated anything."</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/migration-harness/">The Migration Harness</a> · <a href="/migrating-without-lying/">Migrating Without Lying</a></p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section class="rung" id="s-5">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">5</span>
+        <div class="meter" role="img" aria-label="Human">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Human</span>
+      </div>
+      <div>
+        <h2>The human rung</h2>
+        <p class="thesis">
+          Review catches the bugs that have no rule yet. Every miss here becomes the next rule for
+          the levers above.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <div class="tools">
+
+        <article class="tool" id="t-21">
+          <h3 data-n="21">The comprehension gate</h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The agent's diff passes every check and is still wrong. Review is the only filter for defects that have no rule yet, and it works only if the reviewer can explain the change.</dd></div>
+            <div><dt class="how">How</dt><dd>The person who asks for the merge fills in four fields before the diff exists. The fields say what it does, where it enters and leaves, which rule it obeys, and what would make it wrong.</dd></div>
+            <div><dt class="ex">Example</dt><dd>"Adds a helper and updates two callers" describes the diff. "Cash totals now round down to the nickel instead of to the nearest one" describes the change.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>The falsifier names the test that covers it, or says <code>NONE</code>. Count catches per review, and <code>CHARTER-GAP</code> entries closed.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/comprehension-standard/">The Comprehension Standard</a> · <a href="/reverse-review/">Reverse-review</a> · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ch. 32 · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 2, 22</p>
+        </article>
+
+        <article class="tool" id="t-22">
+          <h3 data-n="22">Drills <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>Reviewers stop catching agent defects, and nothing measures it. The human check is the last filter on agent output, so practice keeps it sharp.</dd></div>
+            <div><dt class="how">How</dt><dd>Keep each drill short, repeated, and scored on the process, not the answer. So predict before you look, prove with a failing test or a concrete wrong output, and name the failure's class.</dd></div>
+            <div><dt class="ex">Example</dt><dd>The bisect drill: one regression, two hundred commits, no agent, 30 minutes a month. Verify the reproducer fails 5 of 5 on the bad commit and 0 of 5 on the good one before you search.</dd></div>
+            <div><dt class="prove">Prove it</dt><dd>Seed one known agent defect in a diff each week, and score four columns: found, proved, classified, durable fix. Don't total them. The flat column is the defect class that would ship.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/bisect-drill/">The Bisect Drill</a> · <a href="/reverse-review/">Reverse-review</a> · <a href="/mentors-playbook/">The Mentor's Playbook</a> · <a href="/cold-codebase/">Cold Codebase</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 11, 13</p>
+        </article>
+
+        <article class="tool" id="t-23">
+          <h3 data-n="23">The rejection log <span class="new">hidden</span></h3>
+          <dl>
+            <div><dt class="why">Why</dt><dd>The same agent defect comes back after you rejected it once. A log of rejections, with the cost of being wrong, shows which defects recur and should become rules.</dd></div>
+            <div><dt class="how">How</dt><dd>Log each rejection and each escape in one line: the date, the change, what you did, and the cost had you been wrong. Escapes go first. Keep it where it outlives the job.</dd></div>
+            <div><dt class="ex">Example</dt><dd><code>2026-03-19 #431 approved the cache change; it broke stale reads in prod. now: every cache PR states its invalidation explicitly. two caught since, #455 and #470</code></dd></div>
+            <div><dt class="prove">Prove it</dt><dd>The "caught since" tail shows the behavior changed: that defect class stopped shipping. Aim for one to three entries a week.</dd></div>
+          </dl>
+          <p class="more">Learn more · <a href="/evidence-of-judgment/">Evidence of Judgment</a> · <a href="/seniority-ladder/">The Seniority Ladder</a> · <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a> ch. 23</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section class="rung" id="s-6">
+    <div class="rung-head">
+      <div class="rung-index">
+        <span class="num">6</span>
+        <div class="meter" role="img" aria-label="The loop">
+          <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i>
+        </div>
+        <span class="meter-label">Loop</span>
+      </div>
+      <div>
+        <h2>The process: move knowledge between the tools</h2>
+        <p class="thesis">
+          The loop matters more than any one tool. A miss becomes a rule, a rule that leaks becomes a
+          gate, and a gate that stops firing gets deleted.
+        </p>
+      </div>
+    </div>
+
+    <div class="rung-body">
+      <ol class="sequence">
+        <li data-signal="none"><span class="when">Notice</span><span class="what">A miss shows up in review (21), a gate ledger (11), the interrupt chart (16), or an eval (18).</span></li>
+        <li data-signal="none"><span class="when">Diagnose</span><span class="what">Name the symptom, the lever that failed, and the first fix. Then re-run the same prompt on the same main.</span></li>
+        <li data-signal="pass"><span class="when">Fix the cheapest true thing</span><span class="what">Usually that is the code (4) or the contract (1). Then the charter (2).</span></li>
+        <li data-signal="pass"><span class="when">Measure</span><span class="what">Run the eval before and after. If the result is indistinguishable, say so.</span></li>
+        <li data-signal="warn"><span class="when">Promote if it leaks</span><span class="what">Charter, then hook, then harness gate, then stage gate. Keep the prose rule at every step.</span></li>
+        <li data-signal="block"><span class="when">Prune</span><span class="what">Archive rules and tools that stop firing or describe code that has moved on.</span></li>
+      </ol>
+
+      <h3 class="sub">The cadence</h3>
+      <ul>
+        <li><b>Weekly, 15–30 minutes:</b> promote patterns seen three times. Once is noise, and twice is suggestive.</li>
+        <li><b>Monthly, 1–2 hours:</b> prune stale rules. Archive them; don't delete them.</li>
+        <li><b>After a miss:</b> hold a post-mortem when redo passes an hour, or when one failure repeats within two weeks. Ship one structural fix that you can check into git.</li>
+      </ul>
+      <p>
+        "What observability catches twice, governance should prevent the third time." <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a>
+        covers both flywheels in chapters 28–32.
+      </p>
+
+      <div class="takeaway">
+        <span class="label">Start this week</span>
+        <p>
+          Pick the mistake your agent made most often last month. If the code teaches it, fix one
+          instance of the code. Then write it as a tiered charter rule, add one eval task that catches
+          it, and see where it leaks. That leak tells you the next rung.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div><strong>Tools of the Trade</strong>, a field guide.
+      <strong>Ian Johnson</strong>, <em>Harness Engineering</em>.</div>
+    <div>The map · <a href="/whose-gate-is-it/">Whose Gate Is It</a> ·
+      <a href="/constraint-engineering/">Constraint Engineering</a> ·
+      <a href="/journey-of-a-rule/">The Journey of a Rule</a></div>
+    <div>The talk · <a href="/harness-reliable-governable/">Reliable and Governable AI</a></div>
+    <div>The books · <a href="https://leanpub.com/harness-engineering"><em>Harness Engineering</em></a> ·
+      <a href="https://leanpub.com/the-last-check"><em>The Last Check</em></a></div>
+    <div>Colour encodes the signal:
+      <span style="color:var(--forest)">proof</span> ·
+      <span style="color:var(--gold-ink)">example</span> ·
+      <span style="color:var(--brick)">out of reach</span>.</div>
+  </footer>
+
+</div>
+<script>
+  /* Section nav: mark the section currently being read, and keep that item
+     visible when the rail has wrapped to more rows than it can show. */
+  (function () {
+    var nav = document.querySelector('.railnav');
+    if (!nav) return;
+    var ol = nav.querySelector('ol');
+    var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+    var map = {}, sections = [];
+    links.forEach(function (a) {
+      var el = document.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));
+      if (!el) return;
+      map[el.id] = a;
+      sections.push(el);
+    });
+    if (!sections.length) return;
+
+    function measure() {
+      document.documentElement.style.setProperty(
+        '--nav-h', nav.getBoundingClientRect().height + 'px');
+    }
+    measure();
+
+    var active = null;
+    function activate(el) {
+      var a = map[el.id];
+      if (!a || a === active) return;
+      if (active) { active.classList.remove('is-active'); active.removeAttribute('aria-current'); }
+      active = a;
+      a.classList.add('is-active');
+      a.setAttribute('aria-current', 'true');
+      if (ol && ol.scrollHeight > ol.clientHeight + 4) {
+        ol.scrollTop = a.offsetTop - ol.clientHeight / 2 + a.offsetHeight / 2;
+      }
+    }
+
+    /* The section being read is the last one whose top has passed under the
+       rail. Picking the topmost box that merely overlaps a band gets this
+       wrong wherever two sections straddle it. */
+    function pick() {
+      /* Sections land at scroll-margin-top (rail height + 1rem) after a jump,
+         so the line has to sit just below that or the target never counts. */
+      var line = nav.getBoundingClientRect().height + 24;
+      var current = sections[0];
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].getBoundingClientRect().top <= line) current = sections[i];
+        else break;
+      }
+      activate(current);
+    }
+
+    var last = 0, trailing = null;
+    function onScroll() {
+      var now = Date.now();
+      if (now - last > 80) { last = now; pick(); return; }
+      clearTimeout(trailing);
+      trailing = setTimeout(function () { last = Date.now(); pick(); }, 80);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', function () { measure(); onScroll(); });
+    pick();
+  })();
+</script>
+</body>
+</html>
